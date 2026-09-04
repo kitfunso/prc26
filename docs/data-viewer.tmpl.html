@@ -1,0 +1,272 @@
+<title>Taxi-Out Data Viewer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f5f6f8; --panel:#ffffff; --ink:#151a21; --ink2:#59626f; --ink3:#8a929e;
+  --rule:#d8dce3; --rule2:#eceef2;
+  --accent:#2a78d6; --accent-ink:#1c5cab;
+  --blank:#d03b3b; --blank-bg:#fbeaea;
+  --s100:#cde2fb;--s200:#9ec5f4;--s300:#6da7ec;--s400:#3987e5;--s500:#256abf;--s600:#184f95;--s700:#0d366b;
+  --tip-bg:#151a21; --tip-ink:#f5f6f8;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#16181c; --panel:#1e2126; --ink:#f1f3f6; --ink2:#a6adb8; --ink3:#6f7784;
+    --rule:#30343b; --rule2:#262a30;
+    --accent:#3987e5; --accent-ink:#86b6ef;
+    --blank:#e66767; --blank-bg:#3a2224;
+    --s100:#0d366b;--s200:#184f95;--s300:#256abf;--s400:#3987e5;--s500:#6da7ec;--s600:#9ec5f4;--s700:#cde2fb;
+    --tip-bg:#f1f3f6; --tip-ink:#16181c;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#16181c; --panel:#1e2126; --ink:#f1f3f6; --ink2:#a6adb8; --ink3:#6f7784;
+  --rule:#30343b; --rule2:#262a30;
+  --accent:#3987e5; --accent-ink:#86b6ef;
+  --blank:#e66767; --blank-bg:#3a2224;
+  --s100:#0d366b;--s200:#184f95;--s300:#256abf;--s400:#3987e5;--s500:#6da7ec;--s600:#9ec5f4;--s700:#cde2fb;
+  --tip-bg:#f1f3f6; --tip-ink:#16181c;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+main{max-width:1240px;margin:0 auto;padding:36px 28px 80px;display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:"IBM Plex Sans Condensed","Arial Narrow",sans-serif;text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:40px;font-weight:700;letter-spacing:-.01em}
+h2{font-size:24px;font-weight:700}
+h3{font-size:16px;font-weight:600;color:var(--ink2)}
+p{max-width:68ch;margin:0}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.mono,code,td.m{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-size:13px}
+header{display:flex;flex-direction:column;gap:14px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden;margin-top:8px}
+.tile{background:var(--panel);padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.tile b{font-family:"IBM Plex Sans Condensed",sans-serif;font-size:28px;font-weight:700;line-height:1.1}
+.tile span{font-size:12.5px;color:var(--ink2)}
+section{display:flex;flex-direction:column;gap:14px}
+.sec-head{display:flex;flex-direction:column;gap:6px}
+.scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:6px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--rule2);white-space:nowrap;vertical-align:top}
+th{position:sticky;top:0;background:var(--panel);font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid var(--rule)}
+tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right}
+td.target{color:var(--accent-ink);font-weight:600}
+.blank{color:var(--blank);background:var(--blank-bg);font-size:11px;font-weight:600;padding:1px 6px;border-radius:3px;letter-spacing:.04em;text-transform:uppercase}
+.gloss{white-space:normal;max-width:46ch;min-width:30ch;color:var(--ink2)}
+.bar{display:inline-block;height:9px;background:var(--accent);border-radius:0 2px 2px 0;vertical-align:middle}
+.small-mult{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:12px 12px 8px;display:flex;flex-direction:column;gap:4px}
+.panel .t{display:flex;justify-content:space-between;align-items:baseline}
+.panel .t b{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:500}
+.panel .t span{font-size:12px;color:var(--ink2)}
+svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{font-family:"IBM Plex Sans",sans-serif;fill:var(--ink2);font-size:11px}
+svg .axis{stroke:var(--rule);stroke-width:1}
+svg .grid{stroke:var(--rule2);stroke-width:1}
+svg .bar-mark{fill:var(--accent)}
+svg .bar-mark.dim{fill:var(--s200)}
+svg .bar-mark:hover{fill:var(--accent-ink)}
+svg .med{stroke:var(--ink);stroke-width:1.5}
+.wide{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:16px}
+.legend{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink2)}
+.legend .ramp{width:160px;height:10px;border-radius:2px;background:linear-gradient(90deg,var(--s100),var(--s400),var(--s700))}
+#tip{position:fixed;pointer-events:none;background:var(--tip-bg);color:var(--tip-ink);font:12.5px/1.4 "IBM Plex Sans",sans-serif;padding:6px 9px;border-radius:4px;max-width:260px;z-index:9;opacity:0;transition:opacity .08s}
+#tip b{font-family:"IBM Plex Mono",monospace;font-weight:500}
+.note{font-size:13.5px;color:var(--ink2);max-width:78ch}
+.two{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;align-items:start}
+@media (max-width:900px){.tiles{grid-template-columns:repeat(2,1fr)}.small-mult{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){#tip{transition:none}}
+</style>
+
+<main>
+<header>
+  <div class="eyebrow">PRC Data Challenge 2026 &middot; bucket prc-2026-datasets &middot; pulled 4 Sep 2026</div>
+  <h1>Taxi-Out Data Viewer</h1>
+  <p>Every row is one aircraft movement at one of ten airports. For departures the target is <code>TAXITIME_SEC_mvt</code>: seconds from off-block at the stand to wheels-up on the runway. The ranking set blanks that column and the off-block time; everything else stays.</p>
+  <div class="tiles" id="tiles"></div>
+</header>
+
+<section>
+  <div class="sec-head"><h2>Files and months</h2>
+  <p class="note">Twelve monthly training files cover 2025. The ranking file holds January and July 2026, plus a handful of stragglers timestamped 1 August. Departures and arrivals are near 50:50; only departures carry the target.</p></div>
+  <div class="two">
+    <div class="wide"><h3>Departures per training month</h3><div id="months"></div></div>
+    <div class="scroll"><table id="ranktab"></table></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Twenty-four real rows</h2>
+  <p class="note">Heathrow departures from 06:00Z on Tuesday 15 July 2025, in takeoff order, all 30 columns. Times are UTC and trimmed to the clock. The highlighted column is the target; the two columns marked <span class="blank">blank in ranking</span> are what the ranking file removes.</p></div>
+  <div class="scroll" style="max-height:640px;overflow:auto"><table id="sample"></table></div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Column catalogue</h2>
+  <p class="note">Coverage is over the 2,085,047 training departures that have a target, and over the 344,841 ranking departures. <code>_mvt</code> columns come from the airport's own records, <code>_flt</code> columns from the Network Manager flight list joined onto them; the join misses about 1.4% of rows, which is why every <code>_flt</code> column sits at the same coverage.</p></div>
+  <div class="scroll"><table id="cat"></table></div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Taxi-out by airport</h2>
+  <p class="note">Heathrow is the slowest airport by a wide margin. Rome has a broken tail: 1,967 taxi-outs longer than an hour and a maximum of 131,167 s, which is 36 hours, against a p90 of 28 minutes. Zurich has 313 zero-or-negative values. Those rows need handling before anything is fit on them.</p></div>
+  <div class="scroll"><table id="apts"></table></div>
+  <div class="small-mult" id="hists"></div>
+  <p class="note">Bars are one-minute bins, shared x-axis 0 to 45+ minutes, the last bin catches everything longer. Each panel has its own y-scale. The dark tick is the median.</p>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Median taxi-out by hour of day</h2>
+  <p class="note">UTC hour of takeoff. The morning departure bank shows at every airport; Istanbul and Madrid run late into the local evening. Night cells at Frankfurt, Munich and Zurich rest on a handful of flights because of curfews.</p></div>
+  <div class="wide">
+    <div id="heat"></div>
+    <div class="legend" style="margin-top:10px"><span id="heat-lo"></span><div class="ramp"></div><span id="heat-hi"></span><span style="margin-left:6px">median seconds &middot; hover a cell for the count</span></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>The off-block clue that survives blanking</h2>
+  <p class="note">The Network Manager's own actual off-block time, <code>AOBT_3_flt</code>, is left in the ranking file. Takeoff minus that is a direct guess at taxi-out. This is how far that guess misses the true value, over every 2025 departure that has both.</p></div>
+  <div class="two">
+    <div class="wide"><h3>Takeoff &minus; AOBT_3 &minus; true taxi-out, 30-second bins</h3><div id="leak"></div></div>
+    <div class="scroll"><table id="leaktab"></table></div>
+  </div>
+  <p class="note">The middle is tight but the shoulders are heavy. NM records off-block to the minute and from a different source than the airport, so the two clocks disagree by minutes on a large minority of flights. Used raw this scores about 385 s RMSE over the year; the current leaderboard leader is at 249 s.</p>
+</section>
+</main>
+<div id="tip"></div>
+
+<script id="data" type="application/json">/*DATA*/</script>
+<script>
+const D = JSON.parse(document.getElementById('data').textContent);
+const fmt = n => n.toLocaleString('en-GB');
+const el = (t, a={}, ...kids) => { const e = document.createElement(t); for (const [k,v] of Object.entries(a)) e.setAttribute(k, v); for (const k of kids) e.append(k); return e; };
+const NS = 'http://www.w3.org/2000/svg';
+const sv = (t, a={}) => { const e = document.createElementNS(NS, t); for (const [k,v] of Object.entries(a)) e.setAttribute(k, v); return e; };
+const tip = document.getElementById('tip');
+function hover(node, html){
+  node.addEventListener('mousemove', e => { tip.innerHTML = html; tip.style.opacity = 1; tip.style.left = (e.clientX + 14) + 'px'; tip.style.top = (e.clientY + 14) + 'px'; });
+  node.addEventListener('mouseleave', () => tip.style.opacity = 0);
+}
+const clock = s => s ? s.slice(11,19) : '';
+const mmss = s => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+
+// tiles
+const totalRows = D.months.reduce((a,m)=>a+m.rows,0);
+const rankRows = D.ranking.reduce((a,m)=>a+m.rows,0);
+for (const [b, s] of [[fmt(totalRows), 'training movements, 2025, 12 files'], [fmt(D.n_dep_train), 'training departures with a target'], [fmt(rankRows), 'ranking movements, Jan + Jul 2026'], [fmt(D.n_dep_rank), 'ranking departures to predict']])
+  document.getElementById('tiles').append(el('div', {class:'tile'}, el('b', {}, b), el('span', {}, s)));
+
+// months bar chart
+(function(){
+  const W=560, H=200, L=50, R=10, T=14, B=30, w=W-L-R, h=H-T-B;
+  const max = Math.max(...D.months.map(m=>m.dep));
+  const svg = sv('svg', {viewBox:`0 0 ${W} ${H}`});
+  const step = 50000;
+  for (let v=0; v<=max; v+=step){ const y=T+h-(v/max)*h; svg.append(sv('line',{x1:L,x2:L+w,y1:y,y2:y,class:'grid'})); const t=sv('text',{x:L-6,y:y+4,'text-anchor':'end'}); t.textContent=(v/1000)+'k'; svg.append(t); }
+  const bw = w/D.months.length;
+  D.months.forEach((m,i)=>{ const bh=(m.dep/max)*h, x=L+i*bw+3, y=T+h-bh;
+    const r=sv('rect',{x,y,width:bw-6,height:bh,rx:2,class:'bar-mark'}); hover(r,`<b>${m.month}</b><br>${fmt(m.dep)} departures<br>${fmt(m.arr)} arrivals`); svg.append(r);
+    const t=sv('text',{x:x+(bw-6)/2,y:T+h+16,'text-anchor':'middle'}); t.textContent=['J','F','M','A','M','J','J','A','S','O','N','D'][i]; svg.append(t); });
+  svg.append(sv('line',{x1:L,x2:L+w,y1:T+h,y2:T+h,class:'axis'}));
+  document.getElementById('months').append(svg);
+})();
+
+// ranking months table
+(function(){
+  const t=document.getElementById('ranktab');
+  t.append(el('thead',{},el('tr',{},el('th',{},'Ranking month'),el('th',{class:'n'},'Rows'),el('th',{class:'n'},'Departures'),el('th',{class:'n'},'Arrivals'))));
+  const tb=el('tbody'); for(const m of D.ranking) tb.append(el('tr',{},el('td',{class:'m'},m.month),el('td',{class:'n'},fmt(m.rows)),el('td',{class:'n'},fmt(m.dep)),el('td',{class:'n'},fmt(m.arr))));
+  t.append(tb);
+})();
+
+// sample rows
+const BLANK = new Set(['BLOCK_TIME_UTC_mvt','TAXITIME_SEC_mvt']);
+const TS = new Set(['MVT_TIME_UTC_mvt','BLOCK_TIME_UTC_mvt','SCHED_TIME_UTC_mvt','LOBT_flt','IOBT_flt','EOBT_1_flt','ARVT_1_flt','AOBT_3_flt','ARVT_3_flt']);
+(function(){
+  const t=document.getElementById('sample'); const cols=Object.keys(D.sample[0]);
+  const hr=el('tr'); for(const c of cols){ const th=el('th',{},c.replace(/_(mvt|flt)$/,'')); if(BLANK.has(c)) th.append(' ',el('span',{class:'blank'},'blank in ranking')); if(c.endsWith('_flt')) th.style.color='var(--ink3)'; hr.append(th); }
+  t.append(el('thead',{},hr));
+  const tb=el('tbody');
+  for(const r of D.sample){ const tr=el('tr'); for(const c of cols){ let v=r[c]; if(v==null) v='';
+    else if(TS.has(c)) v=clock(v); else if(c==='AIRCRAFT_OPERATOR_flt') v=String(v).slice(0,8)+'…'; else if(typeof v==='number' && c.endsWith('_ID_mvt')) v=String(Math.round(v));
+    const td=el('td',{class: c==='TAXITIME_SEC_mvt' ? 'm target n' : 'm'}, String(v)); if(c==='TAXITIME_SEC_mvt') td.title=mmss(r[c])+' min'; tr.append(td);} tb.append(tr); }
+  t.append(tb);
+})();
+
+// column catalogue
+const GLOSS = {
+ MVT_ID_mvt:'Unique id of the movement record. Submission key.', FLIGHT_ID_mvt:'Network Manager flight id, where the join matched.', FLIGHT_mvt:'Flight number as printed on the boarding pass.', FLIGHT_RULE_mvt:'I instrument, V visual, NA unknown.', ADEP_mvt:'Departure aerodrome, ICAO.', ADES_mvt:'Destination aerodrome, ICAO.', PHASE_mvt:'DEP or ARR at the reporting airport.', MVT_TIME_UTC_mvt:'Takeoff (DEP) or landing (ARR).', BLOCK_TIME_UTC_mvt:'Off-block (DEP) or in-block (ARR). Removed for ranking departures.', SCHED_TIME_UTC_mvt:'Scheduled departure or arrival.', AIRCRAFT_TYPE_mvt:'ICAO type designator, e.g. A21N.', RUNWAY_mvt:'Runway used. Fully present in ranking.', STAND_mvt:'Stand id. Airport-specific naming.', TAXITIME_SEC_mvt:'THE TARGET. Takeoff minus off-block, seconds.',
+ LOBT_flt:'Last known off-block time, NM.', CALLSIGN_flt:'ATC callsign, e.g. BAW6VB.', ADEP_flt:'Departure aerodrome per NM.', ADES_flt:'Destination per NM.', ADES_FILED_flt:'Destination in the filed plan; differs from ADES_flt on a diversion.', MARKET_SEGMENT_flt:'Mainline, Regional, Low-Cost, Business Aviation, All-Cargo, Charter, Other, Not classified.', IOBT_flt:'Initial off-block time from the first flight plan.', FLIGHT_RULE_flt:'I, V, Y (IFR then VFR), Z (VFR then IFR).', FLIGHT_TYPE_flt:'S scheduled, N non-scheduled, G general aviation, X other.', AIRCRAFT_TYPE_flt:'ICAO type per NM.', WK_TBL_CAT_flt:'Wake category: L light, M medium, H heavy, J super.', AIRCRAFT_OPERATOR_flt:'Airline designator, hashed.', EOBT_1_flt:'Estimated off-block, filed plan (M1).', ARVT_1_flt:'Arrival time, filed plan (M1).', AOBT_3_flt:'Actual off-block, flown trajectory (M3). Present in ranking.', ARVT_3_flt:'Arrival time, flown trajectory (M3).'
+};
+(function(){
+  const t=document.getElementById('cat');
+  t.append(el('thead',{},el('tr',{},el('th',{},'Column'),el('th',{},'Type'),el('th',{},'Meaning'),el('th',{class:'n'},'Training coverage'),el('th',{class:'n'},'Ranking coverage'),el('th',{class:'n'},'Distinct'),el('th',{},'Examples'))));
+  const tb=el('tbody');
+  for(const c of D.catalogue){ const pt=100*c.nonnull_train/D.n_dep_train, pr=100*c.nonnull_rank/D.n_dep_rank;
+    const cov=(p,tot)=>{ const d=el('td',{class:'n'}); d.append(el('span',{class:'bar',style:`width:${Math.max(1,p*0.6)}px;margin-right:6px`}), p.toFixed(1)+'%'); if(p===0){d.innerHTML=''; d.append(el('span',{class:'blank'},'blanked'));} return d; };
+    const ex = c.examples.map(e=> TS.has(c.col)? e.slice(0,19).replace('T',' ') : (c.col==='AIRCRAFT_OPERATOR_flt'? e.slice(0,10)+'…' : (c.col.endsWith('_ID_mvt')? String(Math.round(+e)) : e))).join(' · ');
+    const name=el('td',{class:'m'},c.col); if(c.col==='TAXITIME_SEC_mvt') name.classList.add('target');
+    tb.append(el('tr',{},name,el('td',{class:'m',style:'color:var(--ink3)'},c.type.replace(' WITH TIME ZONE','TZ')),el('td',{class:'gloss'},GLOSS[c.col]||''),cov(pt),cov(pr),el('td',{class:'n'},fmt(c.distinct)),el('td',{class:'m',style:'color:var(--ink2)'},ex))); }
+  t.append(tb);
+})();
+
+// airports table
+(function(){
+  const t=document.getElementById('apts');
+  t.append(el('thead',{},el('tr',{},el('th',{},'Airport'),el('th',{class:'n'},'Departures'),el('th',{class:'n'},'p10'),el('th',{class:'n'},'Median'),el('th',{class:'n'},'p90'),el('th',{class:'n'},'Mean'),el('th',{class:'n'},'SD'),el('th',{class:'n'},'Max'),el('th',{class:'n'},'> 1 hour'),el('th',{class:'n'},'≤ 0'))));
+  const tb=el('tbody'); const maxN=Math.max(...D.airports.map(a=>a.n));
+  for(const a of D.airports){ const nd=el('td',{class:'n'}); nd.append(el('span',{class:'bar',style:`width:${100*a.n/maxN}px;margin-right:6px`}),fmt(a.n));
+    const flag=(v,bad)=>{const d=el('td',{class:'n'},fmt(v)); if(bad) d.style.color='var(--blank)'; return d;};
+    tb.append(el('tr',{},el('td',{class:'m'},a.apt),nd,el('td',{class:'n'},mmss(a.p10)),el('td',{class:'n',style:'font-weight:600'},mmss(a.p50)),el('td',{class:'n'},mmss(a.p90)),el('td',{class:'n'},mmss(a.mean)),flag(a.sd,a.sd>600),flag(a.mx,a.mx>20000),flag(a.over1h,a.over1h>1000),flag(a.nonpos,a.nonpos>100))); }
+  t.append(tb);
+})();
+
+// histograms, small multiples
+(function(){
+  const W=220,H=110,L=4,R=4,T=6,B=18,w=W-L-R,h=H-T-B; const bins=46;
+  const by={}; for(const r of D.hist){ (by[r.apt]??=Array(bins).fill(0))[r.m]=r.n; }
+  const med=Object.fromEntries(D.airports.map(a=>[a.apt,a.p50]));
+  for(const a of D.airports){ const arr=by[a.apt]; const max=Math.max(...arr); const svg=sv('svg',{viewBox:`0 0 ${W} ${H}`}); const bw=w/bins;
+    arr.forEach((n,i)=>{ const bh=(n/max)*h; const r=sv('rect',{x:L+i*bw+0.5,y:T+h-bh,width:bw-1,height:bh,class:'bar-mark'+(i===bins-1?' dim':'')}); hover(r,`<b>${a.apt}</b> ${i===bins-1?'45+':i+'–'+(i+1)} min<br>${fmt(n)} departures`); svg.append(r); });
+    const mx=L+(med[a.apt]/60)*bw; svg.append(sv('line',{x1:mx,x2:mx,y1:T-2,y2:T+h,class:'med'}));
+    svg.append(sv('line',{x1:L,x2:L+w,y1:T+h,y2:T+h,class:'axis'}));
+    for(const m of [0,15,30,45]){ const t=sv('text',{x:L+m*bw+(m===45?-2:0),y:H-4,'text-anchor':m===0?'start':(m===45?'end':'middle')}); t.textContent=m===45?'45+':m; svg.append(t); }
+    document.getElementById('hists').append(el('div',{class:'panel'},el('div',{class:'t'},el('b',{},a.apt),el('span',{},'median '+mmss(a.p50))),svg)); }
+})();
+
+// heatmap
+(function(){
+  const apts=D.airports.map(a=>a.apt); const vals=D.hour.filter(r=>r.n>=30).map(r=>r.p50); const lo=Math.min(...vals), hi=Math.max(...vals);
+  document.getElementById('heat-lo').textContent=mmss(lo); document.getElementById('heat-hi').textContent=mmss(hi);
+  const ramp=['--s100','--s200','--s300','--s400','--s500','--s600','--s700'];
+  const cw=40,ch=26,L=56,T=22,W=L+24*cw+4,H=T+apts.length*ch+4;
+  const svg=sv('svg',{viewBox:`0 0 ${W} ${H}`});
+  for(let hh=0;hh<24;hh++){ const t=sv('text',{x:L+hh*cw+cw/2,y:T-8,'text-anchor':'middle'}); t.textContent=String(hh).padStart(2,'0'); svg.append(t); }
+  apts.forEach((a,i)=>{ const t=sv('text',{x:L-8,y:T+i*ch+ch/2+4,'text-anchor':'end',style:'font-family:"IBM Plex Mono",monospace;font-size:12px'}); t.textContent=a; svg.append(t); });
+  const idx={}; for(const r of D.hour) idx[r.apt+':'+r.h]=r;
+  apts.forEach((a,i)=>{ for(let hh=0;hh<24;hh++){ const r=idx[a+':'+hh]; if(!r) continue; const thin=r.n<30; const k=Math.min(6,Math.floor(((r.p50-lo)/(hi-lo||1))*7));
+    const rect=sv('rect',{x:L+hh*cw+1,y:T+i*ch+1,width:cw-2,height:ch-2,rx:2,fill:`var(${ramp[Math.max(0,k)]})`,opacity:thin?0.35:1});
+    hover(rect,`<b>${a}</b> ${String(hh).padStart(2,'0')}:00–${String(hh).padStart(2,'0')}:59Z<br>median ${mmss(r.p50)} min<br>${fmt(r.n)} departures${thin?' · thin, faded':''}`); svg.append(rect); } });
+  document.getElementById('heat').append(svg);
+})();
+
+// leak histogram + table
+(function(){
+  const W=560,H=210,L=44,R=10,T=12,B=30,w=W-L-R,h=H-T-B; const max=Math.max(...D.leak.map(b=>b.n));
+  const svg=sv('svg',{viewBox:`0 0 ${W} ${H}`}); const n=D.leak.length, bw=w/n;
+  for(let v=0;v<=max;v+=100000){ const y=T+h-(v/max)*h; svg.append(sv('line',{x1:L,x2:L+w,y1:y,y2:y,class:'grid'})); const t=sv('text',{x:L-6,y:y+4,'text-anchor':'end'}); t.textContent=(v/1000)+'k'; svg.append(t); }
+  D.leak.forEach((b,i)=>{ const bh=(b.n/max)*h; const edge=Math.abs(b.b)===30; const r=sv('rect',{x:L+i*bw+0.5,y:T+h-bh,width:bw-1,height:bh,class:'bar-mark'+(edge?' dim':'')});
+    const lab= b.b===-30?'below −15 min':(b.b===30?'above +15 min':`${(b.b*30/60).toFixed(1)} to ${((b.b+1)*30/60).toFixed(1)} min`); hover(r,`<b>${lab}</b><br>${fmt(b.n)} departures`); svg.append(r); });
+  svg.append(sv('line',{x1:L,x2:L+w,y1:T+h,y2:T+h,class:'axis'}));
+  const zero=L+(30+0)*bw; svg.append(sv('line',{x1:zero,x2:zero,y1:T,y2:T+h,class:'med'}));
+  for(const m of [-15,-10,-5,0,5,10,15]){ const x=L+(m*2+30)*bw+(m===15?bw:0); const t=sv('text',{x,y:H-6,'text-anchor':'middle'}); t.textContent=(m>0?'+':'')+m+(m===15?' min':''); svg.append(t); }
+  document.getElementById('leak').append(svg);
+  const s=D.leak_stats[0]; const t=document.getElementById('leaktab'); const tb=el('tbody');
+  for(const [k,v] of [['Departures with both clocks',fmt(s.n)],['Mean error (bias)',`${s.bias>0?'+':''}${s.bias} s`],['RMSE if used raw',`${s.rmse} s`],['Median absolute error',`${s.mad} s`],['Within ±60 s',`${s.pct_within_60s}%`],['Off by more than 10 min',`${s.pct_over_10min}%`]]) tb.append(el('tr',{},el('td',{},k),el('td',{class:'n',style:'font-weight:600'},v)));
+  t.append(el('thead',{},el('tr',{},el('th',{},'Off-block clue, 2025'),el('th',{class:'n'},''))),tb);
+})();
+</script>
