@@ -1,6 +1,7 @@
 # Experiment Protocol: prc26 taxi-out regression
 
 Instantiated 2026-09-04 from `~/.claude/skills/quant-ml-protocol/templates/EXPERIMENT-PROTOCOL.md`.
+v2 (2026-09-04) applies the review in `docs/protocol-review-v1.html` (revisions R1-R17, decisions D1-D3; Keith: "apply consolidated, D1 yes, D2 A, D3 A").
 Every number below was measured on this box on 2026-09-04; the command that regenerates it sits beside it.
 Rules and data layout: `NOTES.md`. Site: https://prc-data-challenge-2026.netlify.app/ (deadline 11 Oct 2026 23:59:59 CET).
 
@@ -11,19 +12,22 @@ Rules and data layout: `NOTES.md`. Site: https://prc-data-challenge-2026.netlify
 | Training anchors (DEP rows with target, 2025-01..2025-12) | 2,085,047 | `python -c "import json;print(json.load(open('data/view.json'))['n_dep_train'])"` |
 | Ranking DEP rows (to predict) | 344,841 | same file, key `n_dep_rank` |
 | Scored rows on the board (usedPairs) | 215,876 | `python lb.py`; identical on all 50 page-1 entries |
-| Holdout = Jan + Jul 2025 DEP rows | 344,419 (153,706 + 190,713) | `view.json` key `months` |
-| Holdout rows with AOBT_3 | 339,050 | `python scripts/noise_bar.py` |
-| Independence unit | day x airport block (flights in one block share the queue) | design choice, attackable |
-| n_independent, holdout | 620 (62 days x 10 airports) | `python scripts/noise_bar.py` |
-| n_independent, training | 3,650 (365 x 10) | arithmetic on the row above |
-| Feature cap (n_indep / 8, holdout) | 77 | arithmetic |
+| Holdout = Jan + Jul 2025 DEP rows with target | 344,419 (153,706 + 190,713) by month key; 344,423 under the date filter in `scripts/noise_bar.py` (4 boundary rows, unexplained, immaterial) | `view.json` key `months` |
+| Holdout lane A (flight plan matched: AOBT_3 present) | 339,046 by month key (339,050 under the date filter) | `python -m taxi.baselines`, row table |
+| Holdout lane B (no flight plan: AOBT_3, EOBT_1, LOBT, IOBT all null; schedule time present) | 5,373 | same |
+| Training lanes, the ten training months | lane A 1,723,531; lane B 17,097 (all twelve months: 2,062,577 / 22,470) | same |
+| Independence unit | the day: flights on one day share weather, the network and the airport's disruptions, and airports on the same day are not independent (R1) | design choice, attackable |
+| n_independent, holdout | 62 days | `python scripts/noise_bar.py` |
+| n_independent, training | 303 days | calendar of the ten training months |
+| Complexity control | no feature cap; month-pair out-of-fold results and per-feature knockout against the 2 s floor (R1) | section 3 |
 
-Noise yardstick, measured with a day-block bootstrap (300 reps, each resampled to the scored size of 215,876 rows)
-on the raw AOBT_3 residual (takeoff minus AOBT_3 minus truth) over the holdout:
+Noise yardstick, measured 2026-09-04 with a day-block bootstrap (300 reps, each resampled to the scored size of 215,876 rows)
+on the raw AOBT_3 residual (takeoff minus AOBT_3 minus truth) over the lane-A holdout rows. It describes one contrast
+(raw versus per-airport-debiased, 19.4 s); it is not a universal floor (R2).
 
 | Statistic | Value |
 |---|---|
-| RMSE of raw AOBT_3 residual, holdout | 428.2 s |
+| RMSE of raw AOBT_3 residual, holdout lane A | 428.2 s |
 | SE of the RMSE LEVEL, day-block bootstrap | 10.2 s (95% band 406.5 to 446.1) |
 | SE of the RMSE level, iid-row subsample | 2.2 s |
 | SE of the level, Gaussian formula rmse/sqrt(2n) | 0.65 s (wrong here by 3x to 15x: heavy tails plus day clustering) |
@@ -32,31 +36,43 @@ on the raw AOBT_3 residual (takeoff minus AOBT_3 minus truth) over the holdout:
 
 Regenerate: `python scripts/noise_bar.py` (DuckDB over `data/training_*.parquet`, numpy, seed 0).
 
+Sensitivity runs (v2, R2), same contrast:
+
+| Run | SE of the level | Paired SE |
+|---|---|---|
+| `python scripts/noise_bar.py --no-resample` (every resampled row kept) | 9.7 s (band 409.0 to 444.8) | 1.03 s |
+| `python scripts/noise_bar.py --block 3` (3-day blocks, resampled to 215,876) | 12.4 s (band 403.6 to 450.6) | 1.21 s |
+
 Consequences written into the decision rule:
-- **Detectable-effect floor = 2 s paired delta-RMSE** on the holdout (2 x paired SE). A delta under 2 s is a tie.
-- **Levels do not transfer.** A different set of days moves the RMSE level by about 10 s (1 SE). A local holdout level is never compared with a board level; only within-set deltas are.
+- **Practical minimum effect = 2 s paired improvement** on the holdout lane. A delta under 2 s is a tie. Every verdict carries its own paired bootstrap interval (section 3); the 2 s is a floor on what we act on, not a detectability claim. The first ladder showed why the per-verdict interval matters: a 19.5 s and a 33.0 s mean gain both came with intervals crossing zero (section 4, B3a and B3d).
+- **Levels do not transfer.** A different set of days moves the RMSE level by about 10 s (1 SE); a different set of months moves it more (B4 lane A: 279 s on the training-month folds, 311 s on Jan + Jul). A local level is never compared with a board level; only within-set deltas are.
+- **Lane B has its own bar.** Lane-B verdict intervals come from the same paired bootstrap on lane-B rows; they are hundreds of seconds wide (section 4).
 - The earlier session note "SE about 0.4 s, gaps under 1 s are noise" used the Gaussian formula and is withdrawn.
 
 ## 1. Instrument and target
 
-- Instrument: N/A. No trade, no costs. The money metric is the leaderboard RMSE; a submission is free and unlimited (the site states no cap; checked 2026-09-04, `NOTES.md`).
-- Target: `TAXITIME_SEC_mvt` in raw seconds for `PHASE_mvt = 'DEP'`. The scorer is RMSE on raw seconds, so the primary fit minimises MSE on raw seconds. Log-target or Huber fits are labelled diagnostics and cannot flip a verdict.
-- Decomposition: the part already paid is takeoff minus AOBT_3 (`MVT_TIME_UTC_mvt - AOBT_3_flt`), present in the ranking file for 339,551 of 344,841 DEP rows. The model works on the residual around it.
-- Naive-baseline check: predicting takeoff minus AOBT_3 with no model scores 428.2 s on the holdout; the board leader is 249.46 s (`python lb.py`, 2026-09-04). The leak alone does not solve the target, so the target stands. The per-airport-debiased residual scores 408.8 s.
-- Hidden simple strategy: the per-airport mean and per-airport x hour means are baselines B1 and B2 below; every model is reported next to them.
+- Instrument: N/A. No trade, no costs. The money metric is the leaderboard RMSE; a submission costs nothing and no cap is stated (checked 2026-09-04 on index.html and ranking.html; R13).
+- Target: `TAXITIME_SEC_mvt` in raw seconds for `PHASE_mvt = 'DEP'`. The scorer is RMSE on raw seconds, so every verdict is on raw RMSE. Any training objective is admissible (MSE, Huber, winsorised or capped labels); the objective is a design choice of the lane, judged only on raw RMSE (R4).
+- Label lineage (R4): feature `z_aobt` = takeoff minus AOBT_3 (`MVT_TIME_UTC_mvt - AOBT_3_flt`); lane-A label `c` = `y - z_aobt`; a lane-A model predicts `z_aobt + c_hat`. Neither `y` nor `c` may appear in a feature frame; `tests/test_lineage.py` fails the build if it does. The feature frame is `taxi.data.features`, columns `KEYS + FEATURES`, and `month` is a fold key, never a feature (R7).
+- Two lanes (R3). Lane A = departures with a flight-plan match (`AOBT_3_flt` present; in every such row `EOBT_1_flt`, `LOBT_flt` and `IOBT_flt` are present too). Lane B = departures without one (all four null; `SCHED_TIME_UTC_mvt` present on every row). Ranking: 339,551 lane A, 5,290 lane B. Each lane has its own models, its own admission cap, its own champion and its own verdicts; a submission is the lane-A champion plus the lane-B champion.
+- Naive-baseline check (R13): predicting takeoff minus AOBT_3 with no model scores 428.2 s on the lane-A holdout; the per-airport mean scores 440.7 s there; the board leader is 249.46 s (`python lb.py`, 2026-09-04). The leak alone does not solve the target, so the target stands. The per-airport-debiased residual scores 408.8 s in-sample (a yardstick, not a baseline).
+- Hidden simple strategy: the per-airport mean and per-airport x hour x weekday means are baselines B1 and B2 below; every model is reported next to them, per lane.
 
 ## 2. Data register
 
 | Source | Files | Vintaged? | Revision risk | Staleness cap | Point-in-time rule |
 |---|---|---|---|---|---|
-| Organiser bucket `prc-2026-datasets` (MinIO, `s3.opensky-network.org`) | 12 x `training_YYYY-MM-01_..parquet`, `ranking.parquet`, `submitting.parquet`; sha256 list below | fixed snapshot downloaded 2026-09-04 | UNKNOWN whether the organisers re-issue files; re-run `sha256sum data/*.parquet` before every submission build and refuse to build on a changed hash | N/A | see below |
-| External data (weather, METAR, other OpenSky, prior years) | none | N/A | N/A | N/A | NOT admitted. The site says nothing either way (WebFetch of `data.html` and `index.html`, 2026-09-04, both silent). Admitting any needs an amendment with its own row. |
+| Organiser bucket `prc-2026-datasets` (MinIO, `s3.opensky-network.org`) | 12 x `training_YYYY-MM-01_..parquet`, `ranking.parquet`, `submitting.parquet`; sha256 list below | fixed snapshot downloaded 2026-09-04 | UNKNOWN whether the organisers re-issue files; `tests/test_submission_file.py` checks the 14 hashes and every submission build runs the tests first | N/A | see below |
+| External open data | none yet | N/A | N/A | N/A | Admissible (R15): eligibility.html requires additional datasets to be "openly available under an open source license" and documented. Each source needs its own row here (source, licence, fetch date, point-in-time rule) via amendment before any run. |
+| W1 weather (D3 = A, Keith 2026-09-04) | to be declared after S1 | | | | Row to be filled by the amendment that declares W1; no run before that. |
 
 Point-in-time rule for this competition (the scorer is offline on a fixed file):
 1. Every column of `ranking.parquet` is admissible as a feature for any row, including the times of other movements after the own AOBT (takeoffs and landings before, around and after it). The site sets no restriction.
-2. In ranking, every DEP row has `BLOCK_TIME_UTC_mvt` and `TAXITIME_SEC_mvt` blanked. So the feature builder runs on a **masked view of training** that blanks those two columns on every DEP row. Arrivals keep their block times in both files.
-3. A test asserts the feature matrix for a training month is identical whether built from the masked training file or from a ranking-shaped copy of it. The build fails if not.
-4. `AOBT_3_flt` is minute-granular; it is missing on 5,290 ranking DEP rows (344,841 - 339,551). Every model declares its fallback for those rows.
+2. In ranking, every DEP row has `BLOCK_TIME_UTC_mvt` and `TAXITIME_SEC_mvt` blanked. So the feature builder runs on a **masked view of training** that never selects those two columns (`taxi.data.VIEW`). Arrivals keep their block times in both files.
+3. `tests/test_masked_view.py` asserts the feature frame for a training month is identical whether built from the training file or from a ranking-shaped copy of it (block time and taxi time blanked on departures), and that the ranking file builds every one of its 344,841 departures. The build fails if not (R11).
+4. `tests/test_lineage.py` asserts no label column reaches the feature frame and `month` is not a feature (R4, R7).
+5. `tests/test_submission_file.py` asserts a built submission carries exactly the template's id set, no nulls and integer seconds, and that the 14 data hashes match this file (R11).
+6. `AOBT_3_flt` is minute-granular and missing on the 5,290 lane-B ranking rows; lane B is modelled on its own (section 1).
 
 sha256 (2026-09-04, `sha256sum data/*.parquet`):
 
@@ -79,85 +95,100 @@ ac36b17db7a537e3baeb682fa4763dacaa1fcc5d9bfa6bf32b3ee5d9f91300b0  training_2025-
 
 ## 3. Decision rule (declared before the first run)
 
-Primary metrics, both required:
-1. **Holdout RMSE** on Jan + Jul 2025 DEP rows (all 344,419, fallback rules included), model fit on the other ten months of 2025. The verdict statistic is the **paired delta-RMSE vs the current champion**, day-block bootstrap, 300 reps, seed 0. A challenger wins only if the 95% interval of the delta excludes zero AND the point delta is at least 2 s.
-2. **Board RMSE** on the 215,876 scored rows. Every submission is a ledger trial (section 8). For learning what works, a board delta under 2 s is a tie; for the ranking itself the board is exact and needs no interval.
+Sign convention everywhere (R8): **improvement = champion RMSE minus challenger RMSE; positive is good.**
 
-Selection honesty: the holdout selects the champion; the board judges it. The haircut for each submission is (holdout delta) minus (board delta), recorded in the ledger. Two promoted champions in a row with a negative board delta trip REVIEW (section 8).
+Primary metrics, both required:
+1. **Development holdout RMSE**, Jan + Jul 2025, per lane (R3, R9). Lane A (339,046 rows) is the primary verdict lane; lane B (5,373 rows) is judged separately on its own rows; the all-row RMSE (lane-A rung plus lane-B champion) is reported and never decides. The verdict statistic is the **paired improvement versus the current lane champion** on the same rows, day-block bootstrap, 2,000 reps, seed 0, whole days resampled, no resample to the board size (`taxi.verdict.paired_delta`, R2). A challenger wins only if the 95% interval lies above zero AND the point improvement is at least 2 s. January and July are reported beside the combined number; a win with opposite signs in the two months is a flag.
+2. **Board RMSE** on the 215,876 scored rows, point values only, no interval (R8). Every submission is a ledger trial (section 8). For learning what works, a board improvement under 2 s is a tie; for the ranking itself the board is exact.
+
+Development holdout, disclosed (R9): before v2 the holdout supplied the noise bar, the 600 s tail threshold, the B3 level, the tail tables and the lane split. No model was chosen on it. From v2 every holdout verdict is counted in the ledger's holdout-verdict counter (section 8). There is no sealed month: ranking.html ranks teams on the best RMSE across their submissions and names no separate final set, so the board is the final judge. Every M lane also reports one forward fold (train Jan-Nov 2025, predict Dec 2025) as a transfer diagnostic; it never decides.
+
+Selection honesty: the holdout selects the champion; the board judges it. haircut = holdout improvement minus board improvement, recorded per submission. REVIEW fires when two promoted champions in a row show board improvement at or below zero (section 8).
 
 Tie-break: parsimony. Fewer features, simpler model class, fewer stages. A tie promotes the simpler model.
 
-Nulls: any lane that searches (feature sets, hyperparameters, tail thresholds, ensemble weights) re-runs its whole recipe on 5 target-permuted copies of the training months (permutation within day x airport block). The real gain must beat the best permuted gain by 2 s; otherwise the gain is a flag, not a result. Nulls are vetoes for promotion, flags for reporting.
+Nulls (D2 = A, Keith 2026-09-04; a declared deviation from the skill's 20-replay process null): no permutation replays. Every declared search states its cell count k and its analytic optimism bound = E[max of k standard normals] x the lane's paired SE for that contrast (k = 4: 1.03 x SE; k = 12: 1.63 x SE; `python -c "import numpy as np;r=np.random.default_rng(0);print(r.standard_normal((200000,12)).max(1).mean())"`). A search gain that does not clear the bound plus 2 s is a flag, not a result. Grids are chosen by nested month-pair CV inside the training months (five folds: 02+03, 04+05, 06+08, 09+10, 11+12; R17); the holdout sees one frozen fit per lane per lane-version.
 
-Every verdict sentence quotes the effect next to the 2 s floor ("delta -6.3 s, floor 2 s").
+Training admission caps (R5): per lane, one declared sweep over {3600, 7200, 14400, none} on the month-pair CV, judged on untrimmed validation folds (lane A on B4, lane B on B1). Lane A admits |c| <= C; lane B admits 0 < y <= C. The chosen cap is the least-trimming one among those within 2 s (the floor) of the best CV RMSE, "none" counting as least trimming. The holdout is always scored untrimmed. The chosen cap is recorded in section 4 and applies to every fit in that lane until amended.
+
+Every verdict sentence quotes the effect next to the 2 s floor ("improvement +6.3 s [+4.1, +8.4], floor 2 s").
 
 A number inside the floor never justifies another run of the same kind. The next run must change a declared axis.
 
-Stage-6 gate (Keith): (a) the first leaderboard submission S1; (b) every new model class (LightGBM, TabPFN-3, ensemble) before its first submission; (c) any amendment to this file. Between gates, submissions of promoted champions run in waves of at most 3, each logged.
+Stage-6 gate (Keith): (a) the first leaderboard submission S1; (b) every new model class (LightGBM, TabPFN, ensemble, weather lane) before its first submission; (c) any amendment to this file.
 
-Stage-6 surface: honest table, paired intervals for both metrics, this rule restated with "attack the rule, not just the numbers", all caution flags, the ledger line (N submissions so far).
+Submission budget (R10): at most 2 board submissions per promoted champion, plus the declared probes below; every submission is a ledger row.
+
+Board probes (D1 = yes, Keith 2026-09-04; codex 9): after S1, for each group G in {lane-B rows, January rows, July rows}, two submissions: the S1 file with +c and with -c added on G only, c = 300 s. With n = 215,876 and SSE = n x RMSE^2, the scored count of G is m = (SSE+ + SSE- - 2 SSE0) / (2 c^2) and the sum of the S1 errors (prediction minus truth) over the scored rows of G is (SSE+ - SSE-) / (4 c). Six submissions, ledger rows P1-P6; the site ranks on the best RMSE, so probes cannot lower the rank.
+
+Stage-6 surface: honest table per lane, paired intervals for every holdout verdict, this rule restated with "attack the rule, not just the numbers", all caution flags, the ledger line (N submissions, N_h holdout verdicts so far).
 
 ## 4. Declared experiments registry
 
-Common design unless stated: train = 2025 months 02-06 and 08-12; holdout = 2025-01 + 2025-07; features built on the masked view (section 2); fallback where AOBT_3 is missing = B1 prediction. Hash = commit of this file at declaration (see `git log -- docs/EXPERIMENT-PROTOCOL.md`).
+Common design unless stated: train = 2025 months 02-06 and 08-12; holdout = 2025-01 + 2025-07; features built on the masked view (section 2, `taxi.data.features`); two lanes with their own caps and champions; a submission = lane-A champion plus lane-B champion. Anchor rule (R6): `z_anchor` = `z_aobt` where it is non-negative, else `z_eobt`; lane B uses `z_sched`. `queue` = other same-airport takeoffs between the anchor off-block time and the own takeoff. Hash = commit of this file at declaration (see `git log -- docs/EXPERIMENT-PROTOCOL.md`). Results: `docs/BASELINES.md` (`python -m taxi.baselines`), verdict rows H1-H11 in `docs/TRIAL-LEDGER.md`.
 
-| Id | Declared | Design | Null design | Status | Verdict |
+| Id | Declared | Design | Search / bound | Status | Verdict (holdout RMSE; improvement vs champion [95%]) |
 |---|---|---|---|---|---|
-| B0 | 2026-09-04 | global mean of the target | none (no search) | DECLARED | |
-| B1 | 2026-09-04 | per-airport mean | none | DECLARED | |
-| B2 | 2026-09-04 | per-airport x UTC-hour x weekday mean | none | DECLARED | |
-| B3 | 2026-09-04 | takeoff minus AOBT_3, fallback B1 | none | DECLARED | |
-| B4 | 2026-09-04 | B3 plus per-airport OLS on [residual, queue-ahead count] (queue = same-airport takeoffs between own AOBT_3 and own takeoff) | none | DECLARED | |
-| M1 | 2026-09-04 | LightGBM, MSE objective, at most 77 features (airport, hour, weekday, month, runway, stand, AOBT_3 residual, EOBT/LOBT deltas, queue and arrival counts in windows around AOBT_3 and takeoff); grid of at most 12 cells chosen by month-block CV inside the 10 training months; holdout touched once per frozen fit | 5 permutation replays of the full grid | DECLARED | |
-| M2 | 2026-09-04 | two-stage tail model: classifier on abs(AOBT_3 residual) > 600 s from ranking-visible traffic, then separate regressors; compared with M1 on the same rows | 5 permutation replays | DECLARED | |
-| M3 | 2026-09-04 | TabPFN-3 regressor per airport (GPU, tabpfn 6.3.1), same feature set as M1, training subsample per airport within the 1,000,000-row limit | 5 permutation replays if any per-airport selection is searched | DECLARED | |
-| E1 | 2026-09-04 | weighted blend of M1 and M3 (and M2 if promoted), weights chosen by month-block CV on training months | 5 permutation replays over the weight search | DECLARED | |
-| S1 | 2026-09-04 | first board submission = the champion after B0-B4 and M1; ranking file built from all 12 months of 2025 with the frozen spec | N/A (a trial, not a search) | DECLARED, gated on Keith | |
+| B0 | 2026-09-04 | global mean of the lane's training target | none | RUN 2026-09-04 | lane A 476.7 s; lane B 3,959.4 s; first rung |
+| B1 | 2026-09-04 | per-airport mean | none | RUN 2026-09-04 | lane A 440.7 s, +36.1 [+31.6, +41.1] WIN; lane B 3,709.9 s, +249.4 [+135.5, +353.9] WIN |
+| B2 | 2026-09-04 | per-airport x UTC-hour x ISO-weekday mean, unseen cell falls back to B1 | none | RUN 2026-09-04 | lane A 433.1 s, +7.6 [+6.2, +8.9] WIN; lane B 3,807.5 s, -97.6 [-232.9, +15.4] lose |
+| B3a-d (lane A) | 2026-09-04 v2 | gap family (R6): takeoff minus AOBT_3 (a), minus EOBT_1 (b), minus LOBT (c), anchor rule (d); each plus the per-airport median of (y minus gap) from training | none | RUN 2026-09-04 | vs B2: a 413.6 s, +19.5 [-17.9, +73.7] tie; b 620.9 s, -187.8 lose; c 709.7 s, -276.6 lose; d 400.1 s, +33.0 [-2.5, +86.3] tie. None promoted: the gap errors cluster on a few days |
+| B3s (lane B) | 2026-09-04 v2 | takeoff minus schedule time, per-airport median calibrated | none | RUN 2026-09-04 | lane B 4,889.7 s, -1,179.7 [-2,262.0, -214.0] lose |
+| B4 | 2026-09-04 v2 | per-airport OLS: lane A on [z_anchor, z_eobt, z_lobt, queue]; lane B on [z_sched, queue] | none | RUN 2026-09-04 | **champion both lanes.** Lane A 311.2 s (Jan 279.9, Jul 334.5), +121.9 [+88.7, +173.5] vs B2 WIN; lane B 2,074.1 s (Jan 2,939.3, Jul 1,649.7), +1,635.8 [+733.6, +2,538.9] vs B1 WIN; all rows 403.0 s |
+| CAP | 2026-09-04 v2 | admission-cap sweep per lane (section 3): 4 cells, month-pair CV | k = 4, bound 1.03 x SE | RUN 2026-09-04 | lane A (B4) 279.7 / 279.2 / 279.2 / 279.2 s for 3600 / 7200 / 14400 / none: **none**; lane B (B1) 3,207.5 / 3,046.0 / 2,932.9 / 2,888.7 s: **none** |
+| M1 | 2026-09-04, v2 | LightGBM per lane; lane A on label c, lane B on y; features: airport, hour, weekday, runway, stand, aircraft type, wake category, market segment, z_anchor, z_aobt, z_eobt, z_lobt, z_sched, queue, arrival and departure counts in windows around the anchor and the takeoff; no month; grid of at most 12 cells by month-pair CV; forward fold reported | k = 12, bound 1.63 x SE | DECLARED | |
+| M2 | 2026-09-04 | two-stage tail model: classifier on abs(c) > 600 s from ranking-visible traffic, then separate regressors; compared with M1 on the same rows | k stated at run | DECLARED | |
+| M3 | 2026-09-04, v2 | TabPFN regressor per airport (GPU, tabpfn 6.3.1), M1's feature set. One-airport pilot first with three gates: fit plus predict under 30 min wall-clock, VRAM under 16 GB, month-pair OOF gain of at least 2 s over M1 on that airport (R12). Licence: Prior Labs (Apache 2.0 plus paragraph 10, attribution): ship the licence and "Built with PriorLabs-TabPFN" wherever weights are made available; a model trained on TabPFN outputs carries "TabPFN" at the start of its name | k stated at run | DECLARED, pilot-gated | |
+| E1 | 2026-09-04 | weighted blend of M1 and M3 (and M2 if promoted), weights chosen by month-pair CV; named "TabPFN-..." if M3 is in it | k = weight grid | DECLARED | |
+| W1 | 2026-09-04 v2 | weather lane (D3 = A): open METAR archive as external data, own data-register row, declared after S1 | k stated at declaration | DECLARED, not runnable before its register row | |
+| S1 | 2026-09-04 | first board submission = lane champions after B0-B4 and M1; ranking file built from all 12 months of 2025 with the frozen specs | N/A (a trial, not a search) | DECLARED, gated on Keith | |
+| P1-P6 | 2026-09-04 v2 | board probes of the scored subset (section 3), after S1 | N/A | DECLARED (D1 = yes) | |
 
 ## 5. NOT-DONE table
 
 | Declared item | Why not run | Effect on the verdict |
 |---|---|---|
-| all of section 4 | protocol instantiated 2026-09-04; no run yet | no verdict exists yet |
+| M1, M2, M3, E1, W1, S1, P1-P6 | v2 applied and baselines run 2026-09-04; M1 is next | no model verdict exists yet; the champions are B4 in both lanes |
+| Forward fold (train Jan-Nov, predict Dec) | declared for M lanes only | none yet |
 
 ## 6. Accrual list (thin windows)
 
-N/A. The smallest airport (LSZH, 134,907 training departures) has about 22,000 holdout rows; no per-airport lane falls under the 300-anchor floor.
+Anchors are flights; the thin-window floor of 300 anchors counts flights the verdict rides. Lane A holds 339,046 holdout flights and lane B 5,373 (62 days each), so no lane is thin by that count. The honest width is the day-block bootstrap interval, not the flight count: 62 days is the effective sample for every lane, which is why lane-B intervals are hundreds of seconds wide. No per-airport lane falls under the floor (the smallest airport, LSZH, has about 22,000 lane-A holdout rows).
 
 ## 7. Caution flags (ride every report)
 
-- F1 **Scored subset unexplained.** The board scores 215,876 of 344,841 ranking DEP rows. Checked 2026-09-04: no column non-null count equals it, no simple predicate equals it, no airport subset sums to it, the site states no exclusion. UNKNOWN which rows count.
+- F1 **Scored subset unexplained.** The board scores 215,876 of 344,841 ranking DEP rows. Checked 2026-09-04: no column non-null count equals it, no simple predicate equals it, no airport subset sums to it, training target coverage is 100% and `submitting.parquet` holds all 344,841 ids, so neither explains it; the site states no exclusion. Inference (arithmetic in `docs/protocol-review-v1.html`, section E): if the scored rows carried the 2025 lane-B structure at the same rate, those rows alone would floor the board RMSE at 494 s, above the leader's 249.46 s; so either 2026 lacks that tail or the scorer drops it. UNKNOWN which; probes P1-P6 answer it (R14).
 - F2 **2026 tail transfer unknown.** In every 2025 month the AOBT_3-residual tail (5.9% to 8.2% of rows) carries 59% to 77% of the squared error. Whether Jan/Jul 2026 look the same is unknown until a submission lands.
-- F3 **Truth outliers in training.** LIRF: 1,967 taxi-outs over 1 h, max 131,167 s; LSZH: 313 non-positive; LFPG: 65 non-positive (`view.json` key `airports`). If rows like these sit in the scored set they dominate the RMSE. Training truth is not cleaned without a declared diagnostic.
-- F4 **AOBT_3 missing** on 5,290 ranking DEP rows; every model declares its fallback.
-- F5 **Level transfer.** One SE of the RMSE level across day blocks is 10.2 s; local levels are never compared with board levels.
+- F3 **Truth outliers in training and holdout.** Training: 122 rows over 4 h carry 40.8% of the squared error around the per-airport mean; holdout: 45 rows over 4 h carry 56.3%, and about 43 of them are lane B. LIRF max taxi 131,167 s; LSZH 313 non-positive; LFPG 65 non-positive. Training truth is trimmed only by the declared admission cap (section 3; the sweep chose none in both lanes); the holdout is never trimmed (`python scripts/review_checks.py`).
+- F4 **Lane B.** 5,290 ranking rows have no flight plan. In training their target has mean 1,384 s and RMS 3,669 s (lane A: 987 and 1,072); the per-airport mean scores 3,710 s on the lane-B holdout against 441 s on lane A. With the B4 champions in both lanes, lane B is still about 41% of the all-row squared error (arithmetic from the two lane RMSEs and counts in section 4). Every submission declares its lane-B champion.
+- F5 **Level transfer.** One SE of the RMSE level across day blocks is 10.2 s, and the same B4 spec scores 279 s on training-month folds against 311 s on Jan + Jul; local levels are never compared with board levels.
 - F6 **Board volume.** The leader file is `_v344`; the board ranks each team by its best submission, so volume is rewarded. Our ledger counts N so the winner-take-best effect on our own history stays visible.
+- F7 **TabPFN licence attribution** (section 4, M3): any public artefact that makes TabPFN weights available, and any blend trained on TabPFN outputs, carries the attribution and the name prefix.
+- F8 **Gap baselines are day-clustered.** B3a and B3d beat B2 by 19.5 s and 33.0 s on the mean and still lost the verdict because their intervals cross zero: a few days carry their squared error. Any model leaning on the raw gaps inherits that; the interval, not the mean, decides.
 
 ## 8. Prospective ledger contract
 
-- Ledger: `docs/TRIAL-LEDGER.md`, append-only, one row per board submission. Columns: id, date, file name, spec tag, git hash, holdout RMSE, holdout delta vs previous champion, board RMSE, board delta, haircut, usedPairs. Old-spec rows stay, labelled.
-- Tripwires: REVIEW when two promoted champions in a row score a negative board delta (the holdout has stopped mirroring the board; stop and re-examine the split). KILL: N/A, no money at risk. Operational kill: a submission that fails the site validation (missing or extra MVT_ID) is logged as VOID and the builder is fixed before the next one.
+- Ledger: `docs/TRIAL-LEDGER.md`, append-only. Section A, one row per board submission: id, date, file name, spec tag (lane-A champion + lane-B champion), git hash, holdout RMSE (lane A, lane B, all rows), holdout improvement vs the previous champion, board RMSE, board improvement, haircut, usedPairs. Section B, one row per holdout verdict: id, date, lane, champion, challenger, improvement with interval, verdict; the row count is the holdout-verdict counter N_h. Section C, probe rows P1-P6 with the derived scored count and error sum per group. Old-spec rows stay, labelled (R8, R11).
+- Tripwires: REVIEW when two promoted champions in a row show board improvement at or below zero (the holdout has stopped mirroring the board; stop and re-examine the split). KILL: N/A, no money at risk. Operational kill: a submission that fails the site validation (missing or extra MVT_ID) is logged as VOID and the builder is fixed before the next one; `tests/test_submission_file.py` runs before every build.
 - Drift monitor: N/A.
 
 ## Amendment log
 
 - v1 2026-09-04: instantiated. Baselines B0-B4 and lanes M1-M3, E1, S1 declared; noise bar measured and the 2 s floor set.
+- v2 2026-09-04: review applied (`docs/protocol-review-v1.html`). R1 unit = day, feature cap dropped. R2 per-verdict paired bootstrap, 2,000 reps, no resample; sensitivity runs recorded in section 0. R3 two lanes by flight-plan match. R4 label lineage z, c and any training objective. R5 admission-cap sweep. R6 gap family B3a-d, B3s, B4 on the gaps plus queue, anchor rule. R7 no `month` feature. R8 sign convention, board point values. R9 development-holdout disclosure, forward fold, months reported separately, no sealed month. R10 submission budget. R11 named tests and ledger sections. R12 TabPFN pilot gates and licence. R13 wording. R14 flags F1, F3, F4 with numbers. R15 external data admissible. R16 NOTES.md refreshed. R17 five month-pair folds. D1 probes P1-P6 declared. D2 analytic optimism bound in place of permutation nulls. D3 weather lane W1 declared for after S1. Baselines and the cap sweep run the same day (section 4); the cap tie rule was sharpened to "within the 2 s floor" after the first sweep printed 279.2 s for three caps and the code picked 14400 by float noise; the sweep was re-run under the sharpened rule and chose none in both lanes. F8 added.
 
 ## GSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
 | CEO Review | `/plan-ceo-review` | Scope & strategy | 0 | NOT RUN | |
-| Codex Review | `/codex review` | Independent 2nd opinion | 1 | ISSUES_OPEN | 12 findings (gpt-5.6-sol, xhigh, 2026-09-04): 8 overlap the in-house pass, 4 unique (holdout already mined, no forward-transfer fold, scored-subset probing, board as judge) |
-| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | ISSUES_OPEN | 17 revisions R1-R17 and 3 decisions D1-D3, consolidated in `docs/protocol-review-v1.html`; waiting for "apply consolidated" before v2 |
+| Codex Review | `/codex review` | Independent 2nd opinion | 1 | RESOLVED | 12 findings (gpt-5.6-sol, xhigh, 2026-09-04): 8 overlap the in-house pass, 4 unique; all folded into v2 (R4, R9, R10, D1) |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | RESOLVED | 17 revisions R1-R17 and 3 decisions D1-D3 in `docs/protocol-review-v1.html`; applied as v2 on 2026-09-04 (Keith: "apply consolidated, D1 yes, D2 A, D3 A") |
 | Design Review | `/plan-design-review` | UI/UX gaps | 0 | NOT RUN | no UI in scope |
 | DX Review | `/plan-devex-review` | Developer experience gaps | 0 | NOT RUN | |
 
 - **CODEX:** label lineage (feature z = takeoff - AOBT_3, label c = target - z), holdout already mined for the noise bar, no forward-transfer fold, permutation nulls mis-specified, sign convention inconsistent, probe the scored subset through the board, TabPFN feasibility unproven.
-- **CROSS-MODEL:** codex and the in-house pass agree on 8 of 12 codex items (independence unit, paired SE, nulls, signs, lineage, robust training, TabPFN pilot, baselines from the visible timestamps). The in-house pass adds the split of the verdict lane by AOBT_3 presence (43 of the 45 holdout rows over 4 h lack AOBT_3 and carry most of the all-row squared error), the training admission caps, dropping `month`, and the corrected external-data rule (eligibility.html admits documented open datasets). Codex item 10 assumes a hidden final set; ranking.html states the rank is the best RMSE across submissions and names no separate set, so its sealed-audit fix is downgraded to a submission budget with logging.
-- **VERDICT:** ENG REVIEW ISSUES OPEN; eng review required. No baseline or model code runs until the consolidated revisions are applied as protocol v2.
+- **CROSS-MODEL:** codex and the in-house pass agree on 8 of 12 codex items (independence unit, paired SE, nulls, signs, lineage, robust training, TabPFN pilot, baselines from the visible timestamps). The in-house pass adds the split of the verdict lane by flight-plan match (about 43 of the 45 holdout rows over 4 h are lane B and carry most of the all-row squared error), the training admission caps, dropping `month`, and the corrected external-data rule (eligibility.html admits documented open datasets). Codex item 10 assumes a hidden final set; ranking.html states the rank is the best RMSE across submissions and names no separate set, so its sealed-audit fix is downgraded to a submission budget with logging.
+- **VERDICT:** ENG REVIEW RESOLVED; protocol v2 in force. Baselines and the cap sweep are run; M1 is next, then S1 and the probes behind the gates in section 3.
 
-**UNRESOLVED DECISIONS:**
-- D1 Board probes of the scored subset (about 6 perturbation submissions, each logged): run them after S1, or not.
-- D2 Nulls: analytic search-optimism bound plus nested month-block CV (a declared deviation from the skill's 20-replay process null), or the skill-literal replays.
-- D3 External open data (eligibility.html admits documented open datasets): declare a weather lane after S1, or keep it foreclosed.
+**DECISIONS (Keith, 2026-09-04):** D1 board probes: yes, after S1. D2 nulls: A, analytic bound plus nested month-pair CV. D3 external data: A, weather lane W1 after S1.

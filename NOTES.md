@@ -7,8 +7,15 @@ Predict taxi-out time (`TAXITIME_SEC_mvt`) for departures at 10 European airport
 Scored on RMSE over Jan + Jul 2026 movements. Deadline **11 Oct 2026 23:59:59 CET**.
 Prize: 5000 EUR split across the top 3. Winning entries must be GPLv3 on GitHub.
 
-## Data (needs MinIO keys, see Blocker)
-- Bucket `competition-data` on `s3.opensky-network.org` (path-style, https).
+## Site rules (quoted 2026-09-04)
+- index.html: "The applied ranking will use Root Mean Square Error (RMSE) for submitted predictions for the movements in January and July 2026."
+- ranking.html: "Teams will be ranked based on the best Root Mean Square Error (RMSE) achieved across their submissions." No separate final set and no submission cap are mentioned.
+- eligibility.html: additional datasets must be "openly available under an open source license" and documented; source code goes public on GitHub under GPLv3.
+
+## Data
+- Bucket `prc-2026-datasets` on `s3.opensky-network.org` (path-style, https). Keys live in `.env`
+  as `PRC_KEY` / `PRC_SECRET` (gitignored; never commit or log them). All 14 files are under `data/`,
+  hashes in `docs/EXPERIMENT-PROTOCOL.md` section 2.
 - 12 monthly `training_2025-MM-01_2025-MM-01.parquet` files, 4,167,797 movements.
 - `ranking.parquet` — Jan + Jul 2026. For `PHASE_mvt='DEP'`, `BLOCK_TIME_UTC_mvt`
   and `TAXITIME_SEC_mvt` are blanked. Everything else is present.
@@ -22,9 +29,10 @@ airport's off-block is blanked. NM's own actual off-block, `AOBT_3_flt`, is a
 near-duplicate of it and is **not listed as blanked**. If it survived, the target
 is arithmetic, not a model. `probe.py` tests exactly this on training data.
 
-Counter-evidence: the top of the leaderboard is 249s RMSE after 542 submissions.
-A live `AOBT_3_flt` would put someone near zero. So expect it to be blanked too,
-or to disagree with the airport clock by minutes. Check it, then move on.
+Checked 2026-09-04: `AOBT_3_flt` survives in ranking, and takeoff minus AOBT_3 scores
+428.2 s RMSE on the Jan+Jul 2025 holdout rows that have it. It is a feature, not a
+shortcut. The 5,290 ranking departures without it have no flight-plan record at all
+(protocol section 1, lane B).
 
 ## Live leaderboard (pulled 2026-09-04, `python lb.py`)
 Per-team best; the API returns every submission, not team bests.
@@ -48,20 +56,8 @@ Swagger: `https://datacomp.opensky-network.org/api/swagger-ui/`
 `merry-octopus`, accepted 2026-09-04. Submission bucket `prc-2026-merry-octopus`.
 Submissions go in as `merry-octopus_v<N>.parquet`.
 
-## BLOCKER: access keys not generated yet
-Unlike 2024, the acceptance email carries no key pair. It grants the OSN account
-access; the S3 key and secret are minted by hand in the MinIO console:
-
-1. https://s3-console.opensky-network.org/access-keys
-2. Login: "Other Authentication Methods" then "Login with SSO", then OpenSky credentials.
-3. Left nav "Access Keys", button "Create access key". Copy both values once, the
-   secret is shown a single time.
-4. Put them in `.env` as `PRC_KEY` / `PRC_SECRET`, then `python probe.py`.
-
-Endpoint for clients is `s3.opensky-network.org`, path-style, TLS. The console
-host (`s3-console.`) is a different name from the API host; do not mix them.
-
-Data bucket name is not stated on the 2026 site. It was `competition-data` in
-2024 and `probe.py` assumes the same. First thing to confirm once keys exist:
-
-    SELECT * FROM glob('s3://competition-data/*');
+## Access keys
+The acceptance email carries no key pair; the S3 key and secret are minted by hand in
+the MinIO console (https://s3-console.opensky-network.org/access-keys, SSO login, "Create
+access key", the secret is shown once). The console host (`s3-console.`) is a different
+name from the API host `s3.opensky-network.org`; do not mix them.

@@ -1,0 +1,9 @@
+[project]
+name = "prc26"
+version = "0.1.0"
+description = "PRC Data Challenge 2026 taxi-out model, team merry-octopus"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
