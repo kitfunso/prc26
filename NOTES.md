@@ -44,15 +44,24 @@ API (leaderboard is broken on the site, Observable migration):
 `https://datacomp.opensky-network.org/api/competitions/bb3693e1-26bc-4a9e-8619-4fe78b4eab0c/leaderboard`
 Swagger: `https://datacomp.opensky-network.org/api/swagger-ui/`
 
-## BLOCKER — waiting on bucket keys
-Keith submitted the team-creation request on 2026-09-04. Not yet visible in the
-teams API: still 208 teams, newest registration 19:15Z, checked at 20:05Z. The
-list moves in ~15-minute batches, so a fresh request lagging is expected.
+## Team
+`merry-octopus`, accepted 2026-09-04. Submission bucket `prc-2026-merry-octopus`.
+Submissions go in as `merry-octopus_v<N>.parquet`.
 
-Remaining gates, in order:
-1. PRC approves the request by hand, sends a verification email.
-2. Reply to it; they then send the MinIO bucket keys.
-3. `export PRC_KEY=... PRC_SECRET=...` then `python probe.py`.
+## BLOCKER: access keys not generated yet
+Unlike 2024, the acceptance email carries no key pair. It grants the OSN account
+access; the S3 key and secret are minted by hand in the MinIO console:
 
-Team name is assigned by them (an adjective-animal pair) and arrives in that
-email. Record it here when it lands; it is also the submission filename prefix.
+1. https://s3-console.opensky-network.org/access-keys
+2. Login: "Other Authentication Methods" then "Login with SSO", then OpenSky credentials.
+3. Left nav "Access Keys", button "Create access key". Copy both values once, the
+   secret is shown a single time.
+4. Put them in `.env` as `PRC_KEY` / `PRC_SECRET`, then `python probe.py`.
+
+Endpoint for clients is `s3.opensky-network.org`, path-style, TLS. The console
+host (`s3-console.`) is a different name from the API host; do not mix them.
+
+Data bucket name is not stated on the 2026 site. It was `competition-data` in
+2024 and `probe.py` assumes the same. First thing to confirm once keys exist:
+
+    SELECT * FROM glob('s3://competition-data/*');
