@@ -6,7 +6,7 @@ get your OSN account added to the buckets by registering a team).
 import os
 import duckdb
 
-BUCKET = os.environ.get("PRC_BUCKET", "competition-data")
+BUCKET = os.environ.get("PRC_BUCKET", "prc-2026-datasets")
 
 
 def connect() -> duckdb.DuckDBPyConnection:
@@ -52,7 +52,7 @@ def main() -> None:
         WHERE PHASE_mvt='DEP' AND AOBT_3_flt IS NOT NULL AND TAXITIME_SEC_mvt IS NOT NULL
     """).df().to_string())
 
-    print("\n== target distribution (the RMSE we must beat is ~277s) ==")
+    print("\n== target distribution (leaderboard best is 249.5s as of 2026-09-04) ==")
     print(con.sql(f"""
         SELECT ADEP_mvt, count(*) AS n,
                avg(TAXITIME_SEC_mvt) AS mean_s, stddev(TAXITIME_SEC_mvt) AS sd_s
