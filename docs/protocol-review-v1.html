@@ -1,0 +1,189 @@
+<title>Taxi-Out Protocol Review</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#F6F7F5;--ink:#1C232B;--muted:#5B6570;--line:#D8DDD9;--accent:#1F4FB0;--amber:#B0680A;--tint:#E9EEF9;--tint-amber:#FBF1E3;--code:#EEF0EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#12161B;--ink:#E6EAEE;--muted:#9AA5B1;--line:#2A323B;--accent:#7FA2F2;--amber:#E0A04A;--tint:#1B2433;--tint-amber:#2A2116;--code:#1B2027}}
+:root[data-theme="dark"]{--bg:#12161B;--ink:#E6EAEE;--muted:#9AA5B1;--line:#2A323B;--accent:#7FA2F2;--amber:#E0A04A;--tint:#1B2433;--tint-amber:#2A2116;--code:#1B2027}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;margin:0}
+main{max-width:1040px;margin:0 auto;padding:40px 24px 72px}
+.eyebrow{font:500 12px/1.4 "IBM Plex Mono",ui-monospace,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:34px;font-weight:600;line-height:1.15;margin:8px 0 12px;text-wrap:balance}
+h2{font-size:20px;font-weight:600;margin:40px 0 10px;text-wrap:balance}
+h3{font-size:16px;font-weight:600;margin:20px 0 6px}
+p,li{max-width:72ch}
+.lede{font-size:17px;max-width:72ch}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-size:.92em}
+code{background:var(--code);padding:1px 5px;border-radius:3px}
+pre{background:var(--code);padding:10px 12px;border-radius:4px;overflow-x:auto;font-size:13px}
+.wrap{overflow-x:auto;margin:10px 0 18px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--muted);font-size:13px}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.id{white-space:nowrap;font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:500}
+.decision{border-left:4px solid var(--amber);background:var(--tint-amber);padding:14px 18px;margin:14px 0;border-radius:0 4px 4px 0}
+.decision h3{margin-top:0}
+.call{color:var(--amber);font-weight:600}
+.headline{border-left:4px solid var(--accent);background:var(--tint);padding:14px 18px;margin:18px 0;border-radius:0 4px 4px 0}
+.headline ul{margin:0;padding-left:18px}
+.src{color:var(--muted);font-size:13px;white-space:nowrap}
+details{margin:12px 0}summary{cursor:pointer;font-weight:600}
+.note{color:var(--muted);font-size:13px}
+a{color:var(--accent)}
+</style>
+<main>
+<div class="eyebrow">prc26 · /plan-eng-review · 2026-09-04 · protocol v1 at commit 656ad9c</div>
+<h1>Taxi-Out Protocol Review</h1>
+<p class="lede">Verdict: the protocol is sound in shape and wrong in three load-bearing places. The all-row holdout RMSE is dominated by 1.6% of rows that have no AOBT_3, the label leaks the truth into a declared feature, and the site admits open external data where the protocol says it is silent. Seventeen revisions and three decisions follow. Nothing runs until Keith says "apply consolidated".</p>
+
+<div class="headline"><ul>
+<li><strong>56% of the all-row holdout squared error</strong> sits in the 5,373 rows without AOBT_3 (RMSE 3,951 s there, 440 s elsewhere). Verdict lanes must split by AOBT_3 presence.</li>
+<li><strong>The board leader at 249.46 s cannot carry a 2025-like tail.</strong> If the scored rows held the same no-AOBT_3 structure, those rows alone would floor the RMSE at 494 s. Either 2026 lacks the tail or the scorer drops it. Inference, arithmetic below.</li>
+<li><strong>Codex (gpt-5.6-sol, xhigh) returned 12 findings</strong>, 8 overlapping the in-house pass. Its four unique ones are folded into R9, R10 and D1.</li>
+</ul></div>
+
+<h2>Decisions for Keith</h2>
+
+<div class="decision"><h3>D1 · Probe the scored subset through the board</h3>
+<p>The unknown 215,876-row subset defines the objective. The no-AOBT_3 group alone decides about 7.7 s of board RMSE depending on whether its rows are scored: 5,290 rows with a 400 s prediction offset add 3,920 s² to a 62,230 s² base. Two submissions per group, one with +c and one with -c on that group only, give its scored fraction and mean residual. Groups: AOBT_3 missing, January, July. About six submissions, each a logged ledger row.</p>
+<p>Site: ranking.html says teams are ranked on the best RMSE across their submissions, so probes cannot lower the rank; no cap is stated anywhere. <span class="call">My call: yes, right after S1.</span> Submissions are outward-facing, so this stays a Keith decision either way. Source: codex 9.</p></div>
+
+<div class="decision"><h3>D2 · Nulls: analytic bound or skill-literal replays</h3>
+<p><strong>A.</strong> Drop the 5-permutation nulls. Record per lane the expected best-of-grid optimism under no effect (12 cells: 1.63 x the paired SE, about 1.7 s, inside the 2 s floor); pick the grid by nested month-block CV; count every holdout verdict in the trial ledger. <strong>B.</strong> The skill as written: at least 20 full-recipe replays, 12 cells x 5 folds x 20 = 1,200 fits per lane.</p>
+<p><span class="call">My call: A.</span> It deviates from the skill's process-null principle, which is why it is not mine to take. Source: codex 6, in-house.</p></div>
+
+<div class="decision"><h3>D3 · External open data</h3>
+<p>eligibility.html: "All additional datasets used are openly available under an open source license" and must be documented. The protocol's data register says the site is silent; that is wrong (R15). <strong>A.</strong> Declare a weather lane W1 after S1 lands: an open METAR archive, its own register row and point-in-time rule, gated like any new model class. <strong>B.</strong> Keep external data foreclosed for this campaign.</p>
+<p><span class="call">My call: A, after S1.</span> January tails are the likeliest place weather shows, and the rule allows it.</p></div>
+
+<h2>Consolidated revisions (apply on "apply consolidated")</h2>
+<p class="note">Each row: protocol section, the issue in one sentence, the concrete fix, who found it, confidence 1-10. Line numbers refer to protocol v1 at 656ad9c.</p>
+<div class="wrap"><table>
+<tr><th>Id</th><th>Section</th><th>Issue</th><th>Fix</th><th>Source</th><th class="num">Conf</th></tr>
+<tr><td class="id">R1</td><td>§0 L16-19</td><td>The unit is declared as day x airport (620) but <code>noise_bar.py</code> resamples whole days (62); the n/8 feature cap (77) is a linear-model heuristic on the wrong count.</td><td>Declare the day as the unit (62 holdout days, 303 training days). Delete the feature cap. Control complexity with month-block out-of-fold results and per-feature knockout against the 2 s floor.</td><td class="src">in-house, codex 4</td><td class="num">9</td></tr>
+<tr><td class="id">R2</td><td>§0 L21-38, §3 L83</td><td>The 1.03 s paired SE was measured for one contrast (raw vs debiased, 19.4 s) after resampling to 215,876 rows; it is not a universal floor.</td><td>Every verdict bootstraps its own paired delta by day, 2,000 reps, no resampling to the board size. Keep 2 s as the practical minimum effect, not a detectability claim. Run one 3-day moving-block sensitivity and record it in §0.</td><td class="src">codex 5, in-house</td><td class="num">9</td></tr>
+<tr><td class="id">R3</td><td>§0, §1, §3 L83</td><td>The all-row holdout RMSE is dominated by the 5,373 rows without AOBT_3 (56% of the squared error; RMSE 3,951 s vs 440 s); an all-row verdict is moved by the fallback constant, not the model.</td><td>Two verdict lanes. Lane A = rows with AOBT_3, the measured noise bar applies. Lane B = rows without AOBT_3, its own noise bar, judged and reported separately. The all-row number is reported and never decides.</td><td class="src">in-house</td><td class="num">9</td></tr>
+<tr><td class="id">R4</td><td>§1 L43-44, §4 M1</td><td>"AOBT_3 residual" is defined with the truth inside it and then listed as an M1 feature; the training objective and the evaluation metric are conflated (Huber "cannot flip a verdict").</td><td>Feature z = takeoff - AOBT_3, label c = y - z, prediction = z + c_hat. A lineage test fails the build if c or y reaches the feature list. Any training objective (MSE, Huber, winsorised label) is admissible; judged only on raw RMSE.</td><td class="src">codex 1 and 11, in-house</td><td class="num">10</td></tr>
+<tr><td class="id">R5</td><td>§4 common design</td><td>Training truth holds 122 rows over 4 h that carry 40.8% of the training squared error; one such row in a leaf of 100 shifts the leaf mean by about 1,300 s.</td><td>Declared admission rule per lane: |c| at most C_cap (lane A), 0 &lt; y at most Y_cap (lane B); caps picked by one declared sweep {3600, 7200, 14400, none} on month-block CV inside the training months. The holdout is always scored untrimmed.</td><td class="src">in-house</td><td class="num">9</td></tr>
+<tr><td class="id">R6</td><td>§4 B3, B4</td><td>The task is largely imputing the hidden off-block time from visible timestamps; B3 tests only AOBT_3, and the 240 holdout rows where takeoff precedes AOBT_3 carry 9% of the residual squared error.</td><td>B3 becomes a family: takeoff - AOBT_3, - EOBT, - LOBT, each per-airport median-calibrated. B4 = per-airport OLS on the three gaps plus the queue count. Negative-gap rows fall back to the EOBT gap by rule.</td><td class="src">codex 8, in-house</td><td class="num">8</td></tr>
+<tr><td class="id">R7</td><td>§4 M1</td><td><code>month</code> can never be validated: no holdout month has a same-season month in training, while deployment has one.</td><td>Drop <code>month</code> from M1. If reinstated, it is a deployment-only feature checked on the forward fold (R9).</td><td class="src">in-house</td><td class="num">8</td></tr>
+<tr><td class="id">R8</td><td>§3 L86, L92, L98; §8 L139</td><td>Signs are inconsistent (-6.3 reads favourable, "at least 2 s" reads positive, a negative board delta trips REVIEW), and §3 asks for paired board intervals that cannot exist without row truth.</td><td>improvement = champion RMSE - challenger RMSE, positive is good, everywhere. REVIEW fires when two promoted champions in a row show board improvement at or below 0. haircut = holdout improvement - board improvement. The board reports point values only.</td><td class="src">codex 7, in-house</td><td class="num">9</td></tr>
+<tr><td class="id">R9</td><td>§3</td><td>"Holdout touched once" is already false (the noise bar, the 600 s tail threshold and the B3 level were read from it), and Jan/Jul are predicted from later months, which tests interpolation rather than forward transfer.</td><td>Relabel it the development holdout and list its uses so far (no model choice was made on it). Add one forward fold (train Jan-Nov 2025, predict Dec 2025) as a diagnostic on every M lane. Report Jan and Jul separately. No sealed month: ranking.html ranks on the best RMSE across submissions and names no separate set, so the board is the final judge.</td><td class="src">codex 2, 3, 10; site read</td><td class="num">8</td></tr>
+<tr><td class="id">R10</td><td>§3 L96</td><td>"Waves of at most 3" is arbitrary and the ledger does not remove board adaptivity.</td><td>Replace with a budget: at most 2 board submissions per promoted champion plus the declared probes (D1); every submission logged; the three gates stay.</td><td class="src">codex 10</td><td class="num">7</td></tr>
+<tr><td class="id">R11</td><td>§2 L58, §8</td><td>The masked-view test and the submission test are unnamed; the ledger counts board submissions but not holdout verdicts.</td><td>Name <code>tests/test_masked_view.py</code>, <code>tests/test_submission_file.py</code> (id set equals submitting.parquet, no nulls, integer dtype, the 14 sha256 hashes), <code>tests/test_lineage.py</code>. The ledger gains a holdout-verdict counter and probe rows.</td><td class="src">in-house</td><td class="num">8</td></tr>
+<tr><td class="id">R12</td><td>§4 M3</td><td>Ten per-airport TabPFN fits, 345k-row inference and a weight search are unproven on 16 GB; tabpfn 6.3.1 ships under "Prior Labs License (Apache 2.0 with ADDITIONAL PROVISION)", version 1.2 Dec 2025.</td><td>One-airport pilot with wall-clock, VRAM and at-least-2 s OOF-gain gates before the lane. Licence read (dist-info/licenses/LICENSE, paragraph 10): attribution only, no use restriction. If we make available anything containing the weights we ship the licence and display "Built with PriorLabs-TabPFN"; a model trained on TabPFN outputs (E1 would be) must carry "TabPFN" at the start of its name. Record this in §2 before any TabPFN submission.</td><td class="src">codex 12, in-house</td><td class="num">8</td></tr>
+<tr><td class="id">R13</td><td>§1 L42, L45</td><td>"free and unlimited" asserts more than the site states; 408.8 s is an in-sample yardstick presented beside a baseline.</td><td>"no cap stated (checked 2026-09-04)". Label 408.8 s in-sample, not B3.</td><td class="src">in-house</td><td class="num">8</td></tr>
+<tr><td class="id">R14</td><td>§7 F1, F3, F4</td><td>The flags lack the numbers measured today.</td><td>F1: training target coverage is 100% and submitting.parquet holds all 344,841 ids, so neither explains 215,876; the leader at 249.46 s is inconsistent with a 2025-like no-AOBT_3 tail among the scored rows (inference, see evidence). F3: the tail-share table. F4: rows without AOBT_3 have mean 1,384 s and RMS 3,669 s in training.</td><td class="src">in-house</td><td class="num">9</td></tr>
+<tr><td class="id">R15</td><td>§2 external-data row</td><td>The row says the site is silent; eligibility.html admits documented open datasets.</td><td>Correct the row: open, documented external data is admissible; each source still needs its own register row and point-in-time rule via amendment (D3 decides the first).</td><td class="src">in-house, site read</td><td class="num">10</td></tr>
+<tr><td class="id">R16</td><td>NOTES.md</td><td>Cited as the rules source but stale: bucket named <code>competition-data</code>, a "keys not generated" blocker.</td><td>Targeted refresh of those lines; add the three site quotes (ranking, eligibility, prize).</td><td class="src">in-house</td><td class="num">9</td></tr>
+<tr><td class="id">R17</td><td>§4 M1 grid</td><td>10 single-month folds x 12 cells = 120 fits per grid.</td><td>5 folds of month pairs.</td><td class="src">in-house</td><td class="num">7</td></tr>
+</table></div>
+
+<h2>Evidence</h2>
+<p class="note">Holdout = Jan + Jul 2025 departures with a target. Two filters were used: the month key (344,419 rows) and the date range in <code>noise_bar.py</code> (344,423 rows); the 4-row difference is unexplained and does not change any conclusion. Regenerate: <code>python scripts/review_checks.py</code> and <code>python scripts/review_tail_vs_aobt.py</code>.</p>
+
+<h3>A · Where the squared error sits (around the per-airport mean)</h3>
+<div class="wrap"><table>
+<tr><th>Truth bucket</th><th class="num">Training rows</th><th class="num">Training SSE %</th><th class="num">Holdout rows</th><th class="num">Holdout SSE %</th></tr>
+<tr><td>over 4 h</td><td class="num">122</td><td class="num">40.80</td><td class="num">45</td><td class="num">56.33</td></tr>
+<tr><td>2 h to 4 h</td><td class="num">462</td><td class="num">5.64</td><td class="num">104</td><td class="num">4.27</td></tr>
+<tr><td>1 h to 2 h</td><td class="num">3,542</td><td class="num">8.11</td><td class="num">832</td><td class="num">6.72</td></tr>
+<tr><td>non-positive</td><td class="num">388</td><td class="num">0.05</td><td class="num">83</td><td class="num">0.04</td></tr>
+<tr><td>up to 1 h</td><td class="num">2,080,533</td><td class="num">45.40</td><td class="num">343,359</td><td class="num">32.65</td></tr>
+</table></div>
+
+<h3>B · The per-airport mean on the holdout, by AOBT_3 presence</h3>
+<div class="wrap"><table>
+<tr><th>Rows</th><th class="num">n</th><th class="num">RMSE (s)</th><th class="num">Share of SSE %</th></tr>
+<tr><td>all</td><td class="num">344,423</td><td class="num">659.1</td><td class="num">100</td></tr>
+<tr><td>with AOBT_3</td><td class="num">339,050</td><td class="num">440.4</td><td class="num">43.95</td></tr>
+<tr><td>without AOBT_3</td><td class="num">5,373</td><td class="num">3,951.0</td><td class="num">56.05</td></tr>
+<tr><td>all, with +400 s on the rows without AOBT_3</td><td class="num">344,423</td><td class="num">656.6</td><td class="num"></td></tr>
+</table></div>
+<p>Only 2 of the 45 holdout rows over 4 h have an AOBT_3, and the one row with a gap over 4 h (truth 87,002 s) is predicted by its gap to within 179 s. The rest of the over-4 h rows sit in the no-AOBT_3 group. For scale, the raw AOBT_3 gap scores 428.2 s on the with-AOBT_3 rows against 440.4 s for the per-airport mean: the anchor is weak on the bulk and both numbers are tail-dominated.</p>
+
+<h3>C · Residual to the AOBT_3 gap (res = gap - truth), rows with AOBT_3</h3>
+<div class="wrap"><table>
+<tr><th>Truth bucket</th><th class="num">n</th><th class="num">mean truth</th><th class="num">mean gap</th><th class="num">mean res</th><th class="num">RMS res</th><th class="num">Residual SSE %</th></tr>
+<tr><td>up to 1 h</td><td class="num">338,244</td><td class="num">997</td><td class="num">1,012</td><td class="num">16</td><td class="num">393</td><td class="num">83.94</td></tr>
+<tr><td>1 h to 2 h</td><td class="num">737</td><td class="num">4,484</td><td class="num">1,637</td><td class="num">-2,847</td><td class="num">3,254</td><td class="num">12.56</td></tr>
+<tr><td>2 h to 4 h</td><td class="num">36</td><td class="num">8,547</td><td class="num">1,331</td><td class="num">-7,216</td><td class="num">7,337</td><td class="num">3.12</td></tr>
+<tr><td>non-positive</td><td class="num">31</td><td class="num">-6</td><td class="num">971</td><td class="num">977</td><td class="num">1,035</td><td class="num">0.05</td></tr>
+<tr><td>over 4 h</td><td class="num">2</td><td class="num">51,031</td><td class="num">43,920</td><td class="num">-7,111</td><td class="num">10,184</td><td class="num">0.33</td></tr>
+</table></div>
+<div class="wrap"><table>
+<tr><th>Gap bucket</th><th class="num">n</th><th class="num">mean truth</th><th class="num">mean res</th><th class="num">RMS res</th><th class="num">Residual SSE %</th></tr>
+<tr><td>gap up to 1 h</td><td class="num">338,368</td><td class="num">1,003</td><td class="num">9</td><td class="num">396</td><td class="num">85.28</td></tr>
+<tr><td>gap 1 h to 2 h</td><td class="num">438</td><td class="num">2,023</td><td class="num">2,309</td><td class="num">2,784</td><td class="num">5.46</td></tr>
+<tr><td>gap negative (takeoff before AOBT_3)</td><td class="num">240</td><td class="num">1,300</td><td class="num">-4,029</td><td class="num">4,858</td><td class="num">9.11</td></tr>
+<tr><td>gap 2 h to 4 h</td><td class="num">3</td><td class="num">4,717</td><td class="num">3,110</td><td class="num">5,428</td><td class="num">0.14</td></tr>
+<tr><td>gap over 4 h</td><td class="num">1</td><td class="num">87,002</td><td class="num">179</td><td class="num">179</td><td class="num">0.00</td></tr>
+</table></div>
+
+<h3>D · Rows without AOBT_3, training months</h3>
+<div class="wrap"><table>
+<tr><th>Group</th><th class="num">n</th><th class="num">mean truth</th><th class="num">RMS truth</th><th class="num">median</th></tr>
+<tr><td>with AOBT_3</td><td class="num">2,062,577</td><td class="num">987</td><td class="num">1,072</td><td class="num">911</td></tr>
+<tr><td>without AOBT_3</td><td class="num">22,470</td><td class="num">1,384</td><td class="num">3,669</td><td class="num">951</td></tr>
+</table></div>
+
+<h3>E · Arithmetic behind the inferences (not read facts)</h3>
+<pre>board floor if the scored rows carried the 2025 no-AOBT_3 structure:
+  python -c "print((0.0156*215876*3951**2/215876)**0.5)"        -> 494 s  (leader: 249.46 s)
+board cost of a 400 s offset on 5,290 no-AOBT_3 rows, if scored:
+  python -c "print((249.46**2+5290*400**2/215876)**0.5-249.46)"  -> 7.7 s
+expected best-of-12 optimism under no effect, in paired-SE units:
+  python -c "import numpy as np;r=np.random.default_rng(0);print(r.standard_normal((200000,12)).max(1).mean())"  -> 1.63</pre>
+
+<h2>Codex outside voice, verbatim</h2>
+<p class="note">codex exec 0.144.1, model gpt-5.6-sol, reasoning xhigh, read-only, no tools, 18,874 tokens. Prompt: the protocol v1 text with a header asking for at most 12 findings the in-house pass missed.</p>
+<details><summary>12 findings</summary>
+<ol>
+<li><strong>§§0, 4 (B4/M1)</strong> — “AOBT_3 residual” is defined as <code>takeoff − AOBT_3 − truth</code>, then appears as an M1 feature and ambiguously in B4. That is either target leakage or an unreproducible definition. <strong>Fix:</strong> define <code>z = takeoff − AOBT_3</code> as the feature and <code>c = target − z</code> as the training label; enforce feature-lineage tests excluding <code>c</code>. <strong>Confidence: 10/10.</strong></li>
+<li><strong>§§0, 3, 4</strong> — Jan/Jul has already been mined for the 600-second threshold, feature cap, baseline performance, and decision floor. “Holdout touched once” is false before M1 starts. <strong>Fix:</strong> relabel it development validation; use nested date-block CV and seal untouched dates or months for final auditing. <strong>Confidence: 10/10.</strong></li>
+<li><strong>§3</strong> — The Jan/Jul holdout is fitted using later 2025 months, while deployment predicts 2026 using only the prior year. This validates temporal interpolation, not forward transfer, and combining January with July can hide opposite failures. <strong>Fix:</strong> add rolling-origin folds and report January and July separately. <strong>Confidence: 9/10.</strong></li>
+<li><strong>§0</strong> — The claimed 620 independent units ignore same-date cross-airport shocks and adjacent-day persistence. The <code>n_independent/8</code> feature cap is an unjustified linear-model heuristic based on holdout rather than training information. <strong>Fix:</strong> use date-level moving blocks or two-way clustering and control LightGBM complexity through grouped OOF results, not a 77-feature cap. <strong>Confidence: 9/10.</strong></li>
+<li><strong>§§0, 3</strong> — Resampling to the board’s row count does not estimate uncertainty for the actual holdout estimator. A paired SE observed for one 19.4-second contrast cannot establish a universal 2-second noise floor; paired variance changes by challenger. <strong>Fix:</strong> bootstrap each exact paired comparison with at least 2,000 replicates and call 2 seconds a practical threshold, not detectability. <strong>Confidence: 10/10.</strong></li>
+<li><strong>§§3, 4</strong> — Permuting raw targets within airport-days is not exchangeable given hour and queue structure, and it tests the wrong null relative to B3. Five permutations have minimum p-value 1/6 and provide a noisy maximum at enormous cost. <strong>Fix:</strong> use nested blocked validation, or residual randomization under an explicit null with at least 100 permutations only for finalists. <strong>Confidence: 10/10.</strong></li>
+<li><strong>§§3, 8</strong> — Delta signs are inconsistent: “−6.3” appears favorable, “at least 2” implies positive is favorable, while negative board deltas trigger review. Stage 6 also requests paired board intervals despite having no scored-row truths. <strong>Fix:</strong> define <code>improvement = old RMSE − new RMSE</code>, positive is good, and report board point deltas only. <strong>Confidence: 10/10.</strong></li>
+<li><strong>§§1, 4</strong> — Because <code>target = takeoff − block</code> and takeoff is visible, this is principally hidden off-block-time imputation. The protocol jumps to traffic and tail models before exhausting the visible timestamp estimates. <strong>Fix:</strong> test <code>takeoff−EOBT</code>, <code>takeoff−LOBT</code>, and <code>takeoff−AOBT_3</code>, followed by an OOF linear/median airport calibration of their implied block times. <strong>Confidence: 10/10.</strong></li>
+<li><strong>§§7, 8</strong> — The unknown 215,876-row subset is not merely a caution flag; it defines the objective’s weighting distribution. Optimizing all-row holdout RMSE may target the wrong population. <strong>Fix:</strong> first reconcile submission-template IDs, then—if rules permit—use ± perturbation submissions by month, airport, and missingness group to infer scored fractions and group residual sums. <strong>Confidence: 9/10.</strong></li>
+<li><strong>§§3, 8</strong> — The board cannot remain an independent judge after unlimited adaptive submissions; the ledger and haircut do not remove winner’s curse. Arbitrary waves of three also reduce the chance of top three. <strong>Fix:</strong> retain a sealed local audit for scientific claims, while explicitly budgeting board probes and low-dimensional calibration/blend searches, logging every query. <strong>Confidence: 10/10.</strong></li>
+<li><strong>§§1, 7</strong> — Preventing Huber or transformed-target fits from “flipping” the verdict confuses evaluation loss with the training estimator. Labels near 131,000 seconds can destabilize MSE training, while robust training may still improve raw-RMSE evaluation. <strong>Fix:</strong> admit clipping, winsorized, and Huber candidates, judging all of them solely on raw grouped-validation RMSE. <strong>Confidence: 10/10.</strong></li>
+<li><strong>§4 (M3)</strong> — Ten large per-airport TabPFN fits, 77 features, 345,000-row inference, weight searches, and permutation replays are not established as feasible on 16 GB VRAM. The advertised one-million-row limit is not a runtime or memory benchmark. <strong>Fix:</strong> run one representative-airport pilot with hard wall-clock, VRAM, and ≥2-second OOF-gain gates before allocating the full lane. <strong>Confidence: 9/10.</strong></li>
+</ol></details>
+<p><strong>Cross-model tension.</strong> Codex items 2 and 10 assume a hidden final evaluation and ask for a sealed month. ranking.html states the rank is the best RMSE across a team's submissions and names no separate set, so the board is the final judge and a sealed month would cost training data for no competition gain. Downgraded to R9 and R10. Codex item 9 (probing) is stronger than codex rated it once the 7.7 s arithmetic is on the table; it is D1.</p>
+
+<h2>Review status</h2>
+<h3>Not in scope</h3>
+<ul>
+<li>Model code, baselines, tests: they wait for protocol v2. Writing them against v1 would build on the leaking label (R4).</li>
+<li>Resolving the 215,876-row subset locally: every local check is exhausted (F1); only the board can answer (D1).</li>
+<li>A sealed audit month: no competition reason (R9); revisit only if the organisers announce a separate final set.</li>
+<li>Weather data engineering: D3 first.</li>
+</ul>
+<h3>What already exists</h3>
+<ul>
+<li><code>viewdata.py</code> and <code>docs/data-viewer.html</code>: column and month statistics; source of the §0 counts.</li>
+<li><code>lb.py</code>: board reader (per-team best, usedPairs). <code>probe.py</code>: bucket access check.</li>
+<li><code>scripts/noise_bar.py</code>: day-block bootstrap; becomes the per-verdict paired-delta helper after R2.</li>
+<li><code>scripts/review_checks.py</code>, <code>scripts/review_tail_vs_aobt.py</code>: the measurements on this page.</li>
+</ul>
+<h3>Failure modes flagged (critical)</h3>
+<ol>
+<li>Submission id set differs from submitting.parquet: the ranking script errors. Covered by <code>tests/test_submission_file.py</code> (R11).</li>
+<li>An all-row holdout verdict swung by the fallback constant on 5,373 rows (R3).</li>
+<li>MSE training on labels up to 131,167 s (R4, R5).</li>
+<li>TabPFN lane exceeding 16 GB or the time budget without a pilot (R12).</li>
+</ol>
+<h3>Implementation tasks (after "apply consolidated")</h3>
+<ul>
+<li>T1 (P1) amend <code>docs/EXPERIMENT-PROTOCOL.md</code> to v2 per R1-R17 and the D1-D3 answers; amendment log entry.</li>
+<li>T2 (P1) tests: <code>tests/test_submission_file.py</code>, <code>tests/test_masked_view.py</code>, <code>tests/test_lineage.py</code>.</li>
+<li>T3 (P1) baselines B0-B4 with the B3 family, split-lane reporting, <code>docs/TRIAL-LEDGER.md</code>.</li>
+<li>T4 (P1) <code>scripts/noise_bar.py</code>: per-verdict paired bootstrap (2,000 reps, day blocks), one 3-day block sensitivity.</li>
+<li>T5 (P2) admission-cap sweep on month-block CV; T6 (P2) M1 on label c; T7 (P2) TabPFN one-airport pilot plus licence read.</li>
+<li>T8 (P3) board probes if D1 is yes; T9 (P3) NOTES.md refresh; T10 (P3) weather lane if D3 is A.</li>
+</ul>
+<p class="note">Parallelisation: T2, T3 and T4 are independent files and can run as three lanes; everything else is sequential behind T1. JSONL task export skipped: jq is not installed on this box.</p>
+</main>

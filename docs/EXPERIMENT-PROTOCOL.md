@@ -142,3 +142,22 @@ N/A. The smallest airport (LSZH, 134,907 training departures) has about 22,000 h
 ## Amendment log
 
 - v1 2026-09-04: instantiated. Baselines B0-B4 and lanes M1-M3, E1, S1 declared; noise bar measured and the 2 s floor set.
+
+## GSTACK REVIEW REPORT
+
+| Review | Trigger | Why | Runs | Status | Findings |
+|--------|---------|-----|------|--------|----------|
+| CEO Review | `/plan-ceo-review` | Scope & strategy | 0 | NOT RUN | |
+| Codex Review | `/codex review` | Independent 2nd opinion | 1 | ISSUES_OPEN | 12 findings (gpt-5.6-sol, xhigh, 2026-09-04): 8 overlap the in-house pass, 4 unique (holdout already mined, no forward-transfer fold, scored-subset probing, board as judge) |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | ISSUES_OPEN | 17 revisions R1-R17 and 3 decisions D1-D3, consolidated in `docs/protocol-review-v1.html`; waiting for "apply consolidated" before v2 |
+| Design Review | `/plan-design-review` | UI/UX gaps | 0 | NOT RUN | no UI in scope |
+| DX Review | `/plan-devex-review` | Developer experience gaps | 0 | NOT RUN | |
+
+- **CODEX:** label lineage (feature z = takeoff - AOBT_3, label c = target - z), holdout already mined for the noise bar, no forward-transfer fold, permutation nulls mis-specified, sign convention inconsistent, probe the scored subset through the board, TabPFN feasibility unproven.
+- **CROSS-MODEL:** codex and the in-house pass agree on 8 of 12 codex items (independence unit, paired SE, nulls, signs, lineage, robust training, TabPFN pilot, baselines from the visible timestamps). The in-house pass adds the split of the verdict lane by AOBT_3 presence (43 of the 45 holdout rows over 4 h lack AOBT_3 and carry most of the all-row squared error), the training admission caps, dropping `month`, and the corrected external-data rule (eligibility.html admits documented open datasets). Codex item 10 assumes a hidden final set; ranking.html states the rank is the best RMSE across submissions and names no separate set, so its sealed-audit fix is downgraded to a submission budget with logging.
+- **VERDICT:** ENG REVIEW ISSUES OPEN; eng review required. No baseline or model code runs until the consolidated revisions are applied as protocol v2.
+
+**UNRESOLVED DECISIONS:**
+- D1 Board probes of the scored subset (about 6 perturbation submissions, each logged): run them after S1, or not.
+- D2 Nulls: analytic search-optimism bound plus nested month-block CV (a declared deviation from the skill's 20-replay process null), or the skill-literal replays.
+- D3 External open data (eligibility.html admits documented open datasets): declare a weather lane after S1, or keep it foreclosed.
