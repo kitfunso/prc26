@@ -15,6 +15,9 @@ KEYS = ("id", "apt", "month", "day", "t_off")
 CATEGORICAL = ("runway", "stand", "actype", "wake", "segment")
 COUNTS = ("queue", "dep_before", "dep_after", "arr_anchor", "arr_off", "push_anchor")
 FEATURES = ("hour", "wday", "has_fpl", "z_aobt", "z_eobt", "z_lobt", "z_sched", "z_anchor") + CATEGORICAL + COUNTS
+# Plan-provenance columns (D1): outside FEATURES so the champions' column lists stay as declared.
+PLAN_CAT = ("operator", "ftype", "frule", "ades")
+PLAN = PLAN_CAT + ("dur", "slip", "d_ae", "d_al", "d_es", "aobt_sec", "aobt_m5", "eobt_m5", "lobt_sec")
 LABELS = ("y", "c")
 WINDOW = 900.0
 
@@ -28,7 +31,14 @@ SELECT MVT_ID_mvt AS id, ADEP_mvt AS apt, month(MVT_TIME_UTC_mvt) AS month, MVT_
        epoch(MVT_TIME_UTC_mvt) - epoch(LOBT_flt) AS z_lobt,
        epoch(MVT_TIME_UTC_mvt) - epoch(SCHED_TIME_UTC_mvt) AS z_sched,
        RUNWAY_mvt::VARCHAR AS runway, STAND_mvt::VARCHAR AS stand, AIRCRAFT_TYPE_mvt::VARCHAR AS actype,
-       WK_TBL_CAT_flt::VARCHAR AS wake, MARKET_SEGMENT_flt::VARCHAR AS segment
+       WK_TBL_CAT_flt::VARCHAR AS wake, MARKET_SEGMENT_flt::VARCHAR AS segment,
+       AIRCRAFT_OPERATOR_flt::VARCHAR AS operator, FLIGHT_TYPE_flt::VARCHAR AS ftype,
+       FLIGHT_RULE_mvt::VARCHAR AS frule, ADES_flt::VARCHAR AS ades,
+       epoch(ARVT_1_flt) - epoch(EOBT_1_flt) AS dur, epoch(EOBT_1_flt) - epoch(IOBT_flt) AS slip,
+       epoch(AOBT_3_flt) - epoch(EOBT_1_flt) AS d_ae, epoch(AOBT_3_flt) - epoch(LOBT_flt) AS d_al,
+       epoch(EOBT_1_flt) - epoch(SCHED_TIME_UTC_mvt) AS d_es,
+       epoch(AOBT_3_flt) % 60 AS aobt_sec, (epoch(AOBT_3_flt) % 300 = 0)::INT AS aobt_m5,
+       (epoch(EOBT_1_flt) % 300 = 0)::INT AS eobt_m5, epoch(LOBT_flt) % 60 AS lobt_sec
 FROM read_parquet({files}) WHERE PHASE_mvt = 'DEP' ORDER BY apt, t_off, id"""
 
 LANDINGS = """
@@ -63,9 +73,9 @@ def features(paths: list[str]) -> pd.DataFrame:
     df["z_anchor"] = np.where(df.has_fpl, z_fpl, df.z_sched)
     for name, col in zip(COUNTS, _traffic(df, landings)):
         df[name] = col
-    for c in CATEGORICAL:
+    for c in CATEGORICAL + PLAN_CAT:
         df[c] = df[c].astype("category")
-    return df[list(KEYS + FEATURES)]
+    return df[list(KEYS + FEATURES + PLAN)]
 
 
 def _between(s: np.ndarray, lo: np.ndarray, hi: np.ndarray) -> np.ndarray:

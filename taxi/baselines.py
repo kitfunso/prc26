@@ -46,8 +46,8 @@ def gap(col: str) -> Model:
     return fit_predict
 
 
-def b4(tr: pd.DataFrame, te: pd.DataFrame, lane: str) -> np.ndarray:
-    cols = ["z_anchor", "z_eobt", "z_lobt", "queue"] if lane == "A" else ["z_sched", "queue"]
+def b4(tr: pd.DataFrame, te: pd.DataFrame, lane: str, cols: list[str] | None = None) -> np.ndarray:
+    cols = cols or (["z_anchor", "z_eobt", "z_lobt", "queue"] if lane == "A" else ["z_sched", "queue"])
     out = b1(tr, te, lane)
     for apt, ix in te.groupby("apt").indices.items():
         t = tr[tr.apt == apt]

@@ -38,31 +38,31 @@ def b4w(tr: pd.DataFrame, te: pd.DataFrame) -> np.ndarray:
     return out
 
 
-def cv_a(tr: pd.DataFrame, cell: dict) -> tuple[tuple[int, int, int], list[str]]:
-    lines = ["| fold | W1 RMSE (s) | W1 rounds (clf, tail, body) | fit s |", "|---|---|---|---|"]
+def cv_a(tr: pd.DataFrame, cell: dict, cols: list[str] = COLS_A, name: str = "W1") -> tuple[tuple[int, int, int], list[str]]:
+    lines = [f"| fold | {name} RMSE (s) | {name} rounds (clf, tail, body) | fit s |", "|---|---|---|---|"]
     sq, n, rounds = 0.0, 0, []
     for fold in CV_FOLDS:
         m, t0 = tr.month.isin(fold).values, time.time()
         va = tr[m]
-        models = stages(tr[~m], cell, va=va, cols=COLS_A)
+        models = stages(tr[~m], cell, va=va, cols=cols)
         e = predict_m2(models, va)[0] - va.y.values
         sq, n = sq + float(e @ e), n + len(e)
         rounds.append([b.best_iteration for b in models])
         lines.append(f"| {fold} | {rmse(e):.1f} | {rounds[-1]} | {time.time() - t0:.0f} |")
         print(lines[-1], flush=True)
     r = tuple(int(x) for x in np.mean(rounds, axis=0))
-    lines.append(f"\nCV RMSE over the five folds: W1 {np.sqrt(sq / n):.1f} s (M2 on the same rows: see docs/M2.md); final W1 rounds {r}.")
+    lines.append(f"\nCV RMSE over the five folds: {name} {np.sqrt(sq / n):.1f} s (M2 on the same rows: see docs/M2.md); final {name} rounds {r}.")
     print(lines[-1], flush=True)
     return r, lines
 
 
-def verdict_line(name: str, champ: str, v: Verdict) -> str:
-    bound = expected_max(K) * (v.hi - v.lo) / 3.92
+def verdict_line(name: str, champ: str, v: Verdict, k: int = K) -> str:
+    bound = expected_max(k) * (v.hi - v.lo) / 3.92
     clears = v.win and v.delta >= bound + FLOOR
     word = f"WIN, clears bound plus floor, {name} promoted" if clears else (
         f"WIN on the interval but inside bound plus floor, {champ} stays" if v.win else f"tie or lose, {champ} stays")
     return (f"Improvement {name} vs {champ}: {v.delta:+.1f} s [{v.lo:+.1f}, {v.hi:+.1f}]; paired SE {(v.hi - v.lo) / 3.92:.1f} s; "
-            f"optimism bound for k = {K}: {bound:.1f} s; floor {FLOOR:.0f} s. Verdict: {word}.")
+            f"optimism bound for k = {k}: {bound:.1f} s; floor {FLOOR:.0f} s. Verdict: {word}.")
 
 
 def coverage(df: pd.DataFrame, name: str) -> str:

@@ -1,6 +1,7 @@
 """M1: LightGBM per lane on the masked feature frame; grid by month-pair CV; verdict vs B4 (protocol section 4)."""
 from __future__ import annotations
 
+import re
 import time
 
 import lightgbm as lgb
@@ -8,11 +9,11 @@ import numpy as np
 import pandas as pd
 
 from taxi.baselines import b4
-from taxi.data import CATEGORICAL, CV_FOLDS, FEATURES, HOLDOUT_MONTHS, TRAIN_MONTHS, load
+from taxi.data import CATEGORICAL, CV_FOLDS, FEATURES, HOLDOUT_MONTHS, PLAN_CAT, TRAIN_MONTHS, load
 from taxi.verdict import FLOOR, paired_delta, rmse
 
 MODEL_FEATURES = ["apt", *FEATURES]
-CAT = ["apt", *CATEGORICAL]
+CAT = ["apt", *CATEGORICAL, *PLAN_CAT]  # every categorical the view carries; matrix() and the fits keep only those in cols
 LABEL = {"A": "c", "B": "y"}
 GRID = {
     "A": [dict(num_leaves=n, min_data_in_leaf=m, objective=o)
@@ -110,6 +111,12 @@ def main_sensitivity() -> None:
     for name, m in (("all rows", np.ones(len(tea), bool)), ("z_aobt >= 0 rows", ~neg)):
         v = paired_delta(e_b4[m], e_m1[m], tea.day.values[m])
         print(f"{name}: B4 {v.champion:.1f}, M1 {v.challenger:.1f}, {v.line()}", flush=True)
+
+
+def final_rounds(name: str, path: str) -> tuple[int, int, int]:
+    """The M2-recipe rounds a lane report recorded, e.g. final_rounds("W1", "docs/W1.md")."""
+    m = re.search(rf"final {name} rounds \((\d+), (\d+), (\d+)\)", open(path, encoding="utf-8").read())
+    return int(m.group(1)), int(m.group(2)), int(m.group(3))
 
 
 def expected_max(k: int) -> float:

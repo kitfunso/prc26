@@ -9,7 +9,7 @@ the W1 run (ledger H15, H16) and the Stage 5.7 critique (`docs/gate-s2.html`).
 
 | # | Question | Short answer | Pointer |
 |---|---|---|---|
-| 1 | What have you tried? | 16 holdout verdicts (B0-B4, gap family, M1, M2, W1 in both lanes), 3 declared searches, 1 board submission, 2 scored probes, M3 pilot run (time gate failed) | `docs/TRIAL-LEDGER.md` H1-H16; protocol section 4 |
+| 1 | What have you tried? | 19 holdout verdicts (B0-B4, gap family, M1, M2, W1 in both lanes, D1 plan provenance, L1 lane-B campaign, MC1 CatBoost), 4 declared searches, 1 board submission, 2 scored probes, M3 pilot run (time gate failed) | `docs/TRIAL-LEDGER.md` H1-H19; protocol section 4 |
 | 2 | What features? | 20 columns: airport, hour, weekday, has_fpl, four time gaps, anchor gap, five categoricals, six 900 s traffic counts; 14 ranking columns never used | `taxi/data.py` FEATURES; `docs/M1-KNOCKOUT.md`; section 2 below |
 | 3 | What feature engineering? | label lineage (lane A learns the residual after the off-block gap), anchor rule, traffic counts from ranking-visible movements, tail split (M2), weather as-of join (W1) | section 3 below |
 | 4 | What model? | means and OLS (B0-B4), LightGBM (M1), two-stage LightGBM (M2), TabPFN pilot (M3); lane B champion is still a two-feature OLS | protocol rows B0-M3 |
@@ -21,7 +21,7 @@ the W1 run (ledger H15, H16) and the Stage 5.7 critique (`docs/gate-s2.html`).
 
 ## 1. What have you tried
 
-Holdout verdicts, N_h = 16 (`docs/TRIAL-LEDGER.md` section B):
+Holdout verdicts, N_h = 19 (`docs/TRIAL-LEDGER.md` section B):
 
 | Rows | Lane | What | Outcome |
 |---|---|---|---|
@@ -30,11 +30,13 @@ Holdout verdicts, N_h = 16 (`docs/TRIAL-LEDGER.md` section B):
 | H12-H13 | B, A | M1 LightGBM | lane B lose (-312.1 s vs B4); lane A WIN 259.5 s, +51.6 [+48.4, +55.1] |
 | H14 | A | M2 two-stage | WIN 256.6 s, +2.9 [+1.8, +4.1]; the gain sits in body rows, not the tail it was built for |
 | H15-H16 | B, A | W1 weather: B4 plus five METAR columns; M2 recipe plus 16 METAR columns | lane B tie (+9.9 [-2.7, +22.6]), B4 stays; lane A WIN 253.8 s, +2.9 [+1.8, +3.9], W1-A promoted (floor-edge again, F10) |
+| H17-H18 | B, A | L1a: B4 plus the VFR flag (CV winner of four lane-B cells); D1: M2 recipe on W1-A's columns plus 13 plan-provenance columns | lane B tie (+2.1 [-0.2, +5.3]), B4 stays; lane A WIN 242.2 s, +11.6 [+9.2, +14.0], D1 promoted (the whole interval clears the floor) |
+| H19 | A | MC1: CatBoost on the GPU, M2 recipe, W1-A's 36 columns | WIN vs W1-A, 248.2 s, +5.6 [+4.4, +6.8]; not promoted, D1 is 6.0 s better on the same rows; MC2 (CatBoost at D1's columns, against D1) declared |
 
 Declared searches (ledger line 35): CAP sweep k = 4 per lane (chose no cap); M1 grid k = 12 lane A (bound 2.8 s), k = 8 lane B (bound 229.4 s); M2 k = 1; W1 k = 1 per lane.
 Diagnostics, never verdicts: forward fold Jan-Nov to Dec for M1 (`docs/M1.md` line 117); per-feature knockout for M1 (`docs/M1-KNOCKOUT.md`).
 Board: S1 325.40 s, rank 11 of 29, leader 277.29 s (protocol row S1). Probes P1, P2 scored; P3-P6 rejected by the 3-per-day cap; single-sided P3s, P5s scheduled for 2026-09-06 00:05 UTC.
-Run 2026-09-05 after this file was first written: M3 TabPFN pilot on LIRF, gain +11.6 s and VRAM 3.8 GB pass, the 30 min time gate fails at 38.1 min, M3 stopped pending Keith (`docs/M3-PILOT.md`; four of five folds seeded from the printed lines of killed runs, RMSE rounded to 0.1 s). W1 weather run in both lanes (`docs/W1.md`, rows H15-H16 above). S2 file built from W1-A plus B4, not uploaded (`docs/gate-s2.html`).
+Run 2026-09-05 after this file was first written: M3 TabPFN pilot on LIRF, gain +11.6 s and VRAM 3.8 GB pass, the 30 min time gate fails at 38.1 min, M3 stopped pending Keith (`docs/M3-PILOT.md`; four of five folds seeded from the printed lines of killed runs, RMSE rounded to 0.1 s). W1 weather run in both lanes (`docs/W1.md`, rows H15-H16 above). S2 file built from W1-A plus B4, not uploaded (`docs/gate-s2.html`). Later the same day: D1 and L1 run (rows H17-H18 above), D1 promoted; MC1 run (row H19), a win against W1-A that does not displace D1; MC2 declared.
 
 ## 2. What features
 
@@ -64,7 +66,7 @@ Not done: target transforms (log or asinh of y for lane B, quantile targets); st
 ## 4. What model
 
 Tried: B0 global mean, B1 per-airport mean, B2 airport x hour x weekday mean, B3 gap family, B4 per-airport OLS; M1 LightGBM with l2 and huber objectives; M2 two-stage LightGBM (classifier plus tail and body regressors); M3 TabPFN 6.3.1 per airport (pilot on LIRF only).
-Not tried: a lane-B model campaign beyond the M1 grid (half the squared error rides on a two-feature OLS, flag F9); per-airport LightGBM; median (L1) regression; CatBoost or XGBoost (same family as M1, expected inside the noise bar, low priority); k-nearest rows on stand, runway, hour; neural nets; blends (E1 declared, waits on M3).
+Not tried: a lane-B model campaign beyond the M1 grid (half the squared error rides on a two-feature OLS, flag F9); per-airport LightGBM; median (L1) regression; XGBoost (CatBoost run as MC1, H19: +5.6 s vs W1-A on identical columns, so the same-family assumption was wrong; MC2 declared); k-nearest rows on stand, runway, hour; neural nets; blends (E1 declared, waits on M3).
 
 ## 5. Tuning
 
@@ -86,7 +88,7 @@ Draft declaration O1 (lane A only; lane B needs a model class, not tuning):
 
 ## 7. Detail (Keith grades)
 
-What exists for grading: protocol registry with every design declared before its run (section 4 of the protocol); the ledger with 16 paired intervals; a current NOT-DONE table; the knockout table; the M2 report stating that its gain sits in the body rows, not the tail it targeted.
+What exists for grading: protocol registry with every design declared before its run (section 4 of the protocol); the ledger with 19 paired intervals; a current NOT-DONE table; the knockout table; the M2 report stating that its gain sits in the body rows, not the tail it targeted.
 Thin spots, by the author: no forward fold for M2 or W1; no per-airport error table in `docs/M2.md`; no residual table by hour, runway or stand to guide the next feature set; no learning curve (does more training data still help?); the probe decomposition (lane B = 50% of holdout squared error) has not been turned into a lane-B campaign; per-airport squared-error shares were only used to pick the M3 pilot airport.
 
 ## 8. Effort (Keith grades)
@@ -100,12 +102,12 @@ Each item has a cost and a draft declaration. Keith picks; nothing below runs un
 Inputs
 
 - W1 weather: RUN 2026-09-05 (`docs/W1.md`): lane A +2.9 s [+1.8, +3.9] WIN, lane B tie. Next weather step, if any: a join-shift stress (observation latency, +10 min on the as-of join), k = 1, about 40 min.
-- F1 unused plan columns: operator, flight type, flight rule, destination, filed duration (ARVT_1 minus EOBT_1), plan slip (EOBT_1 minus IOBT), all filed-plan fields, ARVT_3 excluded. k = 1 (all in), M2 recipe vs M2 refit, about 5 min.
+- F1 unused plan columns: RUN as D1 2026-09-05 (`docs/D1.md`): +11.6 s [+9.2, +14.0] WIN, D1 promoted; the gain sits in the AOBT_3 minus EOBT_1 and AOBT_3 minus LOBT gaps, operator and destination; the rounding and second-of-minute flags carry nothing.
 - G1 stand x runway target encoding: fold-internal median of c per airport, stand, runway as one numeric column. k = 1, about 5 min.
 
 Mechanisms
 
-- L1 lane-B campaign: per-airport median regression; LightGBM on log(y) with a per-airport offset; a "over 1 h" classifier times a conditional mean. k = 3, bound about 0.85 x 161 s = 137 s, about 10 min. This is the half of the squared error nobody has modelled.
+- L1 lane-B campaign: RUN 2026-09-05 (`docs/L1.md`), four cells (VFR flag, log target, over-1-h classifier, pooled fit): the VFR flag ties B4 (+2.1 s [-0.2, +5.3]); the three model cells lose to B4 on CV by 560 to 1,160 s. Lane B is still the half of the squared error nobody has beaten.
 - E1 blend of W1-A and M3 (declared): waits on Keith amending M3's 30 min time gate (the pilot failed it at 38.1 min); needs M3 on all ten airports, about 10 airports x 5 folds x 8 min = about 7 h GPU, then an 11-point weight grid, k = 11.
 - T1 target treatment for lane A: asinh(c) and a median-loss fit vs l2. k = 2, about 5 min.
 

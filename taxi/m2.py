@@ -19,7 +19,7 @@ Models = tuple[lgb.Booster, lgb.Booster, lgb.Booster]
 def fit(x: pd.DataFrame, label: np.ndarray, cell: dict, va: tuple[pd.DataFrame, np.ndarray] | None = None,
         rounds: int = MAX_ROUNDS, cols: list[str] = MODEL_FEATURES) -> lgb.Booster:
     params = {**BASE, **cell}
-    d = lgb.Dataset(matrix(x, cols), label, categorical_feature=CAT)
+    d = lgb.Dataset(matrix(x, cols), label, categorical_feature=[c for c in CAT if c in cols])
     if va is None:
         return lgb.train(params, d, num_boost_round=rounds)
     dv = lgb.Dataset(matrix(va[0], cols), va[1], reference=d)
