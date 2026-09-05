@@ -3,12 +3,13 @@
 Contract: `docs/EXPERIMENT-PROTOCOL.md` section 8. Sign convention: improvement = champion RMSE minus challenger RMSE, positive is good.
 Rows are never edited; a superseded row gets a note in a later row. Old-spec rows stay, labelled.
 
-Counters: N (board submissions) = 0. N_h (holdout verdicts) = 13.
+Counters: N (board submissions) = 1. N_h (holdout verdicts) = 13.
 
 ## A. Board submissions
 
 | id | date | file | spec (lane A + lane B) | git | holdout lane A | holdout lane B | holdout all rows | holdout improvement | board RMSE | board improvement | haircut | usedPairs |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
+| S1 | 2026-09-05 | `merry-octopus_v1.parquet` (sha256 c79d20d7b691ef1696acdf93537e092fa8faf405c62a08aea15f5a55488f39de, 344,841 rows, uploaded 09:5x UTC, scored 09:58:03 UTC) | lane A M1 (31 leaves, min_data 200, l2, 1,016 rounds) + lane B B4 [z_sched, queue], both fit on all 12 months of 2025 | 256b4c1 | 259.5 | 2,074.1 | 365.3 | lane A +51.6 [+48.4, +55.1] vs B4 (H13); all rows +37.7 vs B4 in both lanes (reported) | 325.3982 (rank 11 of 29 teams; leader 277.29) | N/A, first submission | N/A | 344,841 |
 
 ## B. Holdout verdicts (Jan + Jul 2025, paired day-block bootstrap, 2,000 reps, seed 0; floor 2 s)
 
