@@ -22,8 +22,8 @@ def _line(z_tr: np.ndarray, y_tr: np.ndarray, z_te: np.ndarray) -> np.ndarray:
     return a + s * z_te
 
 
-def per_row(tr: pd.DataFrame, te: pd.DataFrame, fit: Fit) -> np.ndarray:
-    """L4b everywhere; a touched row whose band has MIN_NONCOPY non-copy training rows gets P(copy) x z_sched + (1 - P(copy)) x fit(non-copy rows)."""
+def per_row(tr: pd.DataFrame, te: pd.DataFrame, fit: Fit, min_noncopy: int = MIN_NONCOPY) -> np.ndarray:
+    """L4b everywhere; a touched row whose band has min_noncopy non-copy training rows gets P(copy) x z_sched + (1 - P(copy)) x fit(non-copy rows)."""
     out, m = champion(tr, te), touched(tr, te)
     for apt in np.unique(te.apt.values[m]):
         t = tr[(tr.apt == apt) & (tr.notyp == 1)].reset_index(drop=True)
@@ -32,7 +32,7 @@ def per_row(tr: pd.DataFrame, te: pd.DataFrame, fit: Fit) -> np.ndarray:
         z, zb, p = sub.z_sched.values, band(sub.z_sched.values), shrunk(t, sub)
         for b in np.unique(zb):
             k, j = (tb == b) & ~c, zb == b
-            if int(k.sum()) >= MIN_NONCOPY:
+            if int(k.sum()) >= min_noncopy:
                 out[ix[j]] = p[j] * z[j] + (1 - p[j]) * fit(t.z_sched.values[k], t.y.values[k], z[j])
     return out
 

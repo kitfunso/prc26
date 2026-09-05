@@ -4,6 +4,7 @@ from __future__ import annotations
 import glob
 
 import duckdb
+import holidays
 import numpy as np
 import pandas as pd
 
@@ -20,8 +21,12 @@ PLAN_CAT = ("operator", "ftype", "frule", "ades")
 PLAN = PLAN_CAT + ("dur", "slip", "d_ae", "d_al", "d_es", "aobt_sec", "aobt_m5", "eobt_m5", "lobt_sec")
 # Stand, type and operator columns (L3, D2, L5): built from the same file's rows, so the ranking file carries them too.
 STAND = ("notyp", "d_as", "occ", "t_occ", "airline")
+# R1 runway share and H1 holiday flags: outside FEATURES for the same reason as PLAN.
+EXTRA = ("rwy_share", "hol", "hol_prev", "hol_next")
+COUNTRY = dict(ED="DE", EG="GB", EH="NL", LE="ES", LF="FR", LI="IT", LS="CH", LT="TR")
 LABELS = ("y", "c")
 WINDOW = 900.0
+HOUR = 3600.0
 
 # Ranking blanks BLOCK_TIME_UTC_mvt and TAXITIME_SEC_mvt on departures, so the view never selects them.
 VIEW = """
@@ -72,32 +77,66 @@ def _files(paths: list[str]) -> str:
     return "[" + ", ".join(f"'{p}'" for p in paths) + "]"
 
 
-def features(paths: list[str]) -> pd.DataFrame:
+def anchor(df: pd.DataFrame) -> np.ndarray:
+    """A1 (R6 amended): the first non-negative of the AOBT, EOBT and schedule gaps; a departure with none anchors at its own takeoff (F11)."""
+    has, z = df.has_fpl.values, np.zeros(len(df))
+    for v, ok in ((df.z_sched.values, np.ones(len(df), bool)), (df.z_eobt.values, has), (df.z_aobt.values, has)):
+        m = ok & (v >= 0)  # a missing gap is NaN and never passes; the most preferred gap writes last
+        z[m] = v[m]
+    return z
+
+
+def features(paths: list[str], window: float = WINDOW) -> pd.DataFrame:
     """Feature frame for the departures in the given files; the traffic counts need every movement of the period."""
     con = connect()
     df = con.sql(VIEW.format(files=_files(paths))).df()
     landings = con.sql(LANDINGS.format(files=_files(paths))).df()
-    z_fpl = np.where(df.z_aobt >= 0, df.z_aobt, df.z_eobt)
-    df["z_anchor"] = np.where(df.has_fpl, z_fpl, df.z_sched)
-    for name, col in zip(COUNTS, _traffic(df, landings)):
+    df["z_anchor"] = anchor(df)
+    for name, col in zip(COUNTS, _traffic(df, landings, window)):
         df[name] = col
     df["occ"], df["t_occ"] = _occupancy(df, con.sql(ONBLOCK.format(files=_files(paths))).df())
+    df["rwy_share"] = _rwy_share(df)
+    df["hol"], df["hol_prev"], df["hol_next"] = _holidays(df)
     df["notyp"] = df.notyp.astype(np.int8)
     for c in CATEGORICAL + PLAN_CAT:
         df[c] = df[c].astype("category")
-    return df[list(KEYS + FEATURES + PLAN + STAND)]
+    return df[list(KEYS + FEATURES + PLAN + STAND + EXTRA)]
+
+
+def _rwy_share(df: pd.DataFrame) -> np.ndarray:
+    """R1: share of the airport's takeoffs on this runway in the hour before the anchor; NaN when that hour is empty or the runway is missing."""
+    t_off, anc, out = df.t_off.values, df.t_off.values - df.z_anchor.values, np.full(len(df), np.nan)
+    for apt, ix in df.groupby("apt").indices.items():
+        s_all, a = np.sort(t_off[ix]), anc[ix]
+        den = np.searchsorted(s_all, a, "left") - np.searchsorted(s_all, a - HOUR, "left")
+        for jx in df.iloc[ix].groupby("runway").indices.values():
+            s = np.sort(t_off[ix[jx]])
+            num = np.searchsorted(s, a[jx], "left") - np.searchsorted(s, a[jx] - HOUR, "left")
+            out[ix[jx]] = np.where(den[jx] > 0, num / np.maximum(den[jx], 1), np.nan)
+    return out
+
+
+def _holidays(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """H1: public holiday in the airport's country on the takeoff day; hol_prev = yesterday was one, hol_next = tomorrow is one."""
+    day = pd.to_datetime(df.day).dt.normalize()
+    years, out = sorted(day.dt.year.unique()), np.zeros((3, len(df)), dtype=np.int8)
+    for apt, ix in df.groupby("apt").indices.items():
+        h = pd.to_datetime(sorted(holidays.country_holidays(COUNTRY[str(apt)[:2]], years=years)))
+        for k, off in enumerate((0, 1, -1)):
+            out[k, ix] = day.iloc[ix].isin(h + pd.Timedelta(days=off)).values
+    return out[0], out[1], out[2]
 
 
 def _occupancy(df: pd.DataFrame, onblock: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
     """First arrival parked on the departure's stand after its anchor: occ = it parked before takeoff, t_occ = takeoff minus that on-block."""
-    t_off, anchor = df.t_off.values, df.t_off.values - df.z_anchor.values
+    t_off, anc = df.t_off.values, df.t_off.values - df.z_anchor.values
     nxt = np.full(len(df), np.inf)
     parked = {k: g.t.values for k, g in onblock.groupby(["apt", "stand"])}
     for key, ix in df.groupby(["apt", "stand"]).indices.items():
         s = parked.get(key)
         if s is None:
             continue
-        pos = np.searchsorted(s, anchor[ix], "right")
+        pos = np.searchsorted(s, anc[ix], "right")
         nxt[ix] = np.where(pos < len(s), s[np.minimum(pos, len(s) - 1)], np.inf)
     occ = nxt < t_off
     return occ.astype(np.int8), np.where(occ, t_off - nxt, np.nan)
@@ -107,8 +146,8 @@ def _between(s: np.ndarray, lo: np.ndarray, hi: np.ndarray) -> np.ndarray:
     return np.searchsorted(s, hi, "right") - np.searchsorted(s, lo, "left")
 
 
-def _traffic(df: pd.DataFrame, landings: pd.DataFrame) -> list[np.ndarray]:
-    """Same-airport counts from sorted event times: takeoffs, landings and anchors around the anchor and the takeoff."""
+def _traffic(df: pd.DataFrame, landings: pd.DataFrame, window: float = WINDOW) -> list[np.ndarray]:
+    """Same-airport counts from sorted event times: takeoffs, landings and anchors within window s of the anchor and the takeoff."""
     t_off = df.t_off.values
     anchor = t_off - df.z_anchor.values
     out = [np.zeros(len(df), dtype=np.int32) for _ in COUNTS]
@@ -117,11 +156,11 @@ def _traffic(df: pd.DataFrame, landings: pd.DataFrame) -> list[np.ndarray]:
         s_dep, s_anc, s_arr = np.sort(t_off[ix]), np.sort(anchor[ix]), land.get(apt, np.empty(0))
         a, t = anchor[ix], t_off[ix]
         out[0][ix] = np.maximum(np.searchsorted(s_dep, t, "left") - np.searchsorted(s_dep, a, "left"), 0)
-        out[1][ix] = np.searchsorted(s_dep, a, "left") - np.searchsorted(s_dep, a - WINDOW, "left")
-        out[2][ix] = np.searchsorted(s_dep, t + WINDOW, "right") - np.searchsorted(s_dep, t, "right")
-        out[3][ix] = _between(s_arr, a - WINDOW, a + WINDOW)
-        out[4][ix] = _between(s_arr, t - WINDOW, t + WINDOW)
-        out[5][ix] = _between(s_anc, a - WINDOW, a + WINDOW) - 1
+        out[1][ix] = np.searchsorted(s_dep, a, "left") - np.searchsorted(s_dep, a - window, "left")
+        out[2][ix] = np.searchsorted(s_dep, t + window, "right") - np.searchsorted(s_dep, t, "right")
+        out[3][ix] = _between(s_arr, a - window, a + window)
+        out[4][ix] = _between(s_arr, t - window, t + window)
+        out[5][ix] = _between(s_anc, a - window, a + window) - 1
     return out
 
 
@@ -129,9 +168,9 @@ def truth(paths: list[str]) -> pd.Series:
     return connect().sql(TRUTH.format(files=_files(paths))).df().set_index("id").y
 
 
-def load(months: tuple[int, ...]) -> pd.DataFrame:
+def load(months: tuple[int, ...], window: float = WINDOW) -> pd.DataFrame:
     """Features joined with truth for the given 2025 months; c is the lane-A label y minus z_aobt."""
     paths = [month_file(m) for m in months]
-    df = features(paths).join(truth(paths), on="id", how="inner")
+    df = features(paths, window).join(truth(paths), on="id", how="inner")
     df["c"] = df.y - df.z_aobt
     return df.reset_index(drop=True)

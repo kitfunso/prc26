@@ -38,14 +38,15 @@ def b4w(tr: pd.DataFrame, te: pd.DataFrame) -> np.ndarray:
     return out
 
 
-def cv_a(tr: pd.DataFrame, cell: dict, cols: list[str] = COLS_A, name: str = "W1") -> tuple[tuple[int, int, int], list[str]]:
+def cv_a(tr: pd.DataFrame, cell: dict, cols: list[str] = COLS_A, name: str = "W1") -> tuple[tuple[int, int, int], list[str], np.ndarray]:
     lines = [f"| fold | {name} RMSE (s) | {name} rounds (clf, tail, body) | fit s |", "|---|---|---|---|"]
-    sq, n, rounds = 0.0, 0, []
+    sq, n, rounds, oof = 0.0, 0, [], np.full(len(tr), np.nan)
     for fold in CV_FOLDS:
         m, t0 = tr.month.isin(fold).values, time.time()
         va = tr[m]
         models = stages(tr[~m], cell, va=va, cols=cols)
-        e = predict_m2(models, va)[0] - va.y.values
+        oof[m] = predict_m2(models, va)[0]
+        e = oof[m] - va.y.values
         sq, n = sq + float(e @ e), n + len(e)
         rounds.append([b.best_iteration for b in models])
         lines.append(f"| {fold} | {rmse(e):.1f} | {rounds[-1]} | {time.time() - t0:.0f} |")
@@ -53,7 +54,7 @@ def cv_a(tr: pd.DataFrame, cell: dict, cols: list[str] = COLS_A, name: str = "W1
     r = tuple(int(x) for x in np.mean(rounds, axis=0))
     lines.append(f"\nCV RMSE over the five folds: {name} {np.sqrt(sq / n):.1f} s (M2 on the same rows: see docs/M2.md); final {name} rounds {r}.")
     print(lines[-1], flush=True)
-    return r, lines
+    return r, lines, oof
 
 
 def verdict_line(name: str, champ: str, v: Verdict, k: int = K) -> str:
@@ -89,7 +90,7 @@ def main() -> None:
               "|---|---|---|---|---|---|", rowb("B4", eb0), rowb("B4 + weather", eb1), "", verdict_line("W1-B", "B4", vb), ""]
     print("\n".join(lane_b), flush=True)
     cell, _ = chosen_cells()["A"]
-    rounds, lines = cv_a(tra, cell)
+    rounds, lines, _ = cv_a(tra, cell)
     p1 = predict_m2(stages(tra, cell, rounds=rounds, cols=COLS_A), tea)[0]
     p2 = predict_m2(stages(tra, cell, rounds=m2_rounds()), tea)[0]
     e1, e2 = p1 - tea.y.values, p2 - tea.y.values

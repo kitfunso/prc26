@@ -65,9 +65,9 @@ def load_metar() -> pd.DataFrame:
     return out.sort_values(["apt", "t"]).reset_index(drop=True)
 
 
-def join(df: pd.DataFrame, metar: pd.DataFrame) -> pd.DataFrame:
-    """As-of join at the anchor time (latest observation at or before it) plus 3 h look-back sums, per airport."""
-    anchor = df.t_off.values - df.z_anchor.values
+def join(df: pd.DataFrame, metar: pd.DataFrame, lag: float = 0.0) -> pd.DataFrame:
+    """As-of join at the anchor time (latest observation at or before it) plus 3 h look-back sums, per airport; lag (WS1) reads lag s earlier."""
+    anchor = df.t_off.values - df.z_anchor.values - lag
     cols = {c: np.full(len(df), np.nan) for c in WEATHER}
     for apt, ix in df.groupby("apt").indices.items():
         m = metar[metar.apt == apt]

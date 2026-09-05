@@ -23,7 +23,7 @@ def plan_gain(models: Models) -> list[str]:
 def main() -> None:
     tra, tea = lane_a()
     cell, _ = chosen_cells()["A"]
-    rounds, lines = cv_a(tra, cell, cols=COLS_D1, name="D1")
+    rounds, lines, _ = cv_a(tra, cell, cols=COLS_D1, name="D1")
     models = stages(tra, cell, rounds=rounds, cols=COLS_D1)
     e1 = predict_m2(models, tea)[0] - tea.y.values
     e0 = champion_holdout("W1-A", tra, tea) - tea.y.values

@@ -7,7 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from taxi.data import HOLDOUT_MONTHS, PLAN, TRAIN_MONTHS, load
+from taxi.data import HOLDOUT_MONTHS, PLAN, TRAIN_MONTHS, WINDOW, load
 from taxi.m1 import chosen_cells, final_rounds
 from taxi.m2 import predict_m2, stages
 from taxi.w1 import COLS_A
@@ -37,10 +37,10 @@ def cache_path(name: str) -> str:
     return f"data/cache/{name.lower().replace('-', '')}_holdout.parquet"
 
 
-def lane_a() -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Lane-A training and holdout frames with weather joined, in the row order every lane-A verdict shares."""
+def lane_a(window: float = WINDOW, lag: float = 0.0) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Lane-A training and holdout frames with weather joined, in the row order every lane-A verdict shares (window: TW1; lag: WS1)."""
     metar = load_metar()
-    tr, te = (join(load(m), metar) for m in (TRAIN_MONTHS, HOLDOUT_MONTHS))
+    tr, te = (join(load(m, window), metar, lag) for m in (TRAIN_MONTHS, HOLDOUT_MONTHS))
     tra, tea = (d[d.has_fpl].reset_index(drop=True) for d in (tr, te))
     return tra, tea
 
@@ -75,8 +75,29 @@ def champion_holdout(name: str, tra: pd.DataFrame, tea: pd.DataFrame) -> np.ndar
     return pred
 
 
+def champion_oof(name: str, tra: pd.DataFrame) -> np.ndarray:
+    """The named champion's out-of-fold month-pair CV predictions on the training months, run once and cached (E1, E2 pick their weight here)."""
+    path, fp = cache_path(name).replace("_holdout", "_oof"), _fingerprint(tra, tra.iloc[:0])
+    if os.path.exists(path):
+        c = pd.read_parquet(path)
+        if len(c) == len(tra) and c.fp.iloc[0] == fp and np.array_equal(c.id.values, tra.id.values):
+            return c.pred.values
+    cols, tag, doc, kind = CHAMPIONS_A[name]
+    if kind == "cb":
+        from taxi.mc1 import cv_a
+        pred = cv_a(tra, cols, name).oof
+    else:
+        from taxi.w1 import cv_a
+        pred = cv_a(tra, chosen_cells()["A"][0], cols=cols, name=tag)[2]
+    pd.DataFrame({"id": tra.id.values, "pred": pred, "fp": fp}).to_parquet(path, index=False)
+    return pred
+
+
 if __name__ == "__main__":
     import sys
     tra, tea = lane_a()
-    for name in sys.argv[1:] or ["W1-A"]:
-        print(name, len(champion_holdout(name, tra, tea)), "holdout predictions cached at", cache_path(name))
+    for name in [a for a in sys.argv[1:] if a != "oof"] or ["W1-A"]:
+        if "oof" in sys.argv:
+            print(name, len(champion_oof(name, tra)), "OOF predictions cached at", cache_path(name).replace("_holdout", "_oof"))
+        else:
+            print(name, len(champion_holdout(name, tra, tea)), "holdout predictions cached at", cache_path(name))

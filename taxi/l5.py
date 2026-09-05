@@ -19,6 +19,7 @@ PSEUDO, MIN_AIRLINE = 10.0, 15
 NB = len(EDGES) + 1
 Prob = Callable[[pd.DataFrame, pd.DataFrame], np.ndarray]
 Pred = Callable[[pd.DataFrame, pd.DataFrame, Any], np.ndarray]
+Champ = tuple[str, Callable[[pd.DataFrame, pd.DataFrame], np.ndarray]]
 
 
 def is_copy(t: pd.DataFrame) -> np.ndarray:
@@ -74,16 +75,16 @@ def per_row(tr: pd.DataFrame, te: pd.DataFrame, prob: Prob) -> np.ndarray:
 CELLS: dict[str, Prob] = {"L5a": shrunk, "L5b": logistic}
 
 
-def cv(trb: pd.DataFrame, cells: dict[str, Any], pred: Pred) -> tuple[str, list[str]]:
-    """Month-pair CV of the champion L4b and every cell, all floored; returns the best cell and the table lines."""
-    names = ["L4b", *cells]
+def cv(trb: pd.DataFrame, cells: dict[str, Any], pred: Pred, champ: Champ = ("L4b", champion)) -> tuple[str, list[str]]:
+    """Month-pair CV of the named champion and every cell, all floored; returns the best cell and the table lines."""
+    names = [champ[0], *cells]
     lines = ["| fold | " + " | ".join(f"{k} RMSE" for k in names) + " |", "|---|" + "---|" * len(names)]
     sq, n = {k: 0.0 for k in names}, 0
     for fold in CV_FOLDS:
         m = trb.month.isin(fold).values
         tr, te, row = trb[~m].reset_index(drop=True), trb[m].reset_index(drop=True), []
         for k in names:
-            p = champion(tr, te) if k == "L4b" else pred(tr, te, cells[k])
+            p = champ[1](tr, te) if k == champ[0] else pred(tr, te, cells[k])
             e = floored(p) - te.y.values
             sq[k], row = sq[k] + float(e @ e), row + [f"{rmse(e):.1f}"]
         n += len(te)
@@ -96,25 +97,36 @@ def cv(trb: pd.DataFrame, cells: dict[str, Any], pred: Pred) -> tuple[str, list[
     return best, lines
 
 
-def judge(cells: dict[str, Any], pred: Pred, title: str, blurb: str, path: str) -> None:
-    """CV over the declared cells, then the CV winner alone against floored L4b on the lane-B holdout; writes the report to path."""
+def judge(cells: dict[str, Any], pred: Pred, title: str, blurb: str, path: str, champ: Champ = ("L4b", champion), k: int = K,
+          same_as: str | None = None) -> None:
+    """CV over the declared cells, then the CV winner alone against the floored champion on the lane-B holdout (not touched when the winner
+    is same_as, the champion under a cell name); writes the report to path."""
     tr, te = load(TRAIN_MONTHS), load(HOLDOUT_MONTHS)
     trb, teb = (d[~d.has_fpl].reset_index(drop=True) for d in (tr, te))
-    best, lines = cv(trb, cells, pred)
-    p0, p1 = floored(champion(trb, teb)), floored(pred(trb, teb, cells[best]))
+    best, lines = cv(trb, cells, pred, champ)
+    name = champ[0]
+    if best == same_as:
+        text = "\n".join([f"# {title}, Jan+Jul 2025 development holdout", "", f"Train months {TRAIN_MONTHS}. {blurb} k = {k}.", "",
+                          "## Month-pair CV (lane-B rows of the fold)", ""] + lines + ["", "## Holdout: not touched", "",
+                          f"The CV winner {best} is {name} itself; by the declaration no cell meets the holdout and {name} stays."]) + "\n"
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write(text)
+        print(text)
+        return
+    p0, p1 = floored(champ[1](trb, teb)), floored(pred(trb, teb, cells[best]))
     e0, e1 = p0 - teb.y.values, p1 - teb.y.values
     v, m = paired_delta(e0, e1, teb.day.values), touched(trb, teb)
     jan, jul = teb.month.values == 1, teb.month.values == 7
     row = lambda name, e: f"| {name} | {rmse(e):.1f} | {rmse(e[jan]):.1f} | {rmse(e[jul]):.1f} | {e.min():.0f} | {e.max():.0f} |"
     report = [f"# {title}, Jan+Jul 2025 development holdout", "",
               f"Train months {TRAIN_MONTHS}. Touched rows as L4 ({sorted(teb.apt[m].unique())}); every other row keeps L4b. {blurb} Every cell and the "
-              f"champion carry the floor at 0 s (H22). k = {K}; the CV winner alone meets the holdout.", "",
+              f"champion carry the floor at 0 s (H22). k = {k}; the CV winner alone meets the holdout.", "",
               "## Month-pair CV (lane-B rows of the fold)", ""] + lines + ["",
-              f"## Holdout verdict vs champion L4b with the floor ({len(teb)} rows; {best} differs from it on {int((p1 != p0).sum())} rows)", "",
-              "| model | RMSE | Jan | Jul | min error | max error |", "|---|---|---|---|---|---|", row("L4b floored", e0), row(f"{best} floored", e1), "",
-              verdict_line(best, "L4b", v, k=K), "", "## By airport (reported)", ""] + by_airport(teb, {"L4b": e0, best: e1}) + ["",
-              f"## Touched rows by band (reported, {int(m.sum())} rows)", ""] + by_band(teb, m, {"L4b": e0, best: e1}) + ["",
-              f"All rows with L4b (reported, never decides): {all_rows(te, e0)}; with {best}: {all_rows(te, e1)}."]
+              f"## Holdout verdict vs champion {name} with the floor ({len(teb)} rows; {best} differs from it on {int((p1 != p0).sum())} rows)", "",
+              "| model | RMSE | Jan | Jul | min error | max error |", "|---|---|---|---|---|---|", row(f"{name} floored", e0), row(f"{best} floored", e1), "",
+              verdict_line(best, name, v, k=k), "", "## By airport (reported)", ""] + by_airport(teb, {name: e0, best: e1}) + ["",
+              f"## Touched rows by band (reported, {int(m.sum())} rows)", ""] + by_band(teb, m, {name: e0, best: e1}) + ["",
+              f"All rows with {name} (reported, never decides): {all_rows(te, e0)}; with {best}: {all_rows(te, e1)}."]
     text = "\n".join(report) + "\n"
     with open(path, "w", encoding="utf-8") as fh:
         fh.write(text)

@@ -2,15 +2,14 @@
 import numpy as np
 import pytest
 
-from taxi.data import LANDINGS, VIEW, WINDOW, _files, connect, month_file
+from taxi.data import LANDINGS, VIEW, WINDOW, _files, anchor, connect, month_file
 
 
 @pytest.fixture(scope="module")
 def raw():
     con, files = connect(), _files([month_file(2)])
     dep, arr = con.sql(VIEW.format(files=files)).df(), con.sql(LANDINGS.format(files=files)).df()
-    z_fpl = np.where(dep.z_aobt >= 0, dep.z_aobt, dep.z_eobt)
-    dep["anchor"] = dep.t_off - np.where(dep.has_fpl, z_fpl, dep.z_sched)
+    dep["anchor"] = dep.t_off - anchor(dep)
     return dep, arr
 
 
