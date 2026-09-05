@@ -1,4 +1,5 @@
-"""Lane-A champion holdout predictions, fit once per champion and cached, so every lane-A challenger is judged against the same errors."""
+"""Champion registry: lane-A holdout predictions fit once per champion and cached, so every lane-A challenger is judged against the same errors;
+lane-B champions by name behind one predictor path."""
 from __future__ import annotations
 
 import os
@@ -13,11 +14,23 @@ from taxi.w1 import COLS_A
 from taxi.weather import join, load_metar
 
 COLS_D1 = [*COLS_A, *PLAN]
+COLS_D2 = [*COLS_D1, "d_as", "occ", "t_occ"]
 # Lane-A champions by name: columns, the report whose recorded rounds the refit uses, and the model family (lgb or cb).
 CHAMPIONS_A = {"W1-A": (COLS_A, "W1", "docs/W1.md", "lgb"), "D1": (COLS_D1, "D1", "docs/D1.md", "lgb"),
                "MC2": (COLS_D1, "MC2", "docs/MC2.md", "cb")}
 # The registry's current champion per lane; verdict wording promotes only against these names.
-CURRENT = {"A": "MC2", "B": "B4"}
+CURRENT = {"A": "MC2", "B": "L6a"}
+
+
+def predict_b(name: str, tr: pd.DataFrame, te: pd.DataFrame) -> np.ndarray:
+    """The named lane-B champion fit on tr and predicted on te, unfloored (the floor is the file's C1 option, H22)."""
+    from taxi.baselines import b4
+    if name == "B4":
+        return b4(tr, te, "B")
+    from taxi import l4, l6  # local: both reach taxi.w1, which reads CURRENT above
+    if name in l4.CELLS:
+        return l4.per_band(tr, te, l4.CELLS[name])
+    return l6.per_row(tr, te, l6.CELLS[name])
 
 
 def cache_path(name: str) -> str:

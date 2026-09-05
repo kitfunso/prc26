@@ -1,13 +1,13 @@
-from taxi.data import FEATURES, KEYS, LABELS, PLAN
+from taxi.data import FEATURES, KEYS, LABELS, PLAN, STAND
 
 
 def test_feature_names_carry_no_label():
-    assert not set(FEATURES + PLAN) & set(LABELS)
-    assert "month" not in FEATURES + PLAN
+    assert not set(FEATURES + PLAN + STAND) & set(LABELS)
+    assert "month" not in FEATURES + PLAN + STAND
 
 
 def test_feature_frame_has_only_declared_columns(feb_features):
-    assert list(feb_features.columns) == list(KEYS + FEATURES + PLAN)
+    assert list(feb_features.columns) == list(KEYS + FEATURES + PLAN + STAND)
     assert feb_features.id.is_unique
     assert feb_features.z_anchor.notna().all()
 

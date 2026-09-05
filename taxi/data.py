@@ -18,6 +18,8 @@ FEATURES = ("hour", "wday", "has_fpl", "z_aobt", "z_eobt", "z_lobt", "z_sched", 
 # Plan-provenance columns (D1): outside FEATURES so the champions' column lists stay as declared.
 PLAN_CAT = ("operator", "ftype", "frule", "ades")
 PLAN = PLAN_CAT + ("dur", "slip", "d_ae", "d_al", "d_es", "aobt_sec", "aobt_m5", "eobt_m5", "lobt_sec")
+# Stand, type and operator columns (L3, D2, L5): built from the same file's rows, so the ranking file carries them too.
+STAND = ("notyp", "d_as", "occ", "t_occ", "airline")
 LABELS = ("y", "c")
 WINDOW = 900.0
 
@@ -38,12 +40,18 @@ SELECT MVT_ID_mvt AS id, ADEP_mvt AS apt, month(MVT_TIME_UTC_mvt) AS month, MVT_
        epoch(AOBT_3_flt) - epoch(EOBT_1_flt) AS d_ae, epoch(AOBT_3_flt) - epoch(LOBT_flt) AS d_al,
        epoch(EOBT_1_flt) - epoch(SCHED_TIME_UTC_mvt) AS d_es,
        epoch(AOBT_3_flt) % 60 AS aobt_sec, (epoch(AOBT_3_flt) % 300 = 0)::INT AS aobt_m5,
-       (epoch(EOBT_1_flt) % 300 = 0)::INT AS eobt_m5, epoch(LOBT_flt) % 60 AS lobt_sec
+       (epoch(EOBT_1_flt) % 300 = 0)::INT AS eobt_m5, epoch(LOBT_flt) % 60 AS lobt_sec,
+       AIRCRAFT_TYPE_mvt IS NULL AS notyp, epoch(AOBT_3_flt) - epoch(SCHED_TIME_UTC_mvt) AS d_as,
+       coalesce(substr(FLIGHT_mvt, 1, 3), 'NA') AS airline
 FROM read_parquet({files}) WHERE PHASE_mvt = 'DEP' ORDER BY apt, t_off, id"""
 
 LANDINGS = """
 SELECT ADES_mvt AS apt, epoch(MVT_TIME_UTC_mvt) AS t
 FROM read_parquet({files}) WHERE PHASE_mvt = 'ARR' ORDER BY apt, t"""
+
+ONBLOCK = """
+SELECT ADES_mvt AS apt, STAND_mvt::VARCHAR AS stand, epoch(BLOCK_TIME_UTC_mvt) AS t
+FROM read_parquet({files}) WHERE PHASE_mvt = 'ARR' AND STAND_mvt IS NOT NULL AND BLOCK_TIME_UTC_mvt IS NOT NULL ORDER BY apt, stand, t"""
 
 TRUTH = """
 SELECT MVT_ID_mvt AS id, TAXITIME_SEC_mvt::DOUBLE AS y
@@ -73,9 +81,26 @@ def features(paths: list[str]) -> pd.DataFrame:
     df["z_anchor"] = np.where(df.has_fpl, z_fpl, df.z_sched)
     for name, col in zip(COUNTS, _traffic(df, landings)):
         df[name] = col
+    df["occ"], df["t_occ"] = _occupancy(df, con.sql(ONBLOCK.format(files=_files(paths))).df())
+    df["notyp"] = df.notyp.astype(np.int8)
     for c in CATEGORICAL + PLAN_CAT:
         df[c] = df[c].astype("category")
-    return df[list(KEYS + FEATURES + PLAN)]
+    return df[list(KEYS + FEATURES + PLAN + STAND)]
+
+
+def _occupancy(df: pd.DataFrame, onblock: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
+    """First arrival parked on the departure's stand after its anchor: occ = it parked before takeoff, t_occ = takeoff minus that on-block."""
+    t_off, anchor = df.t_off.values, df.t_off.values - df.z_anchor.values
+    nxt = np.full(len(df), np.inf)
+    parked = {k: g.t.values for k, g in onblock.groupby(["apt", "stand"])}
+    for key, ix in df.groupby(["apt", "stand"]).indices.items():
+        s = parked.get(key)
+        if s is None:
+            continue
+        pos = np.searchsorted(s, anchor[ix], "right")
+        nxt[ix] = np.where(pos < len(s), s[np.minimum(pos, len(s) - 1)], np.inf)
+    occ = nxt < t_off
+    return occ.astype(np.int8), np.where(occ, t_off - nxt, np.nan)
 
 
 def _between(s: np.ndarray, lo: np.ndarray, hi: np.ndarray) -> np.ndarray:

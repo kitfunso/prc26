@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from catboost import CatBoostClassifier, CatBoostRegressor, Pool
 
-from taxi.champ import COLS_D1, champion_holdout, lane_a
+from taxi.champ import COLS_D1, COLS_D2, champion_holdout, lane_a
 from taxi.data import CV_FOLDS, TRAIN_MONTHS
 from taxi.m1 import CAT
 from taxi.m2 import K, is_tail
@@ -18,7 +18,7 @@ from taxi.w1 import COLS_A, verdict_line
 CELL = dict(depth=8, learning_rate=0.1, l2_leaf_reg=3.0, border_count=254, random_seed=0, task_type="GPU", devices="0", verbose=0, allow_writing_files=False)
 MAX_ITER, PATIENCE = 5000, 100
 # Lane name: its columns and the champion it was declared against.
-LANES = {"MC1": (COLS_A, "W1-A"), "MC2": (COLS_D1, "D1")}
+LANES = {"MC1": (COLS_A, "W1-A"), "MC2": (COLS_D1, "D1"), "D2": (COLS_D2, "MC2")}
 Models = tuple[CatBoostClassifier, CatBoostRegressor, CatBoostRegressor]
 
 
@@ -92,7 +92,7 @@ def main(name: str) -> None:
     cell = {k: v for k, v in CELL.items() if k not in ("verbose", "devices", "allow_writing_files")}
     report = [f"# {name}: CatBoost (GPU) in the M2 recipe, Jan+Jul 2025 development holdout", "",
               f"Train months {TRAIN_MONTHS}; regenerate with `python -m taxi.mc1 {name}`. Cell {cell}, up to {MAX_ITER} iterations, early stopping "
-              f"{PATIENCE}, on {champ}'s {len(cols)} columns; k = {K}. Champion {champ} refit at its recorded rounds on the same rows. "
+              f"{PATIENCE}, on {len(cols)} columns; k = {K}. Champion {champ} refit at its recorded rounds on the same rows. "
               f"CV plus the final fit took {wall:.1f} min of wall clock.", "",
               "## Month-pair CV", ""] + lines + ["", f"## Holdout verdict vs champion {champ} ({len(tea)} rows; tail rows {int(vt.sum())})", "",
               "| model | RMSE | Jan | Jul | tail rows | body rows |", "|---|---|---|---|---|---|", row(champ, e0), row(name, e1), "",
