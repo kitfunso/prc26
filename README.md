@@ -15,4 +15,13 @@ Team `merry-octopus`. Deadline 11 Oct 2026.
     set -a; . ./.env; set +a
     python probe.py
 
+## Data
+
+Weather features (lane W1) come from the ASOS/METAR archive of the Iowa
+Environmental Mesonet, Iowa State University (public domain; attribution
+appreciated per https://mesonet.agron.iastate.edu/disclaimer.php), pulled
+2026-09-05 with `python -m taxi.weather fetch` into `data/weather/2026-09-05/`;
+the per-file sha256 in its `manifest.json` pins the pull. `data/` is not
+committed.
+
 Licensed GPLv3, as the challenge requires of prize-eligible entries.

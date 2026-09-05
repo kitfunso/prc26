@@ -3,7 +3,7 @@
 Contract: `docs/EXPERIMENT-PROTOCOL.md` section 8. Sign convention: improvement = champion RMSE minus challenger RMSE, positive is good.
 Rows are never edited; a superseded row gets a note in a later row. Old-spec rows stay, labelled.
 
-Counters: N (board submissions) = 1 model (S1) + 2 scored probes (P1, P2); 4 probe files rejected by the scorer's daily cap on 2026-09-05. N_h (holdout verdicts) = 13.
+Counters: N (board submissions) = 1 model (S1) + 2 scored probes (P1, P2); 4 probe files rejected by the scorer's daily cap on 2026-09-05. N_h (holdout verdicts) = 16.
 
 ## A. Board submissions
 
@@ -30,8 +30,11 @@ Source: `python -m taxi.baselines` on 2026-09-04, output in `docs/BASELINES.md`;
 | H11 | 2026-09-04 | A | B2 | B4 | 311.2 | +121.9 [+88.7, +173.5] | WIN, B4 promoted (lane-A champion) |
 | H12 | 2026-09-05 | B | B4 | M1 | 2,386.3 | -312.1 [-643.8, -12.1] | lose; B4 stays lane-B champion (`docs/M1.md`) |
 | H13 | 2026-09-05 | A | B4 | M1 | 259.5 | +51.6 [+48.4, +55.1] | WIN, clears bound 2.8 s plus floor 2 s; M1 promoted (lane-A champion) |
+| H14 | 2026-09-05 | A | M1 | M2 | 256.6 | +2.9 [+1.8, +4.1] | WIN, clears bound 0 s (k = 1) plus floor 2 s on the point estimate, low end of the interval 1.8 s; Jan +2.3, Jul +3.3; M2 promoted (lane-A champion, `docs/M2.md`) |
+| H15 | 2026-09-05 | B | B4 | W1-B (B4 + w_sknt, w_vsby, w_p3h, w_ts3h, w_sn) | 2,064.2 | +9.9 [-2.7, +22.6] | tie (interval crosses zero); B4 stays (`docs/W1.md`) |
+| H16 | 2026-09-05 | A | M2 | W1-A (M2 recipe on M1's columns plus 16 weather columns) | 253.8 | +2.9 [+1.8, +3.9] | WIN, clears bound 0 s (k = 1) plus floor 2 s on the point estimate, low end of the interval 1.8 s under the floor (same shape as H14); Jan +4.8, Jul +1.6; W1-A promoted (lane-A champion, `docs/W1.md`) |
 
-Declared searches so far (not holdout verdicts; judged on month-pair CV): CAP lane A (k = 4, bound 1.03 x SE), CAP lane B (k = 4); M1 grid lane A (k = 12, bound 1.63 x paired SE 1.7 s = 2.8 s), M1 grid lane B (k = 8, bound 1.42 x paired SE 161.1 s = 229.4 s).
+Declared searches so far (not holdout verdicts; judged on month-pair CV): CAP lane A (k = 4, bound 1.03 x SE), CAP lane B (k = 4); M1 grid lane A (k = 12, bound 1.63 x paired SE 1.7 s = 2.8 s), M1 grid lane B (k = 8, bound 1.42 x paired SE 161.1 s = 229.4 s); M2 lane A (k = 1, bound 0 x SE); W1 lane A (k = 1) and W1 lane B (k = 1), declared 2026-09-05 before the run; M3 pilot LIRF lane A (k = 1), run 2026-09-05: OOF gain +11.6 s and VRAM pass, the 30 min time gate fails at 38.1 min, M3 stopped pending Keith.
 
 ## C. Board probes (P1-P6, after S1; protocol section 3)
 
