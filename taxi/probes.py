@@ -14,6 +14,8 @@ RANKING = "data/ranking.parquet"
 # (probe id, file version, group, sign); the order is the declaration's, lane B first.
 PROBES = (("P1", 2, "laneB", +1), ("P2", 3, "laneB", -1), ("P3", 4, "jan", +1),
           ("P4", 5, "jan", -1), ("P5", 6, "jul", +1), ("P6", 7, "jul", -1))
+# Single-sided re-run after the daily cap rejected P3-P6: with m known, one +c file per group gives the error sum.
+SINGLE = (("P3s", 8, "jan", +1), ("P5s", 9, "jul", +1))
 GROUP_SQL = {"laneB": "AOBT_3_flt IS NULL", "jan": "month(MVT_TIME_UTC_mvt) = 1", "jul": "month(MVT_TIME_UTC_mvt) >= 7"}
 
 
@@ -25,11 +27,11 @@ def groups() -> dict[str, pd.Index]:
     return out
 
 
-def build() -> None:
+def build(probes: tuple = PROBES) -> None:
     s1 = duckdb.sql(f"SELECT * FROM read_parquet('{S1}')").df()
     pred = pd.Series(s1.TAXITIME_SEC_mvt.values.astype("float64"), index=s1.MVT_ID_mvt.values)
     grp = groups()
-    for pid, v, g, sign in PROBES:
+    for pid, v, g, sign in probes:
         p = pred.copy()
         p[grp[g]] += sign * C
         out = f"data/merry-octopus_v{v}.parquet"
@@ -44,17 +46,24 @@ def derive(board: dict[str, float], n: int) -> list[str]:
     lines = []
     for g in GROUP_SQL:
         vp, vm = [v for _, v, gg, s in PROBES if gg == g and s > 0][0], [v for _, v, gg, s in PROBES if gg == g and s < 0][0]
-        if vp not in sse or vm not in sse:
-            lines.append(f"{g}: not scored (needs files v{vp} and v{vm})")
+        plus = [v for v in (vp, *[v for _, v, gg, s in SINGLE if gg == g and s > 0]) if v in sse]
+        if vp in sse and vm in sse:
+            m = (sse[vp] + sse[vm] - 2 * sse[1]) / (2 * C * C)
+            err = (sse[vp] - sse[vm]) / (4 * C)
+        elif plus:
+            m = float(sizes[g])
+            err = (sse[plus[0]] - sse[1] - m * C * C) / (2 * C)
+        else:
+            lines.append(f"{g}: not scored (needs v{vp} and v{vm}, or any scored +c file)")
             continue
-        m = (sse[vp] + sse[vm] - 2 * sse[1]) / (2 * C * C)
-        err = (sse[vp] - sse[vm]) / (4 * C)
         lines.append(f"{g}: derived m = {m:,.1f} (actual rows {sizes[g]:,}), S1 error sum = {err:,.0f} s, mean error {err / sizes[g]:+.1f} s per row")
     return lines
 
 
 if __name__ == "__main__":
-    if sys.argv[1:2] == ["derive"]:
+    if sys.argv[1:2] == ["single"]:
+        build(SINGLE)
+    elif sys.argv[1:2] == ["derive"]:
         import lb
         ours = {r["filename"]: r for r in lb.fetch_all() if r["teamName"] == "merry-octopus"}
         board = {int(f.split("_v")[1].split(".")[0]): r["score"] for f, r in ours.items()}
