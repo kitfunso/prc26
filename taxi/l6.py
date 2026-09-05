@@ -7,9 +7,9 @@ import numpy as np
 import pandas as pd
 
 from taxi.l4 import MIN_BAND, band, touched
-from taxi.l5 import PSEUDO, champion, is_copy, judge, shrunk
+from taxi.l5 import NB, PSEUDO, champion, is_copy, judge, shrunk
 
-MIN_NONCOPY = MIN_BAND
+MIN_NONCOPY = MIN_BAND  # inherited from L4's band minimum, not tuned: LIRF's non-copy counts gate the same bands for any threshold in 12..35
 Fit = Callable[[np.ndarray, np.ndarray, np.ndarray], np.ndarray]
 
 
@@ -34,6 +34,16 @@ def per_row(tr: pd.DataFrame, te: pd.DataFrame, fit: Fit) -> np.ndarray:
             k, j = (tb == b) & ~c, zb == b
             if int(k.sum()) >= MIN_NONCOPY:
                 out[ix[j]] = p[j] * z[j] + (1 - p[j]) * fit(t.z_sched.values[k], t.y.values[k], z[j])
+    return out
+
+
+def gate_counts(tr: pd.DataFrame, te: pd.DataFrame) -> dict[str, list[int]]:
+    """Non-copy training rows per band at each touched airport; the mixture applies where the count reaches MIN_NONCOPY."""
+    out, m = {}, touched(tr, te)
+    for apt in np.unique(te.apt.values[m]):
+        t = tr[(tr.apt == apt) & (tr.notyp == 1)]
+        c, tb = is_copy(t), band(t.z_sched.values)
+        out[str(apt)] = [int(((tb == b) & ~c).sum()) for b in range(NB)]
     return out
 
 

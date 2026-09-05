@@ -108,7 +108,7 @@ Inputs
 - W1 weather: RUN 2026-09-05 (`docs/W1.md`): lane A +2.9 s [+1.8, +3.9] WIN, lane B tie. Next weather step, if any: a join-shift stress (observation latency, +10 min on the as-of join), k = 1, about 40 min.
 - F1 unused plan columns: RUN as D1 2026-09-05 (`docs/D1.md`): +11.6 s [+9.2, +14.0] WIN, D1 promoted; the gain sits in the AOBT_3 minus EOBT_1 and AOBT_3 minus LOBT gaps, operator and destination; the rounding and second-of-minute flags carry nothing.
 - G1 stand x runway target encoding: fold-internal median of c per airport, stand, runway as one numeric column. k = 1, about 5 min.
-- D2 lane-A columns (declared 2026-09-05 after H23, protocol section 4): MC2 plus d_as (AOBT_3 minus schedule), occ and t_occ (stand occupancy), k = 1, about 40 min GPU. Not run yet.
+- D2 lane-A columns (declared 2026-09-05 after H23, protocol section 4): MC2 plus d_as (AOBT_3 minus schedule), occ and t_occ (stand occupancy), k = 1, about 40 min GPU. RUN 2026-09-05 (`docs/D2.md`): 231.9 s vs MC2 232.9, +1.0 [+0.5, +1.5], under the 2 s floor, TIE, MC2 stays (H28).
 
 Mechanisms
 

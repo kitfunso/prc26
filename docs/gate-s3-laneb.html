@@ -1,0 +1,189 @@
+<meta charset="utf-8">
+<title>S3 Lane-B Gate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#F6F7F5;--ink:#1C232B;--muted:#5B6570;--line:#D8DDD9;--accent:#1F4FB0;--amber:#B0680A;--tint:#E9EEF9;--tint-amber:#FBF1E3;--code:#EEF0EC;--win:#1F6B3A;--tint-win:#E6F2EA;--lose:#9B2C2C;--tint-lose:#F8E7E7}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#171B1F;--ink:#E6E9E6;--muted:#9AA4AE;--line:#333A41;--accent:#8FB0F0;--amber:#E0A050;--tint:#1E2A42;--tint-amber:#3A2A12;--code:#22282E;--win:#7FCB9A;--tint-win:#16301F;--lose:#E39B9B;--tint-lose:#3A1A1A}}
+:root[data-theme="dark"]{--bg:#171B1F;--ink:#E6E9E6;--muted:#9AA4AE;--line:#333A41;--accent:#8FB0F0;--amber:#E0A050;--tint:#1E2A42;--tint-amber:#3A2A12;--code:#22282E;--win:#7FCB9A;--tint-win:#16301F;--lose:#E39B9B;--tint-lose:#3A1A1A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "IBM Plex Sans",system-ui,sans-serif}
+main{max-width:76ch;margin:0 auto;padding:40px 24px 80px}
+h1{font-size:30px;line-height:1.2;font-weight:600;margin:6px 0 10px;text-wrap:balance}
+h2{font-size:19px;font-weight:600;margin:40px 0 10px;text-wrap:balance}
+h3{font-size:16px;font-weight:600;margin:24px 0 6px}
+p{margin:0 0 12px}
+.eyebrow{font:500 12px/1.4 "IBM Plex Mono",monospace;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:18px;color:var(--muted);margin-bottom:22px}
+.headline{border-left:4px solid var(--accent);background:var(--tint);padding:14px 18px;margin:18px 0}
+.headline p:last-child{margin:0}
+.decision{border:1px solid var(--amber);background:var(--tint-amber);padding:14px 18px;margin:18px 0;border-radius:2px}
+.decision h2{margin:0 0 8px;font-size:17px}
+.call{font-weight:600}
+.wrap{overflow-x:auto;margin:10px 0 16px}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:13px}
+td.num,th.num{text-align:right;white-space:nowrap}
+td.id{font-family:"IBM Plex Mono",monospace;font-size:13px;white-space:nowrap}
+tr.win td{background:var(--tint-win)}
+tr.lose td{background:var(--tint-lose)}
+.note{font-size:14px;color:var(--muted)}
+.tag{display:inline-block;font:500 11px/1.4 "IBM Plex Mono",monospace;letter-spacing:.03em;padding:1px 6px;border:1px solid var(--line);border-radius:2px;margin-right:6px;color:var(--muted)}
+.tag.win{color:var(--win);border-color:var(--win)}
+.tag.lose{color:var(--lose);border-color:var(--lose)}
+.tag.amber{color:var(--amber);border-color:var(--amber)}
+code,pre{font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+code{background:var(--code);padding:1px 5px;border-radius:2px}
+pre{background:var(--code);padding:12px 14px;overflow-x:auto;border-radius:2px;line-height:1.5}
+ol,ul{padding-left:22px;margin:0 0 12px}
+li{margin-bottom:6px}
+.q{margin:12px 0;padding:10px 14px;border-left:3px solid var(--line)}
+.q .n{font:500 12px/1.4 "IBM Plex Mono",monospace;color:var(--muted);display:block;margin-bottom:2px}
+.rule{border:1px dashed var(--line);padding:12px 16px;margin:12px 0;border-radius:2px}
+.rule strong{color:var(--accent)}
+.crit{margin:10px 0;padding:10px 14px;background:var(--code);border-radius:2px}
+.crit .r{margin-top:6px;padding-top:6px;border-top:1px solid var(--line);font-size:14px}
+a{color:var(--accent)}
+</style>
+<main>
+<div class="eyebrow">prc26 · Stage-6 gate, lane B · 2026-09-05 · base commit ba0714e · protocol v2 · companion to <code>docs/gate-s3.html</code> (lane A, unchanged)</div>
+<h1>S3 promotion gate, lane B: the airline mixture L6a replaces B4 in the third submission candidate</h1>
+<p class="lede">Lane B is the 5,373 holdout rows (5,290 ranking rows) with no flight plan at all. It is 1.6% of the rows and half of the all-row squared error. Tonight three declared lanes ran on it; two won, one lost, and the candidate file changed from v13 to v14 on exactly 378 rows. Lane A's one declared lane, D2, tied.</p>
+
+<div class="headline">
+<p><strong>Lane B (5,373 rows): 1,965.6 s to 1,861.8 s in two promoted steps.</strong> L4b, per-band least-squares lines on the schedule gap at LIRF's no-type rows, beat floored B4 by +26.0 s [+4.0, +54.3] (H25). L6a, the same lines with an airline-driven copy-probability mixture in the bands that hold 20 or more non-copy training rows, beat floored L4b by +77.9 s [+43.0, +135.5] (H27), and the five-fold CV agrees (1,501.5 s against 1,527.6 s). L5, the ungated mixture, lost by 269.8 s (H26) and its loss anatomy is what L6 was built from.</p>
+<p><strong>All rows with both champions (MC2 plus L6a): 327.5 s floored</strong> (v13's pair 336.8 s; S1's pair 365.3 s locally and 325.40 s on the board). Every gain is at one airport, LIRF, on 347 of its 397 no-type holdout rows. No other lane-B row moved.</p>
+<p><strong>Lane A (339,046 rows): D2 tied MC2.</strong> MC2's CatBoost cell with three more columns (AOBT minus schedule, stand occupancy and its duration) scores 231.9 s against MC2's cached 232.9 s, +1.0 s [+0.5, +1.5], under the 2 s floor (H28). MC2 stays and v14's lane A is unchanged.</p>
+</div>
+
+<div class="decision">
+<h2>What I am asking for</h2>
+<ol>
+<li><span class="call">S3 upload: yes or no.</span> File <code>data/merry-octopus_v14.parquet</code>, sha256 <code>b1da4dfe305131855da7bdbcd3f0be8f4a3ac79c6e813c703c2252fd4ce1ed3b</code>, 344,841 rows, no negative value. It supersedes v13 (never uploaded). One of the day's three scored files. Nothing has gone to the board since S1.</li>
+<li><span class="call">Accept or reject caution flag F13.</span> L6 was declared after I had seen the H26 holdout by-band table. The training-fold diagnostic that motivated the gate shows the same shape and the CV, which never touches the holdout, corroborates the direction; the CV is not independent of the design, since both read the same training folds, and the k = 2 bound does not price that peek. If you reject the flag, the lane-B champion reverts to L4b and the candidate to v13-with-L4b (a one-line registry change and a rebuild).</li>
+<li><span class="call">Next lane-B item, or stop.</span> The remaining lane-B error is LFPG's two unpredictable rows (52% of the lane's squared error) and LIRF's far band (11 rows above 12 h, RMSE 12,172 s), neither of which any visible column explains. The NOT-DONE table below lists what was declared and not run.</li>
+</ol>
+</div>
+
+<h2>The S3 file, exactly</h2>
+<div class="wrap"><table>
+<tr><th>lane</th><th>model</th><th class="num">train rows</th><th class="num">ranking rows</th><th class="num">train y mean</th><th class="num">pred mean</th><th class="num">pred p50</th><th class="num">pred p99</th><th class="num">negatives before the floor</th></tr>
+<tr><td class="id">A</td><td>MC2 (CatBoost on D1's 49 columns), values copied by id from v12: GPU refits do not reproduce</td><td class="num">2,062,577</td><td class="num">339,551</td><td class="num">986.9</td><td class="num">1,030.3</td><td class="num">958.0</td><td class="num">2,483.0</td><td class="num">14</td></tr>
+<tr><td class="id">B</td><td>L6a, refit on all 12 months of 2025</td><td class="num">22,470</td><td class="num">5,290</td><td class="num">1,384.4</td><td class="num">1,441.7</td><td class="num">1,039.3</td><td class="num">8,713.4</td><td class="num">8</td></tr>
+</table></div>
+<p class="note">Built by <code>python -m taxi.s2 data/merry-octopus_v14.parquet MC2 0 data/merry-octopus_v12.parquet</code> (floor 0 s, C1). Rebuilt after the critique fixes (gate-count print added to the builder): sha256 b1da4dfe... reproduced byte for byte (<code>data/s2_v14_check.log</code>; the check copy was deleted), 12-month gate counts LIRF 15, 45, 466, 202, 15, 0, 11, bands 1 to 3 on as in H27. Against v13 exactly 378 rows differ, all of them LIRF lane-B rows without an aircraft type (their mean moves from 7,834 to 7,538 s); the lane-A values are byte-identical. Lane-B level check: prediction mean 4.1% above the training mean (v13: 5.3%).</p>
+
+<h2>Honest table, lane B: CV picks the cell, the holdout judges it</h2>
+<p class="note">Every cell and the champion carry the floor at 0 s. CV = five month-pair folds over the ten training months (2025 minus Jan and Jul), lane-B rows only. Holdout = Jan + Jul 2025, 5,373 rows. Only the CV winner ever meets the holdout; the other cells' holdout numbers were never computed.</p>
+<div class="wrap"><table>
+<tr><th>lane</th><th>champion</th><th>cells (k)</th><th class="num">CV champion</th><th class="num">CV cells</th><th>CV winner</th><th class="num">holdout champion</th><th class="num">holdout winner</th><th class="num">gain, paired interval</th><th>verdict</th></tr>
+<tr class="win"><td class="id">L4</td><td>B4 floored</td><td>L4a regime mixture, L4b per-band lines (2)</td><td class="num">1,544.9</td><td class="num">1,968.1 / 1,527.6</td><td>L4b</td><td class="num">1,965.6</td><td class="num">1,939.7</td><td class="num">+26.0 [+4.0, +54.3]</td><td>WIN, bound 7.3 s + floor 2 s; L4b promoted (H25)</td></tr>
+<tr class="lose"><td class="id">L5</td><td>L4b floored</td><td>L5a shrunk airline table, L5b logistic (2)</td><td class="num">1,527.6</td><td class="num">1,743.5 / 1,796.8</td><td>L5a</td><td class="num">1,939.7</td><td class="num">2,209.5</td><td class="num">-269.8 [-548.2, -21.7]</td><td>LOSE; L4b stays (H26)</td></tr>
+<tr class="win"><td class="id">L6</td><td>L4b floored</td><td>L6a mean component, L6b line component (2)</td><td class="num">1,527.6</td><td class="num">1,501.5 / 1,501.8</td><td>L6a</td><td class="num">1,939.7</td><td class="num">1,861.8</td><td class="num">+77.9 [+43.0, +135.5]</td><td>WIN, bound 13.4 s + floor 2 s; L6a promoted (H27)</td></tr>
+</table></div>
+<p class="note">The CV-to-holdout gap is the month mix, not selection: the holdout months are LIRF's low-copy months (copy share Jan 0.43, Jul 0.33 against Feb and Dec 0.76), so the same model scores worse there in every row of this table. L4's CV cells both lost the CV to B4's 1,544.9 except L4b; L5's both lost to L4b; L6's both beat L4b by 26 s and were 0.3 s apart, parsimony picked the mean.</p>
+
+<h2>The mechanism, measured before each declaration</h2>
+<p>A LIRF departure with no aircraft type and no plan is stamped one of two ways. Either its block time is the schedule, so the label equals the schedule gap exactly (a <em>copy</em> row: |y - z_sched| within 600 s), or it is a normal taxi of about 1,300 s whatever the gap says. B4's single line at LIRF (1.229 z - 2,021) averages the two and over-predicts the 1-4 h bands by 1,800-4,300 s. That is L4: one line per band of z_sched (edges at 0, 1, 2, 4, 8, 12 h). Then the airline, the first three characters of <code>FLIGHT_mvt</code> and present on 360 of the 383 LIRF no-type ranking rows, separates the two stampings inside a band:</p>
+<div class="wrap"><table>
+<tr><th>LIRF no-type training rows, 1-4 h bands (1,248 rows, copy share 0.465)</th><th class="num">rows</th><th class="num">copy share</th></tr>
+<tr><td>KLM</td><td class="num">17</td><td class="num">0.00</td></tr>
+<tr><td>EZY / ITY / EJU / EIN / UAL</td><td class="num">24 / 76 / 40</td><td class="num">0.04 / 0.05 / 0.10 / 0.11 / 0.13</td></tr>
+<tr><td>VLG / RYR</td><td class="num">228 (RYR)</td><td class="num">0.28 / 0.32</td></tr>
+<tr><td>WMT</td><td class="num">167</td><td class="num">0.47</td></tr>
+<tr><td>WZZ / NOS / EXS / AEZ</td><td class="num">52 / 26 / 22 / 40</td><td class="num">0.75 / 0.77 / 0.82 / 0.83</td></tr>
+<tr><td>LAV, ISR, ETH, TWB, TKJ, KMM</td><td class="num">17-53 each</td><td class="num">1.00</td></tr>
+<tr><td>FLIGHT missing (airline "NA")</td><td class="num">23</td><td class="num">0.83</td></tr>
+</table></div>
+<p class="note">The share also rises with the hour of takeoff (0.21 at 06 h to 0.83 at 23 h) and the stand's hundreds digit (0.03 for 4xx, 0.65 for 9xx); L5b's logistic used those and lost the CV to the plain table. Diagnostics: <code>scripts/diag_lirf.py</code>, <code>scripts/diag_l5.py</code> (output <code>docs/diag_l5.out</code>).</p>
+<p><strong>Why L5 lost and L6 won.</strong> L5 mixed P(copy) x z_sched with the band's non-copy mean everywhere. Above 12 h LIRF has six non-copy training rows and they sit 3 to 9 hours <em>above</em> the schedule gap (mean y 87,644 s), so "non-copy mean" there is not a taxi time; on the training folds that band alone cost 1.35e10 of squared error while bands 1-5 gained 1.45e9. L6 applies the mixture only where the band holds 20 or more non-copy training rows (LIRF bands 0-1 h, 1-2 h and 2-4 h) and keeps L4b elsewhere. Postmortem of L4a and L5, both lost in the far band: a pooled constant is never a taxi time above 8 h.</p>
+
+<h2>Touched rows by band, holdout (397 LIRF no-type rows; reported, never decides)</h2>
+<div class="wrap"><table>
+<tr><th>band of z_sched</th><th class="num">rows</th><th class="num">B4 floored</th><th class="num">L4b</th><th class="num">L6a</th></tr>
+<tr><td>at or below 0</td><td class="num">5</td><td class="num">1,082</td><td class="num">1,082</td><td class="num">1,082 (gate off: 10 non-copy training rows)</td></tr>
+<tr><td>0-1 h</td><td class="num">17</td><td class="num">5,351</td><td class="num">2,922</td><td class="num">2,328</td></tr>
+<tr><td>1-2 h</td><td class="num">194</td><td class="num">2,506</td><td class="num">2,258</td><td class="num">1,876</td></tr>
+<tr><td>2-4 h</td><td class="num">136</td><td class="num">5,632</td><td class="num">5,496</td><td class="num">4,600</td></tr>
+<tr><td>4-8 h</td><td class="num">29</td><td class="num">5,256</td><td class="num">5,654</td><td class="num">5,654 (gate off: 11)</td></tr>
+<tr><td>8-12 h</td><td class="num">5</td><td class="num">2,280</td><td class="num">230</td><td class="num">230 (gate off: 0)</td></tr>
+<tr><td>above 12 h</td><td class="num">11</td><td class="num">11,679</td><td class="num">12,172</td><td class="num">12,172 (gate off: 6)</td></tr>
+<tr><td>LIRF, all 397</td><td class="num">397</td><td class="num">4,587</td><td class="num">4,434</td><td class="num">3,957</td></tr>
+</table></div>
+<p class="note">The 4-8 h band is where L4b is worse than B4 (5,654 vs 5,256 on 29 rows) and L6a leaves it alone. Every other airport's lane-B RMSE is unchanged by all three lanes (EDDF 417, EDDM 679, EGLL 1,162, EHAM 719, LEBL 367, LEMD 346, LFPG 3,449, LSZH 670, LTFM 720).</p>
+
+<h2>Every holdout verdict tonight, with its interval</h2>
+<div class="wrap"><table>
+<tr><th>id</th><th>lane</th><th>champion</th><th>challenger</th><th class="num">RMSE</th><th class="num">gain [interval]</th><th>verdict</th></tr>
+<tr><td class="id">H24</td><td>B</td><td>B4 floored</td><td>L3b: B4 plus notyp, stand occupancy, time on stand (CV winner of 3)</td><td class="num">1,964.8</td><td class="num">+0.8 [-30.6, +32.6]</td><td>tie; B4 stays</td></tr>
+<tr class="win"><td class="id">H25</td><td>B</td><td>B4 floored</td><td>L4b per-band lines (CV winner of 2)</td><td class="num">1,939.7</td><td class="num">+26.0 [+4.0, +54.3]</td><td>WIN, bound 7.3 s + floor; L4b promoted</td></tr>
+<tr class="lose"><td class="id">H26</td><td>B</td><td>L4b floored</td><td>L5a airline mixture, ungated (CV winner of 2)</td><td class="num">2,209.5</td><td class="num">-269.8 [-548.2, -21.7]</td><td>LOSE; L4b stays</td></tr>
+<tr class="win"><td class="id">H27</td><td>B</td><td>L4b floored</td><td>L6a gated airline mixture (CV winner of 2)</td><td class="num">1,861.8</td><td class="num">+77.9 [+43.0, +135.5]</td><td>WIN, bound 13.4 s + floor; L6a promoted</td></tr>
+<tr><td class="id">H28</td><td>A</td><td>MC2 cached refit, 232.9</td><td>D2: MC2's cell on its 49 columns plus d_as, occ, t_occ (k = 1)</td><td class="num">231.9</td><td class="num">+1.0 [+0.5, +1.5]</td><td>tie, under the 2 s floor; MC2 stays</td></tr>
+</table></div>
+<p><strong>Ledger line.</strong> N_h = 28 holdout verdicts this campaign (14 wins, 7 losses, 7 ties; the earlier 23 are in <code>docs/gate-s3.html</code>). At one-sided 2.5% per verdict the expected number of false wins is 0.70. Lane B's two wins tonight have interval low ends of +4.0 s (L4b, a whisker above the floor) and +43.0 s (L6a). Board submissions N = 1 (S1) plus probes.</p>
+
+<h2>The rule, restated</h2>
+<div class="rule">
+<p>A challenger <strong>wins</strong> when the paired day-block bootstrap interval of its RMSE gain sits above zero <em>and</em> the point estimate clears the analytic optimism bound (E[max of k N(0,1)] x paired SE, k = the declared cell count) plus the 2 s floor. An interval crossing zero is a tie and a tie promotes the simpler model. Lane B is judged on its own 5,373 rows against the lane-B champion with the floor. Every search is declared before it runs; an undeclared run is a diagnostic and cannot promote.</p>
+<p><strong>This verdict is only as good as this rule; attack the rule, not just the numbers.</strong></p>
+<p>Three places to attack it here. First, the rule prices a k = 2 search but not the order of the searches: L6's gate was designed from L5's loss anatomy, and the H26 holdout by-band table had been seen (F13). Second, the rule judges one holdout; 347 LIRF rows carry the whole gain and their 2026 counterparts (383 no-type LIRF ranking rows) may be stamped by different hands. Third, the bootstrap blocks by day; LIRF's copy rows cluster by airline, not by day, so the paired SE (23.6 s) may understate the airline-cluster variance.</p>
+</div>
+
+<h2>Caution flags</h2>
+<p class="note">F1-F12 ride by pointer from <code>docs/gate-s3.html</code>. Lane-B relevant among them: truth outliers (F3, LFPG's two rows are 52% of the lane's squared error and stay unmodelled), lane B itself (F4), lane B resists the model class (F9: every LightGBM, CatBoost, logistic and Huber cell has lost to a line). New:</p>
+<ul>
+<li><span class="tag amber">F13</span><strong>Design after a holdout peek.</strong> L6 was declared after the H26 holdout by-band table was seen. Mitigations on the record: the design decision (gate on non-copy row counts) was taken from the training-fold diagnostic, which shows the same band anatomy; the CV picks and confirms without the holdout; the gate threshold (20 rows) is L4's existing band minimum, not a tuned number. Not priced by the k = 2 bound. The flag rides every later report.</li>
+<li><span class="tag amber">F14</span><strong>One airport, one stamping practice.</strong> The whole lane-B gain since S1 (2,074 to 1,862 s) sits on LIRF's no-type rows and on how LIRF stamps block times for untyped departures. A change of practice in 2026 (or between airlines' ground handlers) would remove it and could reverse it: a row the model calls a copy at P = 0.9 that turns out a normal taxi costs about 0.9 x (z_sched - 1,300) s.</li>
+<li><span class="tag">F15</span><strong>Airline mix drift.</strong> 66% of the 383 LIRF no-type ranking rows have an airline with 15 or more training rows, 87% at least one; the rest get the band share. Copy share by month in 2025 ranges 0.33 (Jul) to 0.76 (Feb and Dec), which is airline-mix seasonality, so the shrunk table's 10 pseudo-rows carry more weight in the low-count months.</li>
+</ul>
+
+<h2>Self-audit (Stage 5.6): what else is wrong with what I did</h2>
+<ol>
+<li><strong>Data.</strong> The airline is a callsign prefix; for a registration-style callsign the first three characters are not an operator. 23 LIRF no-type ranking rows have no <code>FLIGHT_mvt</code> and are pooled as "NA" (training copy share 0.83 on 23 rows). The copy definition (600 s) was fixed before L5 ran and never varied; it comes from L3's regime split.</li>
+<li><strong>Statistics.</strong> F13 above is the main finding: the k = 2 bound covers the two L6 cells and nothing about the L5-to-L6 redesign. A stricter accounting would treat L5 and L6 as one k = 4 search (bound E[max 4] = 1.03 x 23.6 s = 24.3 s, still cleared by the 77.9 s point estimate and the 43.0 s low end). The wide interval [+43, +135] says the gain is real in sign and uncertain in size; the size on the board depends on 2026 LIRF stamping (F14).</li>
+<li><strong>Code.</strong> Synthetic tests only (<code>tests/test_l4.py</code>, <code>test_l5.py</code>, <code>test_l6.py</code>: pure copy and pure normal airlines recover z_sched and 1,000 s; untouched rows equal the champion). The pandas categorical <code>stand</code> column broke the logistic design once (fixed in <code>taxi/l5.py</code>); the shrunk table reindexes a MultiIndex built from categorical airline values, which the critique below was asked to check. The v14 build's lane-A copy is checked by id count (378 differing rows, all LIRF lane B).</li>
+<li><strong>Process.</strong> Three lanes declared and run in one session, each recorded before the next was declared; the caution flag was written into the L6 declaration, not added after the win. Gap: the two diagnostics lived in the scratchpad while their numbers were quoted in the protocol; they are now committed under <code>scripts/</code>. Not done: no forward fold for any lane-B lane (lane B has no forward-fold rule in the protocol), and no independent critique had run before the promotion was written into the registry; it ran before this page (below).</li>
+</ol>
+
+<h2>Independent critique (Stage 5.7, verbatim)</h2>
+<p class="note">A Sonnet reviewer that did not build or run the lanes, given the artifacts (reports, code, ledger and protocol rows, tests), asked to attack selection honesty, leakage, the tuned constants, code correctness, 2026 stability and ledger consistency. Its findings verbatim, my response under each.</p>
+<div class="crit"><span class="tag amber">CONDITION</span><strong>1 · docs/TRIAL-LEDGER.md:48 / docs/EXPERIMENT-PROTOCOL.md:158.</strong> L6's gate was designed after the H26 holdout by-band table was seen, but the declared <code>k = 2</code> optimism bound (0.56 x paired SE) only prices the L6a-vs-L6b fit choice, not the look-then-design step that produced the gate shape itself — the true family-wise search across L4→L5→L6 is wider than any single step's k. Fix: score the adaptive chain under one inflated k, or re-confirm L6a's win on a holdout slice no L4/L5/L6 diagnostic has ever touched, before trusting it as the lane-B champion.<div class="r"><strong>Response.</strong> Measured. Under one bound for the whole L4-L5-L6 chain (six declared cells) E[max 6] = 1.268, so the bound is 29.9 s on the paired SE of 23.6 s (k = 4 for L5 plus L6: 24.3 s); the point estimate 77.9 s and the interval's low end 43.0 s clear both. No untouched holdout slice exists: Jan+Jul 2025 is the only holdout, and the ranking file is judged by the board, which is the re-confirmation (v14 differs from v13 on exactly these 378 rows, so the board delta between them isolates this lane). Recorded as F13; the k = 6 reading is in the ledger's H27 note.</div></div>
+<div class="crit"><span class="tag amber">CONDITION</span><strong>2 · docs/TRIAL-LEDGER.md:50.</strong> the claim "the CV (which never sees the holdout) confirms the direction" presents the CV win (1501.5 vs 1527.6) as independent corroboration, but the same pooled-training-fold shape that motivated the gate was inspected non-blind before L6 was built, so the CV and the design are correlated, not independent, evidence. Fix: state the CV number as corroborating rather than independent in the record.<div class="r"><strong>Response.</strong> Fixed in the record: the ledger H27 row, the protocol L6 row and this page now say the CV corroborates the direction and is not independent of the design, since both read the same training folds.</div></div>
+<div class="crit"><span class="tag amber">CONDITION</span><strong>3 · taxi/l6.py:12.</strong> <code>MIN_NONCOPY = MIN_BAND</code> silently reuses L4's unrelated per-band-fit threshold (20) for the non-copy gate with no fresh justification, and 20 happens to exactly separate the training bands that helped from the ones that hurt in the diagnostic quoted at <code>docs/EXPERIMENT-PROTOCOL.md:158</code>; nothing shows another threshold was ruled out. Fix: justify 20 for the non-copy gate on its own terms (e.g. a CV sweep over 10/15/20/25) or explicitly flag it as inherited rather than tuned.<div class="r"><strong>Response.</strong> Flagged as inherited, not tuned, in <code>taxi/l6.py</code> and here. Sensitivity from the measured counts: LIRF's non-copy training rows per band in the H27 training set are 10, 35, 317, 115, 11, 0 and 6, so any threshold from 12 to 35 gates the same three bands; 10 or 11 would also admit band 0 (10 rows) or band 4 (11 rows). A CV sweep over thresholds was not declared and is not run (NOT-DONE table).</div></div>
+<div class="crit"><span class="tag">NOTE</span><strong>4 · taxi/l5.py:67.</strong> <code>mu_all = float(t.y.values[~c].mean())</code> in <code>per_row</code> returns NaN with no guard if a touched airport's training rows are ever all "copy" — currently masked because LIRF always has non-copy rows, but the function isn't LIRF-specific and <code>touched()</code> could later admit another airport. Fix: fall back to <code>t.y.mean()</code> (or raise) when <code>(~c).sum() == 0</code>.<div class="r"><strong>Response.</strong> Fixed at the producer: <code>taxi/l5.py</code> falls back to the airport's training mean when every row is a copy. 21 tests pass.</div></div>
+<div class="crit"><span class="tag">NOTE</span><strong>5 · taxi/l3.py / taxi/l5.py:18.</strong> <code>COPY = 600.0</code> is hardcoded independently in both files instead of shared from one definition; L6 inherits L5's copy via <code>shrunk()</code>. Fix: define <code>COPY</code> once and import it everywhere it's used, so a future revision can't silently diverge between L3's regime split and L5/L6's copy flag.<div class="r"><strong>Response.</strong> Fixed: <code>taxi/l5.py</code> imports COPY from <code>taxi/l3.py</code>; one definition.</div></div>
+<div class="crit"><span class="tag">NOTE</span><strong>6 · taxi/s2.py:36 / taxi/champ.py:33.</strong> the S3 ranking build refits L6a on all 12 months, which changes every band's non-copy training-row count, but nothing logs whether bands 1-3 still clear <code>MIN_NONCOPY = 20</code> and get gated the way H27 validated — a silent shift here would ship an unvalidated variant of the champion. Fix: print per-band touched/gated row counts in s2.py's lane-B branch and diff against <code>docs/L6.md</code>.<div class="r"><strong>Response.</strong> Fixed and measured: <code>taxi/s2.py</code> prints the per-band non-copy counts from a new <code>gate_counts</code> helper in <code>taxi/l6.py</code>. On the 12-month refit LIRF holds 15, 45, 466, 202, 15, 0 and 11 non-copy rows in bands 0 to 6, so bands 1 to 3 are gated on and bands 0, 4, 5 and 6 off, exactly as H27 validated; v14 is the validated variant. A rebuild of v14 after the change reproduces its sha256 (see the rebuild note under the S3 file).</div></div>
+<div class="crit"><span class="tag">NOTE</span><strong>7 · docs/L6.md:24 / docs/EXPERIMENT-PROTOCOL.md:157.</strong> the win margin (paired SE 23.6 s) is estimated on 397 Jan+Jul 2025 LIRF no-type rows, while the ranking file has 383 such rows across all 12 months and only 360 (94%) carry <code>FLIGHT_mvt</code> at all, per the L5 protocol row — airline-mix or schedule-stamping drift in the other 10 months has not been checked against this margin. Fix: report L6a-vs-L4b error by month (or at least on the 10 non-holdout months) using the 12-month refit predictions before relying on the holdout interval at ranking time.<div class="r"><strong>Response.</strong> The month-pair CV in <code>docs/L6.md</code> is that check, out of sample: L6a beats L4b on every one of the five folds that together cover the ten non-holdout months (1,650.6 vs 1,666.5; 1,956.4 vs 1,979.6; 1,633.9 vs 1,655.1; 1,103.9 vs 1,151.7; 1,159.9 vs 1,185.8). A by-month table from the 12-month refit's own predictions would be in-sample and is not run. F15 carries the FLIGHT coverage (360 of 383 rows with an airline).</div></div>
+<div class="crit"><span class="tag win">VERIFIED</span><strong>8 · taxi/l5.py:36-38.</strong> (verified, not a bug): <code>shrunk()</code>'s <code>MultiIndex.from_arrays([te.airline.values, zb])</code> reindex works correctly because <code>airline</code> is excluded from <code>data.py</code>'s <code>CATEGORICAL</code>/<code>PLAN_CAT</code> casts and stays plain object dtype — confirmed empirically that lookups by (airline, band) tuples align and unseen combinations fill to NaN as intended, so no fix needed; listed since it was a named risk in the brief.<div class="r"><strong>Response.</strong> No action.</div></div>
+<div class="crit"><span class="tag win">CLEAN</span>Clean categories checked and passed: label leakage (ranking frame in <code>taxi/s2.py</code> never joins <code>y</code> via <code>taxi/data.py:128 truth()</code>, and every prediction function reads <code>.y</code> only off the training argument <code>t</code>/<code>tr</code>/<code>trl</code>, never <code>te</code>/<code>sub</code>/<code>rkl</code>); id/dtype alignment in <code>taxi/s2.py</code>'s parent-copy path (both <code>merry-octopus_v12.parquet</code> and <code>data/ranking.parquet</code> carry <code>MVT_ID_mvt</code> as float64, max ~2.14e8, far under float64's exact-integer range, and <code>s2.py:39-40</code> raises on any unmatched id); band-edge arithmetic in <code>taxi/l4.py:22-24</code> (<code>test_l4.py:14</code> confirms no off-by-one); <code>taxi/verdict.py</code>'s win/clears logic against <code>taxi/w1.py:59-68</code>; and ledger/protocol/report consistency for H24-H27 (champion hand-off B4→L4b→L6a, N_h=5,373, touched/differing row counts, and the declared-searches sentence, which is byte-identical between <code>docs/TRIAL-LEDGER.md:50</code> and <code>docs/EXPERIMENT-PROTOCOL.md</code>).<div class="r"><strong>Response.</strong> No action; the reviewer's "N_h=5,373" reads the lane-B row count, the ledger's N_h is the verdict count (27).</div></div>
+
+<h2>Steering questions (gate set)</h2>
+<div class="q"><span class="n">1 · Attack the decision rule, not just the numbers.</span>The rule promoted L6a on one holdout with a k = 2 bound after a design peek (F13). If you hold that the peek voids the lane, the honest position is L4b (H25, low end +4.0 s) and v13-with-L4b; the CV alone (1,501.5 vs 1,527.6, no holdout involved) is the evidence that survives that reading.</div>
+<div class="q"><span class="n">2 · Tied on WHAT?</span>Nothing tonight is a tie except H24 (L3b, +0.8 [-30.6, +32.6]). Both wins carry intervals above zero on the lane's RMSE; there is no second primary metric in this competition (RMSE is the board), so the secondary readouts are the by-band and by-airport tables, both of which move only at LIRF.</div>
+<div class="q"><span class="n">3 · What market structure could explain or refute this?</span>The mechanism is clerical: at LIRF an untyped, plan-less departure's block time is often the schedule itself, and which airlines' rows get that treatment is stable enough in 2025 to predict. What refutes it: a 2026 change in LIRF's ground-handling data feed, which nothing local can see. The board can: a v14 that scores no better than v13 would on the same lane-A values says the LIRF copy rows moved.</div>
+<div class="q"><span class="n">4 · Is the capacity right for the data frequency?</span>L6a has, per LIRF band, one shrunk table over about 30 airlines and a mean; three bands are gated on. That is fewer parameters than L5b's logistic (which lost the CV) and far fewer than any tree model tried on lane B (all lost). The 20-row gate and 10 pseudo-rows are the capacity controls.</div>
+<div class="q"><span class="n">5 · What would make you say no?</span>Any of: the critique finding a label path from holdout or ranking rows into the predictions; the CV gain vanishing when the folds are re-cut (not run); a 2026 LIRF stamping change, visible only on the board. The first is checkable now; the third argues for uploading v14 rather than sitting on it, because the board is the only instrument that measures F14.</div>
+<div class="q"><span class="n">6 · What is on the accrual list, and when is each re-test?</span>Lane B has no accrual rows: H24's tie (L3b) and H26's loss are closed. Lane-B items not run are in the NOT-DONE table; none is scheduled.</div>
+<div class="q"><span class="n">7 · What have you tried, and what is missing?</span>Lane B since S1: weather (W1-B, tie), VFR flag and three model cells (L1, tie), floor (C1, win), capped and Huber lines (L2, lose), stand and type columns (L3, tie), per-band lines (L4, win), airline mixture (L5, lose), gated mixture (L6, win). Missing with a mechanism: nothing I can name; missing without one: LFPG's two rows and LIRF's far band (F3), the day-stamped regime as its own predictor (L4a tried it and lost).</div>
+
+<h2>NOT-DONE table</h2>
+<div class="wrap"><table>
+<tr><th>item</th><th>declared</th><th>why not run or not judged</th></tr>
+<tr><td>L6b line component</td><td>yes (L6 cell 2)</td><td>lost the CV to L6a by 0.3 s; by the declaration only the CV winner meets the holdout</td></tr>
+<tr><td>L5b logistic on airline, band, hour, stand</td><td>yes (L5 cell 2)</td><td>lost the CV to L5a by 53 s; never judged on the holdout</td></tr>
+<tr><td>Airline mixture at airports other than LIRF</td><td>no</td><td>the touched-row gate needs 100 no-type training rows per airport; only LIRF qualifies (LIRF's are the day-stamping mechanism, other airports' no-type rows are typed normal taxis B4 already fits within a few hundred seconds)</td></tr>
+<tr><td>Far-band (above 12 h) and 4-8 h rows at LIRF</td><td>no</td><td>6 and 11 non-copy training rows; nothing to estimate; L4b's per-band line stays</td></tr>
+<tr><td>LFPG's two rows (52% of lane-B squared error)</td><td>no</td><td>one is a day-early stamp on a punctual flight, one a 58,206 s label; no visible column separates them from normal rows (F3)</td></tr>
+<tr><td>Forward fold for lane B</td><td>not in protocol</td><td>the protocol's forward-fold rule is lane A only; adding one is a protocol change (Keith)</td></tr>
+<tr><td>Re-cut CV folds for L6 (stability of the 26 s CV gain)</td><td>no</td><td>not declared; would be a diagnostic</td></tr>
+</table></div>
+
+<h2>Reproduce</h2>
+<pre>python -m pytest -q                      # 21 tests
+python -m taxi.l4 ; python -m taxi.l5 ; python -m taxi.l6    # docs/L4.md, L5.md, L6.md (lane B only, CPU, about 3 min each)
+PYTHONPATH=. python scripts/diag_lirf.py ; PYTHONPATH=. python scripts/diag_l5.py
+python -m taxi.s2 data/merry-octopus_v14.parquet MC2 0 data/merry-octopus_v12.parquet
+sha256sum data/merry-octopus_v14.parquet   # b1da4dfe305131855da7bdbcd3f0be8f4a3ac79c6e813c703c2252fd4ce1ed3b</pre>
+</main>

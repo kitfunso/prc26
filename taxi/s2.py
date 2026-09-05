@@ -8,6 +8,7 @@ import sys
 import numpy as np
 import pandas as pd
 
+from taxi import l6
 from taxi.champ import CHAMPIONS_A, CURRENT, predict_b, refit_predict
 from taxi.data import HOLDOUT_MONTHS, TRAIN_MONTHS, features, load
 from taxi.m1 import final_rounds
@@ -34,6 +35,8 @@ def main(out: str, champ: str, floor: float | None = None, parent: str | None = 
         trl, rkl = tr[tr.has_fpl == (lane == "A")].reset_index(drop=True), rk[m].reset_index(drop=True)
         if lane == "B":
             p = predict_b(CURRENT["B"], trl, rkl)
+            if CURRENT["B"] in l6.CELLS:
+                print(f"lane B gate: non-copy training rows per band {l6.gate_counts(trl, rkl)}, mixture where >= {l6.MIN_NONCOPY}", flush=True)
         else:
             p = refit_predict(champ, trl, rkl) if parent is None else lane_a.reindex(rkl.id.values).values
             if parent is not None and np.isnan(p).any():

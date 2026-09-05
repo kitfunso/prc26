@@ -9,13 +9,13 @@ from sklearn.linear_model import LogisticRegression
 
 from taxi.data import CV_FOLDS, HOLDOUT_MONTHS, TRAIN_MONTHS, load
 from taxi.l2 import floored
-from taxi.l3 import all_rows, by_airport
+from taxi.l3 import COPY, all_rows, by_airport
 from taxi.l4 import CELLS as L4_CELLS, EDGES, MIN_BAND, band, by_band, per_band, touched
 from taxi.verdict import paired_delta, rmse
 from taxi.w1 import verdict_line
 
 K = 2
-COPY, PSEUDO, MIN_AIRLINE = 600.0, 10.0, 15
+PSEUDO, MIN_AIRLINE = 10.0, 15
 NB = len(EDGES) + 1
 Prob = Callable[[pd.DataFrame, pd.DataFrame], np.ndarray]
 Pred = Callable[[pd.DataFrame, pd.DataFrame, Any], np.ndarray]
@@ -64,7 +64,7 @@ def per_row(tr: pd.DataFrame, te: pd.DataFrame, prob: Prob) -> np.ndarray:
         t = tr[(tr.apt == apt) & (tr.notyp == 1)].reset_index(drop=True)
         ix = np.flatnonzero(m & (te.apt.values == apt))
         sub, c, tb = te.iloc[ix], is_copy(t), band(t.z_sched.values)
-        mu_all = float(t.y.values[~c].mean())
+        mu_all = float(t.y.values[~c].mean()) if (~c).any() else float(t.y.mean())
         mu = np.array([float(t.y.values[(tb == b) & ~c].mean()) if int((tb == b).sum()) >= MIN_BAND and ((tb == b) & ~c).any() else mu_all for b in range(NB)])
         p = prob(t, sub)
         out[ix] = p * sub.z_sched.values + (1 - p) * mu[band(sub.z_sched.values)]
