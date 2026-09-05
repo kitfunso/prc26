@@ -3,7 +3,7 @@
 Contract: `docs/EXPERIMENT-PROTOCOL.md` section 8. Sign convention: improvement = champion RMSE minus challenger RMSE, positive is good.
 Rows are never edited; a superseded row gets a note in a later row. Old-spec rows stay, labelled.
 
-Counters: N (board submissions) = 0. N_h (holdout verdicts) = 11.
+Counters: N (board submissions) = 0. N_h (holdout verdicts) = 13.
 
 ## A. Board submissions
 
@@ -12,7 +12,7 @@ Counters: N (board submissions) = 0. N_h (holdout verdicts) = 11.
 
 ## B. Holdout verdicts (Jan + Jul 2025, paired day-block bootstrap, 2,000 reps, seed 0; floor 2 s)
 
-Source: `python -m taxi.baselines` on 2026-09-04, output in `docs/BASELINES.md`. Caps: none in both lanes (CAP sweep, protocol section 4).
+Source: `python -m taxi.baselines` on 2026-09-04, output in `docs/BASELINES.md`; `python -m taxi.m1` on 2026-09-05, output in `docs/M1.md`. Caps: none in both lanes (CAP sweep, protocol section 4).
 
 | id | date | lane | champion | challenger | challenger RMSE | improvement [95%] | verdict |
 |---|---|---|---|---|---|---|---|
@@ -27,8 +27,10 @@ Source: `python -m taxi.baselines` on 2026-09-04, output in `docs/BASELINES.md`.
 | H9 | 2026-09-04 | A | B2 | B3c | 709.7 | -276.6 [-323.6, -220.7] | lose |
 | H10 | 2026-09-04 | A | B2 | B3d | 400.1 | +33.0 [-2.5, +86.3] | tie (interval crosses zero) |
 | H11 | 2026-09-04 | A | B2 | B4 | 311.2 | +121.9 [+88.7, +173.5] | WIN, B4 promoted (lane-A champion) |
+| H12 | 2026-09-05 | B | B4 | M1 | 2,386.3 | -312.1 [-643.8, -12.1] | lose; B4 stays lane-B champion (`docs/M1.md`) |
+| H13 | 2026-09-05 | A | B4 | M1 | 259.5 | +51.6 [+48.4, +55.1] | WIN, clears bound 2.8 s plus floor 2 s; M1 promoted (lane-A champion) |
 
-Declared searches so far (not holdout verdicts; judged on month-pair CV): CAP lane A (k = 4, bound 1.03 x SE), CAP lane B (k = 4).
+Declared searches so far (not holdout verdicts; judged on month-pair CV): CAP lane A (k = 4, bound 1.03 x SE), CAP lane B (k = 4); M1 grid lane A (k = 12, bound 1.63 x paired SE 1.7 s = 2.8 s), M1 grid lane B (k = 8, bound 1.42 x paired SE 161.1 s = 229.4 s).
 
 ## C. Board probes (P1-P6, after S1; protocol section 3)
 
