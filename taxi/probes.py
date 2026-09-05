@@ -44,6 +44,9 @@ def derive(board: dict[str, float], n: int) -> list[str]:
     lines = []
     for g in GROUP_SQL:
         vp, vm = [v for _, v, gg, s in PROBES if gg == g and s > 0][0], [v for _, v, gg, s in PROBES if gg == g and s < 0][0]
+        if vp not in sse or vm not in sse:
+            lines.append(f"{g}: not scored (needs files v{vp} and v{vm})")
+            continue
         m = (sse[vp] + sse[vm] - 2 * sse[1]) / (2 * C * C)
         err = (sse[vp] - sse[vm]) / (4 * C)
         lines.append(f"{g}: derived m = {m:,.1f} (actual rows {sizes[g]:,}), S1 error sum = {err:,.0f} s, mean error {err / sizes[g]:+.1f} s per row")

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import sys
 from pathlib import Path
@@ -46,5 +47,21 @@ def upload(path: str, bucket: str = BUCKET) -> dict[str, object]:
     return {"bucket": bucket, "key": key, "bytes": len(data), "sha256": sha, "etag": etag}
 
 
+def result(key: str, bucket: str = BUCKET) -> dict[str, object] | None:
+    """The scorer writes <key>_result.json beside the file (score, used_pairs, or a rejection); None until it has run."""
+    s3 = client()
+    try:
+        return json.loads(s3.get_object(Bucket=bucket, Key=f"{key}_result.json")["Body"].read())
+    except s3.exceptions.NoSuchKey:
+        return None
+
+
 if __name__ == "__main__":
-    print(listing() if sys.argv[1:2] == ["list"] else upload(sys.argv[1]))
+    if sys.argv[1:2] == ["list"]:
+        print(listing())
+    elif sys.argv[1:2] == ["status"]:
+        for key, _ in listing():
+            if key.endswith(".parquet"):
+                print(key, result(key))
+    else:
+        print(upload(sys.argv[1]))

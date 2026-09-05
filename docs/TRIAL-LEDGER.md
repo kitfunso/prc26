@@ -3,7 +3,7 @@
 Contract: `docs/EXPERIMENT-PROTOCOL.md` section 8. Sign convention: improvement = champion RMSE minus challenger RMSE, positive is good.
 Rows are never edited; a superseded row gets a note in a later row. Old-spec rows stay, labelled.
 
-Counters: N (board submissions) = 1. N_h (holdout verdicts) = 13.
+Counters: N (board submissions) = 1 model (S1) + 2 scored probes (P1, P2); 4 probe files rejected by the scorer's daily cap on 2026-09-05. N_h (holdout verdicts) = 13.
 
 ## A. Board submissions
 
@@ -39,3 +39,9 @@ For group G with perturbation c = 300 s on the S1 file: m_G = (SSE+ + SSE- - 2 S
 
 | id | date | group G | sign | file | board RMSE | derived m_G | derived error sum | note |
 |---|---|---|---|---|---|---|---|---|
+| P1 | 2026-09-05 | lane B (AOBT_3 null, 5,290 ranking rows) | + | merry-octopus_v2.parquet (sha256 f1b1688b0e97dc701e84fa8d5159f7ef2b3ac411fde2e3f4d1837f4f233f42da) | 324.7339 | 5,289.9 from the P1/P2 pair (ranking count 5,290) | -1,041,701 s (prediction minus truth), mean -196.9 s per lane-B row | scored 10:04:57 UTC, usedPairs 344,841. m matches the row count, so the scorer uses exactly the 344,841 DEP rows and the SSE arithmetic holds. S1 runs 197 s low on the 2026 lane-B rows; the best constant lane-B shift alone would score 324.48 s (0.9 s), so lane B's level is not the gap to the leader |
+| P2 | 2026-09-05 | lane B | - | merry-octopus_v3.parquet (sha256 d73de348cd46dd09ef2ae249fc7e4748c6a073a36cb8f61a8d1c97f09078098a) | 330.2682 | (pair with P1) | (pair with P1) | scored 10:05:03 UTC, usedPairs 344,841 |
+| P3 | 2026-09-05 | January (month 1, 152,719 rows) | + | merry-octopus_v4.parquet (sha256 c6e5a22c466e09c539d857a932c8a3a2d91c53acbff27e6d9ee523e968af1150) | REJECTED | | | scorer result file: DAILY_LIMIT_REACHED, 3 of 3 used today, resets 00:00 UTC. The site states no cap; the scorer enforces 3 per team per day. Re-run design gated on Keith |
+| P4 | 2026-09-05 | January | - | merry-octopus_v5.parquet (sha256 f613342bb446fd6a09c0462cc593c08194c327e1aaa1e532be034a7d63f00e26) | REJECTED | | | as P3 |
+| P5 | 2026-09-05 | July and later (month >= 7, 192,122 rows, 11 of them on 1 August UTC) | + | merry-octopus_v6.parquet (sha256 792381558270b9b6af667672f849fd622f8fa85db4fd2e125f6d41acae534301) | REJECTED | | | as P3 |
+| P6 | 2026-09-05 | July and later | - | merry-octopus_v7.parquet (sha256 2926066cc83d202777191d7bc0cad6c4ebc400e29ad9103574c480fafb893de7) | REJECTED | | | as P3 |
