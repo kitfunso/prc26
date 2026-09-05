@@ -97,6 +97,21 @@ def main_knockout() -> None:
     print(text)
 
 
+def main_sensitivity() -> None:
+    """Critique finding 3: the lane-A verdict without the negative-AOBT-gap rows; a diagnostic that never decides."""
+    tr, te = load(TRAIN_MONTHS), load(HOLDOUT_MONTHS)
+    tra, tea = tr[tr.has_fpl].reset_index(drop=True), te[te.has_fpl].reset_index(drop=True)
+    cell, rounds = chosen_cells()["A"]
+    e_m1 = predict(train(tra, "A", cell, rounds=rounds), tea, "A") - tea.y.values
+    e_b4 = b4(tra, tea, "A") - tea.y.values
+    neg = (tea.z_aobt < 0).values
+    print(f"lane A holdout rows {len(tea)}, z_aobt < 0 on {int(neg.sum())} rows in {tea.day[neg].nunique()} days; "
+          f"RMSE on those rows B4 {rmse(e_b4[neg]):.1f}, M1 {rmse(e_m1[neg]):.1f}", flush=True)
+    for name, m in (("all rows", np.ones(len(tea), bool)), ("z_aobt >= 0 rows", ~neg)):
+        v = paired_delta(e_b4[m], e_m1[m], tea.day.values[m])
+        print(f"{name}: B4 {v.champion:.1f}, M1 {v.challenger:.1f}, {v.line()}", flush=True)
+
+
 def expected_max(k: int) -> float:
     """E[max of k standard normals], the optimism bound multiplier for a k-cell search."""
     return float(np.random.default_rng(0).standard_normal((200_000, k)).max(axis=1).mean())
@@ -104,7 +119,7 @@ def expected_max(k: int) -> float:
 
 def cv(tr: pd.DataFrame, lane: str) -> tuple[dict, int, list[str]]:
     """Month-pair CV of every grid cell; the chosen cell is the most parsimonious within the floor of the best."""
-    lines = ["| cell | leaves | min_data | objective | CV RMSE (s) | rounds | fit s |", "|---|---|---|---|---|---|---|"]
+    lines = ["| cell | leaves | min_data | objective | CV RMSE (s) | rounds | per-fold rounds | fit s |", "|---|---|---|---|---|---|---|---|"]
     results = []
     for i, cell in enumerate(GRID[lane], 1):
         t0, sq, n, rounds = time.time(), 0.0, 0, []
@@ -116,7 +131,7 @@ def cv(tr: pd.DataFrame, lane: str) -> tuple[dict, int, list[str]]:
             rounds.append(bst.best_iteration)
         score, r = float(np.sqrt(sq / n)), int(np.mean(rounds))
         results.append((score, cell, r, i))
-        lines.append(f"| {i} | {cell['num_leaves']} | {cell['min_data_in_leaf']} | {cell['objective']} | {score:.1f} | {r} | {time.time() - t0:.0f} |")
+        lines.append(f"| {i} | {cell['num_leaves']} | {cell['min_data_in_leaf']} | {cell['objective']} | {score:.1f} | {r} | {rounds} | {time.time() - t0:.0f} |")
         print(lines[-1], flush=True)
     best = min(s for s, *_ in results)
     close = [x for x in results if x[0] <= best + FLOOR]
@@ -185,4 +200,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     import sys
-    main_knockout() if sys.argv[1:] == ["knockout"] else main()
+    {"knockout": main_knockout, "sensitivity": main_sensitivity}.get(sys.argv[1] if sys.argv[1:] else "", main)()

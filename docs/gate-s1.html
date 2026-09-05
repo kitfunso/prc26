@@ -1,0 +1,298 @@
+<meta charset="utf-8">
+<title>S1 Promotion Gate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#F6F7F5;--ink:#1C232B;--muted:#5B6570;--line:#D8DDD9;--accent:#1F4FB0;--amber:#B0680A;--tint:#E9EEF9;--tint-amber:#FBF1E3;--code:#EEF0EC;--win:#1F6B3A;--tint-win:#E6F2EA}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#171B1F;--ink:#E6E9E6;--muted:#9AA4AE;--line:#333A41;--accent:#8FB0F0;--amber:#E0A050;--tint:#1E2A42;--tint-amber:#3A2A12;--code:#22282E;--win:#7FCB9A;--tint-win:#16301F}}
+:root[data-theme="dark"]{--bg:#171B1F;--ink:#E6E9E6;--muted:#9AA4AE;--line:#333A41;--accent:#8FB0F0;--amber:#E0A050;--tint:#1E2A42;--tint-amber:#3A2A12;--code:#22282E;--win:#7FCB9A;--tint-win:#16301F}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 "IBM Plex Sans",system-ui,sans-serif;margin:0}
+main{max-width:76ch;margin:0 auto;padding:2.5rem 1.25rem 5rem}
+h1,h2,h3{text-wrap:balance;line-height:1.2;margin:0}
+h1{font-size:2rem;font-weight:600;margin:.4rem 0 1rem}
+h2{font-size:1.25rem;font-weight:600;margin:3rem 0 1rem;padding-top:1rem;border-top:1px solid var(--line)}
+h3{font-size:1rem;font-weight:600;margin:1.5rem 0 .6rem}
+p{margin:0 0 1rem}
+.eyebrow{font:500 .75rem/1 "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:1.1rem;color:var(--muted);max-width:66ch}
+.headline{background:var(--tint);border-left:4px solid var(--accent);padding:1rem 1.25rem;margin:1.5rem 0}
+.headline p:last-child{margin:0}
+.decision{background:var(--tint-amber);border-left:4px solid var(--amber);padding:1rem 1.25rem;margin:1.5rem 0}
+.decision p:last-child{margin:0}
+.call{font-weight:600}
+.wrap{overflow-x:auto;margin:0 0 1.25rem}
+table{border-collapse:collapse;width:100%;font-size:.92rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:.45rem .6rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:.8rem;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap}
+td.num{text-align:right;font-family:"IBM Plex Mono",monospace;white-space:nowrap}
+td.id{font-family:"IBM Plex Mono",monospace;white-space:nowrap}
+tr.win td{background:var(--tint-win)}
+tr.lose td{background:var(--tint-amber)}
+code,pre{font-family:"IBM Plex Mono",monospace;font-size:.88em}
+code{background:var(--code);padding:.1em .35em;border-radius:3px}
+pre{background:var(--code);padding:.9rem 1rem;overflow-x:auto;margin:0 0 1.25rem;line-height:1.45}
+pre code{background:none;padding:0}
+ul,ol{padding-left:1.4rem;margin:0 0 1.25rem}
+li{margin:0 0 .5rem}
+.note{color:var(--muted);font-size:.9rem}
+.tag{display:inline-block;font:500 .72rem/1 "IBM Plex Mono",monospace;padding:.25em .5em;border-radius:3px;border:1px solid var(--line);color:var(--muted);vertical-align:middle;margin-left:.4rem}
+details{margin:0 0 1.25rem}
+summary{cursor:pointer;font-weight:500;color:var(--accent)}
+.q{font-weight:600;margin:1.5rem 0 .4rem}
+.q .n{font-family:"IBM Plex Mono",monospace;color:var(--muted);margin-right:.5rem}
+.rule{font-weight:600;background:var(--tint);padding:.6rem .9rem;display:inline-block;margin:.5rem 0 1rem}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+<main>
+<div class="eyebrow">prc26 · Stage-6 gate · 2026-09-05 · commit 7c09920 · protocol v2</div>
+<h1>S1 Promotion Gate</h1>
+<p class="lede">M1, a LightGBM on the taxi residual, beat the lane-A champion by 51.6 s on the Jan+Jul 2025 holdout with a paired interval of +48.4 to +55.1 s. It lost lane B. This page asks for the first board submission, S1, with M1 in lane A and the two-feature OLS B4 in lane B.</p>
+
+<div class="headline">
+<p><span class="call">Lane A: WIN.</span> M1 259.5 s against B4 311.2 s. Improvement +51.6 s [+48.4, +55.1], paired SE 1.7 s, optimism bound 2.8 s, floor 2 s. Promoted to lane-A champion (ledger H13).</p>
+<p><span class="call">Lane B: LOSE.</span> M1 2,386.3 s against B4 2,074.1 s. Improvement -312.1 s [-643.8, -12.1], paired SE 161.1 s, bound 229.4 s. B4 stays (ledger H12, flag F9).</p>
+<p><span class="call">All rows with the lane champions: 365.3 s</span> (B4 in both lanes: 403.0 s). Reported, never decides.</p>
+</div>
+
+<div class="decision">
+<p class="call">What I am asking for</p>
+<p>A yes or no on S1: upload <code>merry-octopus_v1.parquet</code>, built from all 12 months of 2025 with the two frozen specs below. Nothing has been uploaded. The submission budget is at most two files per promoted champion (protocol section 3, R10); S1 is the first. After S1 land the six probes P1-P6, then the declared lanes W1, M2, M3 and E1, each behind its own gate.</p>
+</div>
+
+<h2>The S1 file, exactly</h2>
+<div class="wrap"><table>
+<tr><th>Lane</th><th>Rows in the ranking file</th><th>Spec</th><th>Training rows</th></tr>
+<tr><td>A (flight plan present)</td><td class="num">339,551</td><td>M1: LightGBM on c = y - z_aobt, objective l2, 31 leaves, min_data_in_leaf 200, learning rate 0.1, feature_fraction 0.8, bagging 0.8 every round, seed 0, 1,016 rounds. Prediction = z_aobt + c_hat. 20 features: apt, hour, wday, has_fpl, the five gaps z_aobt / z_eobt / z_lobt / z_sched / z_anchor, runway, stand, actype, wake, segment, and six 900 s traffic counts.</td><td class="num">2,062,577 (all 12 months of 2025)</td></tr>
+<tr><td>B (no flight-plan record)</td><td class="num">5,290</td><td>B4: per-airport ordinary least squares on [z_sched, queue], predicting y directly. No admission cap (the sweep chose none).</td><td class="num">22,470 (all 12 months)</td></tr>
+</table></div>
+<p><span class="call">Built 2026-09-05, not uploaded.</span> <code>python -m taxi.s1</code> wrote <code>data/merry-octopus_v1.parquet</code>, 344,841 rows, sha256 <code>c79d20d7b691ef1696acdf93537e092fa8faf405c62a08aea15f5a55488f39de</code>. Level check beside the file:</p>
+<div class="wrap"><table>
+<tr><th>Lane</th><th>2025 truth mean</th><th>Ranking prediction mean</th><th>Prediction p50</th><th>Prediction p99</th><th>Anchor gap mean, 2025</th><th>Anchor gap mean, ranking</th></tr>
+<tr><td>A</td><td class="num">986.9</td><td class="num">1,027.4</td><td class="num">960.4</td><td class="num">2,357.5</td><td class="num">1,004.9</td><td class="num">1,037.2</td></tr>
+<tr><td>B</td><td class="num">1,384.4</td><td class="num">1,457.6</td><td class="num">1,034.4</td><td class="num">9,973.7</td><td class="num">5,382.2</td><td class="num">6,670.3</td></tr>
+</table></div>
+<p class="note">Lane A's predictions sit 40 s above the 2025 truth mean while the ranking rows' anchor gap sits 32 s above 2025's, so the shift is in the inputs, not the model. Lane B's ranking rows carry a schedule gap 1,288 s (24%) larger than 2025's, and B4 extrapolates on that gap (F9); its p99 prediction is 9,974 s.</p>
+<p class="note">Row counts: ranking 339,551 + 5,290 = 344,841, the template's size. Training rows = 1,723,531 + 339,046 lane A and 17,097 + 5,373 lane B. The builder <code>taxi.submit.build_submission</code> raises on any missing or extra id and on any null; <code>tests/test_submission_file.py</code> runs before the build. Rounded to integer seconds as the template requires.</p>
+
+<h2>Honest table, per lane</h2>
+<p>Grids were chosen on month-pair CV inside the ten training months. The holdout, Jan + Jul 2025, saw one frozen fit per lane. The forward fold (train Jan-Nov, predict Dec) is a transfer diagnostic. The board judges after; the haircut column of the ledger stays empty until S1 lands.</p>
+<div class="wrap"><table>
+<tr><th>Lane</th><th>Model</th><th>CV inside training</th><th>Holdout Jan+Jul</th><th>Jan</th><th>Jul</th><th>Forward Dec</th><th>Improvement vs B4 [95%]</th><th>Paired SE</th><th>Bound</th><th>Verdict</th></tr>
+<tr><td>A</td><td>B4 (champion before)</td><td class="num">279 (v1 folds)</td><td class="num">311.2</td><td class="num">279.9</td><td class="num">334.5</td><td class="num">271.8</td><td class="num"></td><td class="num"></td><td class="num"></td><td></td></tr>
+<tr class="win"><td>A</td><td>M1</td><td class="num">232.9</td><td class="num">259.5</td><td class="num">231.2</td><td class="num">280.5</td><td class="num">223.2</td><td class="num">+51.6 [+48.4, +55.1]</td><td class="num">1.7</td><td class="num">2.8 (k = 12)</td><td>WIN, promoted</td></tr>
+<tr><td>B</td><td>B4 (champion)</td><td class="num"></td><td class="num">2,074.1</td><td class="num">2,939.3</td><td class="num">1,649.7</td><td class="num">916.9</td><td class="num"></td><td class="num"></td><td class="num"></td><td></td></tr>
+<tr class="lose"><td>B</td><td>M1</td><td class="num">1,844.2</td><td class="num">2,386.3</td><td class="num">3,201.6</td><td class="num">2,008.5</td><td class="num">1,676.7</td><td class="num">-312.1 [-643.8, -12.1]</td><td class="num">161.1</td><td class="num">229.4 (k = 8)</td><td>LOSE, B4 stays</td></tr>
+</table></div>
+<p><span class="call">Gaps stated.</span> Lane A: the CV level 232.9 s became 259.5 s on the holdout, 26.6 s worse; July is 49 s worse than January; December (forward) came in at 223.2 s. Lane B: CV 1,844 s, holdout 2,386 s, December 1,677 s; the level moves by hundreds of seconds because a few days carry the squared error (F3, F8). The signs agree in both months for both lanes, so no opposite-sign flag fires.</p>
+<div class="wrap"><table>
+<tr><th>All rows (reported, never decides)</th><th>RMSE</th></tr>
+<tr><td>B4 in both lanes</td><td class="num">403.0</td></tr>
+<tr><td>M1 in both lanes</td><td class="num">393.9</td></tr>
+<tr><td>Lane champions after this verdict (M1 + B4)</td><td class="num">365.3</td></tr>
+</table></div>
+
+<h2>Every holdout verdict, with its interval</h2>
+<p>Paired day-block bootstrap, 2,000 reps, seed 0, whole days resampled. Improvement = champion RMSE minus challenger RMSE. WIN = interval above zero and at least 2 s.</p>
+<div class="wrap"><table>
+<tr><th>id</th><th>Lane</th><th>Champion</th><th>Challenger</th><th>Challenger RMSE</th><th>Improvement [95%]</th><th>Verdict</th></tr>
+<tr class="win"><td class="id">H1</td><td>B</td><td>B0 (3,959.4)</td><td>B1</td><td class="num">3,709.9</td><td class="num">+249.4 [+135.5, +353.9]</td><td>WIN, B1 promoted</td></tr>
+<tr class="lose"><td class="id">H2</td><td>B</td><td>B1</td><td>B2</td><td class="num">3,807.5</td><td class="num">-97.6 [-232.9, +15.4]</td><td>lose</td></tr>
+<tr class="lose"><td class="id">H3</td><td>B</td><td>B1</td><td>B3s</td><td class="num">4,889.7</td><td class="num">-1,179.7 [-2,262.0, -214.0]</td><td>lose</td></tr>
+<tr class="win"><td class="id">H4</td><td>B</td><td>B1</td><td>B4</td><td class="num">2,074.1</td><td class="num">+1,635.8 [+733.6, +2,538.9]</td><td>WIN, B4 promoted</td></tr>
+<tr class="win"><td class="id">H5</td><td>A</td><td>B0 (476.7)</td><td>B1</td><td class="num">440.7</td><td class="num">+36.1 [+31.6, +41.1]</td><td>WIN, B1 promoted</td></tr>
+<tr class="win"><td class="id">H6</td><td>A</td><td>B1</td><td>B2</td><td class="num">433.1</td><td class="num">+7.6 [+6.2, +8.9]</td><td>WIN, B2 promoted</td></tr>
+<tr><td class="id">H7</td><td>A</td><td>B2</td><td>B3a</td><td class="num">413.6</td><td class="num">+19.5 [-17.9, +73.7]</td><td>tie (interval crosses zero)</td></tr>
+<tr class="lose"><td class="id">H8</td><td>A</td><td>B2</td><td>B3b</td><td class="num">620.9</td><td class="num">-187.8 [-233.8, -132.0]</td><td>lose</td></tr>
+<tr class="lose"><td class="id">H9</td><td>A</td><td>B2</td><td>B3c</td><td class="num">709.7</td><td class="num">-276.6 [-323.6, -220.7]</td><td>lose</td></tr>
+<tr><td class="id">H10</td><td>A</td><td>B2</td><td>B3d</td><td class="num">400.1</td><td class="num">+33.0 [-2.5, +86.3]</td><td>tie (interval crosses zero)</td></tr>
+<tr class="win"><td class="id">H11</td><td>A</td><td>B2</td><td>B4</td><td class="num">311.2</td><td class="num">+121.9 [+88.7, +173.5]</td><td>WIN, B4 promoted</td></tr>
+<tr class="lose"><td class="id">H12</td><td>B</td><td>B4</td><td>M1</td><td class="num">2,386.3</td><td class="num">-312.1 [-643.8, -12.1]</td><td>lose, B4 stays</td></tr>
+<tr class="win"><td class="id">H13</td><td>A</td><td>B4</td><td>M1</td><td class="num">259.5</td><td class="num">+51.6 [+48.4, +55.1]</td><td>WIN, M1 promoted</td></tr>
+</table></div>
+
+<h2>Ledger line</h2>
+<ul>
+<li><span class="call">N = 0</span> board submissions. <span class="call">N_h = 13</span> holdout verdicts: 6 WIN, 2 tie, 5 lose.</li>
+<li>Expected false passes across 13 verdicts at the one-sided 2.5% the interval rule implies: 13 x 0.025 = 0.33. Six passes were recorded; the smallest of them (H6, +7.6 s) sits 4.6 SE above zero.</li>
+<li>Declared searches and their optimism bounds: admission-cap sweep, k = 4 per lane, 1.03 x SE, chose none. M1 grid lane A, k = 12, bound 1.63 x 1.7 = 2.8 s; observed gain 51.6 s, about 18 times the bound. M1 grid lane B, k = 8, bound 1.42 x 161.1 = 229.4 s; observed -312.1 s.</li>
+<li>Regenerate: <code>python -m taxi.baselines</code>, <code>python -m taxi.m1</code>; ledger <code>docs/TRIAL-LEDGER.md</code>, section B.</li>
+</ul>
+
+<h2>What M1 leans on</h2>
+<p>Gain share of the final fit per lane. Lane A is carried by the flight-plan gaps and the two location codes; the traffic counts add almost nothing there. Lane B is carried by the schedule gap and the queue, which is what B4 already uses.</p>
+<div class="wrap"><table>
+<tr><th>Lane A feature</th><th>Gain share</th><th>Lane B feature</th><th>Gain share</th></tr>
+<tr><td class="id">z_aobt</td><td class="num">0.254</td><td class="id">z_sched</td><td class="num">0.394</td></tr>
+<tr><td class="id">z_eobt</td><td class="num">0.146</td><td class="id">queue</td><td class="num">0.127</td></tr>
+<tr><td class="id">runway</td><td class="num">0.142</td><td class="id">runway</td><td class="num">0.118</td></tr>
+<tr><td class="id">stand</td><td class="num">0.109</td><td class="id">stand</td><td class="num">0.114</td></tr>
+<tr><td class="id">z_anchor</td><td class="num">0.106</td><td class="id">z_anchor</td><td class="num">0.102</td></tr>
+<tr><td class="id">apt</td><td class="num">0.081</td><td class="id">apt</td><td class="num">0.057</td></tr>
+<tr><td class="id">z_lobt</td><td class="num">0.050</td><td class="id">push_anchor</td><td class="num">0.031</td></tr>
+<tr><td class="id">z_sched</td><td class="num">0.048</td><td class="id">dep_before</td><td class="num">0.015</td></tr>
+<tr><td class="id">actype</td><td class="num">0.029</td><td class="id">arr_anchor</td><td class="num">0.012</td></tr>
+<tr><td class="id">queue</td><td class="num">0.014</td><td class="id">dep_after</td><td class="num">0.008</td></tr>
+<tr><td colspan="2" class="note">ten remaining features share 0.021</td><td colspan="2" class="note">ten remaining features share 0.023</td></tr>
+</table></div>
+
+<h3>Per-feature knockout, lane A <span class="tag">complete, 20 of 20</span></h3>
+<p>Each row drops one feature and refits the chosen cell at its fixed 1,016 rounds on the five CV folds. "Loss vs full" is the CV RMSE rise; it clears the 2 s floor or it does not. The knockout informs the next declared feature set and never re-opens the verdict (protocol section 5).</p>
+<div class="wrap"><table>
+<tr><th>Dropped</th><th>CV RMSE</th><th>Loss vs full</th><th>Clears floor</th></tr>
+<tr><td class="id">apt</td><td class="num">233.7</td><td class="num">+0.7</td><td>no</td></tr>
+<tr><td class="id">hour</td><td class="num">233.6</td><td class="num">+0.7</td><td>no</td></tr>
+<tr><td class="id">wday</td><td class="num">232.5</td><td class="num">-0.4</td><td>no</td></tr>
+<tr><td class="id">has_fpl</td><td class="num">232.9</td><td class="num">+0.0</td><td>no</td></tr>
+<tr class="win"><td class="id">z_aobt</td><td class="num">236.1</td><td class="num">+3.2</td><td>yes</td></tr>
+<tr class="win"><td class="id">z_eobt</td><td class="num">237.3</td><td class="num">+4.4</td><td>yes</td></tr>
+<tr><td class="id">z_lobt</td><td class="num">234.5</td><td class="num">+1.6</td><td>no</td></tr>
+<tr class="win"><td class="id">z_sched</td><td class="num">238.4</td><td class="num">+5.5</td><td>yes</td></tr>
+<tr><td class="id">z_anchor</td><td class="num">232.4</td><td class="num">-0.5</td><td>no</td></tr>
+<tr class="win"><td class="id">runway</td><td class="num">239.0</td><td class="num">+6.1</td><td>yes</td></tr>
+<tr class="win"><td class="id">stand</td><td class="num">235.9</td><td class="num">+3.0</td><td>yes</td></tr>
+<tr><td class="id">actype</td><td class="num">233.5</td><td class="num">+0.6</td><td>no</td></tr>
+<tr><td class="id">wake</td><td class="num">232.5</td><td class="num">-0.4</td><td>no</td></tr>
+<tr><td class="id">segment</td><td class="num">233.2</td><td class="num">+0.3</td><td>no</td></tr>
+<tr><td class="id">queue</td><td class="num">233.8</td><td class="num">+0.9</td><td>no</td></tr>
+<tr><td class="id">dep_before</td><td class="num">232.9</td><td class="num">+0.0</td><td>no</td></tr>
+<tr><td class="id">dep_after</td><td class="num">233.1</td><td class="num">+0.2</td><td>no</td></tr>
+<tr><td class="id">arr_anchor</td><td class="num">232.8</td><td class="num">-0.1</td><td>no</td></tr>
+<tr><td class="id">arr_off</td><td class="num">232.8</td><td class="num">-0.1</td><td>no</td></tr>
+<tr><td class="id">push_anchor</td><td class="num">232.7</td><td class="num">-0.2</td><td>no</td></tr>
+</table></div>
+<p>Five features clear the floor on their own: runway +6.1, z_sched +5.5, z_eobt +4.4, z_aobt +3.2, stand +3.0. z_lobt sits at +1.6. The six traffic counts, has_fpl, wday, wake, segment and z_anchor each move CV by less than 1 s in either direction, so lane A is carried by the flight-plan gaps and the two location codes, as the gain shares said. One-at-a-time drops overlap, so the sum of the losses is not the cost of dropping them together; the next declared feature set is a separate registry row. Lane B's knockout is in <code>docs/M1-KNOCKOUT.md</code>: apt +74.1, runway +63.2 and queue +34.2 clear, and dropping stand improves its CV by 76.2 s, which is one more sign that the tree class over-fits the 17,097 lane-B rows (F9).</p>
+
+<h2>The rule, restated</h2>
+<ul>
+<li>Improvement = champion RMSE minus challenger RMSE on the same holdout rows, per lane. Lane A decides; lane B is judged on its own rows; the all-row number never decides.</li>
+<li>Verdict statistic: paired day-block bootstrap of the improvement, 2,000 reps, seed 0, whole days resampled, 62 days. WIN needs the 95% interval above zero and a point improvement of at least 2 s. A win with opposite signs in January and July is a flag.</li>
+<li>Every search declares k and pays an analytic optimism bound of E[max of k standard normals] x paired SE. A gain must clear bound plus floor.</li>
+<li>Ties break on parsimony: fewer features, simpler class, fewer stages.</li>
+<li>Board RMSE on the 215,876 scored rows is exact for the ranking and a point value for learning; haircut = holdout improvement minus board improvement, one row per submission. REVIEW fires when two promoted champions in a row show board improvement at or below zero.</li>
+</ul>
+<p class="rule">This verdict is only as good as this rule. Attack the rule, not just the numbers.</p>
+
+<h2>Caution flags F1-F9, verbatim from the protocol</h2>
+<ul>
+<li><span class="call">F1 Scored subset unexplained.</span> The board scores 215,876 of 344,841 ranking DEP rows. Checked 2026-09-04: no column non-null count equals it, no simple predicate equals it, no airport subset sums to it, training target coverage is 100% and <code>submitting.parquet</code> holds all 344,841 ids, so neither explains it; the site states no exclusion. Inference (arithmetic in <code>docs/protocol-review-v1.html</code>, section E): if the scored rows carried the 2025 lane-B structure at the same rate, those rows alone would floor the board RMSE at 494 s, above the leader's 249.46 s; so either 2026 lacks that tail or the scorer drops it. UNKNOWN which; probes P1-P6 answer it (R14).</li>
+<li><span class="call">F2 2026 tail transfer unknown.</span> In every 2025 month the AOBT_3-residual tail (5.9% to 8.2% of rows) carries 59% to 77% of the squared error. Whether Jan/Jul 2026 look the same is unknown until a submission lands.</li>
+<li><span class="call">F3 Truth outliers in training and holdout.</span> Training: 122 rows over 4 h carry 40.8% of the squared error around the per-airport mean; holdout: 45 rows over 4 h carry 56.3%, and about 43 of them are lane B. LIRF max taxi 131,167 s; LSZH 313 non-positive; LFPG 65 non-positive. Training truth is trimmed only by the declared admission cap (section 3; the sweep chose none in both lanes); the holdout is never trimmed (<code>python scripts/review_checks.py</code>).</li>
+<li><span class="call">F4 Lane B.</span> 5,290 ranking rows have no flight plan. In training their target has mean 1,384 s and RMS 3,669 s (lane A: 987 and 1,072); the per-airport mean scores 3,710 s on the lane-B holdout against 441 s on lane A. With the B4 champions in both lanes, lane B is still about 41% of the all-row squared error (arithmetic from the two lane RMSEs and counts in section 4). Every submission declares its lane-B champion.</li>
+<li><span class="call">F5 Level transfer.</span> One SE of the RMSE level across day blocks is 10.2 s, and the same B4 spec scores 279 s on training-month folds against 311 s on Jan + Jul; local levels are never compared with board levels.</li>
+<li><span class="call">F6 Board volume.</span> The leader file is <code>_v344</code>; the board ranks each team by its best submission, so volume is rewarded. Our ledger counts N so the winner-take-best effect on our own history stays visible.</li>
+<li><span class="call">F7 TabPFN licence attribution</span> (section 4, M3): any public artefact that makes TabPFN weights available, and any blend trained on TabPFN outputs, carries the attribution and the name prefix.</li>
+<li><span class="call">F8 Gap baselines are day-clustered.</span> B3a and B3d beat B2 by 19.5 s and 33.0 s on the mean and still lost the verdict because their intervals cross zero: a few days carry their squared error. Any model leaning on the raw gaps inherits that; the interval, not the mean, decides.</li>
+<li><span class="call">F9 Lane B resists the model class.</span> M1 lost to B4 on the lane-B holdout (-312.1 s [-643.8, -12.1]) and on the forward fold (1,676.7 s against 916.9 s) with 17,097 training rows; every huber cell ran to the round ceiling. The two-feature OLS stays champion, so every lane-B ranking row is an extrapolation on the schedule gap plus queue. Lane B is 5,373 of the 344,419 holdout rows and half (50.3%) of the all-row squared error at 365.3 s; the ranking file has 5,290 such rows.</li>
+</ul>
+
+<h2>Self-audit (Stage 5.6): what else is wrong with what I did</h2>
+<ol>
+<li><span class="call">Data.</span> The six traffic counts see only the loaded period, so windows at the first and last 15 minutes of a loaded file undercount. Holdout and ranking are both a Jan+Jul pair loaded together, so the edge shape matches at scoring time, but a January-31 window never sees February in either. Codes unseen in training: ranking versus all 12 months has 0.08% unseen stands and 0.01% unseen aircraft types, zero for runway, wake and segment; LightGBM recodes them to missing (its pandas path calls <code>set_categories</code> on the training list). Ranking nulls: actype 0.11%, wake 1.54%, segment 1.53%. The traffic counts were checked against a brute-force recount on 300 sampled February departures (<code>tests/test_traffic.py</code>, passes).</li>
+<li><span class="call">Statistics.</span> Both lanes ride 62 day blocks, whatever their row counts. The lane-B interval spans 630 s because a handful of days carry its squared error; the lane-A interval is 6.7 s wide. The grid's parsimony window was applied to point CV RMSEs (cells 1, 5 and 9 sit within 1.3 s of each other) with no interval; the choice among them cannot matter by more than the floor. The final round count is the mean best iteration across five folds trained on eight months, then applied to ten months and, for S1, twelve; more rows usually want more rounds, so the fixed count errs on the under-fit side.</li>
+<li><span class="call">Code.</span> The knockout mode was smoke-tested on lane B only before the lane-A run; its lane-A output is the table above; the run's full-model line, 232.9 s at 1,016 rounds, matches the CV grid's chosen cell. The same <code>predict</code> path serves CV, holdout, forward fold and S1, so a bug there moves every number the same way rather than one of them. No upload code exists yet; it is written after the yes and its checksum goes in the ledger row.</li>
+<li><span class="call">Process.</span> The protocol declared "at most 12 cells" for M1 and the bound was computed at k = 12, but the grid axes (leaves, min_data_in_leaf, objective) were fixed at run time, not written down before it. The huber alpha of 600 s was sized for lane-A residuals and is mis-sized for lane-B targets in the thousands, so lane B had four live cells and four dead ones; its bound at k = 8 overstates the search, which is the conservative direction. The knockout was launched after the verdict, as declared. The same hands authored, ran and judged everything; the independent critique below is the outside voice.</li>
+</ol>
+
+<h2>Independent critique (Stage 5.7)</h2>
+<p class="note">A separate reviewer (Sonnet, read-only on the repo and its artefacts, not the summaries) was asked for at most 12 findings on the method: leakage, multiplicity, selection, the bound, the lane split, and a verdict on the lane-A promotion. Its findings ride here verbatim.</p>
+<ol>
+<li><span class="call">[should-fix] Traffic-count features are never checked against the real ranking file.</span> <code>data.py:75-90</code> (<code>_traffic</code>) counts other departures/arrivals in 900s windows, including ones after the own takeoff — admissible per protocol section 2 point 1 only if <code>ranking.parquet</code> truly carries the full DEP+ARR movement set. <code>tests/test_masked_view.py:19-23</code> checks only row count (344,841) and column names on the real ranking file; <code>tests/test_traffic.py</code> brute-force-verifies the count logic only against the February <em>training</em> file, which is known-complete. Nothing asserts <code>ranking.parquet</code> contains nonzero ARR rows or that count distributions match training. A silent shortfall there would surface only after S1's board score, not in the holdout (which is built from training-shaped files). Fix: run <code>features()</code> on <code>ranking.parquet</code> and assert nonzero arrival rows per airport and comparable count distributions before or right after S1.
+<p class="note"><span class="call">Response, checked 2026-09-05.</span> The ranking file holds 344,841 DEP and 344,693 ARR rows. Landings per airport run from 23,123 (LSZH) to 47,764 (LTFM). The six counts on the ranking file sit beside the holdout's:</p>
+<div class="wrap"><table>
+<tr><th>Count</th><th>Ranking mean</th><th>Holdout mean</th><th>Ranking p99</th><th>Holdout p99</th></tr>
+<tr><td class="id">queue</td><td class="num">10.92</td><td class="num">10.69</td><td class="num">44</td><td class="num">46</td></tr>
+<tr><td class="id">dep_before</td><td class="num">8.56</td><td class="num">8.55</td><td class="num">19</td><td class="num">18</td></tr>
+<tr><td class="id">dep_after</td><td class="num">8.65</td><td class="num">8.62</td><td class="num">19</td><td class="num">18</td></tr>
+<tr><td class="id">arr_anchor</td><td class="num">14.94</td><td class="num">14.91</td><td class="num">31</td><td class="num">31</td></tr>
+<tr><td class="id">arr_off</td><td class="num">14.88</td><td class="num">14.83</td><td class="num">31</td><td class="num">32</td></tr>
+<tr><td class="id">push_anchor</td><td class="num">17.96</td><td class="num">17.88</td><td class="num">37</td><td class="num">36</td></tr>
+</table></div>
+<p class="note"><code>tests/test_traffic.py</code> now asserts landings at every one of the ten airports in the ranking file. The condition on the verdict is met.</p></li>
+<li><span class="call">[should-fix] Lane-B huber cells share lane-A's untuned delta.</span> <code>m1.py:23-24</code> (<code>BASE</code> dict, <code>alpha=600.0</code> applied to both lanes). <code>docs/M1.md</code> lane-B grid rows 2/4/6/8 (huber) all ran to the 2000-round ceiling and scored 250-680s worse than l2 siblings. Lane-B <code>y</code> has RMS ~3,669s versus lane-A's ~1,072s (protocol F4), so a 600s huber delta is far too tight for lane B, effectively disqualifying half its 8-cell grid rather than testing it fairly. Fix: scale <code>alpha</code> per lane or drop huber from lane B's grid.
+<p class="note"><span class="call">Response.</span> Agreed; it is item 4 of the self-audit. The next declared lane-B grid sizes the delta per lane or drops huber. The M1 lane-B verdict stands as run: the four live l2 cells lost to B4 on their own.</p></li>
+<li><span class="call">[note] Lane-A reconstruction <code>z_aobt + c_hat</code> (<code>m1.py:48-50</code>) is an exact algebraic identity — it holds for every row regardless of sign, since <code>c = y - z_aobt</code> (<code>data.py:101</code>) by construction, so no lineage break exists.</span> But rows with <code>z_aobt &lt; 0</code> (takeoff before AOBT_3, the anomaly B4 routes around via the anchor rule, protocol R6) get very large <code>|c|</code> labels fed into an uncapped l2 loss (CAP sweep chose "none"). No count or sensitivity check is reported for these rows against the +51.6s win. Fix: report the <code>z_aobt&lt;0</code> row count and re-run the bootstrap excluding those days.
+<p class="note"><span class="call">Response, counted 2026-09-05.</span> Holdout lane A: 240 of 339,046 rows (0.07%) have a negative AOBT gap; ranking lane A: 169 of 339,551 (0.05%). Sensitivity (<code>python -m taxi.m1 sensitivity</code>, a diagnostic that never decides): the 240 rows fall on 53 of the 62 days, so dropping days is dropping the holdout; the rows were dropped instead. On the 240 rows alone, B4 scores 2,266.7 s and M1 1,906.6 s. Without them, B4 305.4 s against M1 254.6 s, improvement +50.8 s [+47.6, +54.0]. The verdict does not move.</p></li>
+<li><span class="call">[note] CV round-count transfer is unvalidated for stability.</span> <code>m1.py:105-125</code>: <code>int(np.mean(rounds))</code> across 5 folds' best iterations is applied unchanged to a frozen fit on all 10 training months (more data than any fold saw). Per-fold round counts aren't logged, so variance across folds — and whether more data needed more rounds — can't be judged. Fix: log per-fold best_iteration in <code>M1.md</code>.
+<p class="note"><span class="call">Response.</span> The CV table now carries a per-fold rounds column; every later M-lane run prints it. M1 was not re-run for it.</p></li>
+<li><span class="call">[note] Optimism bound derives its "SE" from CI width / 3.92, assuming normality.</span> <code>m1.py:152</code>, versus protocol section 0's own statement that the Gaussian SE formula is wrong by 3-15x here (heavy tails, day clustering). Confirmed arithmetic itself is right (E[max of k normals] ≈ 1.42 for k=8, ≈1.63 for k=12, matching <code>m1.py:100-102</code>), and it's immaterial to lane A (51.6s effect vs. 4.8s bound+floor, ~10x clearance), but could matter on a closer future call. Fix: derive the bound from the empirical per-cell bootstrap draws instead.
+<p class="note"><span class="call">Response.</span> Agreed and immaterial here. The width here comes from the day-block bootstrap, not the Gaussian formula section 0 withdrew; the normal step is only the max-of-k factor. A bound from the per-cell bootstrap draws is a protocol amendment, so it goes to Keith as a candidate for the next amendment, not into this verdict.</p></li>
+<li><span class="call">[note] Chosen admission cap is hardcoded, not read back from <code>baselines.cap_sweep</code>.</span> <code>m1.py</code> never imports <code>admit</code>/<code>cap_sweep</code>; correctness today relies on both lanes' sweep having chosen "none." Fix: read the cap from <code>docs/BASELINES.md</code> or the sweep function programmatically.
+<p class="note"><span class="call">Response.</span> Noted; the sweep chose none in both lanes, so no row is affected. A read-back is a code chore for the next lane.</p></li>
+<li><span class="call">[note] <code>has_fpl</code> is a constant within each lane-split training set</span> (<code>data.py:24</code>, <code>MODEL_FEATURES</code>) — zero gain share both lanes confirms it's dead weight, not a bug.
+<p class="note"><span class="call">Response.</span> Agreed; it leaves the next declared feature set.</p></li>
+<li><span class="call">[note] Selection honesty holds: no holdout leakage found.</span> <code>m1.py</code>'s <code>cv()</code> and grid search touch only <code>TRAIN_MONTHS</code> (<code>taxi/data.py:12</code>), holdout is a fully separate <code>load(HOLDOUT_MONTHS)</code> call; one frozen fit per lane is scored once. The paired bootstrap (<code>verdict.py:32-46</code>) uses the <em>same</em> day-block draws for champion and challenger each replicate and computes RMSE per resample before differencing — correctly paired, no arithmetic issue.</li>
+<li><span class="call">[note] Lane B's 62-day independence unit is thin and outlier-dominated</span> (F3: ~43 of 45 extreme holdout rows are lane B), but the resulting wide interval [-643.8, -12.1] stays entirely below zero, so the "lose" call is not an artifact of instability — the width is honest, not disqualifying.</li>
+<li><span class="call">[note] F1 (215,876 of 344,841 ranking rows scored, cause unknown) remains open at S1 time</span> — inherent to the competition's undisclosed scorer, not resolvable before a submission, already tracked by the team's own probes P1-P6.</li>
+</ol>
+<p><span class="call">Reviewer's verdict, verbatim:</span> "No leakage or lineage break found; selection honesty and the paired bootstrap check out; M1 lane-A promotion over B4 is sound and safe to submit as S1, contingent on verifying finding 1 (traffic features on the real ranking file) before trusting the board score to match the holdout's +51.6s."</p>
+
+<h2>What would make me say no</h2>
+<ul>
+<li>The critique finds a path from the blanked columns (BLOCK_TIME, TAXITIME) into any feature, or a count that reads rows the ranking file cannot supply.</li>
+<li><code>python -m pytest -q</code> fails, or the built file's id set differs from <code>submitting.parquet</code>, or any prediction is null. The builder raises on all three.</li>
+<li>The ranking predictions sit far from the 2025 level with no reason in the inputs. Checked at build time (table above): lane A is 40 s above with a 32 s larger anchor gap; lane B is 73 s above with a 1,288 s larger schedule gap. Neither fires, but the lane-B gap shift is the one number on this page I would watch.</li>
+<li>Keith names a 2026 change at any of the ten airports (runway works, terminal or stand renumbering, a schedule shift) that the 2025 training cannot carry. The model has no way to know this; only the domain does.</li>
+</ul>
+
+<h2>Gate questions</h2>
+<p class="note">The six questions from the steering bank, verbatim, each with my answer. The answers are mine to be attacked; the questions are Keith's to press.</p>
+
+<p class="q"><span class="n">1</span>Attack the decision rule, not just the numbers.</p>
+<p>The rule's blind spot is the board's scored subset (F1). If the scorer drops lane B, the lane-A verdict is the whole game and S1 reads cleanly. If it keeps lane B, half the squared error on the board comes from rows where we run a two-feature OLS (F9), and S1 says little about M1. Second, the bootstrap treats the 62 days of Jan+Jul 2025 as the population; 2026 is a fresh draw (F2, F5). Third, at 51.6 s against a 2.8 s bound the rule is not what decides here; transfer decides, and the rule cannot measure transfer until a file lands.</p>
+
+<p class="q"><span class="n">2</span>Tied on WHAT?</p>
+<p>Nothing is tied at the verdict level. Lane A cleared its bound about 18 times over; lane B lost on both point and interval. Inside the lane-A grid, cells 1, 5 and 9 (31, 127 and 255 leaves at min_data 200, l2) were tied within the 2 s floor at 232.9, 231.6 and 231.8 s; parsimony picked 31 leaves. Rounds were not on the grid; early stopping set them.</p>
+
+<p class="q"><span class="n">3</span>What market structure could explain or refute this?</p>
+<p>Here "market" is the airport. Stand carries 11% and runway 14% of the lane-A gain, so a stand renumbering or a runway configuration change in 2026 removes what the model learned. The 2025 tail (F3) came from somewhere physical: a diversion day, a snow day, a ground stop; I do not know which, and whether 2026 has its own. UNKNOWN: any 2026 event at the ten airports. Nothing in the data names one.</p>
+
+<p class="q"><span class="n">4</span>Is the capacity right for the data frequency?</p>
+<p>Lane A: 2.06 million rows, 20 features, 31 leaves, 1,016 rounds. CV picked the smallest tree within the floor, and December (223.2 s) came in below the CV level, so nothing says over-fit at the month scale. Lane B: 17,097 rows and a tail measured in hours; the tree class lost to two-feature OLS on holdout and forward fold alike. Yes for lane A, no for lane B, which is why the lanes carry different classes.</p>
+
+<p class="q"><span class="n">5</span>What would make you say no?</p>
+<p>The four conditions in the section above. None fired: the critique found no leak and its one condition (finding 1) is met, the tests pass, the file builds against the template, and the levels track the inputs. The fourth condition is Keith's to fire.</p>
+
+<p class="q"><span class="n">6</span>What is on the accrual list, and when is each re-test?</p>
+<p>The accrual list is empty. No verdict rode fewer than 300 flights (protocol section 6; the smallest per-airport lane holds about 22,000). Scheduled after S1, in order: probes P1-P6 (six uploads, derive the scored count and error sum per group), W1 register row, M2, M3 one-airport pilot, E1. Each new class gates on Keith before its first upload.</p>
+
+<h2>Appendix</h2>
+<details><summary>M1 grids by month-pair CV</summary>
+<h3>Lane A (k = 12)</h3>
+<div class="wrap"><table>
+<tr><th>Cell</th><th>Leaves</th><th>min_data</th><th>Objective</th><th>CV RMSE</th><th>Rounds</th></tr>
+<tr><td class="num">1</td><td class="num">31</td><td class="num">200</td><td>l2</td><td class="num">232.9</td><td class="num">1,016</td></tr>
+<tr><td class="num">2</td><td class="num">31</td><td class="num">200</td><td>huber</td><td class="num">234.2</td><td class="num">1,989</td></tr>
+<tr><td class="num">3</td><td class="num">31</td><td class="num">2,000</td><td>l2</td><td class="num">235.5</td><td class="num">1,637</td></tr>
+<tr><td class="num">4</td><td class="num">31</td><td class="num">2,000</td><td>huber</td><td class="num">240.4</td><td class="num">1,980</td></tr>
+<tr><td class="num">5</td><td class="num">127</td><td class="num">200</td><td>l2</td><td class="num">231.6</td><td class="num">468</td></tr>
+<tr><td class="num">6</td><td class="num">127</td><td class="num">200</td><td>huber</td><td class="num">232.8</td><td class="num">959</td></tr>
+<tr><td class="num">7</td><td class="num">127</td><td class="num">2,000</td><td>l2</td><td class="num">234.3</td><td class="num">1,232</td></tr>
+<tr><td class="num">8</td><td class="num">127</td><td class="num">2,000</td><td>huber</td><td class="num">238.2</td><td class="num">1,805</td></tr>
+<tr><td class="num">9</td><td class="num">255</td><td class="num">200</td><td>l2</td><td class="num">231.8</td><td class="num">319</td></tr>
+<tr><td class="num">10</td><td class="num">255</td><td class="num">200</td><td>huber</td><td class="num">232.7</td><td class="num">658</td></tr>
+<tr><td class="num">11</td><td class="num">255</td><td class="num">2,000</td><td>l2</td><td class="num">235.2</td><td class="num">805</td></tr>
+<tr><td class="num">12</td><td class="num">255</td><td class="num">2,000</td><td>huber</td><td class="num">239.3</td><td class="num">1,321</td></tr>
+</table></div>
+<h3>Lane B (k = 8)</h3>
+<div class="wrap"><table>
+<tr><th>Cell</th><th>Leaves</th><th>min_data</th><th>Objective</th><th>CV RMSE</th><th>Rounds</th></tr>
+<tr><td class="num">1</td><td class="num">7</td><td class="num">50</td><td>l2</td><td class="num">1,844.2</td><td class="num">385</td></tr>
+<tr><td class="num">2</td><td class="num">7</td><td class="num">50</td><td>huber</td><td class="num">2,306.1</td><td class="num">1,998</td></tr>
+<tr><td class="num">3</td><td class="num">7</td><td class="num">200</td><td>l2</td><td class="num">2,034.9</td><td class="num">587</td></tr>
+<tr><td class="num">4</td><td class="num">7</td><td class="num">200</td><td>huber</td><td class="num">2,520.2</td><td class="num">1,997</td></tr>
+<tr><td class="num">5</td><td class="num">31</td><td class="num">50</td><td>l2</td><td class="num">1,866.6</td><td class="num">310</td></tr>
+<tr><td class="num">6</td><td class="num">31</td><td class="num">50</td><td>huber</td><td class="num">2,087.3</td><td class="num">1,999</td></tr>
+<tr><td class="num">7</td><td class="num">31</td><td class="num">200</td><td>l2</td><td class="num">2,040.7</td><td class="num">538</td></tr>
+<tr><td class="num">8</td><td class="num">31</td><td class="num">200</td><td>huber</td><td class="num">2,427.6</td><td class="num">1,999</td></tr>
+</table></div>
+</details>
+<details><summary>Regenerate every number on this page</summary>
+<pre><code>python -m pytest -q                 # 8 tests, incl. the traffic recount
+python -m taxi.baselines            # docs/BASELINES.md, B0-B4, cap sweep
+python -m taxi.m1                   # docs/M1.md, grids, verdicts, forward fold
+python -m taxi.m1 knockout          # docs/M1-KNOCKOUT.md
+git show 7c09920 --stat             # the commit this page describes</code></pre>
+<p class="note">Sources: <code>docs/M1.md</code>, <code>docs/TRIAL-LEDGER.md</code> (section B), <code>docs/EXPERIMENT-PROTOCOL.md</code> (sections 3, 4, 6, 7). Steering bank: <code>~/.claude/skills/quant-ml-protocol/references/steering-bank.md</code>, gate set.</p>
+</details>
+</main>
