@@ -1,0 +1,249 @@
+<meta charset="utf-8">
+<title>S2 Promotion Gate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#F6F7F5;--ink:#1C232B;--muted:#5B6570;--line:#D8DDD9;--accent:#1F4FB0;--amber:#B0680A;--tint:#E9EEF9;--tint-amber:#FBF1E3;--code:#EEF0EC;--win:#1F6B3A;--tint-win:#E6F2EA;--lose:#9B2C2C;--tint-lose:#F8E7E7}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#171B1F;--ink:#E6E9E6;--muted:#9AA4AE;--line:#333A41;--accent:#8FB0F0;--amber:#E0A050;--tint:#1E2A42;--tint-amber:#3A2A12;--code:#22282E;--win:#7FCB9A;--tint-win:#16301F;--lose:#E39B9B;--tint-lose:#3A1A1A}}
+:root[data-theme="dark"]{--bg:#171B1F;--ink:#E6E9E6;--muted:#9AA4AE;--line:#333A41;--accent:#8FB0F0;--amber:#E0A050;--tint:#1E2A42;--tint-amber:#3A2A12;--code:#22282E;--win:#7FCB9A;--tint-win:#16301F;--lose:#E39B9B;--tint-lose:#3A1A1A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "IBM Plex Sans",system-ui,sans-serif}
+main{max-width:76ch;margin:0 auto;padding:40px 24px 80px}
+h1{font-size:30px;line-height:1.2;font-weight:600;margin:6px 0 10px;text-wrap:balance}
+h2{font-size:19px;font-weight:600;margin:40px 0 10px;text-wrap:balance}
+h3{font-size:16px;font-weight:600;margin:24px 0 6px}
+p{margin:0 0 12px}
+.eyebrow{font:500 12px/1.4 "IBM Plex Mono",monospace;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:18px;color:var(--muted);margin-bottom:22px}
+.headline{border-left:4px solid var(--accent);background:var(--tint);padding:14px 18px;margin:18px 0}
+.headline p:last-child{margin:0}
+.decision{border:1px solid var(--amber);background:var(--tint-amber);padding:14px 18px;margin:18px 0;border-radius:2px}
+.decision h2{margin:0 0 8px;font-size:17px}
+.call{font-weight:600}
+.wrap{overflow-x:auto;margin:10px 0 16px}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:13px}
+td.num,th.num{text-align:right;white-space:nowrap}
+td.id{font-family:"IBM Plex Mono",monospace;font-size:13px;white-space:nowrap}
+tr.win td{background:var(--tint-win)}
+tr.lose td{background:var(--tint-lose)}
+.note{font-size:14px;color:var(--muted)}
+.tag{display:inline-block;font:500 11px/1.4 "IBM Plex Mono",monospace;letter-spacing:.03em;padding:1px 6px;border:1px solid var(--line);border-radius:2px;margin-right:6px;color:var(--muted)}
+.tag.win{color:var(--win);border-color:var(--win)}
+.tag.lose{color:var(--lose);border-color:var(--lose)}
+.tag.amber{color:var(--amber);border-color:var(--amber)}
+code,pre{font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+code{background:var(--code);padding:1px 5px;border-radius:2px}
+pre{background:var(--code);padding:12px 14px;overflow-x:auto;border-radius:2px;line-height:1.5}
+details{border:1px solid var(--line);border-radius:2px;padding:8px 14px;margin:12px 0}
+summary{cursor:pointer;font-weight:600}
+ol,ul{padding-left:22px;margin:0 0 12px}
+li{margin-bottom:6px}
+.q{margin:12px 0;padding:10px 14px;border-left:3px solid var(--line)}
+.q .n{font:500 12px/1.4 "IBM Plex Mono",monospace;color:var(--muted);display:block;margin-bottom:2px}
+.rule{border:1px dashed var(--line);padding:12px 16px;margin:12px 0;border-radius:2px}
+.rule strong{color:var(--accent)}
+.crit{margin:10px 0;padding:10px 14px;background:var(--code);border-radius:2px}
+.crit .r{margin-top:6px;padding-top:6px;border-top:1px solid var(--line);font-size:14px}
+a{color:var(--accent)}
+</style>
+<main>
+<div class="eyebrow">prc26 · Stage-6 gate · 2026-09-05 · commit 2afe8fa · protocol v2</div>
+<h1>S2 promotion gate: weather lane W1-A into the second submission</h1>
+<p class="lede">Second gate of the campaign. Two lane-A promotions since S1 (M2, then W1-A), both wins on the point estimate with the interval's low end under the floor. The M3 TabPFN pilot failed its time gate. The S2 file is built and sits on disk, not uploaded.</p>
+
+<div class="headline">
+<p><strong>Lane A holdout (Jan + Jul 2025, 339,046 rows): W1-A 253.8 s against the S1 champion M1 259.5 s.</strong> Two steps: M2 over M1 +2.9 s [+1.8, +4.1], then W1-A over M2 +2.9 s [+1.8, +3.9]. Each step clears the 2 s floor on the point estimate. Neither interval's low end (1.8 s) does. Paired SE about 0.6 s per step.</p>
+<p><strong>Lane B (5,373 rows): tie.</strong> B4 plus five weather columns 2,064.2 s against B4 2,074.1 s, +9.9 s [-2.7, +22.6]. B4 stays. Lane B is half the all-row squared error and has had no model campaign beyond baselines.</p>
+<p>All rows with both champions: 361.3 s (S1's pair scored 365.3 s locally and 325.40 s on the board; local levels are never compared with board levels, F5). Reported, not judged.</p>
+</div>
+
+<div class="decision">
+<h2>What I am asking for</h2>
+<ol>
+<li><span class="call">S2 upload: yes or no.</span> File <code>data/merry-octopus_v10.parquet</code>, sha256 <code>1076653a3bcce1c554daa5609a22f529f1078a31206d95bbef90d9b76e5fca1c</code>, 344,841 rows, lane A W1-A plus lane B B4, both fit on all twelve months of 2025. Nothing is uploaded without an explicit yes. The upload spends 1 of 3 scored files on its day.</li>
+<li><span class="call">M3 (TabPFN): amend the 30 min time gate or stop.</span> Measured 38.1 min over five folds on one airport; gain and VRAM gates passed. E1 (the M3 lane at full scale) waits on this. My recommendation: stop M3 at this budget; if the gate is amended, require one single-airport LightGBM control first (critique finding 4).</li>
+<li><span class="call">Which of the open items to run next.</span> Recommended order: C1 prediction floor (clip at 0, k = 1, about 10 min, 54 negative predictions in the S2 file), A1 anchor guard (F11, re-verdicts the lane-A chain, about 3 h), L1 lane-B campaign (half the squared error, untouched), then O1 Optuna and F1 unused plan columns. All are declared in <code>docs/COVERAGE.md</code> section 9.</li>
+</ol>
+</div>
+
+<h2>The S2 file, exactly</h2>
+<div class="wrap"><table>
+<tr><th>lane</th><th>model</th><th class="num">training rows</th><th class="num">ranking rows</th><th class="num">train y mean</th><th class="num">pred mean</th><th class="num">pred p50</th><th class="num">pred p99</th><th class="num">negative preds</th></tr>
+<tr><td class="id">A</td><td>W1-A: M2 recipe (classifier on |c| &gt; 600 s, tail and body regressors) at cell {31 leaves, min_data 200, l2}, rounds (577, 378, 1724), 36 columns including 16 METAR</td><td class="num">2,062,577</td><td class="num">339,551</td><td class="num">986.9</td><td class="num">1,027.5</td><td class="num">960.4</td><td class="num">2,361.5</td><td class="num">22</td></tr>
+<tr><td class="id">B</td><td>B4: OLS on [z_sched, queue]</td><td class="num">22,470</td><td class="num">5,290</td><td class="num">1,384.4</td><td class="num">1,457.6</td><td class="num">1,034.4</td><td class="num">9,973.7</td><td class="num">32</td></tr>
+</table></div>
+<p class="note">Level check: prediction means sit 4% (A) and 5% (B) above the training means. Weather join on the ranking file: 0.01% of rows have no METAR at or before the anchor; observation age median 14 min, p95 28 min. Rounds are the mean of the five month-pair folds. Built by <code>python -m taxi.s2</code> (log in the session scratchpad; the script prints the sha256).</p>
+
+<h2>Honest table, per lane</h2>
+<p>Every lane-A model chose its cell on the five 2025 month-pair folds and was judged on Jan + Jul. The CV number is the nomination score, the holdout number is the verdict score. The forward fold (train Jan-Nov, predict Dec) was run for M1 only.</p>
+<div class="wrap"><table>
+<tr><th>lane A model</th><th class="num">CV RMSE (5 folds)</th><th class="num">holdout RMSE</th><th class="num">Jan</th><th class="num">Jul</th><th class="num">gap (holdout minus CV)</th><th>forward fold</th></tr>
+<tr><td>M1 (S1 champion)</td><td class="num">232.9</td><td class="num">259.5</td><td class="num">231.2</td><td class="num">280.5</td><td class="num">+26.6</td><td>run (<code>docs/M1.md</code>)</td></tr>
+<tr><td>M2</td><td class="num">230.7</td><td class="num">256.6</td><td class="num">228.9</td><td class="num">277.2</td><td class="num">+25.9</td><td>NOT run</td></tr>
+<tr class="win"><td>W1-A (champion)</td><td class="num">228.5</td><td class="num">253.8</td><td class="num">224.1</td><td class="num">275.6</td><td class="num">+25.3</td><td>NOT run</td></tr>
+</table></div>
+<p class="note">The CV-to-holdout gap is stable at about 26 s across the three models: Jan + Jul are harder months than the fold average, not a sign of overfit growing along the chain. W1-A's tail RMSE 680.5 s, body 177.3 s. Lane B: B4 2,074.1 s (unchanged since H4); W1-B 2,064.2 s (tie).</p>
+
+<h2>Every holdout verdict, with its interval</h2>
+<p>Paired day-block bootstrap, 2,000 reps, seed 0, delta = champion RMSE minus challenger RMSE (positive favours the challenger). Sixteen verdicts, N<sub>h</sub> = 16.</p>
+<div class="wrap"><table>
+<tr><th>id</th><th>lane</th><th>champion</th><th>challenger</th><th class="num">challenger RMSE</th><th class="num">delta [95% interval]</th><th>verdict</th></tr>
+<tr class="win"><td class="id">H1</td><td>B</td><td>B0 (3,959.4)</td><td>B1</td><td class="num">3,709.9</td><td class="num">+249.4 [+135.5, +353.9]</td><td>WIN, B1 promoted</td></tr>
+<tr class="lose"><td class="id">H2</td><td>B</td><td>B1</td><td>B2</td><td class="num">3,807.5</td><td class="num">-97.6 [-232.9, +15.4]</td><td>lose</td></tr>
+<tr class="lose"><td class="id">H3</td><td>B</td><td>B1</td><td>B3s</td><td class="num">4,889.7</td><td class="num">-1,179.7 [-2,262.0, -214.0]</td><td>lose</td></tr>
+<tr class="win"><td class="id">H4</td><td>B</td><td>B1</td><td>B4</td><td class="num">2,074.1</td><td class="num">+1,635.8 [+733.6, +2,538.9]</td><td>WIN, B4 promoted (lane-B champion)</td></tr>
+<tr class="win"><td class="id">H5</td><td>A</td><td>B0 (476.7)</td><td>B1</td><td class="num">440.7</td><td class="num">+36.1 [+31.6, +41.1]</td><td>WIN, B1 promoted</td></tr>
+<tr class="win"><td class="id">H6</td><td>A</td><td>B1</td><td>B2</td><td class="num">433.1</td><td class="num">+7.6 [+6.2, +8.9]</td><td>WIN, B2 promoted</td></tr>
+<tr><td class="id">H7</td><td>A</td><td>B2</td><td>B3a</td><td class="num">413.6</td><td class="num">+19.5 [-17.9, +73.7]</td><td>tie (interval crosses zero)</td></tr>
+<tr class="lose"><td class="id">H8</td><td>A</td><td>B2</td><td>B3b</td><td class="num">620.9</td><td class="num">-187.8 [-233.8, -132.0]</td><td>lose</td></tr>
+<tr class="lose"><td class="id">H9</td><td>A</td><td>B2</td><td>B3c</td><td class="num">709.7</td><td class="num">-276.6 [-323.6, -220.7]</td><td>lose</td></tr>
+<tr><td class="id">H10</td><td>A</td><td>B2</td><td>B3d</td><td class="num">400.1</td><td class="num">+33.0 [-2.5, +86.3]</td><td>tie (interval crosses zero)</td></tr>
+<tr class="win"><td class="id">H11</td><td>A</td><td>B2</td><td>B4</td><td class="num">311.2</td><td class="num">+121.9 [+88.7, +173.5]</td><td>WIN, B4 promoted (lane-A champion)</td></tr>
+<tr class="lose"><td class="id">H12</td><td>B</td><td>B4</td><td>M1</td><td class="num">2,386.3</td><td class="num">-312.1 [-643.8, -12.1]</td><td>lose; B4 stays</td></tr>
+<tr class="win"><td class="id">H13</td><td>A</td><td>B4</td><td>M1</td><td class="num">259.5</td><td class="num">+51.6 [+48.4, +55.1]</td><td>WIN, clears bound 2.8 s plus floor; M1 promoted (S1)</td></tr>
+<tr class="win"><td class="id">H14</td><td>A</td><td>M1</td><td>M2</td><td class="num">256.6</td><td class="num">+2.9 [+1.8, +4.1]</td><td>WIN on the point estimate, low end under the floor; Jan +2.3, Jul +3.3; M2 promoted</td></tr>
+<tr><td class="id">H15</td><td>B</td><td>B4</td><td>W1-B (B4 + w_sknt, w_vsby, w_p3h, w_ts3h, w_sn)</td><td class="num">2,064.2</td><td class="num">+9.9 [-2.7, +22.6]</td><td>tie (interval crosses zero); B4 stays</td></tr>
+<tr class="win"><td class="id">H16</td><td>A</td><td>M2</td><td>W1-A (M2 recipe plus 16 weather columns)</td><td class="num">253.8</td><td class="num">+2.9 [+1.8, +3.9]</td><td>WIN on the point estimate, low end under the floor; Jan +4.8, Jul +1.6; W1-A promoted</td></tr>
+</table></div>
+
+<h3>Ledger line</h3>
+<p>Board: N = 1 model submission (S1) plus 2 scored probes (P1, P2); 3 scored files per team per day is the cap, and the probe pair v8/v9 is scheduled for 2026-09-06 00:05 UTC. Holdout: N<sub>h</sub> = 16 verdict lanes, 8 wins, 5 losses, 3 ties.</p>
+<p>Multiplicity, stated in the noise yardstick. Each lane-A promotion since S1 was a k = 1 lane judged at bound 0 × SE. The paired SE per step is about 0.6 s (interval half-width 1.05 s divided by 1.96). Under a global null of no gain anywhere, sixteen one-sided 2.5% tests give 0.4 expected false wins and about a 33% chance of at least one. The section-3 rule does not depend on the chain position; but the 2 s floor does the work the alpha-spending does not: at SE 0.6 the floor sits 3.3 SE from zero, so a null step passes it with probability about 0.04%. Had the bound been charged for all sixteen lanes at once, E[max of 16 N(0,1)] × SE ≈ 1.77 × 0.6 ≈ 1.1 s, still under the +2.9 s observed on each step. The chain's weak point is not the null; it is that each step's true gain could be anywhere in [1.8, 3.9] (F10).</p>
+
+<h2>The rule, restated</h2>
+<div class="rule">
+<p>A challenger <strong>wins</strong> when the paired bootstrap interval of its RMSE gain sits above zero <em>and</em> the point estimate clears the analytic optimism bound (E[max of k N(0,1)] × paired SE, k = the declared cell count) plus the 2 s floor. The interval crossing zero is a tie; a tie promotes the simpler model. Lane A decides promotion; lane B is judged on its own rows. No <code>month</code> feature (R7). Every lane is declared before it runs; an undeclared run is a diagnostic.</p>
+<p><strong>This verdict is only as good as this rule; attack the rule, not just the numbers.</strong></p>
+<p>The stricter reading (F10): require the <em>whole interval</em> above the floor. Under it H14 and H16 are ties, the tie promotes the simpler model, and M1 (the S1 file's lane-A model) stays champion. The rule as written decides on the point estimate. Which reading holds is your call, and it decides whether S2 is W1-A or a re-upload of M1.</p>
+</div>
+
+<h2>Caution flags (F1-F11, protocol section 7)</h2>
+<ul>
+<li><span class="tag">F1</span><strong>Scored subset unexplained.</strong> The board scores 215,876 of 344,841 ranking DEP rows; no column, predicate or airport subset equals it (checked 2026-09-04). Probes P1-P6 answer it.</li>
+<li><span class="tag">F2</span><strong>2026 tail transfer unknown.</strong> In every 2025 month the residual tail (5.9% to 8.2% of rows) carries 59% to 77% of the squared error.</li>
+<li><span class="tag">F3</span><strong>Truth outliers.</strong> Holdout: 45 rows over 4 h carry 56.3% of the squared error, about 43 of them lane B. The holdout is never trimmed.</li>
+<li><span class="tag">F4</span><strong>Lane B.</strong> 5,290 ranking rows without a flight plan; target RMS 3,669 s against 1,072 s in lane A. Every submission declares its lane-B champion.</li>
+<li><span class="tag">F5</span><strong>Level transfer.</strong> One SE of the RMSE level across day blocks is 10.2 s; local levels are never compared with board levels.</li>
+<li><span class="tag">F6</span><strong>Board volume.</strong> The leader file is <code>_v344</code>; the board ranks by best submission.</li>
+<li><span class="tag">F7</span><strong>TabPFN licence attribution</strong> on any public artefact that carries its weights or a blend of its outputs.</li>
+<li><span class="tag">F8</span><strong>Gap baselines are day-clustered.</strong> The interval, not the mean, decides.</li>
+<li><span class="tag">F9</span><strong>Lane B resists the model class.</strong> M1 lost to B4 on the lane-B holdout and the forward fold; every lane-B ranking row is an extrapolation on the schedule gap plus queue. Lane B is 50.3% of the all-row squared error.</li>
+<li><span class="tag amber">F10</span><strong>Floor-edge wins.</strong> M2 over M1 and W1-A over M2 each pass on the point estimate with the interval's low end (1.8 s) under the 2 s floor. Under the stricter reading both are ties and M1 stays champion. Your call; rides every report until settled.</li>
+<li><span class="tag amber">F11</span><strong>Anchor after takeoff.</strong> <code>taxi.data</code> takes AOBT as the anchor, EOBT when AOBT is after takeoff, and never checks EOBT. Measured 2026-09-05: 322 of 2,062,577 lane-A rows in 2025 and 51 of 339,551 in the ranking file end up with an anchor after takeoff (median 21 min after, worst 2.6 h), so their traffic counts and weather are read after the event; 741 lane-B rows in 2025 (109 in the ranking file) carry a schedule after takeoff. Admissible under point-in-time rule 1 (every ranking column is admissible for any row), not the declared intent. The guard (first non-negative of AOBT, EOBT, schedule, else takeoff) changes the feature view and re-verdicts the lane-A chain: scheduled as A1.</li>
+</ul>
+
+<h2>M3 pilot (TabPFN 6.3.1, LIRF lane A)</h2>
+<div class="wrap"><table>
+<tr><th>gate</th><th class="num">measured</th><th class="num">limit</th><th>result</th></tr>
+<tr class="lose"><td>fit plus predict under 30 min (all five folds)</td><td class="num">38.1 min</td><td class="num">30</td><td>FAIL</td></tr>
+<tr class="win"><td>peak VRAM under 16 GB</td><td class="num">3.8 GB</td><td class="num">16</td><td>PASS</td></tr>
+<tr class="win"><td>OOF gain over M1 on this airport of at least 2 s</td><td class="num">+11.6 s</td><td class="num">2</td><td>PASS</td></tr>
+</table></div>
+<div class="wrap"><table>
+<tr><th>fold</th><th class="num">fit rows</th><th class="num">predicted rows</th><th class="num">M1 RMSE</th><th class="num">M3 RMSE</th><th class="num">seconds</th><th class="num">VRAM GB</th><th>provenance</th></tr>
+<tr><td class="id">(2, 3)</td><td class="num">50,000 of 109,955</td><td class="num">23,130</td><td class="num">334.2</td><td class="num">328.1</td><td class="num">399</td><td class="num">3.76</td><td>seeded from the printed line of a killed run</td></tr>
+<tr><td class="id">(4, 5)</td><td class="num">50,000 of 104,685</td><td class="num">28,400</td><td class="num">369.5</td><td class="num">357.6</td><td class="num">469</td><td class="num">3.76</td><td>seeded from the printed line of a killed run</td></tr>
+<tr><td class="id">(6, 8)</td><td class="num">50,000 of 103,312</td><td class="num">29,773</td><td class="num">462.0</td><td class="num">447.4</td><td class="num">554</td><td class="num">3.76</td><td>seeded from the printed line of a killed run</td></tr>
+<tr><td class="id">(9, 10)</td><td class="num">50,000 of 104,559</td><td class="num">28,526</td><td class="num">428.4</td><td class="num">411.4</td><td class="num">461</td><td class="num">3.76</td><td>seeded from the printed line of a killed run</td></tr>
+<tr><td class="id">(11, 12)</td><td class="num">50,000 of 109,829</td><td class="num">23,256</td><td class="num">337.5</td><td class="num">333.5</td><td class="num">403</td><td class="num">3.76</td><td>live, full precision</td></tr>
+</table></div>
+<p class="note">Pooled OOF over 133,085 rows: M1 394.4 s, M3 382.7 s. Two fairness caveats ride this table. The M1 side is the pooled all-airport model scored on LIRF rows; TabPFN was fit on 50,000 LIRF rows only, so the +11.6 s does not separate "TabPFN wins" from "a single-airport model wins" (no single-airport LightGBM control was run). Four of five fold rows are reconstructed from the printed lines of runs the harness killed for low system memory (<code>data/m3_folds.json</code> carries <code>"seeded": true</code>; their wall-clock values are whole seconds, the live fold's is 402.55 s). The pilot's gain and VRAM verdicts rest on transcription for four folds; the time verdict does not change under any re-run shorter than 8 min per fold.</p>
+
+<h2>W1: coverage, point in time, licence</h2>
+<ul>
+<li><strong>Source.</strong> IEM ASOS/METAR archive (Iowa State University), report types 3 and 4, ten stations, 2024-12-31 to 2026-08-02, pulled 2026-09-05 into <code>data/weather/2026-09-05/</code>; per-file sha256 in <code>manifest.json</code>, now written by <code>taxi.weather.fetch</code> itself (critique finding 8). Licence read 2026-09-05 at mesonet.agron.iastate.edu/disclaimer.php: public domain, attribution appreciated; attribution is in the README. External data is admissible under R15.</li>
+<li><strong>Join.</strong> Latest observation at or before the anchor time, plus 3 h look-back sums of thunderstorm flags and precipitation. Coverage: training 1,740,628 rows and holdout 344,419 rows with 0.00% missing; ranking 0.01% missing; observation age median 14 min, p95 28 min.</li>
+<li><strong>Point in time.</strong> The anchor is AOBT (off-block) for lane A and the schedule for lane B, so weather is read at push-back, before the taxi it predicts, except on the F11 rows. Availability latency of a METAR in a live system is UNKNOWN and irrelevant to the challenge's scoring, which is retrospective.</li>
+<li><strong>Process.</strong> The register row and the k = 1 per-lane design were declared before the run, executed by the session under Keith's D3 = A ("weather lane W1 after S1").</li>
+</ul>
+
+<h2>Coverage interrogation (Stage 4.5, <code>docs/COVERAGE.md</code>)</h2>
+<div class="wrap"><table>
+<tr><th>#</th><th>question</th><th>short answer</th></tr>
+<tr><td class="id">1</td><td>What have you tried?</td><td>16 holdout verdicts (B0-B4, gap family, M1, M2, W1 in both lanes), 3 declared searches, 1 board submission, 2 scored probes, M3 pilot run (time gate failed)</td></tr>
+<tr><td class="id">2</td><td>What features?</td><td>20 columns: airport, hour, weekday, has_fpl, four time gaps, anchor gap, five categoricals, six 900 s traffic counts; 14 ranking columns never used</td></tr>
+<tr><td class="id">3</td><td>What feature engineering?</td><td>label lineage (lane A learns the residual after the off-block gap), anchor rule, traffic counts from ranking-visible movements, tail split (M2), weather as-of join (W1)</td></tr>
+<tr><td class="id">4</td><td>What model?</td><td>means and OLS (B0-B4), LightGBM (M1), two-stage LightGBM (M2), TabPFN pilot (M3); lane B champion is still a two-feature OLS</td></tr>
+<tr><td class="id">5</td><td>Feature and model parameter tuning?</td><td>one 12-cell grid (lane A) and one 8-cell grid (lane B) over leaves, min_data, objective; learning rate, regularisation, sampling, windows, thresholds never tuned</td></tr>
+<tr><td class="id">6</td><td>Optuna optimisation?</td><td>NOT run. Draft declaration O1 (40 trials, k = 40, bound 3.7 s, about 2 h)</td></tr>
+<tr><td class="id">7</td><td>Are the agent being detailed enough?</td><td>Keith grades. Evidence and the thin spots listed in the file</td></tr>
+<tr><td class="id">8</td><td>Full effort used to find suitable model?</td><td>Keith grades. Facts: 2 days, 2 model classes at full scale, lane B (half the squared error) has had no model campaign beyond baselines</td></tr>
+<tr><td class="id">9</td><td>What is missing that we should try?</td><td>3 inputs, 3 mechanisms, 3 tunings, each with a cost and a draft declaration; plus A1 anchor guard and C1 prediction floor from the critique</td></tr>
+</table></div>
+
+<h2>Self-audit (Stage 5.6): what else is wrong with what I did</h2>
+<h3>Data</h3>
+<ol>
+<li>F11: 51 ranking-file lane-A rows and 109 lane-B rows read their features after takeoff. Admissible by rule 1, wrong by intent; A1 fixes it and re-verdicts the chain.</li>
+<li>The METAR archive is retrospective; a live-availability latency was never measured (UNKNOWN). If it mattered, the stress test is a +10 min shift of the join time; it does not matter for this scoring.</li>
+<li><code>w_ceil</code> is NaN when no broken, overcast or vertical-visibility layer is reported (clear sky), so NaN carries meaning that LightGBM reads as its own branch; not a leak, but a modelling choice never declared.</li>
+<li>0.01% of ranking rows have no observation before the anchor and take NaN weather; the model has seen NaN weather on 0.00% of training rows.</li>
+</ol>
+<h3>Statistics</h3>
+<ol>
+<li>Sequential k = 1 lanes at bound 0 (finding 2). Numbers above: the floor, not the bound, is what stops a null step; the campaign's false-promotion probability across 16 lanes is about 33% for a bare "lo &gt; 0" test and about 0.04% per step for the floor.</li>
+<li>Floor-edge twice (F10). Same point estimate, same low bound, two promotions in a row. The third result of this shape is a stop signal, not a run.</li>
+<li>Lane B is under-powered: paired SE 6.5 s on 5,373 rows against a 2 s floor; the tie says little about weather in lane B (finding 6).</li>
+<li>M3 pilot asymmetry (finding 4): pooled M1 against a single-airport 50,000-row TabPFN.</li>
+</ol>
+<h3>Code</h3>
+<ol>
+<li>Four M3 folds are seeded from printed lines (finding 5); labelled in <code>data/m3_folds.json</code> and the report.</li>
+<li>Rounds for the submission model are the mean of the five fold rounds (577, 378, 1724); the convention was never validated as a rule.</li>
+<li>Manifest hashes are now produced by the code (finding 8); re-run on the existing pull left every hash and fetch time unchanged. 10 tests pass (<code>python -m pytest -q</code>).</li>
+<li>Negative predictions (54) are left as the models emit them; C1 clips at 0 and is declared, not run.</li>
+</ol>
+<h3>Process</h3>
+<ol>
+<li>The W1 register row was executed by the session under D3 = A; no per-lane yes was asked for W1, M2 or the M3 pilot. Every one of them stops here before the board, as the protocol requires.</li>
+<li>The harness killed three M3 runs for low system memory; the fix (detached process, per-fold cache) is structural and recorded.</li>
+<li>Lane B carries half the squared error and has had no model campaign beyond baselines (L1 declared, not run).</li>
+<li>Finding 7 (stale COVERAGE.md) was true when the critic read it; refreshed in <code>2afe8fa</code>.</li>
+</ol>
+
+<h2>Independent critique (Stage 5.7, verbatim)</h2>
+<p class="note">Sonnet 5 reviewer, read-only, briefed on the artefacts (not summaries), 2026-09-05. Reproduced word for word except that the reviewer's em dashes are set as semicolons. Each finding is followed by what was done with it.</p>
+<div class="crit"><p>1. <strong>Anchor fallback unguarded for negative-gap rows</strong> (condition). <code>taxi/data.py:62-63</code> sets <code>z_anchor = z_eobt</code> whenever <code>z_aobt &lt; 0</code>, with no check that <code>z_eobt &gt;= 0</code>. <code>taxi/weather.py:66-73</code> does <code>anchor = t_off - z_anchor</code> and pulls the METAR at-or-before that instant. EXPERIMENT-PROTOCOL.md:185 records 240 lane-A holdout rows with negative <code>z_aobt</code>; whether any of those also carry negative <code>z_eobt</code> (anchor after takeoff, i.e. a post-event weather pull) is unchecked.</p><p class="r"><strong>Response:</strong> measured. 322 lane-A rows in 2025 (51 in the ranking file) and 741 lane-B rows (109 in the ranking file) have an anchor after takeoff. Recorded as F11; fix declared as A1 (re-verdicts the chain, about 3 h). Not changed in code: it changes the feature view under every verdict since H5, so it is your call.</p></div>
+<div class="crit"><p>2. <strong>Multiplicity across the promotion chain is uncorrected</strong> (condition). B4→M1→M2→W1-A is four sequential single-config ("k=1, bound 0×SE") comparisons, each accepted on its own nominal 97.5% one-sided bound (<code>taxi/verdict.py:20-21</code>). <code>TRIAL-LEDGER.md:6</code> counts N_h=16 but nothing spends alpha across it; the win rule is identical regardless of chain position, so the campaign-wide false-promotion rate is unbounded, not just the within-search rate section 3 actually bounds.</p><p class="r"><strong>Response:</strong> agreed on the rule; the numbers are in the ledger line above (33% for at least one false "lo &gt; 0" across 16 lanes; the 2 s floor at 3.3 SE per step is the effective control). Candidate amendment for you: charge the bound with k = N<sub>h</sub> (1.1 s today), or spend alpha across the chain. Not applied.</p></div>
+<div class="crit"><p>3. <strong>Floor met on the letter, not the spirit, twice running</strong> (note). M2 +2.9 [+1.8,+4.1] and W1-A +2.9 [+1.8,+3.9] (<code>docs/M2.md:26</code>, <code>docs/W1.md:29</code>) both pass only because the rule requires <code>lo&gt;0</code>, not <code>lo&gt;=floor</code> (<code>taxi/verdict.py:20-21</code>). Same point estimate, same low bound, two promotions in a row; a third identical-shaped result should trigger the "third patch, stop" instinct, not another run.</p><p class="r"><strong>Response:</strong> F10, rides every report; the stricter reading is stated in the rule box and decides whether S2 is W1-A or M1.</p></div>
+<div class="crit"><p>4. <strong>M3 pilot confounds model class with airport specialization</strong> (condition). <code>taxi/m3.py:36-57</code>: TabPFN trains on 50,000 of ~104-110k rows of one airport; M1 is fit pooled across all airports. The +11.6 s gain (<code>docs/M3-PILOT.md:15</code>) cannot separate "TabPFN wins" from "any single-airport model beats the pooled one"; no single-airport LightGBM control was run.</p><p class="r"><strong>Response:</strong> agreed; the control is the first condition on any amended M3 gate (decision 2 above). Not run.</p></div>
+<div class="crit"><p>5. <strong>4 of 5 M3 folds are reconstructed, not measured</strong> (blocks, for authorizing E1). <code>data/m3_folds.json</code>: the four "seeded" folds carry suspiciously rounded <code>dt</code> (399.0, 469.0, 554.0, 461.0 s) and 1-decimal <code>sq3</code>, versus the one live fold's full-precision <code>dt=402.55...</code>, <code>vram=3.7621...</code>. These were back-derived from a printed table row (RMSE to 0.1 s), not from telemetry; the number that would justify ~7 GPU-hours for E1 rests on transcription, not a rerun.</p><p class="r"><strong>Response:</strong> correct and labelled as such in the table above. E1 is not being asked for; M3 failed its time gate on the live plus seeded times, and any amended gate re-runs all five folds live.</p></div>
+<div class="crit"><p>6. <strong>Lane-B tie is correctly computed, not over-read</strong> (note). W1-B +9.9 [-2.7,+22.6] (<code>docs/W1.md:38</code>) is properly logged as tie. But it's the only weather config tried on lane B (k=1, untuned) on a lane COVERAGE.md:41 already flags as having "no lane-B campaign beyond baselines"; absence of a win here says little.</p><p class="r"><strong>Response:</strong> agreed; L1 (lane-B campaign) is in the recommended order in decision 3.</p></div>
+<div class="crit"><p>7. <strong>COVERAGE.md is stale for the gate it's meant to inform</strong> (condition). <code>docs/COVERAGE.md:7,34-35</code> says N_h=14, M3 "in flight," W1 "pending." Actual state (<code>TRIAL-LEDGER.md:6</code>) is N_h=16, M3 finished and FAILED its time gate, W1 promoted twice (H15,H16). Must be refreshed before Keith sees it.</p><p class="r"><strong>Response:</strong> refreshed in <code>2afe8fa</code> (N_h = 16, H15-H16 row, M3 and W1 status, A1 and C1 added to section 9).</p></div>
+<div class="crit"><p>8. <strong>Weather manifest generator doesn't match its own artifact</strong> (condition). <code>taxi/weather.py:28,41</code> writes only url/params/report_type/fetched_utc; the actual <code>manifest.json</code> also carries a <code>sha256</code> map this code never produces, and pre-existing station files are skipped without adding a <code>fetched_utc</code> entry (<code>weather.py:32-34</code>). A future partial re-run (new station, retry) silently drops the hash pinning the protocol relies on as "the vintage."</p><p class="r"><strong>Response:</strong> fixed at the producer in <code>2afe8fa</code>: <code>fetch()</code> hashes every station file and keeps prior fetch times. Re-run on the existing pull: hashes and fetch times identical to the backup.</p></div>
+<div class="crit"><p>9. <strong>IEM attribution not yet written anywhere</strong> (note). Planned for the README "at publication" (EXPERIMENT-PROTOCOL.md:67) but no README/NOTES.md currently carries it; fine pre-publication, easy to forget.</p><p class="r"><strong>Response:</strong> README "Data" section added in <code>2afe8fa</code>.</p></div>
+<p><strong>VERDICT: sound with conditions.</strong> "fix/verify items 1, 2, 5, 7, 8 before the gate; items 3, 4, 6, 9 are flags to carry forward, not blockers." Status at this gate: 1 measured and recorded (fix is a Keith decision), 2 quantified (amendment is a Keith decision), 5 labelled (E1 not requested), 7 and 8 fixed.</p>
+
+<h2>Steering questions (gate set)</h2>
+<div class="q"><span class="n">1 · What is the naive strategy this beats, on the same rows?</span>The per-airport mean (B0) scores 476.7 s on lane A; the two-gap OLS B4 311.2 s; M1 259.5 s. W1-A at 253.8 s beats all three on the same 339,046 rows, each with a paired interval above zero.</div>
+<div class="q"><span class="n">2 · Where is the number that says this is inside the noise?</span>Paired SE 0.6 s per step; the observed +2.9 s is 4.8 SE from zero and 1.5 SE above the 2 s floor. It is not inside the noise. It is inside the floor's own uncertainty (F10).</div>
+<div class="q"><span class="n">3 · How many lanes could have produced this pass?</span>Sixteen holdout lanes; two of them (H14, H16) produced this shape. Expected false "lo &gt; 0" wins across 16: 0.4. Expected false floor-clearing wins: about 0.006.</div>
+<div class="q"><span class="n">4 · What was declared and not run?</span>E1 (waits on M3's gate), the forward fold for M2 and W1, the single-airport control for M3, O1, L1, F1, A1, C1. NOT-DONE table below.</div>
+<div class="q"><span class="n">5 · What does the tie promote?</span>In lane B the tie keeps B4, the simpler model. In lane A, under the stricter reading of the floor, the ties would keep M1, the S1 model. The rule as written promotes W1-A.</div>
+<div class="q"><span class="n">6 · What is the cost of being wrong?</span>One scored file of the day's three, and a board rank that the site ranks by best submission (F6): a worse S2 does not lower the team's standing. The cost of a wrong promotion is a wrong champion for the next lane, not a lost place.</div>
+<div class="q"><span class="n">7 · What would change your mind?</span>A1 (anchor guard) moving the W1-A gain under the floor; a lane-A forward fold where W1-A loses to M2; the board scoring S2 above S1 by more than the day-block level SE (10.2 s) after the probes explain the scored subset.</div>
+
+<h2>NOT-DONE table</h2>
+<div class="wrap"><table>
+<tr><th>declared item</th><th>why not run</th><th>effect on the verdict</th></tr>
+<tr><td>E1</td><td>M3 pilot failed the 30 min time gate at 38.1 min; gain and VRAM gates pass; waits on decision 2</td><td>champions after W1: lane A W1-A, lane B B4</td></tr>
+<tr><td>Forward fold (train Jan-Nov, predict Dec)</td><td>run for M1; NOT run for M2 or W1</td><td>none, reported only</td></tr>
+<tr><td>M1 per-feature knockout</td><td>run after the M1 verdict (<code>docs/M1-KNOCKOUT.md</code>)</td><td>none: it informs the next declared feature set</td></tr>
+<tr><td>Single-airport LightGBM control for M3</td><td>surfaced by the critique (finding 4); declared as a condition of any amended M3 gate</td><td>none on this gate; blocks E1</td></tr>
+<tr><td>A1 anchor guard, C1 prediction floor, L1, O1, F1</td><td>declared in <code>docs/COVERAGE.md</code> section 9, none run; decision 3</td><td>A1 re-verdicts the lane-A chain when run</td></tr>
+</table></div>
+
+<details><summary>Appendix: regenerate every number on this page</summary>
+<pre>cd C:\Users\skf_s\prc26
+python -m pytest -q                    # 10 tests
+python -m taxi.m2                      # H14: docs/M2.md
+python -m taxi.w1                      # H15, H16: docs/W1.md
+python -m taxi.m3                      # M3 pilot: docs/M3-PILOT.md (uses data/m3_folds.json cache)
+python -m taxi.s2                      # rebuilds data/merry-octopus_v10.parquet and prints its sha256
+python scripts/review_checks.py        # F3 numbers
+git show 2afe8fa --stat                # the commit this gate cites</pre>
+<p class="note">Scratchpad artefacts from the build session (anchor_check.log for F11, s2_detached.log for the S2 level check, manifest_before.json for the manifest re-run) are session files, not repo files; every number they carry is reproducible by the commands above.</p>
+</details>
+</main>

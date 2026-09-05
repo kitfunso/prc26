@@ -10,6 +10,7 @@ Counters: N (board submissions) = 1 model (S1) + 2 scored probes (P1, P2); 4 pro
 | id | date | file | spec (lane A + lane B) | git | holdout lane A | holdout lane B | holdout all rows | holdout improvement | board RMSE | board improvement | haircut | usedPairs |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | S1 | 2026-09-05 | `merry-octopus_v1.parquet` (sha256 c79d20d7b691ef1696acdf93537e092fa8faf405c62a08aea15f5a55488f39de, 344,841 rows, uploaded 09:5x UTC, scored 09:58:03 UTC) | lane A M1 (31 leaves, min_data 200, l2, 1,016 rounds) + lane B B4 [z_sched, queue], both fit on all 12 months of 2025 | 256b4c1 | 259.5 | 2,074.1 | 365.3 | lane A +51.6 [+48.4, +55.1] vs B4 (H13); all rows +37.7 vs B4 in both lanes (reported) | 325.3982 (rank 11 of 29 teams; leader 277.29) | N/A, first submission | N/A | 344,841 |
+| S2 | 2026-09-05 | `merry-octopus_v10.parquet` (sha256 1076653a3bcce1c554daa5609a22f529f1078a31206d95bbef90d9b76e5fca1c, 344,841 rows, BUILT, NOT uploaded: Keith gate `docs/gate-s2.html`) | lane A W1-A (M2 recipe: classifier plus tail and body LightGBM, 31 leaves, min_data 200, l2, rounds 577/378/1724, 36 columns incl. 16 METAR) + lane B B4 [z_sched, queue], both fit on all 12 months of 2025 | 2afe8fa | 253.8 | 2,074.1 | 361.3 | lane A +2.9 [+1.8, +3.9] vs M2 (H16) and +5.7 vs the S1 model M1 (H14 + H16, point estimates); lane B unchanged | (after upload) | (after upload) | (after upload) | 344,841 |
 
 ## B. Holdout verdicts (Jan + Jul 2025, paired day-block bootstrap, 2,000 reps, seed 0; floor 2 s)
 
