@@ -9,7 +9,7 @@ the W1 run (ledger H15, H16) and the Stage 5.7 critique (`docs/gate-s2.html`).
 
 | # | Question | Short answer | Pointer |
 |---|---|---|---|
-| 1 | What have you tried? | 19 holdout verdicts (B0-B4, gap family, M1, M2, W1 in both lanes, D1 plan provenance, L1 lane-B campaign, MC1 CatBoost), 4 declared searches, 1 board submission, 2 scored probes, M3 pilot run (time gate failed) | `docs/TRIAL-LEDGER.md` H1-H19; protocol section 4 |
+| 1 | What have you tried? | 23 holdout verdicts (B0-B4, gap family, M1, M2, W1 in both lanes, D1 plan provenance, L1 lane-B campaign, MC1 CatBoost, MC2 CatBoost at D1's columns, C1 prediction floor in both lanes, L2 bounded lane-B fit), 4 declared searches, 1 board submission, 2 scored probes, M3 pilot run (time gate failed) | `docs/TRIAL-LEDGER.md` H1-H23; protocol section 4 |
 | 2 | What features? | 20 columns: airport, hour, weekday, has_fpl, four time gaps, anchor gap, five categoricals, six 900 s traffic counts; 14 ranking columns never used | `taxi/data.py` FEATURES; `docs/M1-KNOCKOUT.md`; section 2 below |
 | 3 | What feature engineering? | label lineage (lane A learns the residual after the off-block gap), anchor rule, traffic counts from ranking-visible movements, tail split (M2), weather as-of join (W1) | section 3 below |
 | 4 | What model? | means and OLS (B0-B4), LightGBM (M1), two-stage LightGBM (M2), TabPFN pilot (M3); lane B champion is still a two-feature OLS | protocol rows B0-M3 |
@@ -21,7 +21,7 @@ the W1 run (ledger H15, H16) and the Stage 5.7 critique (`docs/gate-s2.html`).
 
 ## 1. What have you tried
 
-Holdout verdicts, N_h = 19 (`docs/TRIAL-LEDGER.md` section B):
+Holdout verdicts, N_h = 23 (`docs/TRIAL-LEDGER.md` section B):
 
 | Rows | Lane | What | Outcome |
 |---|---|---|---|
@@ -32,6 +32,10 @@ Holdout verdicts, N_h = 19 (`docs/TRIAL-LEDGER.md` section B):
 | H15-H16 | B, A | W1 weather: B4 plus five METAR columns; M2 recipe plus 16 METAR columns | lane B tie (+9.9 [-2.7, +22.6]), B4 stays; lane A WIN 253.8 s, +2.9 [+1.8, +3.9], W1-A promoted (floor-edge again, F10) |
 | H17-H18 | B, A | L1a: B4 plus the VFR flag (CV winner of four lane-B cells); D1: M2 recipe on W1-A's columns plus 13 plan-provenance columns | lane B tie (+2.1 [-0.2, +5.3]), B4 stays; lane A WIN 242.2 s, +11.6 [+9.2, +14.0], D1 promoted (the whole interval clears the floor) |
 | H19 | A | MC1: CatBoost on the GPU, M2 recipe, W1-A's 36 columns | WIN vs W1-A, 248.2 s, +5.6 [+4.4, +6.8]; not promoted, D1 is 6.0 s better on the same rows; MC2 (CatBoost at D1's columns, against D1) declared |
+| H20 | A | MC2: CatBoost on the GPU, MC1's cell, D1's 49 columns | WIN vs D1, 232.6 s, +9.6 [+8.2, +10.9]; MC2 promoted |
+| H21 | A | C1: MC2's predictions clipped at 0 s | tie: positive interval but under the 2 s floor, +0.498 s [+0.186, +0.909]; the label is negative on 30 lane-A holdout rows |
+| H22 | B | C1: B4's predictions clipped at 0 s | WIN (both ends clear the 2 s floor), 1965.6 s, +108.5 s [+4.9, +291.9]; floor adopted; the lane-B gain is B4's per-airport OLS at LIRF extrapolating: intercept -2,021 s and slope 1.23 on z_sched (1,091 training rows), so two July rows with the movement 6 to 7 h before schedule (z_sched -26,577 and -21,599 s) are predicted at -34,678 and -28,561 s against truths of 1,387 and 1,682 s; the 17 negative rows carry 11.5% of the lane's squared error |
+| H23 | B | L2: CV winner of two bounded B4 cells (cap, Huber), floored, k = 2 | LOSE, 1992.1 s, -26.5 s [-42.9, -15.3]; CV picked L2b (Huber; five-fold CV, every cell floored: B4 1544.9, L2a 1578.2, L2b 1552.3 s); holdout L2b floored 1992.1 s against B4 floored 1965.6 s, -26.5 s [-42.9, -15.3], paired SE 7.0 s, k = 2 optimism bound 4.0 s; LOSE, B4 with the floor stays lane-B champion |
 
 Declared searches (ledger line 35): CAP sweep k = 4 per lane (chose no cap); M1 grid k = 12 lane A (bound 2.8 s), k = 8 lane B (bound 229.4 s); M2 k = 1; W1 k = 1 per lane.
 Diagnostics, never verdicts: forward fold Jan-Nov to Dec for M1 (`docs/M1.md` line 117); per-feature knockout for M1 (`docs/M1-KNOCKOUT.md`).
@@ -88,7 +92,7 @@ Draft declaration O1 (lane A only; lane B needs a model class, not tuning):
 
 ## 7. Detail (Keith grades)
 
-What exists for grading: protocol registry with every design declared before its run (section 4 of the protocol); the ledger with 19 paired intervals; a current NOT-DONE table; the knockout table; the M2 report stating that its gain sits in the body rows, not the tail it targeted.
+What exists for grading: protocol registry with every design declared before its run (section 4 of the protocol); the ledger with 22 paired intervals; a current NOT-DONE table; the knockout table; the M2 report stating that its gain sits in the body rows, not the tail it targeted.
 Thin spots, by the author: no forward fold for M2 or W1; no per-airport error table in `docs/M2.md`; no residual table by hour, runway or stand to guide the next feature set; no learning curve (does more training data still help?); the probe decomposition (lane B = 50% of holdout squared error) has not been turned into a lane-B campaign; per-airport squared-error shares were only used to pick the M3 pilot airport.
 
 ## 8. Effort (Keith grades)
@@ -120,6 +124,8 @@ Tuning
 Surfaced by the 2026-09-05 critique (`docs/gate-s2.html`)
 
 - A1 anchor guard: 322 lane-A rows in 2025 and 51 in the ranking file take EOBT as the anchor while EOBT is after takeoff (flag F11), and 741 lane-B rows in 2025 (109 in the ranking file) carry a schedule after takeoff. Fix in `taxi.data`: the anchor is the first non-negative of AOBT, EOBT, schedule, else takeoff itself. Changes every model's traffic counts and weather join on 0.05% of rows, so the chain B4, M1, M2, W1-A is re-verdicted after it: about 3 h, k unchanged.
-- C1 prediction floor: the S2 file carries 54 negative predictions (22 lane A, 32 lane B). Clip at 0 s as a declared post-processing rule, judged on the holdout, k = 1, about 10 min.
+- C1 prediction floor: RUN 2026-09-05 (ledger H21). The S2 file carried 54 negative predictions (22 lane A, 32 lane B), the S3 v11 file 48 (16 lane A, 32 lane B); the clip is the `floor` option of `taxi.submit.build_submission` (off by default in the code, on for the S3 candidate), with a test. Holdout effect (`docs/C1.md`, H21 and H22): lane A (MC2) 29 negative predictions of 339,046 rows, RMSE 232.8722 to 232.3744 s (+0.498 s [+0.186, +0.909], tie: positive interval but under the 2 s floor); lane B (B4) 17 of 5,373, RMSE 2074.1 to 1965.6 s (+108.5 s [+4.9, +291.9], WIN (both ends clear the 2 s floor)); all rows 347.1253 to 336.7945 s; the lane-B gain is B4's per-airport OLS at LIRF extrapolating: intercept -2,021 s and slope 1.23 on z_sched (1,091 training rows), so two July rows with the movement 6 to 7 h before schedule (z_sched -26,577 and -21,599 s) are predicted at -34,678 and -28,561 s against truths of 1,387 and 1,682 s; the 17 negative rows carry 11.5% of the lane's squared error. The root cause of the lane-B win, B4's unbounded per-airport OLS, is declared as L2. The label itself is negative on 80 holdout rows and 289 training rows (minimum -12 s), so the clip was judged, not assumed.
+- LK1 runtime leak check (S3 critique finding 6): a test asserting that every feature's anchor precedes takeoff and that no feature reproduces the label beyond a stated correlation; about 30 min; declared, not run.
+- L2 bounded lane-B fit: lane-B lane, two cells, k = 2, declared after H22 from its mechanism (B4's per-airport OLS extrapolates: LIRF intercept -2,021 s, slope 1.23 on z_sched, two holdout rows at -34,678 and -28,561 s): L2a = B4's per-airport OLS on [z_sched, queue] with each airport's prediction capped at that airport's training maximum of y; L2b = the same two columns fit per airport with a Huber loss (scikit-learn 1.7.2 HuberRegressor, epsilon 1.35, alpha 0, columns standardised) instead of least squares. Both cells and the champion carry the floor at 0 s (H22). The cell is chosen on the training month-pair CV (`CV_FOLDS`, as L1); the CV winner alone is judged on the Jan+Jul 2025 holdout against B4 with the floor (the lane-B champion after H22) by the paired day-block bootstrap; optimism bound for k = 2 quoted in the verdict line; floor 2 s; parsimony breaks a tie for B4. RUN 2026-09-05 (ledger H23, `docs/L2.md`): CV picked L2b (Huber; five-fold CV, every cell floored: B4 1544.9, L2a 1578.2, L2b 1552.3 s); holdout L2b floored 1992.1 s against B4 floored 1965.6 s, -26.5 s [-42.9, -15.3], paired SE 7.0 s, k = 2 optimism bound 4.0 s; LOSE, B4 with the floor stays lane-B champion. Lane B is back to having no open item with a mechanism behind it.
 
 Diagnostic (no verdict): a residual table for M2 on the holdout by airport x runway x hour, minutes, to point the next declared feature set.

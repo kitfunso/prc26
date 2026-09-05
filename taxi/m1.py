@@ -114,8 +114,8 @@ def main_sensitivity() -> None:
 
 
 def final_rounds(name: str, path: str) -> tuple[int, int, int]:
-    """The M2-recipe rounds a lane report recorded, e.g. final_rounds("W1", "docs/W1.md")."""
-    m = re.search(rf"final {name} rounds \((\d+), (\d+), (\d+)\)", open(path, encoding="utf-8").read())
+    """The M2-recipe rounds (LightGBM) or trees (CatBoost) a lane report recorded, e.g. final_rounds("W1", "docs/W1.md")."""
+    m = re.search(rf"final {name} (?:rounds|trees) \((\d+), (\d+), (\d+)\)", open(path, encoding="utf-8").read())
     return int(m.group(1)), int(m.group(2)), int(m.group(3))
 
 

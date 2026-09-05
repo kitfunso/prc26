@@ -48,3 +48,14 @@ def test_bad_predictions_raise(tmp_path):
     bad.iloc[0] = np.nan
     with pytest.raises(ValueError, match="null"):
         build_submission(bad, out)
+
+
+def test_floor_is_off_by_default_and_clips_when_asked(tmp_path):
+    ids = template_ids()
+    out = (tmp_path / "clip.parquet").as_posix()
+    p = pd.Series(300.0, index=ids.values)
+    p.iloc[:5] = -40.0
+    back = build_submission(p, out)
+    assert (back.TAXITIME_SEC_mvt.iloc[:5] == -40).all() and (back.TAXITIME_SEC_mvt.iloc[5:] == 300).all()
+    back = build_submission(p, out, floor=0)
+    assert (back.TAXITIME_SEC_mvt.iloc[:5] == 0).all() and (back.TAXITIME_SEC_mvt.iloc[5:] == 300).all()

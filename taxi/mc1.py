@@ -73,7 +73,7 @@ def cv_a(tr: pd.DataFrame, cols: list[str], name: str) -> tuple[tuple[int, int, 
         lines.append(f"| {fold} | {rmse(e):.1f} | {trees[-1]} | {time.time() - t0:.0f} |")
         print(lines[-1], flush=True)
     r = tuple(int(x) for x in np.mean(trees, axis=0))
-    lines.append(f"\nCV RMSE over the five folds: MC1 {np.sqrt(sq / n):.1f} s (W1-A on the same rows: see docs/W1.md); final MC1 trees {r}.")
+    lines.append(f"\nCV RMSE over the five folds: {name} {np.sqrt(sq / n):.1f} s ({LANES[name][1]} on the same rows: see its report); final {name} trees {r}.")
     print(lines[-1], flush=True)
     return r, lines
 

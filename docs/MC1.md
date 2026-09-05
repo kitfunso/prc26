@@ -21,4 +21,4 @@ CV RMSE over the five folds: MC1 223.9 s (W1-A on the same rows: see docs/W1.md)
 | W1-A | 253.8 | 224.1 | 275.6 | 680.5 | 177.3 |
 | MC1 | 248.2 | 217.9 | 270.3 | 658.0 | 175.7 |
 
-Improvement MC1 vs W1-A: +5.6 s [+4.4, +6.8]; paired SE 0.6 s; optimism bound for k = 1: 0.0 s; floor 2 s. Verdict: WIN, clears bound plus floor, MC1 promoted.
+Improvement MC1 vs W1-A: +5.6 s [+4.4, +6.8]; paired SE 0.6 s; optimism bound for k = 1: 0.0 s; floor 2 s. Verdict: WIN, clears bound plus floor against W1-A, NOT promoted: the current champion is D1 (H18). Corrected by hand 2026-09-05 after Stage 5.7 critique finding 2; the generated line read "MC1 promoted" because verdict_line did not know the registry champion; fixed in taxi/w1.py.

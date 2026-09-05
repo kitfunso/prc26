@@ -57,9 +57,12 @@ def cv_a(tr: pd.DataFrame, cell: dict, cols: list[str] = COLS_A, name: str = "W1
 
 
 def verdict_line(name: str, champ: str, v: Verdict, k: int = K) -> str:
+    """Promotion wording only when the comparator is a current registry champion (critique S3, finding 2)."""
+    from taxi.champ import CURRENT
     bound = expected_max(k) * (v.hi - v.lo) / 3.92
     clears = v.win and v.delta >= bound + FLOOR
-    word = f"WIN, clears bound plus floor, {name} promoted" if clears else (
+    word = (f"WIN, clears bound plus floor, {name} promoted" if champ in CURRENT.values() else
+            f"WIN, clears bound plus floor against {champ}, NOT promoted: the current champions are {CURRENT}") if clears else (
         f"WIN on the interval but inside bound plus floor, {champ} stays" if v.win else f"tie or lose, {champ} stays")
     return (f"Improvement {name} vs {champ}: {v.delta:+.1f} s [{v.lo:+.1f}, {v.hi:+.1f}]; paired SE {(v.hi - v.lo) / 3.92:.1f} s; "
             f"optimism bound for k = {k}: {bound:.1f} s; floor {FLOOR:.0f} s. Verdict: {word}.")
