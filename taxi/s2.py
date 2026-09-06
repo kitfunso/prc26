@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 from taxi import l6, l8
-from taxi.champ import CHAMPIONS_A, CURRENT, predict_b, refit_predict
+from taxi.champ import CHAMPIONS_A, COMPOSED_A, CURRENT, predict_b, refit_predict
 from taxi.data import HOLDOUT_MONTHS, TRAIN_MONTHS, features, load
 from taxi.m1 import final_rounds
 from taxi.submit import build_submission
@@ -21,8 +21,9 @@ RANKING = "data/ranking.parquet"
 
 def main(out: str, champ: str, floor: float | None = None, parent: str | None = None) -> None:
     """parent: a built file whose lane-A values are reused by id (GPU refits do not reproduce), so only lane B is fit."""
-    cols, tag, doc, kind = CHAMPIONS_A[champ]
-    rounds = final_rounds(tag, doc) if parent is None else None
+    # A composed champion (SB3) has no single cell or round count: its parts each carry their own, so only its module is quoted.
+    cols, tag, doc, kind = ((), champ, "", "composed") if champ in COMPOSED_A else CHAMPIONS_A[champ]
+    rounds = final_rounds(tag, doc) if parent is None and doc else None
     if parent is not None:
         pp = pd.read_parquet(parent)
         lane_a = pd.Series(pp.TAXITIME_SEC_mvt.values.astype("float64"), index=pp.MVT_ID_mvt.values)
@@ -47,7 +48,7 @@ def main(out: str, champ: str, floor: float | None = None, parent: str | None = 
               f"negative preds {int((p < 0).sum())}", flush=True)
     sub = build_submission(pred, out, floor=floor)
     digest = hashlib.sha256(open(out, "rb").read()).hexdigest()
-    src = f"from {parent}" if parent else f"rounds {rounds} on {len(cols)} columns"
+    src = f"from {parent}" if parent else (COMPOSED_A[champ] if champ in COMPOSED_A else f"rounds {rounds} on {len(cols)} columns")
     print(f"{out}: {len(sub)} rows, sha256 {digest}, spec lane A {champ} ({kind}) {src}, lane B {CURRENT['B']}, floor {floor}")
 
 

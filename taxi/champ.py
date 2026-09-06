@@ -18,8 +18,11 @@ COLS_D2 = [*COLS_D1, "d_as", "occ", "t_occ"]
 # Lane-A champions by name: columns, the report whose recorded rounds the refit uses, and the model family (lgb or cb).
 CHAMPIONS_A = {"W1-A": (COLS_A, "W1", "docs/W1.md", "lgb"), "D1": (COLS_D1, "D1", "docs/D1.md", "lgb"),
                "MC2": (COLS_D1, "MC2", "docs/MC2.md", "cb")}
+# Composed lane-A champions: built from parts each fixed by an earlier run, so they carry a module instead of a cell (SB3, H52).
+# Their bases stay out of CHAMPIONS_A on purpose, because that registry feeds _fingerprint and would invalidate every cache below.
+COMPOSED_A = {"SB3": "taxi.sb3"}
 # The registry's current champion per lane; verdict wording promotes only against these names.
-CURRENT = {"A": "MC2", "B": "L8c"}
+CURRENT = {"A": "SB3", "B": "L8c"}
 
 
 def predict_b(name: str, tr: pd.DataFrame, te: pd.DataFrame) -> np.ndarray:
@@ -53,8 +56,14 @@ def _fingerprint(tra: pd.DataFrame, tea: pd.DataFrame) -> int:
     return int(sum(int(pd.util.hash_pandas_object(d[cols], index=False).sum()) for d in (tra, tea)) % (1 << 62))
 
 
-def refit_predict(name: str, tr: pd.DataFrame, te: pd.DataFrame) -> np.ndarray:
-    """The named champion refit on tr at its recorded rounds, predicted on te; the one lane-A fit path for verdicts and files."""
+def refit_predict(name: str, tr: pd.DataFrame, te: pd.DataFrame, rows: str = "ranking") -> np.ndarray:
+    """The named champion refit on tr at its recorded rounds, predicted on te; the one lane-A fit path for verdicts and files.
+
+    rows names the row set for a composed champion's own caches; month cannot separate them, since the ranking file is Jan and Jul too.
+    """
+    if name in COMPOSED_A:
+        from importlib import import_module  # local: a composed champion imports this module
+        return import_module(COMPOSED_A[name]).predict(tr, te, rows)
     cols, tag, doc, kind = CHAMPIONS_A[name]
     rounds = final_rounds(tag, doc)
     if kind == "cb":
@@ -71,7 +80,7 @@ def champion_holdout(name: str, tra: pd.DataFrame, tea: pd.DataFrame) -> np.ndar
         c = pd.read_parquet(path)
         if len(c) == len(tea) and c.fp.iloc[0] == fp and np.array_equal(c.id.values, tea.id.values):
             return c.pred.values
-    pred = refit_predict(name, tra, tea)
+    pred = refit_predict(name, tra, tea, "holdout")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     pd.DataFrame({"id": tea.id.values, "pred": pred, "fp": fp}).to_parquet(path, index=False)
     return pred

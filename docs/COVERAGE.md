@@ -21,7 +21,7 @@ the W1 run (ledger H15, H16) and the Stage 5.7 critique (`docs/gate-s2.html`).
 
 ## 1. What have you tried
 
-Holdout verdicts, N_h = 51 (`docs/TRIAL-LEDGER.md` section B):
+Holdout verdicts, N_h = 52 (`docs/TRIAL-LEDGER.md` section B):
 
 | Rows | Lane | What | Outcome |
 |---|---|---|---|
@@ -61,6 +61,7 @@ Holdout verdicts, N_h = 51 (`docs/TRIAL-LEDGER.md` section B):
 | H49 | B | L10: LightGBM on the residual label y minus z_sched, LP1's 24 columns, M1's cell inherited, k = 1 | LOSE, -757.5 [-1273.4, -343.3]; loses on all five folds and worst where the champion is best |
 | H50 | A | E1: blend of MC2 and M3 (TabPFN per airport, all ten), weight chosen on OOF over an 11-point grid, k = 11 | TIE or LOSE, +0.6 [+0.1, +1.2] against a 0.4 s bound; M3 alone is 264.9 against MC2's 232.7 and loses at all ten airports (F31)
 | H51 | B | L11: the L6a copy mixture with L8c's classifier extended to the nine airports `taxi.l4.touched` excludes, k = 1 | LOSE, -5.7 [-16.3, +1.3]; LTFM alone loses 150.6 s while six of the other eight improve; LIRF bit-identical as declared (F34)
+| H52 | A | SB3: SB2's composition (five-seed bag, ST1a's fixed gate, C1's floor) on D2's base instead of MC2's, k = 1 | WIN, 229.78 s, +2.4 [+2.0, +2.7]; SB3 promoted, the first lane-A promotion since MC2 and the first pass with no free parameter
 
 Declared searches (ledger line 35): CAP sweep k = 4 per lane (chose no cap); M1 grid k = 12 lane A (bound 2.8 s), k = 8 lane B (bound 229.4 s); M2 k = 1; W1 k = 1 per lane.
 Diagnostics, never verdicts: forward fold Jan-Nov to Dec for M1 (`docs/M1.md` line 117); per-feature knockout for M1 (`docs/M1-KNOCKOUT.md`).

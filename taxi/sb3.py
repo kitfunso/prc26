@@ -13,7 +13,7 @@ import time
 import numpy as np
 import pandas as pd
 
-from taxi.champ import COLS_D2, _fingerprint, champion_holdout, lane_a
+from taxi.champ import COLS_D2, _fingerprint, champion_holdout, lane_a, refit_predict
 from taxi.l2 import floored
 from taxi.m1 import final_rounds
 from taxi.m2 import is_tail
@@ -33,9 +33,10 @@ def _fp(tra: pd.DataFrame, tea: pd.DataFrame) -> int:
     return int((_fingerprint(tra, tea) + h) % (1 << 62))
 
 
-def seed_pred(seed: int, tra: pd.DataFrame, tea: pd.DataFrame, rounds: tuple[int, int, int], fp: int) -> np.ndarray:
-    """One D2 seed's holdout predictions, cached so a killed run resumes at the next seed."""
-    path = f"data/cache/sb3_seed{seed}_holdout.parquet"
+def seed_pred(seed: int, tra: pd.DataFrame, tea: pd.DataFrame, rounds: tuple[int, int, int], fp: int,
+              tag: str = "holdout") -> np.ndarray:
+    """One D2 seed's predictions on tea, cached so a killed run resumes at the next seed; tag keeps each row set's caches apart."""
+    path = f"data/cache/sb3_seed{seed}_{tag}.parquet"
     if os.path.exists(path):
         c = pd.read_parquet(path)
         if len(c) == len(tea) and c.fp.iloc[0] == fp and np.array_equal(c.id.values, tea.id.values):
@@ -47,15 +48,23 @@ def seed_pred(seed: int, tra: pd.DataFrame, tea: pd.DataFrame, rounds: tuple[int
     return pred
 
 
+def predict(tr: pd.DataFrame, te: pd.DataFrame, tag: str = "holdout") -> np.ndarray:
+    """SB3 on any row set: the five-seed D2 bag, ST1a's fixed gate toward D1, C1's floor. The one lane-A path since H52."""
+    rounds, fp = final_rounds("D2", "docs/D2.md"), _fp(tr, te)
+    b = np.mean([seed_pred(s, tr, te, rounds, fp, tag) for s in SEEDS], axis=0)
+    d1 = champion_holdout("D1", tr, te) if tag == "holdout" else refit_predict("D1", tr, te)
+    w = np.where(is_tail(te), W_TAIL, W_BODY)
+    return floored(w * b + (1 - w) * d1)
+
+
 def main() -> None:
     tra, tea = lane_a()
     rounds, fp, y = final_rounds("D2", "docs/D2.md"), _fp(tra, tea), tea.y.values
     preds = [seed_pred(s, tra, tea, rounds, fp) for s in SEEDS]
-    b, hd = np.mean(preds, axis=0), champion_holdout("D1", tra, tea)
+    b = np.mean(preds, axis=0)
     base = floored(champion_holdout("MC2", tra, tea))
-    w = np.where(is_tail(tea), W_TAIL, W_BODY)
     steps = {"MC2 floored (champion)": base, "D2 seed 0 floored": floored(preds[0]), "D2 seed bag": floored(b),
-             "D2 seed bag + ST1a gate (SB3)": floored(w * b + (1 - w) * hd)}
+             "D2 seed bag + ST1a gate (SB3)": predict(tra, tea)}
     sb3 = steps["D2 seed bag + ST1a gate (SB3)"]
     v = paired_delta(base - y, sb3 - y, tea.day.values)
     vt, jan, jul = is_tail(tea), tea.month.values == 1, tea.month.values == 7
