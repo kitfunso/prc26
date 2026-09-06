@@ -117,6 +117,14 @@ most important line on the page.</p>
 </table></div>
 <p>The leader is at 277.29. Both anchors sit above it. Neither is a prediction: one submission cannot fit a transfer, and flags F5
 and F2 say the transfer is unexplained and the 2026 tail unknown.</p>
+<p><strong>Both anchors are computed at the holdout's row mix, and the ranking file's is different.</strong> Measured after the
+critique (<code>docs/MIX.md</code>, new flag F20): the lane split transfers, 1.534% of ranking departures have no flight plan
+against 1.560% here, but lane B was July-heavy in 2025 and is balanced in 2026, and the January cells that grew are the ones we
+predict worst (EHAM 293 &rarr; 805 rows at 1,075 s, LFPG 216 &rarr; 325 at 6,909 s, LIRF 60 &rarr; 107 at 4,187 s). Re-averaging
+the holdout's per-cell error under the ranking counts moves lane B from 1,808.2 to 2,088.5, but a drop-k table shows most of that
+is the two LFPG rows F17 names arriving again through the weights: the shift falls to +38.8 s at two rows dropped and +13.7 at
+twenty. So read both anchors as about 1 to 3 s optimistic on this account, before any other holdout-to-board gap. It is one more
+reason the anchors are not predictions; it is not a reason to change a model.</p>
 
 <h2>4. The blockers the critique raised, now measured</h2>
 <p>Three of its five blockers were missing measurements rather than errors. All three were run before this page went out.</p>
@@ -190,6 +198,11 @@ so. A1 was re-verdicted against the champions only (H29 to H32, all ties). Refit
 stays, because F11 says an anchor after takeoff cannot be known at prediction time. The reporting consequence is that the ledger's
 B4 lane-A figure of 311.2 belongs to neither fit, and lane-A gains quoted against B4 on today's data carry about 27 s of baseline
 shift inside them. CA1 quotes both.</li>
+<li><strong>F20, new and open.</strong> The ranking set's lane-B rows sit in different cells from the holdout's, and the shift goes
+against us. The lane split transfers (1.534% against 1.560%) but lane B moved from July-heavy to balanced, and the January cells
+that grew are the ones the champion handles worst. The honest size, after the two LFPG rows F17 names are dropped, is +13 to +39 s
+of lane-B RMSE and about +1 to +3 s of composite, which makes both board anchors in section 3 slightly optimistic. It corrects a
+projection; it licenses no change to a model. Measured in <code>docs/MIX.md</code>.</li>
 <li><strong>F13, closed.</strong> Multiplicity across the chain. Now priced in both lanes, lane B at H45 and lane A at H46.</li>
 <li><strong>F9.</strong> Lane B resists the model class. Every lane-B ranking row is an extrapolation on the schedule gap plus
 queue, fitted on 17,097 training rows.</li>
