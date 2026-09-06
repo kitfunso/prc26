@@ -48,11 +48,13 @@ them within tens of per cent, in both directions: five are day-scale truths pred
 branch over-predicted. The two LFPG rows are the ones nothing sees. Their schedule is an ordinary 29 and 34 minutes, they carry an
 aircraft type, and the truth is a day. No ranking-visible column separates them from the 878 other LFPG lane-B holdout rows.
 
-## The far band is already better than any constant mixture
+## The far band beats every constant mixture, on 22 rows
 
 22 holdout lane-B rows have a schedule over 12 h. Their training copy share is 0.226 on 53 rows. The current per-row P(copy) scores
 8,652 s there; the best constant mixture weight on the same rows, chosen with hindsight on the holdout itself, scores 35,355 s.
-The gated mixture is four times better than the best single weight an oracle could pick, so this band holds no gain.
+The gated mixture is four times better than the best single weight an oracle could pick. That says the constant-weight family is
+badly specified, not that the band holds no gain: 22 rows with a training copy share estimated on 53 (binomial SE 0.057) cannot
+settle the question. Untested at this n.
 
 ## Oracle bound on the extreme rows
 
@@ -67,15 +69,21 @@ Perfect prediction on the k worst lane-B rows, everything else unchanged:
 | 9 | 988.2 | 261.3154 |
 | 20 | 897.0 | 256.1349 |
 
-## What this closes
+## What this closes, and what it does not
 
-Two rows perfectly predicted is worth 49.6 s of composite. That is the same size as the whole distance from this campaign's board
-score to the leader's, and it is bought by nothing a model can learn.
+Two rows perfectly predicted is worth 49.6 s of composite. The distance from S1's board score to the leader's is 48.1 s
+(325.3982 against 277.29). Those two numbers are the same size, and the 49.6 s is bought by nothing a model can learn.
 
-A rate-based shift cannot recover it either, and the reason is already measured. Under squared error the right prediction for a row
-with a small chance of a day-scale truth is the probability-weighted mean, and a boosted tree fitted on squared loss over training
-data that contains those rows already carries that term in its leaves. `docs/APT.md` is the evidence: every cross-fitted per-key
-recalibration of MC2 is worse than no correction at all, so the level is already right.
+A rate-based shift is NOT closed here. An earlier draft of this section argued it was, citing `docs/APT.md`. That citation was
+wrong and is withdrawn: APT measures per-key recalibration of MC2 on 1,723,531 **lane-A** out-of-fold rows, and the two rows in
+question are **lane-B** rows that MC2 never predicts (`taxi/champ.py` routes lane B to B4, L4, L6 and L8 only). The argument also
+fails on its own terms, because the copy branch's fit rows do not contain a day-scale LFPG truth at all (F3: the training months
+hold no LFPG lane-B row above 9,182 s), so no leaf can carry a term learned from them.
+
+What can honestly be said is weaker. An unconditional rate term for a 2-in-880 day-scale event at LFPG is worth roughly
+2 x 71,000 / 880 = 161 s of uplift on every LFPG lane-B row, which would wreck the 878 ordinary ones; nothing measured here tells
+us whether a conditional version exists, because no ranking-visible column separates the two rows (LK1). Treat this as untested at
+this power, not as closed.
 
 What is left for the model is the 65.7% of squared error under 3,000 s, spread over 344,208 rows. That is lane A's broad middle,
 which is what the queued lanes work on.

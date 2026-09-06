@@ -49,6 +49,6 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--reps", type=int, default=300)
     ap.add_argument("--block", type=int, default=1, help="consecutive days per bootstrap block")
-    ap.add_argument("--no-resample", action="store_true", help="keep every resampled row instead of 215,876")
+    ap.add_argument("--scored", type=int, default=0, help="subsample each draw to this many rows; 0 (the default) keeps every row, because the board scores all 344,841 since 2026-09-04")
     a = ap.parse_args()
-    main(a.reps, a.block, 0 if a.no_resample else 215876)
+    main(a.reps, a.block, a.scored)

@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 from taxi.baselines import b4
-from taxi.champ import CHAMPIONS_A, CURRENT, predict_b, refit_predict
+from taxi.champ import CHAMPIONS_A, predict_b, refit_predict
 from taxi.data import load
 from taxi.m1 import MODEL_FEATURES, chosen_cells, final_rounds
 from taxi.m2 import predict_m2, stages
@@ -25,11 +25,24 @@ def lane_a_pred(name: str, tr: pd.DataFrame, te: pd.DataFrame) -> np.ndarray:
     return predict_cb(stages_cb(tr, iters=final_rounds("MC1", "docs/MC1.md"), cols=COLS_A), te, COLS_A)[0]
 
 
-def main() -> None:
+def kept(lane: str) -> list[str]:
+    """The other lane's rows from the file on disk, so one lane can be refreshed without refitting the other on the GPU."""
+    try:
+        rows = open("docs/FORWARD.md", encoding="utf-8").read().split("\n")
+    except FileNotFoundError:
+        return []
+    return [r for r in rows if r.startswith(f"| {lane} |")]
+
+
+def main(only: str | None = None) -> None:
     metar = load_metar()
     fwd, dec = (join(load(m), metar) for m in (tuple(range(1, 12)), (12,)))
     lines = ["| lane | model | Dec rows | RMSE (s) | fit s |", "|---|---|---|---|---|"]
-    for lane, names in (("A", ("M2", "W1-A", "D1", "MC1", "MC2")), ("B", ("B4", CURRENT["B"]))):
+    # The lane-B chain is named, not read from CURRENT: the file must show every promoted step, not only the one current when it last ran.
+    for lane, names in (("A", ("M2", "W1-A", "D1", "MC1", "MC2")), ("B", ("B4", "L4b", "L6a", "L8c"))):
+        if only and lane != only:
+            lines += kept(lane)
+            continue
         f, d = (x[x.has_fpl == (lane == "A")].reset_index(drop=True) for x in (fwd, dec))
         for name in names:
             t0 = time.time()
@@ -45,4 +58,6 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    main(sys.argv[1] if len(sys.argv) > 1 else None)

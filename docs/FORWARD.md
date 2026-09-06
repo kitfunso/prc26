@@ -10,4 +10,6 @@ Regenerate with `python -m taxi.fwd`. Every model at the rounds its report recor
 | A | MC1 | 164028 | 213.5 | 286 |
 | A | MC2 | 164028 | 204.3 | 389 |
 | B | B4 | 1649 | 916.9 | 0 |
+| B | L4b | 1649 | 1002.1 | 0 |
 | B | L6a | 1649 | 949.7 | 0 |
+| B | L8c | 1649 | 906.0 | 13 |

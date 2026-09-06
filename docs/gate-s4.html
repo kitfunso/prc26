@@ -1,0 +1,352 @@
+<meta charset="utf-8">
+<title>S4 Submission Gate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#F6F7F5;--ink:#1C232B;--muted:#5B6570;--line:#D8DDD9;--accent:#1F4FB0;--amber:#B0680A;--tint:#E9EEF9;--tint-amber:#FBF1E3;--code:#EEF0EC;--win:#1F6B3A;--tint-win:#E6F2EA;--lose:#9B2C2C;--tint-lose:#F8E7E7}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#171B1F;--ink:#E6E9E6;--muted:#9AA4AE;--line:#333A41;--accent:#8FB0F0;--amber:#E0A050;--tint:#1E2A42;--tint-amber:#3A2A12;--code:#22282E;--win:#7FCB9A;--tint-win:#16301F;--lose:#E39B9B;--tint-lose:#3A1A1A}}
+:root[data-theme="dark"]{--bg:#171B1F;--ink:#E6E9E6;--muted:#9AA4AE;--line:#333A41;--accent:#8FB0F0;--amber:#E0A050;--tint:#1E2A42;--tint-amber:#3A2A12;--code:#22282E;--win:#7FCB9A;--tint-win:#16301F;--lose:#E39B9B;--tint-lose:#3A1A1A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "IBM Plex Sans",system-ui,sans-serif}
+main{max-width:76ch;margin:0 auto;padding:40px 24px 80px}
+h1{font-size:30px;line-height:1.2;font-weight:600;margin:6px 0 10px;text-wrap:balance}
+h2{font-size:19px;font-weight:600;margin:40px 0 10px;text-wrap:balance}
+h3{font-size:16px;font-weight:600;margin:24px 0 6px}
+p{margin:0 0 12px}
+.eyebrow{font:500 12px/1.4 "IBM Plex Mono",monospace;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:18px;color:var(--muted);margin-bottom:22px}
+.headline{border-left:4px solid var(--accent);background:var(--tint);padding:14px 18px;margin:18px 0}
+.headline p:last-child{margin:0}
+.decision{border:1px solid var(--amber);background:var(--tint-amber);padding:14px 18px;margin:18px 0;border-radius:2px}
+.decision h2{margin:0 0 8px;font-size:17px}
+.call{font-weight:600}
+.wrap{overflow-x:auto;margin:10px 0 16px}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:13px}
+td.num,th.num{text-align:right;white-space:nowrap}
+td.id{font-family:"IBM Plex Mono",monospace;font-size:13px;white-space:nowrap}
+tr.win td{background:var(--tint-win)}
+tr.lose td{background:var(--tint-lose)}
+.note{font-size:14px;color:var(--muted)}
+.tag{display:inline-block;font:500 11px/1.4 "IBM Plex Mono",monospace;letter-spacing:.03em;padding:1px 6px;border:1px solid var(--line);border-radius:2px;margin-right:6px;color:var(--muted)}
+.tag.win{color:var(--win);border-color:var(--win)}
+.tag.lose{color:var(--lose);border-color:var(--lose)}
+.tag.amber{color:var(--amber);border-color:var(--amber)}
+code,pre{font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+code{background:var(--code);padding:1px 5px;border-radius:2px}
+pre{background:var(--code);padding:12px 14px;overflow-x:auto;border-radius:2px;line-height:1.5}
+ol,ul{padding-left:22px;margin:0 0 12px}
+li{margin-bottom:6px}
+.q{margin:12px 0;padding:10px 14px;border-left:3px solid var(--line)}
+.q .n{font:500 12px/1.4 "IBM Plex Mono",monospace;color:var(--muted);display:block;margin-bottom:2px}
+.rule{border:1px dashed var(--line);padding:12px 16px;margin:12px 0;border-radius:2px}
+.rule strong{color:var(--accent)}
+.crit{margin:10px 0;padding:10px 14px;background:var(--code);border-radius:2px}
+.crit .r{margin-top:6px;padding-top:6px;border-top:1px solid var(--line);font-size:14px}
+a{color:var(--accent)}
+</style>
+
+<main>
+<p class="eyebrow">PRC Data Challenge 2026 &middot; merry-octopus &middot; Stage 6 promotion gate</p>
+<h1>S4: upload v15, or hold</h1>
+<p class="lede">The board still scores S1, a pair two champions old. v15 is built and sitting on disk. An independent critique ran
+against this gate before you saw it and broke four of its numbers. Those are corrected below, the measurements it said were missing
+have been run, and it rides this page in full.</p>
+
+<div class="decision">
+<h2>The call</h2>
+<p class="call">Upload <code>data/merry-octopus_v15.parquet</code> to the board, or leave S1 standing.</p>
+<p class="note">Nothing is uploaded without an explicit yes. The file is built, floored and hashed
+(sha256 <code>639fa7564a105a84995ffb5eee0da99ffa3791406b8cefba6d9e2d53caa68af0</code>, 344,841 rows). The scorer allows three
+submissions a day; five have been spent, four of them on probes.</p>
+</div>
+
+<h2>1. Corrections to this page, before anything else</h2>
+<p>The first draft of this gate carried four wrong figures. Each is a number reused without re-reading its source. They are listed
+here rather than quietly fixed.</p>
+<div class="wrap"><table>
+<tr><th>claim in the first draft</th><th>what the source says</th><th>where</th></tr>
+<tr class="lose"><td>S1 scored 324.7339 on the board</td><td>324.7339 is <strong>P1</strong>, a deliberately perturbed probe
+(lane B plus 300 s). S1 scored <strong>325.3982</strong>.</td><td class="id">ledger rows S1, P1</td></tr>
+<tr class="lose"><td>S1's holdout composite is 353.68</td><td>Its recorded lane RMSEs give <strong>365.24</strong>. 353.68 is not
+reproducible from any recorded pair.</td><td class="id">ledger row S1</td></tr>
+<tr class="lose"><td>S4 buys 31.10 s on the holdout</td><td><strong>42.66 s</strong>, from the corrected S1
+composite.</td><td class="id">section 3</td></tr>
+<tr class="lose"><td>a 1:1 board move lands near 293.6</td><td>Withdrawn. Both inputs were wrong; the two defensible anchors give
+282.7 and 287.4, and neither is tested.</td><td class="id">section 3</td></tr>
+</table></div>
+<p class="note">One consequence is worth saying plainly: the team's best board score is held by a deliberately damaged probe, not by
+a model.</p>
+
+<h2>2. The honest table</h2>
+<p>The development holdout is Jan and Jul 2025, 339,046 lane-A rows and 5,373 lane-B rows, never used to fit. The board scores Jan
+and Jul 2026. Every number is seconds of RMSE. Only S1 and the probes have board scores.</p>
+<div class="wrap"><table>
+<tr><th>id</th><th>lane A</th><th>lane B</th><th class="num">holdout lane A</th><th class="num">holdout lane B</th>
+<th class="num">holdout composite</th><th class="num">board</th></tr>
+<tr><td class="id">S1</td><td>M1</td><td>B4</td><td class="num">259.5</td><td class="num">2074.1</td>
+<td class="num">365.24</td><td class="num">325.3982</td></tr>
+<tr><td class="id">P1</td><td>M1</td><td>B4 plus 300 s</td><td class="num">&mdash;</td><td class="num">&mdash;</td>
+<td class="num">&mdash;</td><td class="num">324.7339</td></tr>
+<tr><td class="id">S3</td><td>MC2</td><td>L6a</td><td class="num">232.4</td><td class="num">1861.8</td>
+<td class="num">327.4784</td><td class="num">not uploaded</td></tr>
+<tr class="win"><td class="id">S4</td><td>MC2</td><td>L8c</td><td class="num">232.1502</td><td class="num">1808.1729</td>
+<td class="num">322.5796</td><td class="num">not uploaded</td></tr>
+</table></div>
+<p class="note">S1's 259.5 and 2074.1 were measured before the anchor guard A1, on a slightly different feature view. Every other
+row is post-guard. That is the one caveat on the 42.66 s.</p>
+
+<h2>3. Where the 42.66 s comes from, and what a board move would be</h2>
+<p>Move one lane at a time away from S1, leaving the other at S1's model:</p>
+<div class="wrap"><table>
+<tr><th>change</th><th class="num">rows changed</th><th class="num">composite</th><th class="num">gain</th></tr>
+<tr><td>S1, both lanes</td><td class="num">&mdash;</td><td class="num">365.24</td><td class="num">&mdash;</td></tr>
+<tr><td>lane A only, M1 to MC2</td><td class="num">339,046</td><td class="num">346.65</td><td class="num">+18.59</td></tr>
+<tr><td>lane B only, B4 to L8c</td><td class="num">5,373</td><td class="num">342.48</td><td class="num">+22.76</td></tr>
+<tr class="win"><td>both, which is S4</td><td class="num">344,419</td><td class="num">322.58</td><td class="num">+42.66</td></tr>
+</table></div>
+<p><strong>55% of the gain comes from 1.56% of the rows</strong>, and that lane's own level bootstrap SD is 400.57 s. This is the
+most important line on the page.</p>
+<p>Two ways to carry the holdout gain across to the board, from the only anchor pair that exists (S1: holdout 365.24, board
+325.3982):</p>
+<div class="wrap"><table>
+<tr><th>assumption</th><th class="num">implied S4 board</th><th>status</th></tr>
+<tr><td>additive offset of 39.84 s</td><td class="num">282.7</td><td>untested</td></tr>
+<tr><td>ratio of 0.891</td><td class="num">287.4</td><td>untested</td></tr>
+</table></div>
+<p>The leader is at 277.29. Both anchors sit above it. Neither is a prediction: one submission cannot fit a transfer, and flags F5
+and F2 say the transfer is unexplained and the 2026 tail unknown.</p>
+
+<h2>4. The blockers the critique raised, now measured</h2>
+<p>Three of its five blockers were missing measurements rather than errors. All three were run before this page went out.</p>
+<div class="wrap"><table>
+<tr><th>blocker</th><th>measurement</th><th>result</th></tr>
+<tr class="win"><td>no verdict of L8c against the baseline the chain started from</td>
+<td><code>python -m taxi.cb1</code>, H45</td>
+<td>B4 floored 1965.6 to L8c floored 1808.2, <strong>+157.5 [+88.4, +268.5]</strong>. Priced once for the whole lane at k = 25
+cells the bound is 90.3 s. <strong>Clears.</strong></td></tr>
+<tr class="win"><td>the L8c step might be a few-row artifact</td><td>drop-k in LB-CONC's construction</td>
+<td>The lead <strong>grows</strong> as the champion's worst rows leave: +53.6 at 0 dropped, +68.2 at 1, +81.0 at 2, +91.2 at 5,
++106.0 at 20.</td></tr>
+<tr class="win"><td>L8c never met the December forward fold, and L6a lost it</td><td><code>python -m taxi.fwd B</code></td>
+<td>B4 916.9, L4b 1002.1, L6a 949.7, <strong>L8c 906.0</strong> on 1,649 December rows. L8c beats the baseline by 10.9 s and is the
+only lane-B champion that does.</td></tr>
+</table></div>
+<p><strong>Flag FF-B is retired for the current champion.</strong> It said the lane-B champion loses to B4 out of sample. That was
+true of L6a and is not true of L8c. The other two blockers were real errors and are fixed: the TAIL rate-shift closure is withdrawn,
+and F17 is restated so it cannot excuse a board regression.</p>
+
+<h2>5. The full promotion chain, with intervals</h2>
+<p>Paired day-block bootstrap, 2,000 reps, seed 0, on the holdout. Positive favours the challenger.</p>
+<div class="wrap"><table>
+<tr><th>lane</th><th>step</th><th class="num">improvement</th><th class="num">interval</th><th>ledger</th></tr>
+<tr><td>A</td><td>M1 to M2</td><td class="num">+2.9</td><td class="num">[+1.8, +4.1]</td><td class="id">H14</td></tr>
+<tr><td>A</td><td>M2 to W1-A</td><td class="num">+2.9</td><td class="num">[+1.8, +3.9]</td><td class="id">H16</td></tr>
+<tr><td>A</td><td>W1-A to D1</td><td class="num">+11.6</td><td class="num">[+9.2, +14.0]</td><td class="id">H18</td></tr>
+<tr><td>A</td><td>D1 to MC2</td><td class="num">+9.6</td><td class="num">[+8.2, +10.9]</td><td class="id">H20</td></tr>
+<tr><td>B</td><td>B4 to L4b</td><td class="num">+26.0</td><td class="num">[+4.0, +54.3]</td><td class="id">H25</td></tr>
+<tr><td>B</td><td>L4b to L6a</td><td class="num">+77.9</td><td class="num">[+43.0, +135.5]</td><td class="id">H27</td></tr>
+<tr><td>B</td><td>L6a to L8c</td><td class="num">+53.6</td><td class="num">[+29.9, +95.0]</td><td class="id">H43</td></tr>
+<tr class="win"><td>B</td><td>B4 to L8c, the chain in one verdict</td><td class="num">+157.5</td>
+<td class="num">[+88.4, +268.5]</td><td class="id">H45</td></tr>
+</table></div>
+<p>Levels, not deltas, with their own day-block bootstrap spread (<code>taxi.verdict.level_ci</code>, 2,000 reps, seed 0):</p>
+<div class="wrap"><table>
+<tr><th>model</th><th class="num">RMSE</th><th class="num">bootstrap SD</th><th class="num">95% range</th></tr>
+<tr><td>lane A MC2</td><td class="num">232.15</td><td class="num">4.47</td><td class="num">223.46 to 240.81</td></tr>
+<tr><td>lane B L8c</td><td class="num">1808.17</td><td class="num">400.57</td><td class="num">1086.10 to 2621.83</td></tr>
+<tr><td>composite</td><td class="num">322.58</td><td class="num">33.04</td><td class="num">266.16 to 389.96</td></tr>
+</table></div>
+
+<h2>6. Trial ledger</h2>
+<p>N_h = 45 holdout verdict lanes have run this campaign, plus one board model and four scored probes. Each lane priced its own cell
+count k. Since today the lane-B chain also carries a bound of its own (H45, k = 25 for every lane-B cell declared since B4), which it
+clears at 157.5 against 90.3. <strong>Lane A has no equivalent chain verdict.</strong> Its four promotions total about +27 s against
+per-step standard errors near 0.2 s, so the arithmetic is not close, but the single contrast M1 against MC2 has not been run.</p>
+
+<h2>7. Caution flags, all of them</h2>
+<ul>
+<li><strong>F18, new and open.</strong> The 2 s promotion floor is shared by both lanes and means very different things in each.
+Lane A's paired standard error is about 0.2 s, so the floor is roughly 10 of them, and it has killed four challengers whose
+intervals sat entirely above zero, worth about 2.7 s together. Lane B's paired standard error is 16.6 s, so the floor is about an
+eighth of one and gates almost nothing. Since MC2, lane A has promoted nothing in ten attempts and lane B has promoted three times.
+<strong>Changing this is a decision-rule change and yours to make</strong>, so nothing was altered.</li>
+<li><strong>F17, restated.</strong> Nine of 344,419 holdout rows carry 34.4% of the squared error and two carry 28.4%. It licenses
+one thing only: our own board score is a high-variance draw from the row sets we might have faced. It licenses nothing about a
+difference measured on the fixed set, so a negative board move between two of our own files is a real regression and the REVIEW
+tripwire still fires on it.</li>
+<li><strong>F13.</strong> Multiplicity across the chain. Now priced in lane B (H45); unpriced in lane A.</li>
+<li><strong>F9.</strong> Lane B resists the model class. Every lane-B ranking row is an extrapolation on the schedule gap plus
+queue, fitted on 17,097 training rows.</li>
+<li><strong>F4, sharpened.</strong> Lane B's target is close to a data artifact. Its copy rate moved from 0.718 in Nov-Apr to 0.474
+in May-Oct within 2025, z = 7.9, and nothing measures 2026's. The only 2026 lane-B reading, probe P1, says S1 runs 197 s low there,
+while the L6a step moved the ranking file's LIRF predictions 296 s the other way. The lane-B chain has no board support at all.</li>
+<li><strong>F5.</strong> Level transfer is unexplained: S1 sits 39.8 s better on the board than on the holdout.</li>
+<li><strong>F3.</strong> Truth outliers are never trimmed from the holdout, by design.</li>
+<li><strong>F2.</strong> Whether the 2026 tail behaves like 2025 is unknown.</li>
+<li><strong>F10.</strong> Two lane-A promotions passed at the floor edge.</li>
+<li><strong>F11 and A1.</strong> The anchor guard was applied and every champion re-verdicted; all tied their old selves.</li>
+<li><strong>F6.</strong> The board ranks each team by its best submission, so volume is rewarded.</li>
+<li><strong>Retired: FF-B.</strong> Superseded by the December forward fold in section 4.</li>
+</ul>
+
+<h2>8. The decision rule, restated</h2>
+<div class="rule">
+<p>A challenger replaces a champion only if the paired day-block bootstrap improvement on the untouched holdout has its whole
+interval above zero, and its point estimate clears a 2 s floor plus an optimism bound priced at the lane's declared cell count k.
+Ties promote the simpler model. A search not declared in protocol section 4 before it ran is a diagnostic and can never decide a
+verdict.</p>
+<p><strong>This verdict is only as good as this rule. Attack the rule, not just the numbers.</strong></p>
+</div>
+<p class="note">F18 is the sharpest attack anyone has made on it so far: one floor, two lanes, and an eighty-fold difference in what
+it costs to pass.</p>
+
+<h2>9. Independent Stage 5.7 critique, verbatim</h2>
+<p class="note">Protocol Stage 5.7 requires a reviewer that did not build or run the campaign to attack the method, given artifacts
+rather than summaries, with its findings riding the gate surface verbatim. This one read the protocol, the ledger, TAIL, APT,
+FORWARD, L8, L9, COVERAGE, LB-CONC and the source of <code>verdict.py</code>, <code>champ.py</code>, <code>l6.py</code> and
+<code>l8.py</code>, and re-ran the arithmetic itself. It is reproduced in full and unedited. Findings 1, 4 and 5 have since been
+measured, and findings 6, 9, 10 and 13 have been corrected in the documents; nothing below has been softened to match.</p>
+
+<div class="crit">
+<p><strong>1. The chain bound is never computed, only asserted per link.</strong> Lane B has had 10 holdout contacts since
+B4-floored (ledger H23, H24, H25, H26, H27, H32, H33, H42, H43, H44) across ~25 declared cells, and 3 promotions &mdash; yet no
+verdict of L8c against B4-floored exists anywhere. Each link priced its own k (H43: "k = 4 bound 17.1 s"). Under one bound for the
+whole lane, E[max of 25] &asymp; 1.97 and the root-sum-square of the three promotion paired SEs (12.8, 23.6, 16.6 from H25/H27/H43)
+is 31.6 s &rarr; bound &asymp; 62 s against a claimed chain total of +157.4 s (1965.6 &rarr; 1808.2). So multiplicity does
+<strong>not</strong> overturn the point estimate &mdash; but the interval that would settle it was never run. <span class="tag">SERIOUS</span>
+Fix: one <code>paired_delta(err_B4floored, err_L8c, days)</code> call on cached errors; record it as H45.</p>
+
+<p><strong>2. The 2 s floor is shared across lanes and is 80x looser in lane B.</strong> <code>taxi/verdict.py:10</code>
+<code>FLOOR = 2.0</code>, used by <code>Verdict.win</code> (line 20) for both lanes. Lane A paired SE &asymp; 0.2 s (H28, H38, H40)
+&rarr; the floor is ~10 SE. Lane B paired SE 16.6 s (H43) &rarr; the floor is 0.12 SE. Consequence, visible in the ledger: since
+MC2, lane A has had ten challengers and <strong>zero</strong> promotions, four of them with intervals strictly above zero killed by
+the floor alone (H21 +0.498 [+0.186,+0.909], H28 +1.0 [+0.5,+1.5], H34 +0.2 [+0.1,+0.3], H35 +1.0 [+0.7,+1.3], &asymp;2.7 s
+discarded); lane B, over the same window, promoted three times. The campaign's recent gains land in lane B partly because the gate
+there barely exists. <span class="tag">SERIOUS</span> Fix: <code>FLOOR = max(2.0, 2 * paired_SE)</code> per contrast.</p>
+
+<p><strong>3. Most of the headline improvement is 1.56% of the rows.</strong> Composite from the ledger's own lane RMSEs: S1 =
+365.24 (row S1: 259.5 / 2074.1 on 339,046 / 5,373), S4 = 322.58. Holding lane B at S1 and moving only lane A gives 346.65
+(&minus;18.6 s); holding lane A and moving only lane B gives 342.48 (&minus;22.8 s). <strong>53% of the 42.7 s gain comes from
+5,373 lane-B rows whose level bootstrap SD is 400.57 s</strong> (<code>docs/TAIL.md</code>, levels table).
+<span class="tag">SERIOUS</span> Fix: report this split on the gate page, not the composite alone.</p>
+
+<p><strong>4. L8c's win is not a few-row artifact, but its falsifier was skipped.</strong> The gain sits in bands 1-3, 347 rows
+(<code>docs/L8.md</code>, touched-rows table); band 3 alone (136 rows, 4600 &rarr; 3847) is ~82% of the SSE reduction; bands 4, 5, 6
+are unchanged, so the TAIL extreme rows in those bands cannot be driving it. But the drop-k robustness check was run for <strong>L6a
+vs B4</strong> (<code>docs/LB-CONC.md</code>, "the lane-B champion survives the extreme rows") and never for <strong>L8c vs
+L6a</strong>. <span class="tag">BLOCKER</span> Fix: rerun that same table for the L8c/L6a pair before the upload; if the lead shrinks
+as rows drop, it is level-driven, not shape-driven.</p>
+
+<p><strong>5. The only time-transfer check lane B has, fails &mdash; and L8c was never given it.</strong>
+<code>docs/FORWARD.md</code> lists lane B rows for B4 (916.9) and L6a (949.7) on 1,649 December rows. L6a, the base L8c is built on,
+is 32.8 s <strong>worse</strong> than the baseline it replaced. <code>FORWARD.md</code> has no L8c row at all. December is a winter
+month (LIRF copy rate 0.76, <code>docs/LB-CONC.md</code> monthly table) and half the ranking set is January.
+<span class="tag">BLOCKER</span> Fix: <code>python -m taxi.fwd</code> with L8c added; if L8c also loses to B4 on December, the
+lane-B chain should not ship.</p>
+
+<p><strong>6. TAIL closes a lane-B branch with lane-A evidence.</strong> <code>docs/TAIL.md</code> "What this closes": "a boosted
+tree fitted on squared loss ... already carries that term in its leaves. <code>docs/APT.md</code> is the evidence." APT reads
+<code>data/cache/mc2_oof.parquet</code>, <strong>1,723,531 lane-A rows</strong> (<code>docs/APT.md</code> header). The rows the claim
+is about are the two LFPG <strong>lane-B</strong> rows in TAIL's nine-row table. MC2 never predicts a lane-B row &mdash;
+<code>taxi/champ.py:23</code> <code>CURRENT = {"A": "MC2", "B": "L8c"}</code>, and <code>predict_b</code> routes lane B to
+B4/L4/L6/L8 only. The evidence and the claim are about disjoint row sets. <span class="tag">BLOCKER</span> Fix: delete the inference
+or re-measure it on lane-B out-of-fold predictions.</p>
+
+<p><strong>7. APT has no power against the hypothesis it is cited for.</strong> Its corrections lose by 0.2 to 1.1 s against 212.86
+(<code>docs/APT.md</code>, recalibration table). A rate term for a 2-in-880 day-scale event at LFPG is &asymp; 2 &times; 71,000 / 880
+&asymp; 161 s of unconditional uplift &mdash; three orders of magnitude larger than anything that table could detect. The companion
+claim (L8 amendment log: "lane B has no removable level bias under L8c, mean error &minus;12.6 s") is equally underpowered: two rows
+alone contribute 2 &times; 71,000 / 5,373 &asymp; 26 s to that mean. <span class="tag">SERIOUS</span> Fix: stop calling either a
+closure; label both "no measurable effect at this power".</p>
+
+<p><strong>8. The far band is closed on 22 rows against a strawman.</strong> <code>docs/TAIL.md</code>: 22 holdout rows, training
+copy share 0.226 on <strong>53 rows</strong> (binomial SE 0.057). That the gated mixture beats "the best constant mixture weight an
+oracle could pick" by 4x says the constant-weight family is badly specified, not that the band holds no gain.
+<span class="tag">MINOR</span> Fix: reword to "not tested at this n".</p>
+
+<p><strong>9. F17's reading of <code>level_ci</code> is wrong and disables the campaign's own tripwire.</strong>
+<code>taxi/verdict.py:47</code> <code>level_ci</code> bootstraps whole days &mdash; it estimates how far the RMSE would move
+<strong>if a different set of days had been drawn</strong>. The board draws no days: it scores one fixed row set identically for
+every team, so the S1&rarr;S4 board delta is exact. Protocol section 3 line 102 already says this ("for the ranking itself the board
+is exact"). F17 nevertheless states "a board move under about 30 s is a row lottery, not a model result". Applied literally, the
+section-8 REVIEW tripwire ("two promoted champions in a row show board improvement at or below zero") can never fire, because any
+negative board move under 30 s is pre-excused. <span class="tag">BLOCKER</span> Fix: F17 licenses only "our board score is a
+high-variance draw from the population we might face"; it licenses nothing about differences measured on the fixed set. Restate and
+keep the tripwire live.</p>
+
+<p><strong>10. The 293 projection rests on two wrong inputs and one unverifiable assumption.</strong> (a) 353.68 is not reproducible
+from any recorded pair: the ledger's own S1 lane RMSEs give <strong>365.24</strong> unfloored (ledger records 365.3), or 355.76 with
+lane B floored. (b) 324.7339 is <strong>P1's</strong> board score (ledger section C, row P1 &mdash; the S1 file with +300 s on lane
+B), not S1's; S1 scored <strong>325.3982</strong> (ledger row S1). The team's best board score is currently held by a deliberately
+perturbed probe, not by a model. With the correct pair the additive offset is 365.24 &minus; 325.3982 = 39.84 &rarr; 282.7, not 293.
+(c) The additive-offset assumption itself is unverified and contradicted by the protocol's own F5 ("Level transfer... local levels
+are never compared with board levels") and F2 ("2026 tail transfer unknown"). <span class="tag">BLOCKER</span> Fix: quote a range
+from the two anchors (ratio 0.891 &rarr; 287.3; additive &rarr; 282.7) and label both as untested.</p>
+
+<p><strong>11. 43 of 44 holdout verdicts have zero board feedback; the honesty machinery is dead.</strong> The haircut column is
+empty for S2, S3 and S4 (ledger section A). Selection honesty (section 3 line 106) and the REVIEW tripwire both need board readings
+that do not exist. Meanwhile the scorer allows 3 files/day for 36 days (section 0 line 54) and 5 have been spent, four of them on
+probes. <span class="tag">SERIOUS</span> Fix: upload S4 &mdash; the decision is right, the projection attached to it is not. Then
+upload the lane-A-only variant (MC2 + B4-floored) as the second file, which is the only way to price the lane-B chain on the
+board.</p>
+
+<p><strong>12. Lane B's target is a data artifact whose rate drifts, and nothing tests 2026's.</strong> The Q1 amendment-log entry
+records <code>tests/test_leak.py</code> failing at |corr(rq, y)| = 0.653 in lane B because "the window is the copied schedule gap
+that is almost the label"; LK1 records notyp at 0.56. The champion chain L4-L8 is a machine for predicting block times copied from
+schedule. That copy rate moved 0.718 (Nov-Apr) to 0.474 (May-Oct) <strong>within 2025</strong>, z = 7.9
+(<code>docs/LB-CONC.md</code>). The only 2026 lane-B measurement (ledger P1/P2, row P1) says S1 runs 196.9 s <strong>low</strong>
+there; the L6a step <strong>lowered</strong> the ranking file's 378 LIRF lane-B predictions by 296 s (ledger S3 row, 7,834 &rarr;
+7,538 s). Directionally opposed, and the whole lane-B level is worth 0.9 s on the board by P1's own arithmetic.
+<span class="tag">SERIOUS</span> Fix: name this as a model risk in the data register and F4; do not describe the lane-B chain as a
+22.8 s improvement without saying it has no board support.</p>
+
+<p><strong>13. Stale numbers still drive live machinery.</strong> Protocol section 0 line 14 records scored rows as 215,876 and line
+24 resamples the noise bar to "the scored size of 215,876 rows", while F1's own update says every row since 2026-09-04 carries
+usedPairs = 344,841. Section 1 line 58 still reads "the board leader is 249.46 s"; F1 says 277.29; your brief says 270.62. The 2 s
+floor was calibrated on the withdrawn row count. <span class="tag">MINOR</span> Fix: re-run <code>scripts/noise_bar.py</code> at
+344,841 and refresh both lines.</p>
+
+<p class="rule"><strong>VERDICT: sound with conditions</strong> &mdash; (i) run L8c on the December forward fold and the drop-k table
+before treating it as a champion (findings 4, 5); (ii) delete or re-measure the TAIL&rarr;APT closure, which uses lane-A evidence for
+a lane-B claim (finding 6); (iii) restate F17 so it cannot excuse a real board regression, and keep the REVIEW tripwire live
+(finding 9); (iv) drop the 293 projection &mdash; its holdout input (353.68) and its board input (324.7339, a probe) are both wrong
+(finding 10); (v) upload S4, plus an MC2 + B4-floored file, as the only way to price the lane-B chain (findings 3, 11, 12).</p>
+</div>
+
+<h3>What was done about it</h3>
+<div class="wrap"><table>
+<tr><th>finding</th><th>action</th></tr>
+<tr><td class="id">1</td><td>Measured. H45 in <code>docs/CB1.md</code>: +157.5 [+88.4, +268.5] against a k = 25 chain bound of
+90.3 s. Clears.</td></tr>
+<tr><td class="id">2</td><td><strong>Open, and yours.</strong> Recorded as flag F18. The floor was not changed, because the decision
+rule is not mine to edit.</td></tr>
+<tr><td class="id">3</td><td>Done. Section 3 of this page carries the lane split. The critique says 53%; the exact figure is
+55%.</td></tr>
+<tr><td class="id">4</td><td>Measured. The lead grows as rows drop, +53.6 to +106.0. Not an artifact.</td></tr>
+<tr><td class="id">5</td><td>Measured. L8c scores 906.0 on December against B4's 916.9. It is the first lane-B champion to beat the
+baseline out of sample; flag FF-B is retired.</td></tr>
+<tr><td class="id">6</td><td>Corrected. The inference is withdrawn in <code>docs/TAIL.md</code>, which now also notes the argument
+fails on its own terms because F3 says the fit rows hold no such truth.</td></tr>
+<tr><td class="id">7, 8</td><td>Corrected. Both are relabelled untested at this power in <code>docs/TAIL.md</code>.</td></tr>
+<tr><td class="id">9</td><td>Corrected. F17 is restated; the REVIEW tripwire is explicitly live.</td></tr>
+<tr><td class="id">10</td><td>Corrected. Section 1 of this page lists all four wrong figures and their sources.</td></tr>
+<tr><td class="id">11</td><td>Its recommendation is gate question 2. It needs your yes, twice.</td></tr>
+<tr><td class="id">12</td><td>Recorded as the sharpened flag F4 in section 7.</td></tr>
+<tr><td class="id">13</td><td>Fixed. The noise bar was re-run with no row cap: SE of the level 9.7 s, paired SE 1.03 s, so the 2 s
+floor is unchanged in substance. Both stale protocol lines now carry the current figures.</td></tr>
+</table></div>
+
+
+<h2>10. Gate questions</h2>
+<div class="q"><span class="n">1</span>Upload v15 now, or hold until the running queue (M3, E1, O1, TH1, Q1) finishes and a
+possibly better lane A is in the file?</div>
+<div class="q"><span class="n">2</span>The critique's last recommendation is a second file, MC2 plus B4 floored, as the only way
+to price the lane-B chain on the board itself. That spends a second daily slot. Do it?</div>
+<div class="q"><span class="n">3</span>F18: change the floor to twice the paired standard error where that exceeds 2 s, leave it
+flat, or something else? Changing it re-opens four lane-A challengers and tightens lane B.</div>
+<div class="q"><span class="n">4</span>Given that 55% of the gain sits in 1.56% of the rows, is the board score still the right
+thing to optimise, or should the remaining time go to the 65.7% of squared error under 3,000 s?</div>
+<div class="q"><span class="n">5</span>Attack the rule in section 8. What does it let through that it should not?</div>
+</main>
