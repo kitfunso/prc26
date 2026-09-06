@@ -119,9 +119,9 @@ Mechanisms
 - L6 lane-B gated airline mixture (declared 2026-09-05 after H26, protocol section 4): L5a's mixture only in a band with 20 or more non-copy training rows at the airport (the training-fold diagnostic put the whole H26 loss in the far band, whose non-copy rows are not taxi times); non-copy component a mean (L6a) or a least-squares line on z_sched (L6b); every other row keeps L4b; two cells, k = 2, seconds; caution: the H26 holdout by-band table was seen before this design. RUN 2026-09-05 (`docs/L6.md`, H27): L6a WINS, +77.9 s [+43.0, +135.5] against floored L4b (CV 1501.5 vs 1527.6 s), promoted to lane-B champion; LIRF 3,957 vs 4,434 s, all rows 327.8 vs 334.8 s.
 - E1 blend of MC2 and M3: the 30 min time gate lifted 2026-09-05 on Keith, 2026-09-05: "Make sure you tried all of the not-dones please I don't care how long it takes." (protocol amendment log); M3 on all ten airports queued (about 9 h GPU, `docs/M3.md`), then the 11-point weight grid chosen on OOF, k = 11 (protocol section 4, amended).
 - L6T lane-B threshold sweep (lane-B critique condition 3): L6a's non-copy minimum at 10, 15, 20, 25; k = 4; RUN 2026-09-05 (`docs/L6T.md`, H33): CV tie to 0.1 s, the picked cell L6T15 is identical to L6a on the holdout, +0.0, L6a stays.
-- R1 runway-configuration proxy (`rwy_share`, the runway's share of the airport's takeoffs in the hour before the anchor) on MC2's cell: k = 1; DECLARED 2026-09-05 (protocol section 4), queued.
-- H1 public-holiday flags (`hol`, `hol_prev`, `hol_next`, `holidays` 0.103 by ICAO prefix) on MC2's cell: k = 1; DECLARED 2026-09-05 (protocol section 4), queued.
-- FF forward fold (train Jan-Nov, predict Dec) for M2, W1-A, D1, MC1, MC2: reported, never decides; queued 2026-09-05, `docs/FORWARD.md`.
+- R1 runway-configuration proxy (`rwy_share`, the runway's share of the airport's takeoffs in the hour before the anchor) on MC2's cell: k = 1; RUN 2026-09-06 (`docs/R1.md`, H40, 41 min): CV 212.3 vs MC2 212.9 s, holdout +0.3 [-0.2, +0.8], TIE, MC2 stays.
+- H1 public-holiday flags (`hol`, `hol_prev`, `hol_next`, `holidays` 0.103 by ICAO prefix) on MC2's cell: k = 1; RUN 2026-09-06 (`docs/H1.md`, H41, 38 min): CV 212.6 vs MC2 212.9 s, holdout -0.3 [-0.7, +0.2], TIE, MC2 stays.
+- FF forward fold (train Jan-Nov, predict Dec) for M2, W1-A, D1, MC1, MC2: reported, never decides; RUN 2026-09-06 (`docs/FORWARD.md`): Dec 2025 RMSE on 164,028 lane-A rows: M2 220.5, W1-A 217.6, D1 212.1, MC1 213.5, MC2 204.3 s (M1 223.2, B4 271.8 from `docs/M1.md`); lane B on 1,649 rows: B4 916.9, L6a 949.7 s (M1 1676.7). FLAG FF-B: lane B's champion L6a is 32.8 s worse than the B4 baseline on the December forward fold (1,649 rows, reported only, no verdict); rides the lane-B gate surface.
 - T1 target treatment for lane A: RUN 2026-09-06 (`docs/T1.md`, H37): asinh target CV 1744.9 s (the sinh inverse amplifies tail overshoots), MAE loss CV 332.8 s and holdout 375.2 s, -142.5 [-152.0, -133.0] against MC2; LOSE, the squared-error fit on the raw label stays.
 
 Tuning
@@ -129,7 +129,7 @@ Tuning
 - O1 Optuna (section 6): DECLARED 2026-09-05 (protocol section 4): TPE over six axes of MC2's cell, 40 trials or 24 h, trial 0 = MC2's cell, k = trials completed; queued last.
 - SB1 seed bagging: RUN 2026-09-05 (`docs/SB1.md`, H35): five CatBoost seeds of MC2's cell at its recorded rounds, seed spread 0.23 s; the mean 231.7 s, +1.0 [+0.7, +1.3] against MC2, clears zero at k = 1 but not the 2 s floor, TIE, MC2 stays; flagged for the C1 floor decision.
 - E2 blend of MC2 and D1, weight on MC2 chosen on OOF among {0.5, 0.7, 0.9}: RUN 2026-09-05 (`docs/E2.md`, H34): w = 0.9, holdout 232.5 s, +0.2 [+0.1, +0.3] against MC2, under the 2 s floor, TIE, MC2 stays.
-- TW1 traffic window sweep {300, 900, 1,800, 3,600} s. k = 4, about 15 min (feature build plus CV per width). DECLARED 2026-09-05 (protocol section 4, on MC2's cell), queued.
+- TW1 traffic window sweep {300, 900, 1,800, 3,600} s. k = 4; RUN 2026-09-06 on MC2's cell (`docs/TW1.md`, H39, 103.7 min): CV TW300 212.8, TW1800 213.0, TW3600 213.6 vs MC2 212.9 s; TW300 met the holdout and lost, -0.5 [-0.9, -0.1]; the width is inert, MC2's 900 s stays.
 
 Surfaced by the 2026-09-05 critique (`docs/gate-s2.html`)
 
