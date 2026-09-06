@@ -44,3 +44,20 @@ def paired_delta(err_champion, err_challenger, days, reps: int = 2000, seed: int
     d = np.sqrt(sse_a[pick].sum(axis=1) / tot) - np.sqrt(sse_b[pick].sum(axis=1) / tot)
     lo, hi = np.percentile(d, [2.5, 97.5])
     return Verdict(rmse(a), rmse(b), rmse(a) - rmse(b), float(lo), float(hi))
+
+
+def level_ci(err, days, reps: int = 2000, seed: int = 0) -> tuple[float, float, float, float]:
+    """Day-block bootstrap of an RMSE LEVEL (not a paired delta): the point value, its bootstrap SD, and the 2.5-97.5 range.
+
+    Levels are what the board reports, and the composite's level is carried by a handful of extreme rows, so its sampling spread
+    is far wider than any paired verdict on the same rows.
+    """
+    e = np.asarray(err, dtype=float)
+    _, grp = np.unique(np.asarray(days), return_inverse=True)
+    nb = int(grp.max()) + 1
+    n = np.bincount(grp, minlength=nb).astype(float)
+    sse = np.bincount(grp, weights=e * e, minlength=nb)
+    pick = np.random.default_rng(seed).integers(0, nb, size=(reps, nb))
+    r = np.sqrt(sse[pick].sum(axis=1) / n[pick].sum(axis=1))
+    lo, hi = np.percentile(r, [2.5, 97.5])
+    return rmse(e), float(r.std(ddof=1)), float(lo), float(hi)
