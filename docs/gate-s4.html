@@ -65,10 +65,20 @@ submissions a day; five have been spent, four of them on probes.</p>
 so the upload is worth roughly <span class="num">38</span> board seconds. Everything still running is worth 1 to 3 s each,
 and four directions have been closed by measurement rather than by opinion: lane A's 49 columns (F25), the lane-B artifact
 rows that hold two thirds of that lane's error (F21), the arrival-clock channel <code>ARVT_3_flt</code>, the one time column
-the feature builder never read (flat against MC2's residuals on all 339,046 rows), and as of today gradient-boosted trees in
+the feature builder never read (flat against MC2's residuals on all 339,046 rows), gradient-boosted trees in
 lane B (F28, <code>docs/LBX.md</code>: ten specifications, all losing, closest <span class="num">&minus;221.8</span> s
-[&minus;367.1, &minus;101.6], a representation gap rather than a tuning one). The gap to first is about seven percent of one
+[&minus;367.1, &minus;101.6], a representation gap rather than a tuning one), and now TabPFN in lane A in both of its forms
+(F31, <code>docs/M3.md</code> and <code>docs/E1.md</code>: 18.4 h of GPU over 60 fits, M3 loses at all ten airports and the
+best blend of it with MC2 is <span class="num">+0.6</span> s [+0.1, +1.2] against a 2 s floor and a 0.4 s bound at k = 11).
+The gap to first is about seven percent of one
 lane and no closed direction contains it. That is a reason to bank the 38 s now, not a reason to stop looking.</p>
+<p class="note"><strong>The second reason, which is about the measurement and not the score.</strong> Every board reading we
+hold was taken on the S1 model: the S1 row itself and the six probes P1 to P6, all of them the same M1 plus B4 file. Nothing
+promoted since has been scored by the board even once. That is <span class="num">50</span> holdout verdicts, the whole
+lane-A chain to MC2 and the whole lane-B chain to L8c, resting on a holdout-to-board correspondence measured at a single
+model. <code>docs/HB.md</code> priced the two known distortions and both are small, but a correspondence measured at one
+point cannot show a slope. Uploading v15 is the only way to get a second point, and the second point is worth more to every
+verdict that follows than the 38 s is worth to the rank.</p>
 </div>
 
 <h2>1. Corrections to this page, before anything else</h2>
@@ -456,8 +466,11 @@ lane B, so the same rule asks eight times more of one lane than the other.</p>
 
 
 <h2>10. Gate questions</h2>
-<div class="q"><span class="n">1</span>Upload v15 now, or hold until the running queue (M3, E1, O1, TH1, Q1) finishes and a
-possibly better lane A is in the file?</div>
+<div class="q"><span class="n">1</span>Upload v15 now, or hold until the running queue finishes and a
+possibly better lane A is in the file? Two of the five lanes this question named have since returned and both lose: M3 and
+E1 are the TabPFN pair above, closed by F31. What is left running is SB3, LP1, Q1, TH1 and O1, plus L11 in lane B, and the
+largest of them was declared at 1 to 3 s of lane A. None of them changes the file's lane-B half, and none is worth the
+<span class="num">38</span> board seconds the upload itself is worth.</div>
 <div class="q"><span class="n">2</span>The critique's last recommendation is a second file, MC2 plus B4 floored, as the only way
 to price the lane-B chain on the board itself. That spends a second daily slot. Do it? F27 sharpens what it can return: the
 difference of two files that differ only in lane B is exact, so this does settle L8c against B4 on 2026 rows, but neither
