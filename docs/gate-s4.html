@@ -212,6 +212,14 @@ the same 25-row population, so the cell died before it was declared; and both bl
 -0.2 [-2.0, +1.1] and the two-value split at -64.9 [-173.1, +10.0]. The 2026 arrivals carry the artifact 0 times in 344,693 rows.
 The consequence for question (d) below: a board gap of a few tens of seconds is not by itself proof that a better recipe exists.
 Measured in <code>docs/DE.md</code>.</li>
+<li><strong>F22, new and open.</strong> Lane A's tail is variance, not bias, and two model families miss on the same rows. The top 1%
+of lane-A rows hold 36.1% of the lane's squared error and 83.3% of that is under-prediction, which looks like a model that shrinks
+long taxis. Conditioned on the prediction it is calibrated (decile bias -12.5 to +4.1 s); the table conditioned on the truth shows
++110.4 to -275.8 s and is regression to the mean, not shrinkage. The ceiling on any additive recalibration is +0.04 s by predicted
+decile and +0.42 s by airport and runway, so calibration and tail expansion close by arithmetic. MC2 and D1 are different families
+on the same 49 columns: their errors correlate 0.960 in the tail, their worst-1% row sets overlap 78%, their mean is worse than the
+better one, and a row-by-row oracle over the two reaches only 214.3 s. The remaining room is in new information, not model class,
+which raises the queued TH1 and Q1 above O1. Measured in <code>docs/TA.md</code>.</li>
 <li><strong>F13, closed.</strong> Multiplicity across the chain. Now priced in both lanes, lane B at H45 and lane A at H46.</li>
 <li><strong>F9.</strong> Lane B resists the model class. Every lane-B ranking row is an extrapolation on the schedule gap plus
 queue, fitted on 17,097 training rows.</li>
