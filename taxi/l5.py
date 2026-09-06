@@ -22,8 +22,8 @@ Pred = Callable[[pd.DataFrame, pd.DataFrame, Any], np.ndarray]
 Champ = tuple[str, Callable[[pd.DataFrame, pd.DataFrame], np.ndarray]]
 
 
-def is_copy(t: pd.DataFrame) -> np.ndarray:
-    return np.abs(t.y.values - t.z_sched.values) <= COPY
+def is_copy(t: pd.DataFrame, copy_s: float = COPY) -> np.ndarray:
+    return np.abs(t.y.values - t.z_sched.values) <= copy_s
 
 
 def champion(tr: pd.DataFrame, te: pd.DataFrame) -> np.ndarray:

@@ -22,11 +22,12 @@ PLAN = PLAN_CAT + ("dur", "slip", "d_ae", "d_al", "d_es", "aobt_sec", "aobt_m5",
 # Stand, type and operator columns (L3, D2, L5): built from the same file's rows, so the ranking file carries them too.
 STAND = ("notyp", "d_as", "occ", "t_occ", "airline")
 # R1 runway share and H1 holiday flags: outside FEATURES for the same reason as PLAN.
-EXTRA = ("rwy_share", "hol", "hol_prev", "hol_next")
+EXTRA = ("rwy_share", "hol", "hol_prev", "hol_next", "rq", "rec_taxi", "d_rec")
 COUNTRY = dict(ED="DE", EG="GB", EH="NL", LE="ES", LF="FR", LI="IT", LS="CH", LT="TR")
 LABELS = ("y", "c")
 WINDOW = 900.0
 HOUR = 3600.0
+RECENT = 10  # Q1: takeoffs averaged for the recent taxi level, not swept
 
 # Ranking blanks BLOCK_TIME_UTC_mvt and TAXITIME_SEC_mvt on departures, so the view never selects them.
 VIEW = """
@@ -96,6 +97,8 @@ def features(paths: list[str], window: float = WINDOW) -> pd.DataFrame:
         df[name] = col
     df["occ"], df["t_occ"] = _occupancy(df, con.sql(ONBLOCK.format(files=_files(paths))).df())
     df["rwy_share"] = _rwy_share(df)
+    df["rq"], df["rec_taxi"] = _local(df)
+    df["d_rec"] = df.z_aobt.values - df.rec_taxi.values
     df["hol"], df["hol_prev"], df["hol_next"] = _holidays(df)
     df["notyp"] = df.notyp.astype(np.int8)
     for c in CATEGORICAL + PLAN_CAT:
@@ -114,6 +117,25 @@ def _rwy_share(df: pd.DataFrame) -> np.ndarray:
             num = np.searchsorted(s, a[jx], "left") - np.searchsorted(s, a[jx] - HOUR, "left")
             out[ix[jx]] = np.where(den[jx] > 0, num / np.maximum(den[jx], 1), np.nan)
     return out
+
+
+def _local(df: pd.DataFrame, k: int = RECENT) -> tuple[np.ndarray, np.ndarray]:
+    """Q1: rq = same-runway takeoffs in the window before the anchor; rec_taxi = mean plan taxi (z_aobt) of the last k airport takeoffs that left
+    the ground before the anchor. Both are rates read at the anchor, so neither re-encodes the anchor-to-takeoff window (LK1)."""
+    t_off, anc = df.t_off.values, df.t_off.values - df.z_anchor.values
+    rq, rec = np.full(len(df), np.nan), np.full(len(df), np.nan)
+    for apt, ix in df.groupby("apt").indices.items():
+        for jx in df.iloc[ix].groupby("runway").indices.values():
+            s = np.sort(t_off[ix[jx]])
+            a = anc[ix[jx]]
+            rq[ix[jx]] = np.searchsorted(s, a, "left") - np.searchsorted(s, a - WINDOW, "left")
+        f = ix[df.has_fpl.values[ix]]
+        o = np.argsort(t_off[f])
+        s, cs = t_off[f][o], np.concatenate([[0.0], np.cumsum(df.z_aobt.values[f][o])])
+        pos = np.searchsorted(s, anc[ix], "left")
+        lo = np.maximum(pos - k, 0)
+        rec[ix] = np.where(pos - lo >= 3, (cs[pos] - cs[lo]) / np.maximum(pos - lo, 1), np.nan)
+    return rq, rec
 
 
 def _holidays(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, np.ndarray]:

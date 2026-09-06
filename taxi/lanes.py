@@ -76,6 +76,12 @@ LANES: dict[str, tuple[Callable[[], dict[str, Lane]], int, str, bool]] = {
     "TH1": (lambda: {f"TH{v}": Lane(fit_kw=dict(tail=float(v))) for v in (400, 900, 1200)}, 4,
             "Tail split sweep: the |c| threshold that splits MC2's two regressors, at 400, 900 and 1,200 s (MC2 uses 600) on MC2's cell; the "
             "classifier target moves with it. The CV winner meets the holdout only if its CV beats MC2's own CV on the same folds and data.", True),
+    "Q1": (lambda: {"Q1a": Lane(cols=(*COLS_D1, "rq")), "Q1b": Lane(cols=(*COLS_D1, "rec_taxi", "d_rec")),
+                    "Q1c": Lane(cols=(*COLS_D1, "rq", "rec_taxi", "d_rec"))}, 4,
+           "Local congestion on MC2's cell: rq counts the same-runway takeoffs between the anchor and this takeoff (the airport-wide count "
+           "queue already exists); rec_taxi is the mean plan taxi z_aobt of the last 10 airport takeoffs that left the ground before the "
+           "anchor, and d_rec is this flight's own z_aobt minus it. Three cells: the runway queue, the recent level, both. The CV winner "
+           "meets the holdout only if its CV beats MC2's own CV on the same folds and data.", True),
     "H1": (lambda: {"H1": Lane(cols=(*COLS_D1, "hol", "hol_prev", "hol_next"))}, 1,
            "Public holiday in the airport's country on the takeoff day, the day before and the day after (`holidays` 0.103, country from the ICAO "
            "prefix), three flags on MC2's cell.", False),

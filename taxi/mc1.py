@@ -12,7 +12,7 @@ from catboost import CatBoostClassifier, CatBoostRegressor, Pool
 from taxi.champ import COLS_D1, COLS_D2, champion_holdout, lane_a
 from taxi.data import CV_FOLDS, TRAIN_MONTHS
 from taxi.m1 import CAT
-from taxi.m2 import K, is_tail
+from taxi.m2 import K, TAIL, is_tail
 from taxi.verdict import paired_delta, rmse
 from taxi.w1 import COLS_A, verdict_line
 

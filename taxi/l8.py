@@ -8,6 +8,7 @@ import pandas as pd
 from catboost import CatBoostClassifier, Pool
 from sklearn.linear_model import LogisticRegression
 
+from taxi.l3 import COPY
 from taxi.l4 import band
 from taxi.l5 import NB, PSEUDO, Prob, is_copy, judge, shrunk
 from taxi.l6 import CELLS as L6_CELLS, per_row
@@ -35,26 +36,26 @@ def _frame(d: pd.DataFrame) -> pd.DataFrame:
                          "airline": d.airline.astype(str).values})
 
 
-def logistic(t: pd.DataFrame, te: pd.DataFrame) -> np.ndarray:
+def logistic(t: pd.DataFrame, te: pd.DataFrame, copy_s: float = COPY) -> np.ndarray:
     """L8a: logistic regression on the measured separators, no airline."""
-    c = is_copy(t)
+    c = is_copy(t, copy_s)
     if len(np.unique(c)) < 2:
         return np.full(len(te), float(c.mean()))
     return LogisticRegression(C=1.0, max_iter=2000).fit(_design(t), c).predict_proba(_design(te))[:, 1]
 
 
-def logistic_airline(t: pd.DataFrame, te: pd.DataFrame) -> np.ndarray:
+def logistic_airline(t: pd.DataFrame, te: pd.DataFrame, copy_s: float = COPY) -> np.ndarray:
     """L8b: L8a's odds times the odds ratio of L5a's shrunk airline x band table against the pooled rate."""
-    c = is_copy(t)
+    c = is_copy(t, copy_s)
     if len(np.unique(c)) < 2:
         return np.full(len(te), float(c.mean()))
-    o = _odds(logistic(t, te)) * _odds(shrunk(t, te)) / _odds(float(c.mean()))
+    o = _odds(logistic(t, te, copy_s)) * _odds(shrunk(t, te)) / _odds(float(c.mean()))
     return o / (1 + o)
 
 
-def gbm(t: pd.DataFrame, te: pd.DataFrame) -> np.ndarray:
+def gbm(t: pd.DataFrame, te: pd.DataFrame, copy_s: float = COPY) -> np.ndarray:
     """L8c: a shallow CatBoost classifier on the same columns with the airline as a categorical."""
-    c = is_copy(t)
+    c = is_copy(t, copy_s)
     if len(np.unique(c)) < 2:
         return np.full(len(te), float(c.mean()))
     cols = [*GBM_COLS, "airline"]
