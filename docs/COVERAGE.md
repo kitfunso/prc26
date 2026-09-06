@@ -39,7 +39,7 @@ Holdout verdicts, N_h = 23 (`docs/TRIAL-LEDGER.md` section B):
 
 Declared searches (ledger line 35): CAP sweep k = 4 per lane (chose no cap); M1 grid k = 12 lane A (bound 2.8 s), k = 8 lane B (bound 229.4 s); M2 k = 1; W1 k = 1 per lane.
 Diagnostics, never verdicts: forward fold Jan-Nov to Dec for M1 (`docs/M1.md` line 117); per-feature knockout for M1 (`docs/M1-KNOCKOUT.md`).
-Board: S1 325.40 s, rank 11 of 29, leader 277.29 s (protocol row S1). Probes P1, P2 scored; P3-P6 rejected by the 3-per-day cap; single-sided P3s, P5s scheduled for 2026-09-06 00:05 UTC.
+Board: S1 325.40 s, rank 11 of 29, leader 277.29 s (protocol row S1). Probes P1, P2 scored 2026-09-05; P3-P6 rejected by the 3-per-day cap; single-sided P3s, P5s scored 2026-09-06 (374.1726, 401.8766): S1's mean error is -21.6 s in January, +16.4 s in July and later, -196.9 s in lane B; fixing the three means is worth 1.46 s, so the gap to the leader is spread, not level.
 Run 2026-09-05 after this file was first written: M3 TabPFN pilot on LIRF, gain +11.6 s and VRAM 3.8 GB pass, the 30 min time gate fails at 38.1 min, M3 stopped pending Keith (`docs/M3-PILOT.md`; four of five folds seeded from the printed lines of killed runs, RMSE rounded to 0.1 s). W1 weather run in both lanes (`docs/W1.md`, rows H15-H16 above). S2 file built from W1-A plus B4, not uploaded (`docs/gate-s2.html`). Later the same day: D1 and L1 run (rows H17-H18 above), D1 promoted; MC1 run (row H19), a win against W1-A that does not displace D1; MC2 declared.
 
 ## 2. What features
@@ -105,9 +105,9 @@ Each item has a cost and a draft declaration. Keith picks; nothing below runs un
 
 Inputs
 
-- W1 weather: RUN 2026-09-05 (`docs/W1.md`): lane A +2.9 s [+1.8, +3.9] WIN, lane B tie. Next weather step, if any: a join-shift stress (observation latency, +10 min on the as-of join), k = 1, about 40 min. DECLARED 2026-09-05 as WS1 (protocol section 4), queued.
+- W1 weather: RUN 2026-09-05 (`docs/W1.md`): lane A +2.9 s [+1.8, +3.9] WIN, lane B tie. Next weather step, if any: a join-shift stress (observation latency, +10 min on the as-of join), k = 1, about 40 min. RUN 2026-09-05 as WS1 (protocol section 4, `docs/WS1.md`, H36): MC2's cell at its recorded rounds on weather joined at anchor minus 600 s lands at 233.2 s, -0.5 [-0.9, -0.0]; a 10 min observation latency costs 0.5 s, the join is not fragile, MC2 stays.
 - F1 unused plan columns: RUN as D1 2026-09-05 (`docs/D1.md`): +11.6 s [+9.2, +14.0] WIN, D1 promoted; the gain sits in the AOBT_3 minus EOBT_1 and AOBT_3 minus LOBT gaps, operator and destination; the rounding and second-of-minute flags carry nothing.
-- G1 stand x runway target encoding: fold-internal median of c per airport, stand, runway as one numeric column. k = 1, about 5 min. DECLARED 2026-09-05 (protocol section 4: at least 20 rows, (airport, stand) fallback, the fit rows encoded out-of-month), queued.
+- G1 stand x runway target encoding: RUN 2026-09-06 (`docs/G1.md`, H38): fold-internal median of c per (airport, stand, runway) as one numeric column on MC2's cell; CV 212.5 against 212.9, holdout +0.2 [-0.2, +0.6], TIE, MC2 stays.
 - D2 lane-A columns (declared 2026-09-05 after H23, protocol section 4): MC2 plus d_as (AOBT_3 minus schedule), occ and t_occ (stand occupancy), k = 1, about 40 min GPU. RUN 2026-09-05 (`docs/D2.md`): 231.9 s vs MC2 232.9, +1.0 [+0.5, +1.5], under the 2 s floor, TIE, MC2 stays (H28).
 
 Mechanisms
@@ -122,13 +122,13 @@ Mechanisms
 - R1 runway-configuration proxy (`rwy_share`, the runway's share of the airport's takeoffs in the hour before the anchor) on MC2's cell: k = 1; DECLARED 2026-09-05 (protocol section 4), queued.
 - H1 public-holiday flags (`hol`, `hol_prev`, `hol_next`, `holidays` 0.103 by ICAO prefix) on MC2's cell: k = 1; DECLARED 2026-09-05 (protocol section 4), queued.
 - FF forward fold (train Jan-Nov, predict Dec) for M2, W1-A, D1, MC1, MC2: reported, never decides; queued 2026-09-05, `docs/FORWARD.md`.
-- T1 target treatment for lane A: asinh(c) and a median-loss fit vs l2. k = 2, about 5 min. DECLARED 2026-09-05 (protocol section 4, on MC2's cell), queued.
+- T1 target treatment for lane A: RUN 2026-09-06 (`docs/T1.md`, H37): asinh target CV 1744.9 s (the sinh inverse amplifies tail overshoots), MAE loss CV 332.8 s and holdout 375.2 s, -142.5 [-152.0, -133.0] against MC2; LOSE, the squared-error fit on the raw label stays.
 
 Tuning
 
 - O1 Optuna (section 6): DECLARED 2026-09-05 (protocol section 4): TPE over six axes of MC2's cell, 40 trials or 24 h, trial 0 = MC2's cell, k = trials completed; queued last.
-- SB1 seed bagging: DECLARED 2026-09-05 (protocol section 4) as five CatBoost seeds of MC2's cell at its recorded rounds, seed 0 = the cached MC2 refit; k = 1, about 30 min GPU. The earlier draft (learning rate 0.05, 15 min) was written for LightGBM timing and is withdrawn.
-- E2 blend of MC2 and D1 (cached holdout predictions), weight on MC2 in {0.5, 0.7, 0.9}: DECLARED 2026-09-05 (protocol section 4), k = 3, seconds.
+- SB1 seed bagging: RUN 2026-09-05 (`docs/SB1.md`, H35): five CatBoost seeds of MC2's cell at its recorded rounds, seed spread 0.23 s; the mean 231.7 s, +1.0 [+0.7, +1.3] against MC2, clears zero at k = 1 but not the 2 s floor, TIE, MC2 stays; flagged for the C1 floor decision.
+- E2 blend of MC2 and D1, weight on MC2 chosen on OOF among {0.5, 0.7, 0.9}: RUN 2026-09-05 (`docs/E2.md`, H34): w = 0.9, holdout 232.5 s, +0.2 [+0.1, +0.3] against MC2, under the 2 s floor, TIE, MC2 stays.
 - TW1 traffic window sweep {300, 900, 1,800, 3,600} s. k = 4, about 15 min (feature build plus CV per width). DECLARED 2026-09-05 (protocol section 4, on MC2's cell), queued.
 
 Surfaced by the 2026-09-05 critique (`docs/gate-s2.html`)
