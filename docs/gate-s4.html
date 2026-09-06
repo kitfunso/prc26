@@ -203,6 +203,15 @@ against us. The lane split transfers (1.534% against 1.560%) but lane B moved fr
 that grew are the ones the champion handles worst. The honest size, after the two LFPG rows F17 names are dropped, is +13 to +39 s
 of lane-B RMSE and about +1 to +3 s of composite, which makes both board anchors in section 3 slightly optimistic. It corrects a
 projection; it licenses no change to a model. Measured in <code>docs/MIX.md</code>.</li>
+<li><strong>F21, new and closed on arrival.</strong> The largest single gain in the campaign is a recording artifact and nothing
+reaches it. A lane-B taxi time within an hour of a full day is a block time written one day early, so the truth is 86,400 s plus an
+ordinary taxi. Six such holdout rows exist; predicting them is worth +510.7 s of lane B, about 45 s of composite, which is more
+than our whole gap to the leader. It closes three ways: +399.2 s of that sits on one LFPG row with an ordinary 1,740 s schedule and
+no mark on it; the five marked rows share their mark (a schedule past 40,000 s) with 12 ordinary flights and 8 schedule copies in
+the same 25-row population, so the cell died before it was declared; and both blind answers lose, a uniform shift at
+-0.2 [-2.0, +1.1] and the two-value split at -64.9 [-173.1, +10.0]. The 2026 arrivals carry the artifact 0 times in 344,693 rows.
+The consequence for question (d) below: a board gap of a few tens of seconds is not by itself proof that a better recipe exists.
+Measured in <code>docs/DE.md</code>.</li>
 <li><strong>F13, closed.</strong> Multiplicity across the chain. Now priced in both lanes, lane B at H45 and lane A at H46.</li>
 <li><strong>F9.</strong> Lane B resists the model class. Every lane-B ranking row is an extrapolation on the schedule gap plus
 queue, fitted on 17,097 training rows.</li>
