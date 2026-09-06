@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import xgboost as xgb
 
+from taxi.bf import best_blend
 from taxi.champ import COLS_D1, lane_a
 from taxi.data import CV_FOLDS, TRAIN_MONTHS
 from taxi.l2 import floored
@@ -96,11 +97,9 @@ def main() -> None:
     bag = floored(0.5 * sb3 + 0.5 * x1)
     e0, e1, ex = sb3 - y, bag - y, x1 - y
     v = paired_delta(e0, e1, tea.day.values)
-    rho = float(np.corrcoef(e0, ex)[0, 1])
-    r0, rx = rmse(e0), rmse(ex)
     # The bar the declaration priced: the best any weight could do on these two, with the weight read off the holdout itself.
-    w = (rx ** 2 - rho * r0 * rx) / (r0 ** 2 + rx ** 2 - 2 * rho * r0 * rx)
-    orc = float(np.sqrt(w ** 2 * r0 ** 2 + (1 - w) ** 2 * rx ** 2 + 2 * w * (1 - w) * rho * r0 * rx))
+    w, orc, rho = best_blend(e0, ex)
+    r0, rx = rmse(e0), rmse(ex)
     vt, jan, jul = is_tail(tea), tea.month.values == 1, tea.month.values == 7
     row = lambda n, e: f"| {n} | {rmse(e):.2f} | {rmse(e[jan]):.1f} | {rmse(e[jul]):.1f} | {rmse(e[vt]):.1f} | {rmse(e[~vt]):.1f} |"  # noqa: E731
     cell = {k: v for k, v in CELL.items() if k not in ("device", "tree_method", "enable_categorical")}
@@ -113,7 +112,7 @@ def main() -> None:
            "| model | RMSE | Jan | Jul | tail rows | body rows |", "|---|---|---|---|---|---|",
            row("SB3 (champion)", e0), row("X1 alone (diagnostic)", ex), row("SB3 + X1 equal bag (challenger)", e1), "",
            "## The bar the declaration priced", "",
-           f"X1's holdout error correlates {rho:.4f} with SB3's, at {rx:.2f} s against SB3's {r0:.2f} s. The best weight on these two, "
+           f"X1's holdout error agrees {rho:.4f} with SB3's (uncentred correlation, `taxi.bf.agreement`), at {rx:.2f} s against SB3's {r0:.2f} s. The best weight on these two, "
            f"read off the holdout itself and so unavailable in practice, is {w:.3f} and reaches {orc:.2f} s, a gain of {r0 - orc:+.2f} s. "
            f"LightGBM's measured point on the same axis was 0.9589 at 241.35 s for +0.07 s.", "",
            verdict_line("SB3 + X1 bag", "SB3", v, k=K)]
