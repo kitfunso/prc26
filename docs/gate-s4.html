@@ -160,10 +160,18 @@ and F17 is restated so it cannot excuse a board regression.</p>
 </table></div>
 
 <h2>6. Trial ledger</h2>
-<p>N_h = 45 holdout verdict lanes have run this campaign, plus one board model and four scored probes. Each lane priced its own cell
-count k. Since today the lane-B chain also carries a bound of its own (H45, k = 25 for every lane-B cell declared since B4), which it
-clears at 157.5 against 90.3. <strong>Lane A has no equivalent chain verdict.</strong> Its four promotions total about +27 s against
-per-step standard errors near 0.2 s, so the arithmetic is not close, but the single contrast M1 against MC2 has not been run.</p>
+<p>N_h = 46 holdout verdict lanes have run this campaign, plus one board model and four scored probes. Each lane priced its own cell
+count k. Both chains now carry a bound of their own. Lane B (H45, k = 25 for every lane-B cell declared since B4) clears at 157.5
+against 90.3. Lane A (H46, k = 39) clears at 102.0 against 37.9: B4 floored 334.2 to MC2 floored 232.2, interval +75.7 to +144.8.
+The gap this page reported as missing is closed.</p>
+<p>The lane-A run added two things nobody asked it for. First, its drop-k table runs the OPPOSITE way from lane B's. Removing the rows
+MC2 misses worst shrinks its lead over D1 from +9.2 s to +3.9 s [+3.1, +4.6] at 3,390 rows dropped, the top 1% that holds 40.8% of the
+lane's squared error. So 58% of that promotion is the tail. It stays above the floor with the interval clear of zero at every drop,
+but lane B's step grew under the same test and lane A's does not. Second, B4's own lane-A baseline moved under the A1 anchor guard:
+306.8 s floored on the pre-A1 anchors against 334.2 s on today's, paired -27.4 [-71.8, -2.4]. A1 was verdicted against the champions
+and never against B4. The chain clears either way, +74.7 s against the old baseline and +102.0 against the refit one, but every
+lane-A improvement quoted against B4 on post-A1 data is about 27 s larger than the same improvement on the anchors B4 was measured
+on. That is new flag F19.</p>
 
 <h2>7. Caution flags, all of them</h2>
 <ul>
@@ -176,7 +184,13 @@ eighth of one and gates almost nothing. Since MC2, lane A has promoted nothing i
 one thing only: our own board score is a high-variance draw from the row sets we might have faced. It licenses nothing about a
 difference measured on the fixed set, so a negative board move between two of our own files is a real regression and the REVIEW
 tripwire still fires on it.</li>
-<li><strong>F13.</strong> Multiplicity across the chain. Now priced in lane B (H45); unpriced in lane A.</li>
+<li><strong>F19, new and open.</strong> The lane-A baseline moved 27.4 s under the A1 anchor guard and no earlier report says
+so. A1 was re-verdicted against the champions only (H29 to H32, all ties). Refit on the restored pre-A1 anchor columns, B4 scores
+306.8 s floored against 334.2 s today, on 97 changed anchor values and 4,437 changed pushback anchors out of 339,046 rows. The guard
+stays, because F11 says an anchor after takeoff cannot be known at prediction time. The reporting consequence is that the ledger's
+B4 lane-A figure of 311.2 belongs to neither fit, and lane-A gains quoted against B4 on today's data carry about 27 s of baseline
+shift inside them. CA1 quotes both.</li>
+<li><strong>F13, closed.</strong> Multiplicity across the chain. Now priced in both lanes, lane B at H45 and lane A at H46.</li>
 <li><strong>F9.</strong> Lane B resists the model class. Every lane-B ranking row is an extrapolation on the schedule gap plus
 queue, fitted on 17,097 training rows.</li>
 <li><strong>F4, sharpened.</strong> Lane B's target is close to a data artifact. Its copy rate moved from 0.718 in Nov-Apr to 0.474

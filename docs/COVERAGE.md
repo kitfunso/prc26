@@ -21,7 +21,7 @@ the W1 run (ledger H15, H16) and the Stage 5.7 critique (`docs/gate-s2.html`).
 
 ## 1. What have you tried
 
-Holdout verdicts, N_h = 23 (`docs/TRIAL-LEDGER.md` section B):
+Holdout verdicts, N_h = 46 (`docs/TRIAL-LEDGER.md` section B):
 
 | Rows | Lane | What | Outcome |
 |---|---|---|---|
@@ -36,6 +36,26 @@ Holdout verdicts, N_h = 23 (`docs/TRIAL-LEDGER.md` section B):
 | H21 | A | C1: MC2's predictions clipped at 0 s | tie: positive interval but under the 2 s floor, +0.498 s [+0.186, +0.909]; the label is negative on 30 lane-A holdout rows |
 | H22 | B | C1: B4's predictions clipped at 0 s | WIN (both ends clear the 2 s floor), 1965.6 s, +108.5 s [+4.9, +291.9]; floor adopted; the lane-B gain is B4's per-airport OLS at LIRF extrapolating: intercept -2,021 s and slope 1.23 on z_sched (1,091 training rows), so two July rows with the movement 6 to 7 h before schedule (z_sched -26,577 and -21,599 s) are predicted at -34,678 and -28,561 s against truths of 1,387 and 1,682 s; the 17 negative rows carry 11.5% of the lane's squared error |
 | H23 | B | L2: CV winner of two bounded B4 cells (cap, Huber), floored, k = 2 | LOSE, 1992.1 s, -26.5 s [-42.9, -15.3]; CV picked L2b (Huber; five-fold CV, every cell floored: B4 1544.9, L2a 1578.2, L2b 1552.3 s); holdout L2b floored 1992.1 s against B4 floored 1965.6 s, -26.5 s [-42.9, -15.3], paired SE 7.0 s, k = 2 optimism bound 4.0 s; LOSE, B4 with the floor stays lane-B champion |
+| H24 | B | L3: CV winner of three cells (regime mixture, B4 plus no-type and stand-occupancy columns, LightGBM on y minus z_sched), k = 3 | tie, 1964.8 s, +0.8 [-30.6, +32.6]; B4 stays |
+| H25 | B | L4: CV winner of two per-band cells on LIRF's no-type rows, k = 2 | WIN, 1939.7 s, +26.0 [+4.0, +54.3]; L4b promoted |
+| H26 | B | L5: P(copy) mixture from a shrunk airline x band table or a logistic, k = 2 | LOSE, 2209.5 s, -269.8 [-548.2, -21.7]; L4b stays |
+| H27 | B | L6: L5a's mixture gated to bands with 20 or more non-copy rows, k = 2 | WIN, 1861.8 s, +77.9 [+43.0, +135.5]; L6a promoted |
+| H28 | A | D2: MC2's cell plus d_as, occ, t_occ, k = 1 | tie under the floor, 231.9 s, +1.0 [+0.5, +1.5]; MC2 stays |
+| H29-H32 | A, B | A1 anchor guard: every champion refit on the fixed anchors | all four tie (W1-A -0.17, D1 -0.19, MC2 +0.15, L6a +0.0); champions stay. B4 was never re-verdicted, which is flag F19 |
+| H33 | B | L6T: CV winner of four non-copy thresholds in L6a's gate, k = 4 | tie, identical on every holdout row; the threshold is inert |
+| H34 | A | E2: weighted blend of MC2 and D1, weight from OOF, k = 3 | tie under the floor, +0.2 [+0.1, +0.3]; the OOF picks w = 0.9 |
+| H35 | A | SB1: mean of five CatBoost seeds of MC2's cell, k = 1 | tie under the floor, +1.0 [+0.7, +1.3]; seed spread 0.23 s |
+| H36 | A | WS1: weather joined at anchor minus 600 s (latency stress), k = 1 | lose, -0.5 [-0.9, -0.0]; the join is not fragile |
+| H37 | A | T1: MAE loss and median, or an asinh target, k = 2 | LOSE, 375.2 s, -142.5 [-152.0, -133.0]; the squared-error fit on the raw label stays |
+| H38 | A | G1: fold-internal median target encoding of airport, stand, runway, k = 1 | tie, +0.2 [-0.2, +0.6]; it repeats the categoricals |
+| H39 | A | TW1: the six traffic counts rebuilt at 300, 1,800 and 3,600 s, k = 4 | lose, -0.5 [-0.9, -0.1]; window width inert |
+| H40 | A | R1: rwy_share, the runway's share of the hour's takeoffs, k = 1 | tie, +0.3 [-0.2, +0.8] |
+| H41 | A | H1: public holiday on the day, the day before, the day after, k = 1 | tie, -0.3 [-0.7, +0.2] |
+| H42 | B | L7: a seasonal P(copy) at LIRF (winter 0.718 vs summer 0.474, z = 7.9), k = 3 | tie, +13.2 [-0.2, +29.7]; the rate difference is better established than this holdout can show, so it went to the accrual list |
+| H43 | B | L8: CV winner of three learned copy probabilities on L6a's gate, k = 4 | WIN, 1808.2 s, +53.6 [+29.9, +95.0]; L8c promoted lane-B champion |
+| H44 | B | L9: the copy-band threshold swept at 300, 900, 1,200 s against 600, k = 4 | tie, +0.6 [-2.3, +3.7]; the regime definition is inert across a four-fold range |
+| H45 | B | CB1: the whole lane-B chain B4 to L8c in one verdict, chain priced at k = 25 | WIN, +157.5 [+88.4, +268.5] against a 90.3 s bound; the L8c step's lead GROWS as the worst rows leave |
+| H46 | A | CA1: the whole lane-A chain B4 to MC2 in one verdict, chain priced at k = 39 | WIN, +102.0 [+75.7, +144.8] against a 37.9 s bound; the MC2 step's lead SHRINKS 58% as the top 1% of rows leave, and B4's own baseline moved 27.4 s under A1 (flag F19) |
 
 Declared searches (ledger line 35): CAP sweep k = 4 per lane (chose no cap); M1 grid k = 12 lane A (bound 2.8 s), k = 8 lane B (bound 229.4 s); M2 k = 1; W1 k = 1 per lane.
 Diagnostics, never verdicts: forward fold Jan-Nov to Dec for M1 (`docs/M1.md` line 117); per-feature knockout for M1 (`docs/M1-KNOCKOUT.md`).
@@ -126,6 +146,7 @@ Mechanisms
 - R1 runway-configuration proxy (`rwy_share`, the runway's share of the airport's takeoffs in the hour before the anchor) on MC2's cell: k = 1; RUN 2026-09-06 (`docs/R1.md`, H40, 41 min): CV 212.3 vs MC2 212.9 s, holdout +0.3 [-0.2, +0.8], TIE, MC2 stays.
 - H1 public-holiday flags (`hol`, `hol_prev`, `hol_next`, `holidays` 0.103 by ICAO prefix) on MC2's cell: k = 1; RUN 2026-09-06 (`docs/H1.md`, H41, 38 min): CV 212.6 vs MC2 212.9 s, holdout -0.3 [-0.7, +0.2], TIE, MC2 stays.
 - CB1 the lane-B chain in one verdict and the L8c step's drop-k table: RUN 2026-09-06 (`docs/CB1.md`, `python -m taxi.cb1`, ledger H45), declared in protocol section 4 before the run. B4 floored 1965.6 to L8c floored 1808.2: +157.5 [+88.4, +268.5] against a bound of 90.3 s that prices every lane-B cell declared since B4 at once (k = 25). The L8c step's lead grows as the champion's worst rows leave (+53.6 at 0 dropped to +106.0 at 20), so it is not a level artifact. Closes Stage 5.7 critique findings 1 and 4.
+- CA1 the lane-A chain in one verdict, the MC2 step's drop-k table and the A1 baseline: RUN 2026-09-06 (`docs/CA1.md`, `python -m taxi.ca1`, ledger H46), declared in protocol section 4 before the run. B4 floored 334.2 to MC2 floored 232.2: +102.0 [+75.7, +144.8] against a bound of 37.9 s that prices every lane-A cell declared since B4 at once (k = 39). Drop-k runs the opposite way from lane B: the MC2 step's lead over D1 falls from +9.2 to +3.9 [+3.1, +4.6] when the top 1% of rows leave, so 58% of that step is the tail, though it stays above the floor with the interval clear of zero. Section 3 measured B4 on the pre-A1 anchors, 306.8 s against 334.2 s today, paired -27.4 [-71.8, -2.4]; that is new flag F19. Closes the lane-A half of Stage 5.7 critique findings 1 and 4.
 - FF forward fold (train Jan-Nov, predict Dec) for M2, W1-A, D1, MC1, MC2: reported, never decides; RUN 2026-09-06 (`docs/FORWARD.md`): Dec 2025 RMSE on 164,028 lane-A rows: M2 220.5, W1-A 217.6, D1 212.1, MC1 213.5, MC2 204.3 s (M1 223.2, B4 271.8 from `docs/M1.md`); lane B re-run 2026-09-06 over the whole chain on 1,649 rows: B4 916.9, L4b 1002.1, L6a 949.7, L8c 906.0 s (M1 1676.7). FLAG FF-B is RETIRED: it recorded that L6a is 32.8 s worse than the B4 baseline out of sample, which is still true, but the current champion L8c beats that baseline by 10.9 s and is the only lane-B champion that does. The lane-B list was read from `CURRENT["B"]`, so the file went stale on every promotion after a run; `taxi.fwd` now names the chain and takes a lane argument (`python -m taxi.fwd B`).
 - T1 target treatment for lane A: RUN 2026-09-06 (`docs/T1.md`, H37): asinh target CV 1744.9 s (the sinh inverse amplifies tail overshoots), MAE loss CV 332.8 s and holdout 375.2 s, -142.5 [-152.0, -133.0] against MC2; LOSE, the squared-error fit on the raw label stays.
 

@@ -41,7 +41,11 @@ def fit_predict(fit: pd.DataFrame, va: pd.DataFrame) -> tuple[np.ndarray, float,
     reg = TabPFNRegressor(device="cuda", categorical_features_indices=cats, random_state=0)
     reg.fit(x_fit, sub.c.values)
     p = np.concatenate([np.asarray(reg.predict(x_va[i:i + CHUNK])) for i in range(0, len(x_va), CHUNK)]) + va.z_aobt.values
-    return p, time.time() - t0, torch.cuda.max_memory_allocated() / 1e9
+    dt, vram = time.time() - t0, torch.cuda.max_memory_allocated() / 1e9
+    # Held across fits, the allocator's reserve grows until WDDM spills it to system memory: 800 s a fold became 8,000 s at fit 16.
+    del reg
+    torch.cuda.empty_cache()
+    return p, dt, vram
 
 
 def cached(path: str, ids: np.ndarray, make) -> pd.DataFrame:
