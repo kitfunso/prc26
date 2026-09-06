@@ -21,7 +21,7 @@ the W1 run (ledger H15, H16) and the Stage 5.7 critique (`docs/gate-s2.html`).
 
 ## 1. What have you tried
 
-Holdout verdicts, N_h = 50 (`docs/TRIAL-LEDGER.md` section B):
+Holdout verdicts, N_h = 51 (`docs/TRIAL-LEDGER.md` section B):
 
 | Rows | Lane | What | Outcome |
 |---|---|---|---|
@@ -59,6 +59,8 @@ Holdout verdicts, N_h = 50 (`docs/TRIAL-LEDGER.md` section B):
 | H47 | A | ST1: row-dependent blend of MC2 and D1, three cells, OOF winner only, k = 3 | TIE, +0.6 [+0.5, +0.8]; ST1a learned weight on MC2 of 1.0 on tail rows and 0.7 on body rows, and the meta-learner came 3.3 s worse out of fold |
 | H48 | A | SB2: SB1's seed bag, ST1a's fixed gate and the C1 floor composed, no free parameter, k = 1 | TIE by the rule, +1.3 [+1.0, +1.7]; the first result the floor parks with no search to price, flag F18 |
 | H49 | B | L10: LightGBM on the residual label y minus z_sched, LP1's 24 columns, M1's cell inherited, k = 1 | LOSE, -757.5 [-1273.4, -343.3]; loses on all five folds and worst where the champion is best |
+| H50 | A | E1: blend of MC2 and M3 (TabPFN per airport, all ten), weight chosen on OOF over an 11-point grid, k = 11 | TIE or LOSE, +0.6 [+0.1, +1.2] against a 0.4 s bound; M3 alone is 264.9 against MC2's 232.7 and loses at all ten airports (F31)
+| H51 | B | L11: the L6a copy mixture with L8c's classifier extended to the nine airports `taxi.l4.touched` excludes, k = 1 | LOSE, -5.7 [-16.3, +1.3]; LTFM alone loses 150.6 s while six of the other eight improve; LIRF bit-identical as declared (F34)
 
 Declared searches (ledger line 35): CAP sweep k = 4 per lane (chose no cap); M1 grid k = 12 lane A (bound 2.8 s), k = 8 lane B (bound 229.4 s); M2 k = 1; W1 k = 1 per lane.
 Diagnostics, never verdicts: forward fold Jan-Nov to Dec for M1 (`docs/M1.md` line 117); per-feature knockout for M1 (`docs/M1-KNOCKOUT.md`).

@@ -12,6 +12,8 @@ from taxi.l5 import NB, PSEUDO, Prob, champion, is_copy, judge, shrunk
 
 MIN_NONCOPY = MIN_BAND  # inherited from L4's band minimum, not tuned: LIRF's non-copy counts gate the same bands for any threshold in 12..35
 Fit = Callable[[np.ndarray, np.ndarray, np.ndarray], np.ndarray]
+Mask = Callable[[pd.DataFrame, pd.DataFrame], np.ndarray]  # L11 widens the gate; the default keeps L4's touched set
+Rows = Callable[[pd.DataFrame, object], pd.DataFrame]
 
 
 def _mean(z_tr: np.ndarray, y_tr: np.ndarray, z_te: np.ndarray) -> np.ndarray:
@@ -23,12 +25,17 @@ def _line(z_tr: np.ndarray, y_tr: np.ndarray, z_te: np.ndarray) -> np.ndarray:
     return a + s * z_te
 
 
+def _notyp_rows(tr: pd.DataFrame, apt: object) -> pd.DataFrame:
+    return tr[(tr.apt == apt) & (tr.notyp == 1)].reset_index(drop=True)
+
+
 def per_row(tr: pd.DataFrame, te: pd.DataFrame, fit: Fit, min_noncopy: int = MIN_NONCOPY, prob: Prob = shrunk,
-            copy_s: float = COPY) -> np.ndarray:
+            copy_s: float = COPY, mask: Mask | None = None, fit_rows: Rows = _notyp_rows) -> np.ndarray:
     """L4b everywhere; a touched row whose band has min_noncopy non-copy training rows gets P(copy) x z_sched + (1 - P(copy)) x fit(non-copy rows)."""
-    out, m = champion(tr, te), touched(tr, te)
+    out = champion(tr, te)
+    m = touched(tr, te) if mask is None else mask(tr, te)
     for apt in np.unique(te.apt.values[m]):
-        t = tr[(tr.apt == apt) & (tr.notyp == 1)].reset_index(drop=True)
+        t = fit_rows(tr, apt)
         ix = np.flatnonzero(m & (te.apt.values == apt))
         sub, c, tb = te.iloc[ix], is_copy(t, copy_s), band(t.z_sched.values)
         z, zb, p = sub.z_sched.values, band(sub.z_sched.values), prob(t, sub)
