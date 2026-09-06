@@ -383,13 +383,41 @@ floor is unchanged in substance. Both stale protocol lines now carry the current
 </table></div>
 
 
+<h2>9b. Every parked tie, priced in the unit the board scores</h2>
+<p>Added 2026-09-06 (<code>docs/LEV.md</code>, <code>python -m taxi.lev</code>). Every verdict on this page is measured in
+lane RMSE and judged against a 2 s floor in the same unit. The board scores one composite. The two are not the same
+second: one second of lane A is <span class="num">0.708</span> s of composite, one second of lane B is
+<span class="num">0.087</span> s, so a lane-A second is worth <span class="num">8.1</span> lane-B seconds. Shares of
+squared error are near-equal (lane A 51.0%, lane B 49.0%), so a percentage gain pays about the same either side, but
+lane B's half is mostly the two day-shift rows F21 prices at zero: deleting them alone takes the composite from
+322.58 to <span class="num">272.99</span>.</p>
+<div class="wrap"><table>
+<tr><th>ledger</th><th>lane</th><th>cell</th><th>lane effect</th><th>interval</th><th>composite</th><th>counted</th></tr>
+<tr><td class="id">H48</td><td>A</td><td>SB2, SB1 then ST1a then the C1 floor</td><td class="num">+1.3 s</td><td class="num">[+1.0, +1.7]</td><td class="num win">+0.92 s</td><td>yes</td></tr>
+<tr><td class="id">H35</td><td>A</td><td>SB1, the five-seed bag</td><td class="num">+1.0 s</td><td class="num">[+0.7, +1.3]</td><td class="num">+0.71 s</td><td>inside H48</td></tr>
+<tr><td class="id">H47</td><td>A</td><td>ST1a, the row-dependent MC2/D1 gate</td><td class="num">+0.6 s</td><td class="num">[+0.5, +0.8]</td><td class="num">+0.42 s</td><td>inside H48</td></tr>
+<tr><td class="id">H34</td><td>A</td><td>E2, the fixed-weight MC2/D1 blend</td><td class="num">+0.2 s</td><td class="num">[+0.1, +0.3]</td><td class="num">+0.14 s</td><td>overlaps ST1a's blend</td></tr>
+<tr><td class="id">H38</td><td>A</td><td>G1, target encoding of airport/stand/runway</td><td class="num">+0.2 s</td><td class="num">[-0.2, +0.6]</td><td class="num">+0.14 s</td><td class="lose">interval crosses zero</td></tr>
+<tr><td class="id">H15</td><td>B</td><td>W1-B, the five weather columns</td><td class="num">+9.9 s</td><td class="num">[-2.7, +22.6]</td><td class="num">+0.86 s</td><td class="lose">interval crosses zero</td></tr>
+<tr><td class="id">H17</td><td>B</td><td>L1a</td><td class="num">+2.1 s</td><td class="num">[-0.2, +5.3]</td><td class="num">+0.18 s</td><td class="lose">interval crosses zero</td></tr>
+<tr><td class="id">H7</td><td>A</td><td>B3a</td><td class="num">+19.5 s</td><td class="num">[-17.9, +73.7]</td><td class="num">+13.52 s</td><td class="lose">interval crosses zero</td></tr>
+<tr><td class="id">H10</td><td>A</td><td>B3d</td><td class="num">+33.0 s</td><td class="num">[-2.5, +86.3]</td><td class="num">+22.50 s</td><td class="lose">interval crosses zero</td></tr>
+</table></div>
+<p class="note">The whole parked inventory is worth <span class="num">+0.92</span> s of composite, and it is SB2 alone.
+SB1 and ST1a are not separate gains, SB2 IS their composition. Five intervals cross zero. E2 reaches for the same D1
+information ST1a already uses inside SB2. Against a projected residual gap of 5.4 to 10.1 s, releasing every parked tie
+closes under a fifth of the smaller anchor's gap. In composite seconds the 2 s floor is 1.41 s on lane A and 0.175 s on
+lane B, so the same rule asks eight times more of one lane than the other.</p>
+
+
 <h2>10. Gate questions</h2>
 <div class="q"><span class="n">1</span>Upload v15 now, or hold until the running queue (M3, E1, O1, TH1, Q1) finishes and a
 possibly better lane A is in the file?</div>
 <div class="q"><span class="n">2</span>The critique's last recommendation is a second file, MC2 plus B4 floored, as the only way
 to price the lane-B chain on the board itself. That spends a second daily slot. Do it?</div>
 <div class="q"><span class="n">3</span>F18: change the floor to twice the paired standard error where that exceeds 2 s, leave it
-flat, or something else? Changing it re-opens four lane-A challengers and tightens lane B.</div>
+flat, or something else? Section 9b prices what it releases: <span class="num">+0.92</span> s of composite, SB2 alone, one line in
+<code>taxi/s2.py</code>. Everything else parked either sits inside SB2 or crosses zero.</div>
 <div class="q"><span class="n">4</span>Given that 55% of the gain sits in 1.56% of the rows, is the board score still the right
 thing to optimise, or should the remaining time go to the 65.7% of squared error under 3,000 s?</div>
 <div class="q"><span class="n">5</span>Attack the rule in section 8. What does it let through that it should not?</div>
