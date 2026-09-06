@@ -60,6 +60,15 @@ have been run, and it rides this page in full.</p>
 <p class="note">Nothing is uploaded without an explicit yes. The file is built, floored and hashed
 (sha256 <code>639fa7564a105a84995ffb5eee0da99ffa3791406b8cefba6d9e2d53caa68af0</code>, 344,841 rows). The scorer allows three
 submissions a day; five have been spent, four of them on probes.</p>
+<p class="note"><strong>Why this is now the only large move on the table.</strong> The board still shows S1 at
+<span class="num">325.3982</span> and nothing has gone up since. Section 3b puts v15 at about <span class="num">287</span>,
+so the upload is worth roughly <span class="num">38</span> board seconds. Everything still running is worth 1 to 3 s each,
+and four directions have been closed by measurement rather than by opinion: lane A's 49 columns (F25), the lane-B artifact
+rows that hold two thirds of that lane's error (F21), the arrival-clock channel <code>ARVT_3_flt</code>, the one time column
+the feature builder never read (flat against MC2's residuals on all 339,046 rows), and as of today gradient-boosted trees in
+lane B (F28, <code>docs/LBX.md</code>: ten specifications, all losing, closest <span class="num">&minus;221.8</span> s
+[&minus;367.1, &minus;101.6], a representation gap rather than a tuning one). The gap to first is about seven percent of one
+lane and no closed direction contains it. That is a reason to bank the 38 s now, not a reason to stop looking.</p>
 </div>
 
 <h2>1. Corrections to this page, before anything else</h2>
