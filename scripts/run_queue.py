@@ -9,20 +9,26 @@ import sys
 import time
 
 QUEUE = "data/queue"
-JOBS = [("oof", ["-m", "taxi.champ", "oof", "MC2", "D1"]), ("e2", ["-m", "taxi.e2"]), ("sb1", ["-m", "taxi.sb1"]),
-        ("ws1", ["-m", "taxi.lanes", "WS1"]), ("t1", ["-m", "taxi.lanes", "T1"]), ("g1", ["-m", "taxi.lanes", "G1"]),
-        ("tw1", ["-m", "taxi.lanes", "TW1"]), ("r1", ["-m", "taxi.lanes", "R1"]), ("h1", ["-m", "taxi.lanes", "H1"]),
-        ("ff", ["-m", "taxi.fwd"]), ("m3", ["-m", "taxi.m3"]), ("e1", ["-m", "taxi.e1"]), ("lp1", ["-m", "taxi.lp1"]), ("o1", ["-m", "taxi.o1"]),
-        ("th1", ["-m", "taxi.lanes", "TH1"]),
-    ("q1", ["-m", "taxi.lanes", "Q1"])]
+JOBS_FILE = "scripts/queue-jobs.json"
+
+
+def pending(only: list[str]) -> tuple[str, list[str]] | None:
+    """Re-read every iteration, so a job appended while the queue runs is picked up without a relaunch; a failure leaves a marker and is skipped."""
+    with open(JOBS_FILE, encoding="utf-8") as fh:
+        for name, args in json.load(fh):
+            if only and name not in only:
+                continue
+            if any(os.path.exists(f"{QUEUE}/{name}.{s}") for s in ("done", "failed")):
+                continue
+            return name, args
+    return None
 
 
 def main() -> None:
     os.makedirs(QUEUE, exist_ok=True)
     only = sys.argv[1:]
-    for name, args in JOBS:
-        if (only and name not in only) or os.path.exists(f"{QUEUE}/{name}.done"):
-            continue
+    while (job := pending(only)) is not None:
+        name, args = job
         t0 = time.time()
         with open(f"{QUEUE}/{name}.log", "a", encoding="utf-8") as out:
             rc = subprocess.call([sys.executable, "-u", *args], stdout=out, stderr=subprocess.STDOUT, cwd=os.getcwd())
