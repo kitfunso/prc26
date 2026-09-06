@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 from taxi.l4 import MIN_BAND, band, touched
-from taxi.l5 import NB, PSEUDO, champion, is_copy, judge, shrunk
+from taxi.l5 import NB, PSEUDO, Prob, champion, is_copy, judge, shrunk
 
 MIN_NONCOPY = MIN_BAND  # inherited from L4's band minimum, not tuned: LIRF's non-copy counts gate the same bands for any threshold in 12..35
 Fit = Callable[[np.ndarray, np.ndarray, np.ndarray], np.ndarray]
@@ -22,14 +22,14 @@ def _line(z_tr: np.ndarray, y_tr: np.ndarray, z_te: np.ndarray) -> np.ndarray:
     return a + s * z_te
 
 
-def per_row(tr: pd.DataFrame, te: pd.DataFrame, fit: Fit, min_noncopy: int = MIN_NONCOPY) -> np.ndarray:
+def per_row(tr: pd.DataFrame, te: pd.DataFrame, fit: Fit, min_noncopy: int = MIN_NONCOPY, prob: Prob = shrunk) -> np.ndarray:
     """L4b everywhere; a touched row whose band has min_noncopy non-copy training rows gets P(copy) x z_sched + (1 - P(copy)) x fit(non-copy rows)."""
     out, m = champion(tr, te), touched(tr, te)
     for apt in np.unique(te.apt.values[m]):
         t = tr[(tr.apt == apt) & (tr.notyp == 1)].reset_index(drop=True)
         ix = np.flatnonzero(m & (te.apt.values == apt))
         sub, c, tb = te.iloc[ix], is_copy(t), band(t.z_sched.values)
-        z, zb, p = sub.z_sched.values, band(sub.z_sched.values), shrunk(t, sub)
+        z, zb, p = sub.z_sched.values, band(sub.z_sched.values), prob(t, sub)
         for b in np.unique(zb):
             k, j = (tb == b) & ~c, zb == b
             if int(k.sum()) >= min_noncopy:
