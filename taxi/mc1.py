@@ -44,13 +44,14 @@ def fit(kind: str, x: pd.DataFrame, label: np.ndarray, va: tuple[pd.DataFrame, n
 
 
 def stages_cb(tr: pd.DataFrame, va: pd.DataFrame | None = None, iters: tuple[int, int, int] = (MAX_ITER,) * 3,
-              cols: list[str] = COLS_A, over: dict | None = None, loss: str | None = None, fwd: Callable | None = None) -> Models:
+              cols: list[str] = COLS_A, over: dict | None = None, loss: str | None = None, fwd: Callable | None = None,
+              tail: float = TAIL) -> Models:
     """M2 recipe: tail classifier, tail regressor, body regressor; fwd (T1a) transforms the regression target, predict_cb's inv undoes it."""
     f = fwd or (lambda c: c)
-    t = is_tail(tr)
+    t = is_tail(tr, tail)
     parts: list = [None, None, None]
     if va is not None:
-        vt = is_tail(va)
+        vt = is_tail(va, tail)
         parts = [(va, vt.astype(int)), (va[vt], f(va.c.values[vt])), (va[~vt], f(va.c.values[~vt]))]
     clf = fit("clf", tr, t.astype(int), parts[0], iters[0], cols, over)
     r_tail = fit("reg", tr[t], f(tr.c.values[t]), parts[1], iters[1], cols, over, loss)

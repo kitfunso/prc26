@@ -19,7 +19,7 @@ COLS_D2 = [*COLS_D1, "d_as", "occ", "t_occ"]
 CHAMPIONS_A = {"W1-A": (COLS_A, "W1", "docs/W1.md", "lgb"), "D1": (COLS_D1, "D1", "docs/D1.md", "lgb"),
                "MC2": (COLS_D1, "MC2", "docs/MC2.md", "cb")}
 # The registry's current champion per lane; verdict wording promotes only against these names.
-CURRENT = {"A": "MC2", "B": "L6a"}
+CURRENT = {"A": "MC2", "B": "L8c"}
 
 
 def predict_b(name: str, tr: pd.DataFrame, te: pd.DataFrame) -> np.ndarray:
@@ -27,9 +27,11 @@ def predict_b(name: str, tr: pd.DataFrame, te: pd.DataFrame) -> np.ndarray:
     from taxi.baselines import b4
     if name == "B4":
         return b4(tr, te, "B")
-    from taxi import l4, l6  # local: both reach taxi.w1, which reads CURRENT above
+    from taxi import l4, l6, l8  # local: each reaches taxi.w1, which reads CURRENT above
     if name in l4.CELLS:
         return l4.per_band(tr, te, l4.CELLS[name])
+    if name in l8.CELLS:  # an L8 cell names the copy probability, not the non-copy fit: L6a's mixture carries it
+        return l6.per_row(tr, te, l6.CELLS["L6a"], prob=l8.CELLS[name])
     return l6.per_row(tr, te, l6.CELLS[name])
 
 

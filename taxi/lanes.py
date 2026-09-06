@@ -73,6 +73,9 @@ LANES: dict[str, tuple[Callable[[], dict[str, Lane]], int, str, bool]] = {
     "R1": (lambda: {"R1": Lane(cols=(*COLS_D1, "rwy_share"))}, 1,
            "Runway-configuration proxy: the share of the airport's takeoffs on this departure's runway in the hour before the anchor (NaN when that "
            "hour is empty), one column on MC2's cell.", False),
+    "TH1": (lambda: {f"TH{v}": Lane(fit_kw=dict(tail=float(v))) for v in (400, 900, 1200)}, 4,
+            "Tail split sweep: the |c| threshold that splits MC2's two regressors, at 400, 900 and 1,200 s (MC2 uses 600) on MC2's cell; the "
+            "classifier target moves with it. The CV winner meets the holdout only if its CV beats MC2's own CV on the same folds and data.", True),
     "H1": (lambda: {"H1": Lane(cols=(*COLS_D1, "hol", "hol_prev", "hol_next"))}, 1,
            "Public holiday in the airport's country on the takeoff day, the day before and the day after (`holidays` 0.103, country from the ICAO "
            "prefix), three flags on MC2's cell.", False),

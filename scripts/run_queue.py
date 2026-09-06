@@ -12,7 +12,8 @@ QUEUE = "data/queue"
 JOBS = [("oof", ["-m", "taxi.champ", "oof", "MC2", "D1"]), ("e2", ["-m", "taxi.e2"]), ("sb1", ["-m", "taxi.sb1"]),
         ("ws1", ["-m", "taxi.lanes", "WS1"]), ("t1", ["-m", "taxi.lanes", "T1"]), ("g1", ["-m", "taxi.lanes", "G1"]),
         ("tw1", ["-m", "taxi.lanes", "TW1"]), ("r1", ["-m", "taxi.lanes", "R1"]), ("h1", ["-m", "taxi.lanes", "H1"]),
-        ("ff", ["-m", "taxi.fwd"]), ("m3", ["-m", "taxi.m3"]), ("e1", ["-m", "taxi.e1"]), ("o1", ["-m", "taxi.o1"])]
+        ("ff", ["-m", "taxi.fwd"]), ("m3", ["-m", "taxi.m3"]), ("e1", ["-m", "taxi.e1"]), ("o1", ["-m", "taxi.o1"]),
+        ("th1", ["-m", "taxi.lanes", "TH1"])]
 
 
 def main() -> None:

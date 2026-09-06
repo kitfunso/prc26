@@ -132,6 +132,8 @@ Tuning
 - SB1 seed bagging: RUN 2026-09-05 (`docs/SB1.md`, H35): five CatBoost seeds of MC2's cell at its recorded rounds, seed spread 0.23 s; the mean 231.7 s, +1.0 [+0.7, +1.3] against MC2, clears zero at k = 1 but not the 2 s floor, TIE, MC2 stays; flagged for the C1 floor decision.
 - E2 blend of MC2 and D1, weight on MC2 chosen on OOF among {0.5, 0.7, 0.9}: RUN 2026-09-05 (`docs/E2.md`, H34): w = 0.9, holdout 232.5 s, +0.2 [+0.1, +0.3] against MC2, under the 2 s floor, TIE, MC2 stays.
 - TW1 traffic window sweep {300, 900, 1,800, 3,600} s. k = 4; RUN 2026-09-06 on MC2's cell (`docs/TW1.md`, H39, 103.7 min): CV TW300 212.8, TW1800 213.0, TW3600 213.6 vs MC2 212.9 s; TW300 met the holdout and lost, -0.5 [-0.9, -0.1]; the width is inert, MC2's 900 s stays.
+- L8 learned copy probability on the lane-B gate (logistic on band, stand occupancy, its age, hour of day and season; the same odds times L5a's airline table; a shallow CatBoost with the airline categorical). k = 4; RUN 2026-09-06 (`docs/L8.md`, H43): CV L8c 1464.5 against L6a 1501.5 s; holdout 1861.8 to 1808.2 s, +53.6 [+29.9, +95.0], WIN, L8c is the lane-B champion. Declared from the oracle-branch diagnostic (P(copy) worth +182.9 s against the non-copy fit's +45.0 s), which also caps what is left in this branch.
+- TH1 tail split sweep {400, 600, 900, 1,200} s on MC2's cell, the threshold that decides which of MC2's two regressors a training row trains (600 s = MC2, never swept; tail rows hold RMSE 544.1 s against the body's 165.6 s). k = 4; DECLARED 2026-09-06 (protocol section 4), queued after O1, `docs/TH1.md`.
 
 Surfaced by the 2026-09-05 critique (`docs/gate-s2.html`)
 

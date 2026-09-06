@@ -26,8 +26,8 @@ def fit(x: pd.DataFrame, label: np.ndarray, cell: dict, va: tuple[pd.DataFrame, 
     return lgb.train(params, d, num_boost_round=rounds, valid_sets=[dv], callbacks=[lgb.early_stopping(PATIENCE, verbose=False)])
 
 
-def is_tail(df: pd.DataFrame) -> np.ndarray:
-    return (df.c.abs() > TAIL).values
+def is_tail(df: pd.DataFrame, tail: float = TAIL) -> np.ndarray:
+    return (df.c.abs() > tail).values
 
 
 def stages(tr: pd.DataFrame, cell: dict, va: pd.DataFrame | None = None,
