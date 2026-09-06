@@ -62,6 +62,9 @@ def main() -> None:
         f"At the finest matching {nr / n:.1%} of lane A sits in a tie. MC2 scores {on_tied:.2f} s on those rows and {pooled:.2f} s of that is",
         f"spread among rows it treats as identical, leaving {misplaced:.2f} s for putting the tie itself in the wrong place. Almost all of the",
         "lane-A error is variation MC2 makes no attempt to predict.\n",
+        f"That {misplaced:.2f} s is not headroom. It is an oracle over {ng:,} group means fitted to {nr:,} rows, and `docs/TA.md` already priced",
+        "the honest version of the same move at +0.043 s by predicted decile and +0.419 s by airport and runway, with `docs/APT.md` finding every",
+        "cross-fitted recalibration worse than none. The tie placement is right; what follows is about the spread underneath it.\n",
         "## 3. Are the tied rows actually identical?\n",
     ]
     sub = tea.loc[tied, list(COLS_D1)]

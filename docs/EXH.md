@@ -23,6 +23,10 @@ At the finest matching 87.5% of lane A sits in a tie. MC2 scores 206.75 s on tho
 spread among rows it treats as identical, leaving 39.64 s for putting the tie itself in the wrong place. Almost all of the
 lane-A error is variation MC2 makes no attempt to predict.
 
+That 39.64 s is not headroom. It is an oracle over 79,968 group means fitted to 296,529 rows, and `docs/TA.md` already priced
+the honest version of the same move at +0.043 s by predicted decile and +0.419 s by airport and runway, with `docs/APT.md` finding every
+cross-fitted recalibration worse than none. The tie placement is right; what follows is about the spread underneath it.
+
 ## 3. Are the tied rows actually identical?
 
 No. Of 79,968 tied groups, 0 (0.0%) have every row on the identical 49-feature vector; the median group
