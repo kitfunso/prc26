@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import numpy as np
 
+from taxi.bl import BOARD
 from taxi.cb1 import lane_b
 from taxi.champ import CURRENT, champion_holdout, lane_a, predict_b
 from taxi.l2 import floored
@@ -85,9 +86,11 @@ def main() -> None:
               f"{priced('A', 2.0):.2f} s on lane A and {priced('B', 2.0):.3f} s on lane B, an {priced('A', 2.0) / priced('B', 2.0):.0f}-fold "
               "difference in what the same rule demands. Flag F18 already records that the floor is about 10 paired SE in lane A and about 0.12 in "
               "lane B; this is the same fact in the board's own unit. Changing it is a decision-rule change and stays with Keith.", "",
-              f"- **The parked inventory is small.** {total:.2f} s of composite against a projected residual gap to the leader of 5.4 to 10.1 s "
-              "(protocol section 4, the two untested S4 anchors at 282.7 and 287.4 against the leader's 277.29). Releasing every parked tie closes "
-              f"under a fifth of the smaller anchor's gap and none of the larger one's.", "",
+              f"- **The parked inventory is small.** {total:.2f} s of composite against a board gap of "
+              f"{BOARD['us']['score'] - BOARD['leader']['score']:.2f} s: our scored file is at {BOARD['us']['score']} and the leader at "
+              f"{BOARD['leader']['score']} (leaderboard read {BOARD['fetched_utc']} UTC, `python lb.py`). The unuploaded champion closes most of "
+              "that on paper, and `docs/BL.md` sections 3 and 5 carry the current band and what the remainder costs. Releasing every parked tie "
+              "moves a small fraction of either.", "",
               "- **Lane A is where the reachable seconds are**, not because it holds more error, but because its error is spread over "
               f"{na:,} rows that a model can move, while half of lane B's sits on two rows that no ranking-visible column separates (LK1, F17, F21)."]
     text = "\n".join(lines) + "\n"

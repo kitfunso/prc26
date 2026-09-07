@@ -56,6 +56,24 @@ against this gate before you saw it and broke four of its numbers. Those are cor
 have been run, and it rides this page in full.</p>
 
 <div class="decision" style="border-color:#b00">
+<h2>Board re-read, 7 September: the leader moved and the field doubled</h2>
+<p><strong>Every leader number this page carried was stale.</strong> The leaderboard was read again at
+<span class="num">2026-09-07 04:17</span> UTC (<code>python lb.py</code>, snapshot <code>data/board.json</code>).
+The leader is <strong>youthful-giraffe at <span class="num">265.7612</span></strong>, not 277.29: 11.53 s better, scored
+2026-09-06 14:27 on two submissions. <strong>60 teams</strong> now have a score, against 29 when S1 went up, and
+<strong>we are 25th</strong> at <span class="num">324.7339</span> (the P1 probe file, which outscores S1 itself by 0.66 s).</p>
+<p>What it changes, and what it does not. v16 still projects to <span class="num">281.4</span> to
+<span class="num">288.0</span>, which is <strong>6th to 8th of 60 today</strong>, so the upload is worth about 17 places and
+roughly 39 board seconds exactly as before. What moves is the price of the rank in section 3c: reaching first place on lane A
+alone now needs holdout lane A at <span class="num">196.7</span> s, a gain of <strong>33.4 s</strong> on SB3, against a
+measured model ceiling near 3 s. The gap the model route cannot close has gone from four times the ceiling to ten times it.</p>
+<p class="note">The stale number was a constant pasted into <code>taxi/bl.py</code> and into prose, with no read date.
+<code>python lb.py</code> now writes the dated snapshot and <code>taxi/bl.py</code> reads the leader, our score and our rank
+from it, so every regenerated page states when the board was last read. Historical entries keep the numbers they were written
+with; F27's lead percentages and the 14.1 s in the 7 September protocol note are superseded by this block.</p>
+</div>
+
+<div class="decision" style="border-color:#b00">
 <h2>Correction, 7 September</h2>
 <p><strong>The SB3 numbers this page first carried were scored with the answer in hand, and they are withdrawn.</strong>
 SB3 as promoted at H52 chose each row's blend weight with <code>taxi.m2.is_tail</code>, which tests <code>abs(c) &gt; 600</code>
@@ -81,7 +99,8 @@ one-parameter family the board leaves open, v16 lands between <span class="num">
 equal-ratio point <span class="num">286.12</span>, against v15's 282.7 to 290.3 and 287.42 (<code>docs/BL.md</code>, regenerated
 on this file). SB3's 2.06 s of holdout lane A is worth about <strong>1.3 s of board composite</strong>. The upload is worth
 roughly <span class="num">39</span> board seconds against S1's 325.3982, and the leader's lead narrows from 7.4% and 7.0% of a
-lane to <span class="num">6.4%</span> and <span class="num">6.1%</span>.</p>
+lane to <span class="num">6.4%</span> and <span class="num">6.1%</span>. Both pairs were computed against 277.29 and the banner
+at the top of this page re-reads the board at 265.7612; <code>docs/BL.md</code> section 4 carries the current pair.</p>
 <p><strong>Two defects were found on the way, both fixed, neither changing a model.</strong> The first killed the
 build 8.9 min in: a per-seed progress line printed the holdout RMSE, and the ranking frame has no label (F39). The guard test F36
 shipped for exactly this shape had monkeypatched away the only function on the path that still read the label, so the shape was
@@ -155,7 +174,7 @@ arrives), and there is now no uncomposed parked positive lane-A tie left, so thi
 <strong>The consequence for the call:</strong> v15 carries MC2 and is superseded by v16, which is built. On the holdout SB3
 takes the composite from 322.5796 to <span class="num">321.1269</span>, worth 1.45 composite seconds, and the board projection
 measured on the file itself moves the two anchors from 282.7 and 287.42 to <span class="num">281.4</span> and
-<span class="num">286.12</span>. Both still sit above the leader's 277.29.</p>
+<span class="num">286.12</span>. Both still sit above the leader's <span class="num">265.7612</span>, by 15.6 to 22.2 s.</p>
 <p class="note"><strong>Why this is now the only large move on the table.</strong> The board still shows S1 at
 <span class="num">325.3982</span> and nothing has gone up since. Section 3b puts v16 at about <span class="num">286</span>,
 so the upload is worth roughly <span class="num">39</span> board seconds. Everything still running is worth 1 to 3 s each,
@@ -247,7 +266,7 @@ most important line on the page.</p>
 <tr class="win"><td>additive offset of 39.84 s, v16 (SB3, built)</td><td class="num">281.3</td><td>untested</td></tr>
 <tr class="win"><td>ratio of 0.891, v16 (SB3, built)</td><td class="num">286.1</td><td>untested</td></tr>
 </table></div>
-<p>The leader is at 277.29. Both anchors sit above it. Neither is a prediction: one submission cannot fit a transfer, and flags F5
+<p>The leader is at 265.7612 (read 7 September, banner above). Both anchors sit above it. Neither is a prediction: one submission cannot fit a transfer, and flags F5
 and F2 say the transfer is unexplained and the 2026 tail unknown.</p>
 <p><strong>Both anchors are computed at the holdout's row mix, and the ranking file's is different.</strong> Measured after the
 critique (<code>docs/MIX.md</code>, new flag F20): the lane split transfers, 1.534% of ranking departures have no flight plan
@@ -287,9 +306,9 @@ and the remaining scorer slots buy nothing more of it. Second, v16's per-lane bo
 from S1's measured ones by the difference of the two files on disk: <strong>+5.59 s per lane-A row and &minus;208.6 s per lane-B
 row</strong>. Removing the lane-B level alone is worth about 1.17 s of board composite at no model cost, and it is a change to a
 submitted file, so it is question 6 below.</p>
-<p>Put v16 on the board at the equal-ratio point (lane A 205.8, lane B 1,618, composite 286.12) and the leader at 277.29 must be
-6.4% better than us in lane B if their lane A matches ours, or 6.1% better in lane A if their lane B matches ours.
-<strong>The lead is about six percent of one lane.</strong> It is not a different class of model, and it is not concentrated in
+<p>Put v16 on the board at the equal-ratio point (lane A 205.8, lane B 1,618, composite 286.12) and the leader at 265.7612 must
+be 15.1% better than us in lane B if their lane A matches ours, or 14.5% better in lane A if their lane B matches ours.
+<strong>The lead is about fifteen percent of one lane</strong>, against six percent when the same arithmetic read 277.29. It is not a different class of model, and it is not concentrated in
 lane B's artifact rows the way <code>docs/LEV.md</code>'s drop-k arithmetic reads on 2025 data.</p>
 
 <h3>3c. What first place costs, in the units the ledger uses (new, <code>docs/BL.md</code> section 5)</h3>
@@ -308,9 +327,9 @@ other; regenerate with <code>python -m taxi.bl</code>.</p>
 <tr><td>B</td><td class="num">150</td><td class="num">274.74</td></tr>
 </table></div>
 <p>A second of lane A is worth <span class="num">0.633</span> s of board and a second of lane B
-<span class="num">0.078</span> s. Reaching 277.29 on lane A alone needs holdout lane A at 215.9 s, a gain of
-<strong>14.1 s</strong> on SB3's 230.0951. On lane B alone it needs 1,692.4 s, a gain of <strong>115.7 s</strong> on
-L8c's 1,808.1729.</p>
+<span class="num">0.078</span> s. Reaching the leader's 265.7612 on lane A alone needs holdout lane A at 196.7 s, a gain of
+<strong>33.4 s</strong> on SB3's 230.0951. On lane B alone it needs 1,534.4 s, a gain of <strong>273.8 s</strong> on
+L8c's 1,808.1729. Read against 277.29 on 6 September the same two numbers were 14.1 s and 115.7 s.</p>
 <p>Set that against the ceilings already measured with the holdout's own answers in hand. <code>docs/GEO.md</code> caps
 every stand-and-runway geometric feature, main effect and congestion interaction together, at
 <span class="num">+3.295</span> s of lane A, and measures the share of that kind of structure that survives the calendar at
@@ -320,7 +339,7 @@ is <code>AOBT_3_flt &minus; BLOCK_TIME</code>, two clocks disagreeing rather tha
 not reach it. Lane B's own oracle is large and unreachable, and <code>docs/DE.md</code> prices a perfect call on its six
 day-shifted rows at about 45 s of composite and then loses with every blind rule tried.
 <strong>So holding the file back to keep modelling has no measured upside left: the ceiling on the model route is a few
-seconds of lane A against the 14 that first place asks for.</strong> The only route left that is measured rather than hoped
+seconds of lane A against the 33 that first place asks for.</strong> The only route left that is measured rather than hoped
 for is board-side, which is questions 6 and 10.</p>
 
 <h2>4. The blockers the critique raised, now measured</h2>

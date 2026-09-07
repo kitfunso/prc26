@@ -7,13 +7,18 @@ score is almost flat along that family, which prices the S4 anchors far better t
 """
 from __future__ import annotations
 
+import json
+import pathlib
+
 import duckdb
 import numpy as np
 import pandas as pd
 
 RANKING = "data/ranking.parquet"
 # docs/TRIAL-LEDGER.md section A (S1) and section C (P1, P3s, P5s).
-S1_BOARD, LEADER = 325.3982, 277.29
+S1_BOARD = 325.3982
+BOARD = json.loads(pathlib.Path("data/board.json").read_text(encoding="utf-8"))  # refresh with `python lb.py`
+LEADER = BOARD["leader"]["score"]
 S1_HOLD = {"A": 259.5, "B": 2074.1}
 CHAL = 16  # the newest built submission, data/merry-octopus_v16.parquet; nothing after S1 has been uploaded.
 CHAL_HOLD = {"A": 230.0951, "B": 1808.1729}
@@ -76,7 +81,10 @@ def main() -> None:
         "# BL: the lane split behind one board number", "",
         "Regenerate with `python -m taxi.bl`. Arithmetic only, no fit. Diagnostic: it declares no cell and decides no verdict.", "",
         f"Ranking DEP rows {nt:,}: lane A {n['A']:,}, lane B {n['B']:,}. S1 scored {S1_BOARD} "
-        f"(total SSE {board:,.0f} s^2); the leader is at {LEADER}.", "",
+        f"(total SSE {board:,.0f} s^2).", "",
+        f"Leaderboard read {BOARD['fetched_utc']} UTC: {BOARD['submissions']} submissions, {BOARD['teams']} teams scored. "
+        f"The leader is {BOARD['leader']['team']} at {LEADER}; we are {BOARD['us']['rank']} of {BOARD['teams']} at "
+        f"{BOARD['us']['score']} on {BOARD['us']['subs']} submissions. Every leader number below moves when that snapshot does.", "",
         "## 1. The split is not measurable, at any number of submissions", "",
         "A submission changes our predictions from `p` to `p'` and returns one number. The difference of the two total SSEs is",
         "`sum(p'^2 - p^2) - 2 sum((p' - p) y)`, and we know `p` and `p'` exactly, so every probe returns one **linear** functional",
