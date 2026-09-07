@@ -18,7 +18,7 @@ from taxi.l2 import floored
 from taxi.m1 import final_rounds
 from taxi.m2 import is_tail
 from taxi.mc1 import predict_cb, stages_cb
-from taxi.verdict import paired_delta, rmse
+from taxi.verdict import paired_delta, rmse, score
 from taxi.w1 import verdict_line
 
 SEEDS = (0, 1, 2, 3, 4)
@@ -44,7 +44,7 @@ def seed_pred(seed: int, tra: pd.DataFrame, tea: pd.DataFrame, rounds: tuple[int
     t0 = time.time()
     pred = predict_cb(stages_cb(tra, iters=rounds, cols=COLS_D2, over={"random_seed": seed}), tea, COLS_D2)[0]
     pd.DataFrame({"id": tea.id.values, "pred": pred, "fp": fp}).to_parquet(path, index=False)
-    print(f"seed {seed}: {time.time() - t0:.0f} s, RMSE {rmse(pred - tea.y.values):.2f}", flush=True)
+    print(f"seed {seed}: {time.time() - t0:.0f} s{score(pred, tea)}", flush=True)
     return pred
 
 

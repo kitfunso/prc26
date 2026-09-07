@@ -29,6 +29,11 @@ def rmse(err: np.ndarray) -> float:
     return float(np.sqrt(np.mean(np.square(err))))
 
 
+def score(pred: np.ndarray, te) -> str:
+    """A progress line's RMSE fragment, empty when the frame carries no label: the ranking file has none (F36, F39)."""
+    return f", RMSE {rmse(pred - te.y.values):.2f}" if "y" in te.columns else ""
+
+
 def paired_delta(err_champion, err_challenger, days, reps: int = 2000, seed: int = 0, block: int = 1) -> Verdict:
     """Champion RMSE minus challenger RMSE on the same rows, resampling whole days; positive favours the challenger."""
     a = np.asarray(err_champion, dtype=float)
