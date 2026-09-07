@@ -70,3 +70,35 @@ to 193.2, which is 6.1% better than ours. So the lead is about 6% of one lane, o
 a different kind of model, and it is not concentrated in lane B's artifact rows the way the drop-k arithmetic in `docs/LEV.md`
 suggests on 2025 data.
 
+## 5. What a holdout second is worth, and what first place costs
+
+Every verdict in this campaign is a holdout number and the prize is a board number. The equal-ratio carry converts one to the
+other, so the price of first place can be read in the same units the ledger uses. Each row moves ONE lane and holds the other.
+
+| lane | holdout gain (s) | holdout lane A | holdout lane B | board |
+|---|---|---|---|---|
+| A | 0 | 230.10 | 1,808.17 | 286.12 |
+| A | 1 | 229.10 | 1,808.17 | 285.48 |
+| A | 2 | 228.10 | 1,808.17 | 284.85 |
+| A | 3 | 227.10 | 1,808.17 | 284.22 |
+| A | 5 | 225.10 | 1,808.17 | 282.97 |
+| A | 10 | 220.10 | 1,808.17 | 279.85 |
+| A | 15 | 215.10 | 1,808.17 | 276.77 |
+| B | 25 | 230.10 | 1,783.17 | 284.19 |
+| B | 50 | 230.10 | 1,758.17 | 282.27 |
+| B | 100 | 230.10 | 1,708.17 | 278.47 |
+| B | 150 | 230.10 | 1,658.17 | 274.74 |
+
+A holdout second of lane A is worth about -0.633 s of board, and a second of lane B about -0.0776 s.
+Reaching 277.29 on lane A alone needs holdout lane A at **215.9 s**, a gain of **14.1 s** on SB3's 230.0951.
+On lane B alone it needs **1,692.4 s**, a gain of **115.7 s** on L8c's 1,808.1729.
+
+Set that against what the diagnostics have already priced with the holdout's own answers in hand. `docs/GEO.md` caps every
+stand-and-runway geometric feature, main effect and congestion interaction together, at +3.295 s of lane A, and puts the share
+that survives the calendar at 26%. `docs/EXH.md` prices what a better fit over the 49 columns could still find at +0.10 s.
+The ARVT3 entry in `docs/COVERAGE.md` names the reason both cap out: the lane-A label is `AOBT_3_flt - BLOCK_TIME`, two
+clocks disagreeing rather than taxi physics, so physical information does not reach it. Lane B's oracle is large and unreachable:
+`docs/DE.md` prices a perfect call on its six day-shifted rows at about 45 s of composite and then loses with every blind rule
+tried. So the measured model headroom is a few seconds of lane A against the double-digit gain first place asks for, and the
+only route left that is measured rather than hoped for is board-side, in `docs/PB.md`.
+

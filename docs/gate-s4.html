@@ -292,6 +292,37 @@ submitted file, so it is question 6 below.</p>
 <strong>The lead is about six percent of one lane.</strong> It is not a different class of model, and it is not concentrated in
 lane B's artifact rows the way <code>docs/LEV.md</code>'s drop-k arithmetic reads on 2025 data.</p>
 
+<h3>3c. What first place costs, in the units the ledger uses (new, <code>docs/BL.md</code> section 5)</h3>
+<p>Every verdict on this page is a holdout number and the prize is a board number. The equal-ratio carry converts one into
+the other, so the price of the rank can be read in the unit the ledger already uses. Each row moves one lane and holds the
+other; regenerate with <code>python -m taxi.bl</code>.</p>
+<div class="wrap"><table>
+<tr><th>lane</th><th class="num">holdout gain (s)</th><th class="num">board</th></tr>
+<tr><td>A</td><td class="num">0</td><td class="num">286.12</td></tr>
+<tr><td>A</td><td class="num">3</td><td class="num">284.22</td></tr>
+<tr><td>A</td><td class="num">5</td><td class="num">282.97</td></tr>
+<tr><td>A</td><td class="num">10</td><td class="num">279.85</td></tr>
+<tr><td>A</td><td class="num">15</td><td class="num">276.77</td></tr>
+<tr><td>B</td><td class="num">50</td><td class="num">282.27</td></tr>
+<tr><td>B</td><td class="num">100</td><td class="num">278.47</td></tr>
+<tr><td>B</td><td class="num">150</td><td class="num">274.74</td></tr>
+</table></div>
+<p>A second of lane A is worth <span class="num">0.633</span> s of board and a second of lane B
+<span class="num">0.078</span> s. Reaching 277.29 on lane A alone needs holdout lane A at 215.9 s, a gain of
+<strong>14.1 s</strong> on SB3's 230.0951. On lane B alone it needs 1,692.4 s, a gain of <strong>115.7 s</strong> on
+L8c's 1,808.1729.</p>
+<p>Set that against the ceilings already measured with the holdout's own answers in hand. <code>docs/GEO.md</code> caps
+every stand-and-runway geometric feature, main effect and congestion interaction together, at
+<span class="num">+3.295</span> s of lane A, and measures the share of that kind of structure that survives the calendar at
+26%. <code>docs/EXH.md</code> prices what a better fit over the same 49 columns could still find at
+<span class="num">+0.10</span> s. The ARVT3 entry in <code>docs/COVERAGE.md</code> names why both cap out: the lane-A label
+is <code>AOBT_3_flt &minus; BLOCK_TIME</code>, two clocks disagreeing rather than taxi physics, so physical information does
+not reach it. Lane B's own oracle is large and unreachable, and <code>docs/DE.md</code> prices a perfect call on its six
+day-shifted rows at about 45 s of composite and then loses with every blind rule tried.
+<strong>So holding the file back to keep modelling has no measured upside left: the ceiling on the model route is a few
+seconds of lane A against the 14 that first place asks for.</strong> The only route left that is measured rather than hoped
+for is board-side, which is questions 6 and 10.</p>
+
 <h2>4. The blockers the critique raised, now measured</h2>
 <p>Three of its five blockers were missing measurements rather than errors. All three were run before this page went out.</p>
 <div class="wrap"><table>
@@ -595,7 +626,8 @@ is O1, a 40-trial CatBoost tuning study that meets MC2 and cannot promote agains
 the search side is closed by measurement and the queue after O1 is empty. Against that, an upload is worth about
 <span class="num">39</span> board seconds. <strong>My reading:</strong> upload v16, because there is no longer a model reason to
 wait and the second board point is worth as much to every verdict that follows as the 39 s is to the rank. Whether the banked
-correction rides with it is question 6.</div>
+correction rides with it is question 6. Section 3c prices what waiting could still buy: 14.1 s of lane A
+to reach the leader against a measured ceiling of about 3 s.</div>
 <div class="q"><span class="n">2</span>The critique's last recommendation is a second file, MC2 plus B4 floored, as the only way
 to price the lane-B chain on the board itself. That spends a second daily slot. Do it? F27 sharpens what it can return: the
 difference of two files that differ only in lane B is exact, so this does settle L8c against B4 on 2026 rows, but neither
@@ -615,7 +647,7 @@ fit.</div>
 openly on GitHub under GPLv3, which the repo already carries. It is private today. No challenge data and no secret is tracked, so
 the flip is safe. It is your call and only yours.</div>
 <div class="q"><span class="n">9</span>Push the unpushed commits? The entire campaign since <code>3d79428</code> exists on this
-machine alone. <code>git rev-list --count origin/master..master</code> prints the count; it was 79 on 7 September. That is a backup
+machine alone. <code>git rev-list --count origin/master..master</code> prints the count; it was 80 on 7 September and rises with every commit, including the one that publishes this page. That is a backup
 question before it is an eligibility one.</div>
 
 <div class="q"><span class="n">10</span>How far do we take the probe idea, and do we take it at all? This is now the largest number

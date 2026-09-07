@@ -65,6 +65,13 @@ def main() -> None:
     la_at_vb = float(np.sqrt((ld - sse(vb, n["B"])) / n["A"]))
     gain = mid - float(np.sqrt((sse(mid, nt) - n["B"] * (chal_sum["B"] / n["B"]) ** 2) / nt))
 
+    board_at = lambda a, b: comp(a * eq, b * eq)  # noqa: E731  a holdout lane pair carried to the board at the equal ratio
+    need = {"A": la_at_vb / eq, "B": lb_at_va / eq}
+    grows = [f"| A | {g} | {CHAL_HOLD['A'] - g:,.2f} | {CHAL_HOLD['B']:,.2f} | {board_at(CHAL_HOLD['A'] - g, CHAL_HOLD['B']):.2f} |"
+             for g in (0, 1, 2, 3, 5, 10, 15)]
+    grows += [f"| B | {g} | {CHAL_HOLD['A']:,.2f} | {CHAL_HOLD['B'] - g:,.2f} | {board_at(CHAL_HOLD['A'], CHAL_HOLD['B'] - g):.2f} |"
+              for g in (25, 50, 100, 150)]
+
     out = [
         "# BL: the lane split behind one board number", "",
         "Regenerate with `python -m taxi.bl`. Arithmetic only, no fit. Diagnostic: it declares no cell and decides no verdict.", "",
@@ -104,6 +111,23 @@ def main() -> None:
         f"to {la_at_vb:.1f}, which is {100 * (1 - la_at_vb / va):.1f}% better than ours. So the lead is about {100 * (1 - la_at_vb / va):.0f}% of one lane, or a mix of less in each. It is not",
         "a different kind of model, and it is not concentrated in lane B's artifact rows the way the drop-k arithmetic in `docs/LEV.md`",
         "suggests on 2025 data.", "",
+        "## 5. What a holdout second is worth, and what first place costs", "",
+        "Every verdict in this campaign is a holdout number and the prize is a board number. The equal-ratio carry converts one to the",
+        "other, so the price of first place can be read in the same units the ledger uses. Each row moves ONE lane and holds the other.", "",
+        "| lane | holdout gain (s) | holdout lane A | holdout lane B | board |", "|---|---|---|---|---|", *grows, "",
+        f"A holdout second of lane A is worth about {board_at(CHAL_HOLD['A'] - 1, CHAL_HOLD['B']) - mid:+.3f} s of board, and a second of lane B about "
+        f"{board_at(CHAL_HOLD['A'], CHAL_HOLD['B'] - 1) - mid:+.4f} s.",
+        f"Reaching {LEADER} on lane A alone needs holdout lane A at **{need['A']:.1f} s**, a gain of **{CHAL_HOLD['A'] - need['A']:.1f} s** on "
+        f"{CHAL_NAME['A']}'s {CHAL_HOLD['A']}.",
+        f"On lane B alone it needs **{need['B']:,.1f} s**, a gain of **{CHAL_HOLD['B'] - need['B']:,.1f} s** on {CHAL_NAME['B']}'s {CHAL_HOLD['B']:,}.", "",
+        "Set that against what the diagnostics have already priced with the holdout's own answers in hand. `docs/GEO.md` caps every",
+        "stand-and-runway geometric feature, main effect and congestion interaction together, at +3.295 s of lane A, and puts the share",
+        "that survives the calendar at 26%. `docs/EXH.md` prices what a better fit over the 49 columns could still find at +0.10 s.",
+        "The ARVT3 entry in `docs/COVERAGE.md` names the reason both cap out: the lane-A label is `AOBT_3_flt - BLOCK_TIME`, two",
+        "clocks disagreeing rather than taxi physics, so physical information does not reach it. Lane B's oracle is large and unreachable:",
+        "`docs/DE.md` prices a perfect call on its six day-shifted rows at about 45 s of composite and then loses with every blind rule",
+        "tried. So the measured model headroom is a few seconds of lane A against the double-digit gain first place asks for, and the",
+        "only route left that is measured rather than hoped for is board-side, in `docs/PB.md`.", "",
     ]
     text = "\n".join(out) + "\n"
     with open("docs/BL.md", "w", encoding="utf-8") as fh:
