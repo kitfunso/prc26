@@ -39,3 +39,15 @@ The three sums already on the board remove 256.3 Ms^2 from the challenger file a
 
 `docs/YR.md` (F23) already measured the year shift on the only 2026 labels the data holds, the ranking file's arrivals, and found it airport-shaped: EHAM +66.9 s in January and -69.7 s in July, EDDF -66.6 s in July, LIRF -43.2 s in January, LSZH +35.2 s in January, against a weighted aggregate of -10.92 s. Its own words are that those cancel in the mean and do not cancel in a squared error, and its section 3 then closed the direction, because arrival and departure taxi times do not move together across 2025 and so the departure version cannot be inferred. A probe does not infer it. It measures the departure sum for that airport directly, which is the one instrument that reaches what YR could only see the shape of. A probe also cannot lose: removing an exactly measured mean reduces that group's SSE by `n_g a_g^2 >= 0` whatever the truth turns out to be, the board ranks each team by its BEST file (`ranking.html`, re-read 2026-09-07), and the bucket cap is 1 GB against 2 MB a file.
 
+## 5. What the probes the board has NOT bought are worth
+
+Section 2 is on the holdout's own composite. This one rescales lane B's group means to the board: the holdout's SSE removed per row, applied to the ranking file's 5,290 lane-B rows, read off v15's 287.42.
+
+| cut | probes | cumulative (s) | marginal (s) |
+|---|---|---|---|
+| lane B, one group | 1 | 0.004 | +0.004 |
+| lane B by airport | 10 | 0.898 | +0.894 |
+| lane B by airport x month | 20 | 1.671 | +0.773 |
+
+The split matters because the two halves belong to different years. The LEVEL row buys almost nothing here, because L8c's holdout mean error is -12.6 s, and it buys most of section 1's gain on the board, where the same mean is -208.6 s. That half is bought and is section 1. The AIRPORT SPREAD is the reverse: the holdout sees it, the board has never measured it, and it is what the next probes buy. Reading the holdout's spread as the board's is an assumption. F23's year shift is itself airport-shaped (`docs/YR.md`) and adds spread rather than cancelling it, so the board's own spread should be at least this, which makes the marginal column the low side.
+

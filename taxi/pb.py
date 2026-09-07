@@ -64,7 +64,23 @@ def correct(src: str, out: str) -> None:
     build_submission(q, out, floor=0.0)
 
 
-def curve() -> tuple[list[tuple[str, int, float]], float, int, float]:
+def marginal(eb: np.ndarray, teb: pd.DataFrame) -> list[tuple[str, int, float, float]]:
+    """Lane-B probe value on the BOARD's scale, so the level the board already measured is separated from the spread it has not."""
+    n_b, n_board = len(eb), len(groups()["laneB"])
+    apt, mon = pd.Series(teb.apt.values), pd.Series(teb.month.values)
+    cuts = [("lane B, one group", pd.Series(["B"] * n_b)), ("lane B by airport", apt),
+            ("lane B by airport x month", apt.astype(str) + "|" + mon.astype(str))]
+    rows, prev = [], 0.0
+    for name, lab in cuts:
+        s = pd.Series(eb).groupby(lab).agg(["size", "mean"])
+        rem = float((s["size"] * s["mean"] ** 2).sum()) / n_b * n_board
+        cum = V15_BOARD - float(np.sqrt((N_RANK * V15_BOARD ** 2 - rem) / N_RANK))
+        rows.append((name, len(s), cum, cum - prev))
+        prev = cum
+    return rows
+
+
+def curve() -> tuple[list[tuple[str, int, float]], float, int, float, list[tuple[str, int, float, float]], float]:
     tra, tea = lane_a()
     trb, teb = lane_b()
     ea = floored(sb3_predict(tra, tea)) - tea.y.values
@@ -91,12 +107,13 @@ def curve() -> tuple[list[tuple[str, int, float]], float, int, float]:
             rem += float((s["size"] * s["mean"] ** 2).sum())
             g += len(s)
         out.append((name, g, base - float(np.sqrt((sse - rem) / n))))
-    return out, base, n, sse
+    return out, base, n, sse, marginal(eb, teb), float(eb.mean())
 
 
 def main() -> None:
     rows = banked()
-    tbl, base, n, sse = curve()
+    tbl, base, n, sse, mrg, hold_mean = curve()
+    n_board_b = len(groups()["laneB"])
     sig = N_RANK * ((S1_RMSE + DP / 2) ** 2 - (S1_RMSE - DP / 2) ** 2) / (2 * 300.0)
     drop = lambda r, rem: r - float(np.sqrt((N_RANK * r ** 2 - rem) / N_RANK))  # noqa: E731
     s1_gain, v15_gain = drop(S1_RMSE, rows[0][2]), drop(V15_BOARD, rows[1][2])
@@ -138,7 +155,18 @@ def main() -> None:
            "departure sum for that airport directly, which is the one instrument that reaches what YR could only see the shape of. "
            "A probe also cannot lose: removing an exactly measured mean reduces that group's SSE by `n_g a_g^2 >= 0` "
            "whatever the truth turns out to be, the board ranks each team by its BEST file (`ranking.html`, re-read 2026-09-07), and the "
-           "bucket cap is 1 GB against 2 MB a file.", ""]
+           "bucket cap is 1 GB against 2 MB a file.", "",
+           "## 5. What the probes the board has NOT bought are worth", "",
+           "Section 2 is on the holdout's own composite. This one rescales lane B's group means to the board: the holdout's SSE removed "
+           f"per row, applied to the ranking file's {n_board_b:,} lane-B rows, read off v15's {V15_BOARD:.2f}.", "",
+           "| cut | probes | cumulative (s) | marginal (s) |", "|---|---|---|---|",
+           *[f"| {nm} | {g} | {c:.3f} | {m:+.3f} |" for nm, g, c, m in mrg], "",
+           "The split matters because the two halves belong to different years. The LEVEL row buys almost nothing here, because L8c's "
+           f"holdout mean error is {hold_mean:+.1f} s, and it buys most of section 1's gain on the board, where the same mean is "
+           f"{rows[1][1][2] / n_board_b:+.1f} s. That half is bought and is section 1. The AIRPORT SPREAD is the reverse: the holdout "
+           "sees it, the board has never measured it, and it is what the next probes buy. Reading the holdout's spread as the board's is "
+           "an assumption. F23's year shift is itself airport-shaped (`docs/YR.md`) and adds spread rather than cancelling it, so the "
+           "board's own spread should be at least this, which makes the marginal column the low side.", ""]
     text = "\n".join(out) + "\n"
     with open("docs/PB.md", "w", encoding="utf-8") as fh:
         fh.write(text)
