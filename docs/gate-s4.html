@@ -91,8 +91,20 @@ because the reduction is <code>n_g a_g&sup2; &ge; 0</code>. It is still a change
 no separate final or private set is named anywhere, so a probe cannot cost a place and the public board is the scored board. The cap
 is 3 files a day and 1 GB a bucket, against 2 MB a file. And prize eligibility, of which only the external-data clause was on record,
 also requires the source openly on GitHub under GPLv3 and documentation sufficient to reproduce the results.
-<code>kitfunso/prc26</code> carries the licence but is private and sits 64 commits ahead of <code>origin/master</code>. No challenge
+<code>kitfunso/prc26</code> carries the licence but is private, and every commit since <code>3d79428</code> (4 September) is unpushed
+(<code>git rev-list --count origin/master..master</code> prints the count; it was 68 when this was written). No challenge
 data and no secret is tracked. Publication is safe; it needs only your decision. Questions 8 and 9.</p>
+
+<p><strong>3. A probe campaign is now priced, and the section 2 table on its own reads too high.</strong> PB section 2 is on the
+holdout's own composite, where L8c is nearly unbiased at &minus;12.6 s. Almost all of its lane-B probe value is therefore the
+airport spread, and almost none is the level. The board is the other way round: the same lane-B mean is &minus;208.6 s, which is
+most of the 1.30 s above. So the two halves do not double count, and the question is what the probes we have NOT bought are worth.
+Rescaling the holdout's lane-B group means to the board's 5,290 rows off v15's 287.42 (<code>docs/PB.md</code> section 5,
+<code>python -m taxi.pb</code>) gives <strong>+0.894 s for 9 more files</strong> (lane B by airport, one per airport) and
+<strong>+0.773 s for 10 after that</strong> (airport by month). That assumes the holdout's airport spread transfers; F23's year
+shift is itself airport-shaped, and adds spread rather than cancelling it, so the number is the low side. At 3 files a day and
+34 days to the deadline the cap does not bind. This does not need a separate answer, it prices question (b): the banked 1.30 s is
+the first instalment, not the whole of it.</p>
 </div>
 
 <div class="decision">
