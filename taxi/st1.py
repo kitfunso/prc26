@@ -35,6 +35,8 @@ def meta(d: pd.DataFrame, a: np.ndarray, b: np.ndarray, cats: list[str]) -> pd.D
 def fit_cell(name: str, d: pd.DataFrame, a: np.ndarray, b: np.ndarray, y: np.ndarray, cats: list[str]):
     """The cell fitted on these rows only, returned as a predictor plus a one-line description of what it learned."""
     if name == "ST1a":
+        raise RuntimeError("ST1a is withdrawn (H53): is_tail reads c = y - z_aobt, so the gate sets each predicted row's weight from that "
+                           "row's own label and cannot run on the ranking file. docs/ST1.md keeps the contaminated numbers as history.")
         t = is_tail(d)
         wt, wb = pick(y[t], a[t], b[t], WEIGHTS)[0], pick(y[~t], a[~t], b[~t], WEIGHTS)[0]
         return (lambda d2, a2, b2: np.where(is_tail(d2), blend(a2, b2, wt), blend(a2, b2, wb))), f"weight on MC2: tail rows {wt}, body rows {wb}"

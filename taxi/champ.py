@@ -22,6 +22,9 @@ CHAMPIONS_A = {"W1-A": (COLS_A, "W1", "docs/W1.md", "lgb"), "D1": (COLS_D1, "D1"
 # Their bases stay out of CHAMPIONS_A on purpose, because that registry feeds _fingerprint and would invalidate every cache below.
 COMPOSED_A = {"SB3": "taxi.sb3"}
 # The registry's current champion per lane; verdict wording promotes only against these names.
+# SB3 keeps lane A at H53 on a corrected number: its ST1a gate read each row's own label and is withdrawn, taking the verdict from
+# +2.38 to +2.0551 [+1.71, +2.37]. Section 3 asks for an interval above zero and a point improvement of at least 2 s, so it still passes,
+# by 0.055 s. Thin, and flagged as such on the gate surface.
 CURRENT = {"A": "SB3", "B": "L8c"}
 
 

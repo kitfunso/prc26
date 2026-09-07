@@ -1,5 +1,7 @@
 # ST1: a row-dependent blend of MC2 and D1, Jan + Jul 2025 development holdout
 
+> **WITHDRAWN 2026-09-07 (flag F36).** The ST1a cell below calls `taxi.m2.is_tail`, which is `abs(c) > 600` with `c = y - z_aobt`, so it sets each predicted row's weight from that row's own label. ST1b and ST1c are honest (a meta-learner on features, a per-airport weight) and their rows stand; ST1a's row is withdrawn and decides nothing. `python -m taxi.st1` raises, because `main` walks all three cells and ST1a is one of them. The honest re-scoring of what ST1a's gate was worth lives in `docs/SB3.md`.
+
 Regenerate with `python -m taxi.st1`. Both base models are cached, so this run touches no GPU. The weight is chosen out of fold over the ten training months (1,723,531 rows) and only the OOF winner meets the holdout, priced at k = 3.
 
 MC2 OOF 212.86 s, D1 OOF 221.08 s on the same rows.

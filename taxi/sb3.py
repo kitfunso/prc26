@@ -1,9 +1,9 @@
-"""SB3: SB2's composition on D2's base instead of MC2's.
+"""SB3: the five-seed D2 bag, floored.
 
-SB2 composed three parked ties on MC2 and landed +1.3 s, still under the 2 s floor. D2 is a fourth parked tie, +1.0 s over MC2 on three extra
-columns, and it is the base the other three were never tried on. Every constant here was fixed by an earlier declared run, so k = 1 again.
-D2 is deliberately NOT registered in CHAMPIONS_A: that registry feeds `_fingerprint`, and adding its columns would invalidate every cached
-champion prediction this campaign has paid for.
+As promoted at H52 this also carried ST1a's gate, which set each row's blend weight from `is_tail(te)`. That reads `c = y - z_aobt`, the
+predicted row's own label, so the 229.7752 s verdict was scored with the answer in hand and the model could not run on the ranking file at
+all. The gate is removed here (H53) and what is left is the bag, which is honest and predicts anywhere. D2 is deliberately NOT registered
+in CHAMPIONS_A: that registry feeds `_fingerprint`, and adding its columns would invalidate every cached champion prediction.
 """
 from __future__ import annotations
 
@@ -49,12 +49,9 @@ def seed_pred(seed: int, tra: pd.DataFrame, tea: pd.DataFrame, rounds: tuple[int
 
 
 def predict(tr: pd.DataFrame, te: pd.DataFrame, tag: str = "holdout") -> np.ndarray:
-    """SB3 on any row set: the five-seed D2 bag, ST1a's fixed gate toward D1, C1's floor. The one lane-A path since H52."""
+    """SB3 on any row set: the five-seed D2 bag under C1's floor, reading nothing but features."""
     rounds, fp = final_rounds("D2", "docs/D2.md"), _fp(tr, te)
-    b = np.mean([seed_pred(s, tr, te, rounds, fp, tag) for s in SEEDS], axis=0)
-    d1 = champion_holdout("D1", tr, te) if tag == "holdout" else refit_predict("D1", tr, te)
-    w = np.where(is_tail(te), W_TAIL, W_BODY)
-    return floored(w * b + (1 - w) * d1)
+    return floored(np.mean([seed_pred(s, tr, te, rounds, fp, tag) for s in SEEDS], axis=0))
 
 
 def main() -> None:
@@ -63,19 +60,23 @@ def main() -> None:
     preds = [seed_pred(s, tra, tea, rounds, fp) for s in SEEDS]
     b = np.mean(preds, axis=0)
     base = floored(champion_holdout("MC2", tra, tea))
-    steps = {"MC2 floored (champion)": base, "D2 seed 0 floored": floored(preds[0]), "D2 seed bag": floored(b),
-             "D2 seed bag + ST1a gate (SB3)": predict(tra, tea)}
-    sb3 = steps["D2 seed bag + ST1a gate (SB3)"]
+    gated = floored(np.where(is_tail(tea), W_TAIL, W_BODY) * b
+                    + (1 - np.where(is_tail(tea), W_TAIL, W_BODY)) * champion_holdout("D1", tra, tea))
+    steps = {"MC2 floored (predecessor)": base, "D2 seed 0 floored": floored(preds[0]), "D2 seed bag floored (SB3)": predict(tra, tea),
+             "the same bag under ST1a's withdrawn label gate": gated}
+    sb3 = steps["D2 seed bag floored (SB3)"]
     v = paired_delta(base - y, sb3 - y, tea.day.values)
     vt, jan, jul = is_tail(tea), tea.month.values == 1, tea.month.values == 7
     row = lambda n, p: f"| {n} | {rmse(p - y):.2f} | {rmse((p - y)[jan]):.1f} | {rmse((p - y)[jul]):.1f} | {rmse((p - y)[vt]):.1f} | {rmse((p - y)[~vt]):.1f} |"  # noqa: E731
     spread = max(rmse(p - y) for p in preds) - min(rmse(p - y) for p in preds)
     seeds = [f"| {s} | {rmse(p - y):.2f} | {paired_delta(base - y, floored(p) - y, tea.day.values).delta:+.2f} |" for s, p in zip(SEEDS, preds)]
 
-    out = [f"# SB3: SB2's composition on D2's base, Jan + Jul 2025 development holdout", "",
+    out = [f"# SB3: the five-seed D2 bag, Jan + Jul 2025 development holdout", "",
            f"Regenerate with `python -m taxi.sb3`. D2's cell and recorded trees {rounds} on its {len(COLS_D2)} columns, fit once per seed on the ten "
-           f"training months with no early stopping, then ST1a's out-of-fold weights ({W_TAIL} on tail rows, {W_BODY} on body rows, blending toward the "
-           f"cached D1 holdout prediction) and C1's floor at 0 s. Every constant was fixed by an earlier declared run, so k = {K}.", "",
+           f"training months with no early stopping, then C1's floor at 0 s. Every constant was fixed by an earlier declared run, so k = {K}. "
+           f"ST1a's gate was part of SB3 as promoted at H52 and is withdrawn: it set each row's weight from `is_tail(te)`, which reads "
+           f"`c = y - z_aobt`, that row's own label. Its line is kept below to price what the withdrawal costs. The verdict line reads NOT "
+           f"promoted because SB3 already holds lane A: this is H52's promotion re-scored without the gate, not a new one.", "",
            "## Seeds (unfloored RMSE; the delta is each seed floored, against the champion)", "",
            "| seed | holdout RMSE (s) | paired delta vs MC2 floored (s) |", "|---|---|---|", *seeds, "",
            f"Seed-to-seed RMSE spread: {spread:.2f} s.", "",

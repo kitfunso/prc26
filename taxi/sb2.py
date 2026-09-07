@@ -29,6 +29,8 @@ def bag(tea: pd.DataFrame) -> np.ndarray:
 
 
 def main() -> None:
+    raise RuntimeError("SB2 is withdrawn (H53): its ST1a gate reads is_tail(tea), which is c = y - z_aobt, the predicted row's own label. "
+                       "docs/SB2.md keeps the contaminated numbers as history.")
     tra, tea = lane_a()
     y, hd = tea.y.values, champion_holdout("D1", tra, tea)
     base = floored(champion_holdout("MC2", tra, tea))

@@ -58,7 +58,7 @@ def main() -> None:
         rows.append(f"| {name} | {rmse(p - y):.2f} | {rho:.4f} | {b:.2f} | {w:.3f} | {r0 - b:+.2f} |")
     front = [f"| {rx} | {needed_rho(r0, float(rx)):.3f} |" for rx in LEVELS]
     out = ["# BF: what a partner model must be to move lane A, Jan + Jul 2025 development holdout", "",
-           f"Diagnostic, never a verdict, no cell declared. Regenerate with `python -m taxi.bf`. Champion SB3 at {r0:.2f} s on "
+           f"Diagnostic, never a verdict, no cell declared. Regenerate with `python -m taxi.bf`. Lane-A champion SB3, the five-seed D2 bag, at {r0:.2f} s on "
            f"{len(tea):,} rows. For two predictors the blend RMSE is closed form in their two levels and their error correlation, so the "
            "best weight and the gain it buys need no fit. Agreement is the UNCENTRED error correlation, mean(e0 x ex) over the two RMSEs, which is the form that keeps the identity exact when the errors are not zero mean. The weight below is read off the holdout itself and is therefore unavailable in "
            "practice: it upper-bounds what any out-of-fold choice could reach.", "",
