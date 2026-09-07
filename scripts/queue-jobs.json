@@ -135,5 +135,15 @@
       "-m",
       "taxi.o1"
     ]
+  ],
+  [
+    "v16",
+    [
+      "-m",
+      "taxi.s2",
+      "data/merry-octopus_v16.parquet",
+      "SB3",
+      "0"
+    ]
   ]
 ]
