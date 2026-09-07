@@ -2,6 +2,7 @@
 lane-B champions by name behind one predictor path."""
 from __future__ import annotations
 
+import hashlib
 import os
 
 import numpy as np
@@ -62,6 +63,19 @@ def _fingerprint(tra: pd.DataFrame, tea: pd.DataFrame) -> int:
     return int(h % (1 << 62))
 
 
+def _code_fp(name: str) -> int:
+    """A composed champion's model lives in a module, so its source joins the cache key; the frames alone cannot see a model change (F40)."""
+    if name not in COMPOSED_A:
+        return 0
+    from importlib import import_module
+    with open(import_module(COMPOSED_A[name]).__file__, "rb") as fh:
+        return int.from_bytes(hashlib.sha256(fh.read()).digest()[:8], "big")
+
+
+def _cache_fp(name: str, tra: pd.DataFrame, tea: pd.DataFrame) -> int:
+    return int((_fingerprint(tra, tea) + _code_fp(name)) % (1 << 62))
+
+
 def refit_predict(name: str, tr: pd.DataFrame, te: pd.DataFrame, rows: str = "ranking") -> np.ndarray:
     """The named champion refit on tr at its recorded rounds, predicted on te; the one lane-A fit path for verdicts and files.
 
@@ -81,7 +95,7 @@ def refit_predict(name: str, tr: pd.DataFrame, te: pd.DataFrame, rows: str = "ra
 
 def champion_holdout(name: str, tra: pd.DataFrame, tea: pd.DataFrame) -> np.ndarray:
     """The named champion's holdout predictions, fit once and cached."""
-    path, fp = cache_path(name), _fingerprint(tra, tea)
+    path, fp = cache_path(name), _cache_fp(name, tra, tea)
     if os.path.exists(path):
         c = pd.read_parquet(path)
         if len(c) == len(tea) and c.fp.iloc[0] == fp and np.array_equal(c.id.values, tea.id.values):
