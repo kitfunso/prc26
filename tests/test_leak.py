@@ -50,8 +50,6 @@ def test_the_lane_a_file_path_runs_on_a_label_free_frame(feb, monkeypatch):
     from taxi import sb3
     te = feb.head(300).drop(columns=["y", "c"])
     monkeypatch.setattr(sb3, "seed_pred", lambda s, tr, tea, *a, **k: np.full(len(tea), 900.0 + s))
-    monkeypatch.setattr(sb3, "refit_predict", lambda *a, **k: np.full(len(te), 900.0))
-    monkeypatch.setattr(sb3, "final_rounds", lambda *a, **k: (1, 1, 1))
-    monkeypatch.setattr(sb3, "_fp", lambda *a, **k: 0)
+    monkeypatch.setattr(sb3, "final_rounds", lambda *a, **k: (1, 1, 1))  # only the fits are stubbed: _fp is what broke second
     p = sb3.predict(feb.head(300), te, "ranking")
     assert len(p) == len(te) and np.isfinite(p).all()

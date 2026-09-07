@@ -55,8 +55,11 @@ def lane_a(window: float = WINDOW, lag: float = 0.0) -> tuple[pd.DataFrame, pd.D
 
 def _fingerprint(tra: pd.DataFrame, tea: pd.DataFrame) -> int:
     # Row-wise hash of every column any champion reads, so a changed feature value invalidates the cache (critique S3, finding 1).
+    # Each frame contributes only the columns it has: the ranking frame comes from `features` and carries no label, and hashing y
+    # unconditionally made every prediction path raise on it (F36). Labelled frames hash the same columns as before, so no cache moves.
     cols = ["id", "y", *dict.fromkeys(c for cs, *_ in CHAMPIONS_A.values() for c in cs)]
-    return int(sum(int(pd.util.hash_pandas_object(d[cols], index=False).sum()) for d in (tra, tea)) % (1 << 62))
+    h = sum(int(pd.util.hash_pandas_object(d[[c for c in cols if c in d.columns]], index=False).sum()) for d in (tra, tea))
+    return int(h % (1 << 62))
 
 
 def refit_predict(name: str, tr: pd.DataFrame, te: pd.DataFrame, rows: str = "ranking") -> np.ndarray:
