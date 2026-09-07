@@ -1,0 +1,18 @@
+# Pinned to the versions this entry was built and scored with (Python 3.12.10).
+numpy==2.3.5
+pandas==2.2.3
+pyarrow==23.0.0
+duckdb==1.5.0
+scipy==1.17.0
+scikit-learn==1.7.2
+catboost==1.2.8
+lightgbm==4.6.0
+xgboost==3.1.3
+optuna==4.7.0
+holidays==0.103
+boto3==1.43.89
+requests==2.32.3
+pytest==9.0.2
+# Only for the TabPFN lanes (E1, E2, LP1), which all lost. Needs CUDA.
+tabpfn==6.3.1
+torch==2.10.0
