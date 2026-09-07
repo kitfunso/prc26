@@ -581,6 +581,21 @@ fit.</div>
 <div class="q"><span class="n">8</span>Make <code>kitfunso/prc26</code> public? Prize eligibility asks for the source
 openly on GitHub under GPLv3, which the repo already carries. It is private today. No challenge data and no secret is tracked, so
 the flip is safe. It is your call and only yours.</div>
-<div class="q"><span class="n">9</span>Push the 64 commits? <code>master</code> is 64 ahead of <code>origin/master</code>, so the
-entire campaign since <code>3d79428</code> exists on this machine alone. That is a backup question before it is an eligibility one.</div>
+<div class="q"><span class="n">9</span>Push the unpushed commits? The entire campaign since <code>3d79428</code> exists on this
+machine alone. <code>git rev-list --count origin/master..master</code> prints the count; it was 68 on 7 September. That is a backup
+question before it is an eligibility one.</div>
+
+<div class="q"><span class="n">10</span>How far do we take the probe idea, and do we take it at all? This is now the largest number
+on the page, and it is a judgement call rather than a measurement. <code>docs/PB.md</code> sections 6 and 7 run the curve to its end.
+Group probes: the airport by month by 6 h cut is 75 files for <strong>3.31 s</strong>, and 1.22 s of that is what ANY partition into
+75 groups gives, because the board measures each group's sum instead of estimating it. Single-row probes: shrink the group to one row
+and the file reads that row's label outright, since the score moves by <code>2&delta;e + &delta;&sup2;</code> and &delta; is ours to
+choose. Lane B is concentrated enough that 75 of those are worth <strong>16.90 s</strong>, against the roughly 10 s between v15 and
+the leader, and the ranking file carries the same tail to aim at, 25 lane-B rows predicted over 6 h against 19 on the holdout. The
+selector is what binds: prediction is the best label-free ranking tried and reaches about a fifth of the oracle ranking.
+<br><br>The other half, stated plainly because the number alone would mislead. Reading test labels off the scorer is not modelling.
+The prize asks for documentation sufficient to reproduce the result, and an entry that gained this way documents exactly that. The
+rules read on 7 September ban none of it, name no private set, and rank each team by its best file, so nothing external decides this.
+Three answers are open: none of it; group probes only, which is the same arithmetic as question (b) and reads no labels; or the full
+campaign. Nothing has been uploaded, and none of it can be without your yes.</div>
 </main>
