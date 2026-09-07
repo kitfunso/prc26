@@ -71,9 +71,10 @@ Shrink a group to one row and the probe reads that row's label outright: the fil
 | prediction | 4.46 | 8.21 | 8.28 | 11.33 | 16.90 |
 | scheduled taxi z_sched | 0.54 | 1.23 | 8.24 | 8.36 | 10.15 |
 | closeness of prediction to 24 h | 4.46 | 8.21 | 8.28 | 11.33 | 16.90 |
+| learned risk model, scripts/sel_risk.py | 0.78 | 2.43 | 4.25 | 7.29 | 10.35 |
 | oracle absolute error, the ceiling and not buyable | 66.42 | 70.28 | 75.76 | 81.75 | 87.84 |
 
-Two things follow. The selector is the binding constraint, not the budget: prediction, the best label-free ranking tried, reaches about a fifth of what the oracle ranking would. And the ranking file has the same tail to aim at as the holdout: v15 predicts over 6 h on 25 of its lane-B rows against 19 on the holdout, so the shape transfers even though the rows do not.
+Two things follow. The selector is the binding constraint, not the budget: prediction, the best label-free ranking tried, reaches about a fifth of what the oracle ranking would. A learned risk model on out-of-fold lane-B residuals is worse, 10.35 s at k = 75 against prediction's 16.90, though it ranks the absolute error better in correlation (`scripts/sel_risk.py` prints both). What pays here is the extreme tail and not the ordering, so that direction is closed. And the ranking file has the same tail to aim at as the holdout: v15 predicts over 6 h on 25 of its lane-B rows against 19 on the holdout, so the shape transfers even though the rows do not.
 
 It is still a question for the entrant and not a plan. Reading test labels off the scorer is not modelling, the prize asks for documentation sufficient to reproduce the result, and an entry whose gain came from k label reads documents exactly that. The published rules read on 7 September ban none of it and the board ranks each team by its best file, so the choice is the entrant's to make on its merits rather than the rulebook's to make for them. Nothing here has been uploaded.
 

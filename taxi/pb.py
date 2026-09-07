@@ -22,6 +22,8 @@ from taxi.submit import build_submission
 BOARD = {"jan": -3_297_233.0, "jul": +3_148_928.0, "laneB": -1_041_701.0}  # S1 error sums (p - y), protocol section 3, row P1-P6
 S1_RMSE, N_RANK = 325.3982, 344_841
 CHALLENGER = "data/merry-octopus_v15.parquet"
+RISK = "data/sel_risk.parquet"  # written by scripts/sel_risk.py
+RISK_NAME = "learned risk model, scripts/sel_risk.py"
 DP = 1e-4  # the board prints RMSE to four decimals
 ORDER = ("jan", "jul", "laneB")
 V15_BOARD = 287.42  # the equal-ratio projection, docs/BL.md section 3
@@ -103,14 +105,26 @@ def singles(eb: np.ndarray, p: np.ndarray, teb: pd.DataFrame) -> tuple[list, tup
     """One file that moves ONE row reads that row's label exactly, so k files zero the k rows the selector picks."""
     ks = (5, 10, 20, 40, 75)
     z = teb.z_sched.values.astype("float64")
-    sel = [("prediction", p), ("scheduled taxi z_sched", z), ("closeness of prediction to 24 h", -np.abs(p - 86_400.0)),
-           ("oracle absolute error, the ceiling and not buyable", np.abs(eb))]
+    sel = [("prediction", p), ("scheduled taxi z_sched", z), ("closeness of prediction to 24 h", -np.abs(p - 86_400.0))]
+    risk = _risk(teb)
+    if risk is not None:
+        sel.append((RISK_NAME, risk))
+    sel.append(("oracle absolute error, the ceiling and not buyable", np.abs(eb)))
     rows = []
     for name, sc in sel:
         o = np.argsort(-np.asarray(sc, dtype="float64"))
         rows.append((name, [_board(float((eb[o[:k]] ** 2).sum()) / len(eb)) for k in ks]))
     rank = _preds(CHALLENGER).reindex(pd.Index(sorted(groups()["laneB"])))
     return rows, ks, (int((rank > 21_600).sum()), int((p > 21_600).sum()))
+
+
+def _risk(teb: pd.DataFrame) -> np.ndarray | None:
+    """Month-fold out-of-fold risk scores, if scripts/sel_risk.py has been run; absent, the row is simply left out."""
+    try:
+        d = pd.read_parquet(RISK)
+    except (FileNotFoundError, OSError):
+        return None
+    return pd.Series(d.risk.values, index=d.id.values).reindex(teb.id.values).values
 
 
 def _board(rem_per_row: float) -> float:
@@ -156,6 +170,13 @@ def main() -> None:
     drop = lambda r, rem: r - float(np.sqrt((N_RANK * r ** 2 - rem) / N_RANK))  # noqa: E731
     s1_gain, v15_gain = drop(S1_RMSE, rows[0][2]), drop(V15_BOARD, rows[1][2])
     body = [f"| {name} | {c[0]:+,.0f} | {c[1]:+,.0f} | {c[2]:+,.0f} | {rem / 1e6:,.1f} |" for name, c, rem in rows]
+    by = dict(sng)
+    risk_note = ""
+    if RISK_NAME in by:
+        risk_note = (f"A learned risk model on out-of-fold lane-B residuals is worse, {by[RISK_NAME][-1]:.2f} s at "
+                     f"k = {ks[-1]} against prediction's {by['prediction'][-1]:.2f}, though it ranks the absolute "
+                     "error better in correlation (`scripts/sel_risk.py` prints both). What pays here is the extreme "
+                     "tail and not the ordering, so that direction is closed. ")
     out = ["# PB: what a board probe buys, and how many are worth spending", "",
            "Diagnostic, never a verdict, no cell declared. Regenerate with `python -m taxi.pb`. A submission returns one number, so it "
            "fixes one linear functional of the 2026 truth vector and nothing else. F27 used that fact to close the lane split, which is "
@@ -220,7 +241,7 @@ def main() -> None:
            "| selector | " + " | ".join(f"k = {k}" for k in ks) + " |", "|---|" + "---|" * len(ks),
            *[f"| {nm} | " + " | ".join(f"{v:.2f}" for v in vs) + " |" for nm, vs in sng], "",
            "Two things follow. The selector is the binding constraint, not the budget: prediction, the best label-free ranking tried, "
-           "reaches about a fifth of what the oracle ranking would. And the ranking file has the same tail to aim at as the holdout: "
+           f"reaches about a fifth of what the oracle ranking would. {risk_note}And the ranking file has the same tail to aim at as the holdout: "
            f"v15 predicts over 6 h on {tail[0]} of its lane-B rows against {tail[1]} on the holdout, so the shape transfers even "
            "though the rows do not.", "",
            "It is still a question for the entrant and not a plan. Reading test labels off the scorer is not modelling, the prize asks "
