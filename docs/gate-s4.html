@@ -49,8 +49,9 @@ a{color:var(--accent)}
 
 <main>
 <p class="eyebrow">PRC Data Challenge 2026 &middot; merry-octopus &middot; Stage 6 promotion gate</p>
-<h1>S4: upload v15, build v16 on SB3, or hold</h1>
-<p class="lede">The board still scores S1, a pair two champions old. v15 is built and sitting on disk. An independent critique ran
+<h1>S4: upload v16, or hold</h1>
+<p class="lede">The board still scores S1, a pair two champions old. v16, carrying both current champions, is built and sitting on
+disk. An independent critique ran
 against this gate before you saw it and broke four of its numbers. Those are corrected below, the measurements it said were missing
 have been run, and it rides this page in full.</p>
 
@@ -69,6 +70,31 @@ lane A reverts to MC2 and SB3 is parked with the other four. Leaving it as it st
 </div>
 
 <div class="decision">
+<h2>Built since 03:37 on 7 September: v16, and the middle option is gone</h2>
+<p><strong>v16 exists. The choice is now two ways, upload or hold.</strong> <code>python -m taxi.s2
+data/merry-octopus_v16.parquet SB3 0</code> finished in 42 min on the GPU: 344,841 rows, sha256
+<code>fccc454fca0fcd9e489b3832af382f3d62c020f226e46ef95c1540b79ec95b5f</code>, lane A SB3, lane B L8c, floor 0 s, ledger row S5.
+It differs from v15 on 329,648 of 339,551 lane-A rows and on <strong>0 of 5,290 lane-B rows</strong>, so L8c reproduces bit for
+bit from its own 12-month refit and lane A is the whole change.</p>
+<p><strong>The projection is now measured on the file rather than carried from the holdout.</strong> Across the whole
+one-parameter family the board leaves open, v16 lands between <span class="num">281.4</span> and <span class="num">288.0</span>,
+equal-ratio point <span class="num">286.12</span>, against v15's 282.7 to 290.3 and 287.42 (<code>docs/BL.md</code>, regenerated
+on this file). SB3's 2.06 s of holdout lane A is worth about <strong>1.3 s of board composite</strong>. The upload is worth
+roughly <span class="num">39</span> board seconds against S1's 325.3982, and the leader's lead narrows from 7.4% and 7.0% of a
+lane to <span class="num">6.4%</span> and <span class="num">6.1%</span>.</p>
+<p><strong>Two defects were found on the way, both fixed, neither changing a model.</strong> The first killed the
+build 8.9 min in: a per-seed progress line printed the holdout RMSE, and the ranking frame has no label (F39). The guard test F36
+shipped for exactly this shape had monkeypatched away the only function on the path that still read the label, so the shape was
+right and the verifier was hollow; <code>tests/test_labelfree_predict.py</code> now drives the real dispatch for all four lane-A
+champions. The second was silent (F40): SB3's cached holdout predictions were the withdrawn label-gated ones, 229.7752 against the
+honest 230.0951, because the cache fingerprint hashes the two frames and cannot see that the model changed under it. No recorded
+verdict used the file, checked module by module; the next lane judged against lane A would have met a champion 0.32 s better than
+any honest model of it. The cache key now carries a hash of a composed champion's module source. 45 tests pass.</p>
+<p class="note">What this changes for you: the middle option on this page, wait 3.5 h for v16, is done. The file is on disk and
+unsent. Nothing else about the call moved.</p>
+</div>
+
+<div class="decision">
 <h2>New since you last opened this page</h2>
 <p><strong>Two findings landed after 01:21 on 7 September. Neither changes a model. One adds a decision, one adds two
 actions.</strong></p>
@@ -81,6 +107,7 @@ prediction vectors sit on disk. So the measurement carries to v15, to v16, and t
 <tr><th>file</th><th class="num">January sum (s)</th><th class="num">July+ sum (s)</th><th class="num">lane B sum (s)</th><th class="num">SSE removed (Ms&sup2;)</th><th class="num">worth</th></tr>
 <tr><td class="id">S1, scored 325.3982</td><td class="num">&minus;3,297,233</td><td class="num">+3,148,928</td><td class="num">&minus;1,041,701</td><td class="num">328.6</td><td class="num">1.47 s</td></tr>
 <tr><td class="id">v15, built, never scored</td><td class="num">&minus;829,824</td><td class="num">+1,611,428</td><td class="num">&minus;1,103,490</td><td class="num">256.3</td><td class="num">1.30 s</td></tr>
+<tr class="win"><td class="id">v16, built, never scored</td><td class="num">&minus;872,200</td><td class="num">+1,665,744</td><td class="num">&minus;1,103,490</td><td class="num">257.7</td><td class="num">1.31 s</td></tr>
 </table></div>
 <p class="note">Detail in <code>docs/PB.md</code>, flag F38, code <code>taxi/pb.py</code>, test <code>tests/test_pb.py</code>.
 <code>python -m taxi.pb &lt;src&gt; &lt;out&gt;</code> writes the corrected file. This supersedes question 6 below, which priced only
@@ -92,27 +119,27 @@ no separate final or private set is named anywhere, so a probe cannot cost a pla
 is 3 files a day and 1 GB a bucket, against 2 MB a file. And prize eligibility, of which only the external-data clause was on record,
 also requires the source openly on GitHub under GPLv3 and documentation sufficient to reproduce the results.
 <code>kitfunso/prc26</code> carries the licence but is private, and every commit since <code>3d79428</code> (4 September) is unpushed
-(<code>git rev-list --count origin/master..master</code> prints the count; it was 68 when this was written). No challenge
+(<code>git rev-list --count origin/master..master</code> prints the count; it was 79 when this was written). No challenge
 data and no secret is tracked. Publication is safe; it needs only your decision. Questions 8 and 9.</p>
 
 <p><strong>3. A probe campaign is now priced, and the section 2 table on its own reads too high.</strong> PB section 2 is on the
 holdout's own composite, where L8c is nearly unbiased at &minus;12.6 s. Almost all of its lane-B probe value is therefore the
 airport spread, and almost none is the level. The board is the other way round: the same lane-B mean is &minus;208.6 s, which is
 most of the 1.30 s above. So the two halves do not double count, and the question is what the probes we have NOT bought are worth.
-Rescaling the holdout's lane-B group means to the board's 5,290 rows off v15's 287.42 (<code>docs/PB.md</code> section 5,
-<code>python -m taxi.pb</code>) gives <strong>+0.894 s for 9 more files</strong> (lane B by airport, one per airport) and
-<strong>+0.773 s for 10 after that</strong> (airport by month). That assumes the holdout's airport spread transfers; F23's year
+Rescaling the holdout's lane-B group means to the board's 5,290 rows off v16's 286.12 (<code>docs/PB.md</code> section 5,
+<code>python -m taxi.pb</code>) gives <strong>+0.898 s for 9 more files</strong> (lane B by airport, one per airport) and
+<strong>+0.776 s for 10 after that</strong> (airport by month). That assumes the holdout's airport spread transfers; F23's year
 shift is itself airport-shaped, and adds spread rather than cancelling it, so the number is the low side. At 3 files a day and
-34 days to the deadline the cap does not bind. This does not need a separate answer, it prices question (b): the banked 1.30 s is
+34 days to the deadline the cap does not bind. This does not need a separate answer, it prices question (b): the banked 1.31 s is
 the first instalment, not the whole of it.</p>
 </div>
 
 <div class="decision">
 <h2>The call</h2>
-<p class="call">Upload <code>data/merry-octopus_v15.parquet</code> to the board, wait about 3.5 h of GPU for a v16 carrying
-the new champion, or leave S1 standing.</p>
+<p class="call">Upload <code>data/merry-octopus_v16.parquet</code> to the board, or leave S1 standing.</p>
 <p class="note">Nothing is uploaded without an explicit yes. The file is built, floored and hashed
-(sha256 <code>639fa7564a105a84995ffb5eee0da99ffa3791406b8cefba6d9e2d53caa68af0</code>, 344,841 rows). The scorer allows three
+(sha256 <code>fccc454fca0fcd9e489b3832af382f3d62c020f226e46ef95c1540b79ec95b5f</code>, 344,841 rows) and it carries both current
+champions, so the wait this page asked about is over. v15 is superseded and stays on disk. The scorer allows three
 submissions a day; five have been spent, four of them on probes.</p>
 <p class="note"><strong>What changed since you last saw this page: lane A has a new champion, and it is the first one the
 2 s floor did not block.</strong> SB3 beat MC2 by <span class="num">+2.06</span> s [+1.71, +2.37] on the same 339,046 rows, paired SE
@@ -125,14 +152,13 @@ five-seed bag +1.0, C1's floor +0.5) on the one base they had never been tried o
 ST1a's gate, was withdrawn on 7 September as a label leak (banner above) and was worth 0.32 s of the number this page first carried. So the floor did not discard those gains permanently, it delayed them until they were taken together, which is the answer to
 finding 2 that neither the flag nor the fix proposed for it could give. The gains do not add linearly (+2.5 would; +2.06 is what
 arrives), and there is now no uncomposed parked positive lane-A tie left, so this particular move cannot be repeated.
-<strong>The consequence for the call:</strong> v15 carries MC2 and is superseded. On the holdout SB3 takes the composite from
-322.5796 to <span class="num">320.9013</span>, worth 1.46 composite seconds, which moves the two board anchors from 282.7 and 287.4
-to <span class="num">281.2</span> and <span class="num">286.0</span>. Both still sit above the leader's 277.29. Building v16 needs
-five 12-month refits, about 3.5 h of GPU on a queue that is still running declared lanes, and buys 1.5 s against an upload worth
-about 38. Uploading v15 now and v16 later is available: the scorer's cap is three files a day, not three in total.</p>
+<strong>The consequence for the call:</strong> v15 carries MC2 and is superseded by v16, which is built. On the holdout SB3
+takes the composite from 322.5796 to <span class="num">321.1269</span>, worth 1.45 composite seconds, and the board projection
+measured on the file itself moves the two anchors from 282.7 and 287.42 to <span class="num">281.4</span> and
+<span class="num">286.12</span>. Both still sit above the leader's 277.29.</p>
 <p class="note"><strong>Why this is now the only large move on the table.</strong> The board still shows S1 at
-<span class="num">325.3982</span> and nothing has gone up since. Section 3b puts v15 at about <span class="num">287</span>,
-so the upload is worth roughly <span class="num">38</span> board seconds. Everything still running is worth 1 to 3 s each,
+<span class="num">325.3982</span> and nothing has gone up since. Section 3b puts v16 at about <span class="num">286</span>,
+so the upload is worth roughly <span class="num">39</span> board seconds. Everything still running is worth 1 to 3 s each,
 and four directions have been closed by measurement rather than by opinion: lane A's 49 columns (F25), the lane-B artifact
 rows that hold two thirds of that lane's error (F21), the arrival-clock channel <code>ARVT_3_flt</code>, the one time column
 the feature builder never read (flat against MC2's residuals on all 339,046 rows), gradient-boosted trees in
@@ -147,20 +173,20 @@ lost by <span class="num">&minus;5.7</span> s [&minus;16.3, +1.3] (H51, <code>do
 closed: the movement file holds 30 columns to the feature view's 25, the four unread ones are plan-side twins of movement fields,
 and an in-sample-optimal recalibration on their disagreements, which no honest model can reach, is worth at most
 <span class="num">+0.14</span> s [+0.04, +0.24] (F33, <code>docs/PV.md</code>). There is no unread input left in the file.
-The gap to first is about seven percent of one
-lane and no closed direction contains it. That is a reason to bank the 38 s now, not a reason to stop looking.</p>
+The gap to first is about six percent of one
+lane and no closed direction contains it. That is a reason to bank the 39 s now, not a reason to stop looking.</p>
 <p class="note"><strong>The second reason, which is about the measurement and not the score.</strong> Every board reading we
 hold was taken on the S1 model: the S1 row itself and the six probes P1 to P6, all of them the same M1 plus B4 file. Nothing
 promoted since has been scored by the board even once. That is <span class="num">53</span> holdout verdicts, the whole
 lane-A chain to MC2 and the whole lane-B chain to L8c, resting on a holdout-to-board correspondence measured at a single
 model, SB3 and L8c included. <code>docs/HB.md</code> priced the two known distortions and both are small, but a correspondence measured at one
-point cannot show a slope. Uploading v15 is the only way to get a second point, and the second point is worth more to every
-verdict that follows than the 38 s is worth to the rank.</p>
+point cannot show a slope. Uploading v16 is the only way to get a second point, and the second point is worth more to every
+verdict that follows than the 39 s is worth to the rank.</p>
 </div>
 
 <h2>1. Corrections to this page, before anything else</h2>
-<p>The first draft of this gate carried four wrong figures. Each is a number reused without re-reading its source. They are listed
-here rather than quietly fixed.</p>
+<p>Six wrong figures have been caught on this page across its drafts, four of them in the first. Each is a number reused without
+re-reading its source. They are listed here rather than quietly fixed.</p>
 <div class="wrap"><table>
 <tr><th>claim in the first draft</th><th>what the source says</th><th>where</th></tr>
 <tr class="lose"><td>S1 scored 324.7339 on the board</td><td>324.7339 is <strong>P1</strong>, a deliberately perturbed probe
@@ -171,6 +197,11 @@ reproducible from any recorded pair.</td><td class="id">ledger row S1</td></tr>
 composite.</td><td class="id">section 3</td></tr>
 <tr class="lose"><td>a 1:1 board move lands near 293.6</td><td>Withdrawn. Both inputs were wrong; the two defensible anchors give
 282.7 and 287.4, and neither is tested.</td><td class="id">section 3</td></tr>
+<tr class="lose"><td>the v16 anchors of 281.1 and 285.9, added 7 September at 03:37</td><td>Both were computed on SB3's
+<strong>withdrawn</strong> 229.7752 composite of 320.9013, on a page whose own banner said every number had been recomputed on
+230.0951. The honest composite is <strong>321.1269</strong> and the anchors are <strong>281.3</strong> and
+<strong>286.1</strong>. Found 2026-09-07 while re-anchoring the board arithmetic on the built v16; F40 is the same defect at the
+cache.</td><td class="id">section 3</td></tr>
 <tr class="lose"><td>the two board anchors are equally likely, and the row mix costs 1 to 3 s</td><td>Both corrected 2026-09-06.
 The mix walk run on both lanes nets 0.52 s <em>in our favour</em> (F26). The anchors are not two guesses but a one-parameter
 family on which v15 lands 282.7 to 290.3, equal-ratio 287.42, so 287 is the plan number (F27).</td><td class="id">section 3b</td></tr>
@@ -213,8 +244,8 @@ most important line on the page.</p>
 <tr><th>assumption</th><th class="num">implied S4 board</th><th>status</th></tr>
 <tr><td>additive offset of 39.84 s, v15 (MC2)</td><td class="num">282.7</td><td>untested</td></tr>
 <tr><td>ratio of 0.891, v15 (MC2)</td><td class="num">287.4</td><td>untested</td></tr>
-<tr class="win"><td>additive offset of 39.84 s, v16 (SB3, not built)</td><td class="num">281.1</td><td>untested</td></tr>
-<tr class="win"><td>ratio of 0.891, v16 (SB3, not built)</td><td class="num">285.9</td><td>untested</td></tr>
+<tr class="win"><td>additive offset of 39.84 s, v16 (SB3, built)</td><td class="num">281.3</td><td>untested</td></tr>
+<tr class="win"><td>ratio of 0.891, v16 (SB3, built)</td><td class="num">286.1</td><td>untested</td></tr>
 </table></div>
 <p>The leader is at 277.29. Both anchors sit above it. Neither is a prediction: one submission cannot fit a transfer, and flags F5
 and F2 say the transfer is unexplained and the 2026 tail unknown.</p>
@@ -235,29 +266,30 @@ month is worth &minus;0.58 s in January and +0.52 s in July, disagreeing on sign
 <h3>3b. The two anchors are not two equal guesses (new, <code>docs/BL.md</code>, flag F27)</h3>
 <p>The board score fixes exactly one equation, <code>n_A &times; rmse_A&sup2; + n_B &times; rmse_B&sup2; = SSE</code>, on 339,551 lane-A
 and 5,290 lane-B rows. Naming S1's board lane A forces its board lane B, so there is a one-parameter family rather than a point.
-Carrying v15's champions across that family by ratio and by additive shift gives:</p>
+Carrying v16's champions across that family by ratio and by additive shift gives:</p>
 <div class="wrap"><table>
-<tr><th class="num">S1 board lane A</th><th class="num">forced S1 board lane B</th><th class="num">v15 board, ratio carry</th><th class="num">v15 board, additive carry</th></tr>
-<tr><td class="num">190</td><td class="num">2,141</td><td class="num">286.19</td><td class="num">282.85</td></tr>
-<tr><td class="num">220</td><td class="num">1,948</td><td class="num">287.04</td><td class="num">282.77</td></tr>
-<tr><td class="num">250</td><td class="num">1,700</td><td class="num">288.02</td><td class="num">283.49</td></tr>
-<tr><td class="num">280</td><td class="num">1,367</td><td class="num">289.11</td><td class="num">285.42</td></tr>
-<tr><td class="num">310</td><td class="num">857</td><td class="num">290.32</td><td class="num">289.86</td></tr>
+<tr><th class="num">S1 board lane A</th><th class="num">forced S1 board lane B</th><th class="num">v16 board, ratio carry</th><th class="num">v16 board, additive carry</th></tr>
+<tr><td class="num">190</td><td class="num">2,141</td><td class="num">285.31</td><td class="num">281.69</td></tr>
+<tr><td class="num">220</td><td class="num">1,948</td><td class="num">285.87</td><td class="num">281.40</td></tr>
+<tr><td class="num">250</td><td class="num">1,700</td><td class="num">286.51</td><td class="num">281.91</td></tr>
+<tr><td class="num">280</td><td class="num">1,367</td><td class="num">287.22</td><td class="num">283.64</td></tr>
+<tr><td class="num">310</td><td class="num">857</td><td class="num">288.01</td><td class="num">287.89</td></tr>
 </table></div>
-<p>Across the whole family v15 lands between 282.7 and 290.3, and the equal-ratio point gives 287.42. The 282.7 anchor is reachable
-only under an additive carry <em>and</em> a lane-B-heavy reading; <strong>287 is the number to plan against, and 283 is the
-optimistic corner of one corner.</strong></p>
+<p>Across the whole family v16 lands between 281.4 and 288.0, and the equal-ratio point gives 286.12. The optimistic corner is
+reachable only under an additive carry <em>and</em> a lane-B-heavy reading; <strong>286 is the number to plan against, and 281 is
+the optimistic corner of one corner.</strong> On v15 the same table read 282.7 to 290.3 with 287.42, so the whole band moved down
+by about 1.3 s when SB3 replaced MC2 in lane A.</p>
 <p>Two consequences. First, the split itself is unmeasurable: a submission returns
 <code>sum(p'&sup2; &minus; p&sup2;) &minus; 2 sum((p' &minus; p) y)</code> with both prediction vectors known, so every probe
 returns one <em>linear</em> functional of the truth vector, while a lane's SSE is quadratic in it; the four unknowns against the
 four available files are rank three. P1 to P6's first moments were the most the leaderboard could ever have given on this question,
-and the remaining scorer slots buy nothing more of it. Second, v15's per-lane board error sums are exact with no upload, carried
-from S1's measured ones by the difference of the two files on disk: <strong>+5.55 s per lane-A row and &minus;208.6 s per lane-B
-row</strong>. Removing the lane-B level alone is worth about 1.16 s of board composite at no model cost, and it is a change to a
+and the remaining scorer slots buy nothing more of it. Second, v16's per-lane board error sums are exact with no upload, carried
+from S1's measured ones by the difference of the two files on disk: <strong>+5.59 s per lane-A row and &minus;208.6 s per lane-B
+row</strong>. Removing the lane-B level alone is worth about 1.17 s of board composite at no model cost, and it is a change to a
 submitted file, so it is question 6 below.</p>
-<p>Put v15 on the board at the equal-ratio point (lane A 207.7, lane B 1,618, composite 287.42) and the leader at 277.29 must be
-7.4% better than us in lane B if their lane A matches ours, or 7.0% better in lane A if their lane B matches ours.
-<strong>The lead is about seven percent of one lane.</strong> It is not a different class of model, and it is not concentrated in
+<p>Put v16 on the board at the equal-ratio point (lane A 205.8, lane B 1,618, composite 286.12) and the leader at 277.29 must be
+6.4% better than us in lane B if their lane A matches ours, or 6.1% better in lane A if their lane B matches ours.
+<strong>The lead is about six percent of one lane.</strong> It is not a different class of model, and it is not concentrated in
 lane B's artifact rows the way <code>docs/LEV.md</code>'s drop-k arithmetic reads on 2025 data.</p>
 
 <h2>4. The blockers the critique raised, now measured</h2>
@@ -553,16 +585,17 @@ lane B, so the same rule asks eight times more of one lane than the other.</p>
 
 
 <h2>10. Gate questions</h2>
-<div class="q"><span class="n">1</span>Upload v15 now, wait about 3.5 h of GPU for a v16 carrying SB3, or hold? Four of the
-six lanes this question named have since returned. M3 and E1 are the TabPFN pair above, closed by F31. LP1 put TabPFN on lane B and
+<div class="q"><span class="n">1</span>Upload v16, or hold? The build is done, so the three-way question this page opened with
+is a two-way one. Four of the six lanes it named have since returned. M3 and E1 are the TabPFN pair above, closed by F31. LP1 put TabPFN on lane B and
 lost by <span class="num">&minus;286.0</span> s [&minus;562.0, &minus;68.7] against its own pre-registered prediction that it would,
 closing lane B's model-class question with a second and non-tree family (H53). L11 extended the copy mixture to the nine airports
 the gate excludes and lost by <span class="num">&minus;5.7</span> s [&minus;16.3, +1.3], with LIRF verified bit-identical (H51). SB3
-won and is the reason this page was rewritten. What is still running is Q1 and TH1, then O1, all lane A and each declared at 1 to 3
-s, worth 0.7 to 2.1 composite seconds against an upload worth about 38. The new fork is v15 against v16: v16 is 1.46 composite
-seconds better and costs 3.5 h of GPU that the queue is currently using on declared lanes. <strong>My reading:</strong> upload v15
-now and build v16 into a later slot, because the daily cap is three files and the value of the upload is the second board point
-rather than the 1.5 s.</div>
+won and is the reason this page was rewritten. Q1, TH1 and X1 have since returned as ties or losses, so the only lane still running
+is O1, a 40-trial CatBoost tuning study that meets MC2 and cannot promote against SB3, declared as a control. Everything else on
+the search side is closed by measurement and the queue after O1 is empty. Against that, an upload is worth about
+<span class="num">39</span> board seconds. <strong>My reading:</strong> upload v16, because there is no longer a model reason to
+wait and the second board point is worth as much to every verdict that follows as the 39 s is to the rank. Whether the banked
+correction rides with it is question 6.</div>
 <div class="q"><span class="n">2</span>The critique's last recommendation is a second file, MC2 plus B4 floored, as the only way
 to price the lane-B chain on the board itself. That spends a second daily slot. Do it? F27 sharpens what it can return: the
 difference of two files that differ only in lane B is exact, so this does settle L8c against B4 on 2026 rows, but neither
@@ -575,14 +608,14 @@ thing to optimise, or should the remaining time go to the 65.7% of squared error
 <div class="q"><span class="n">5</span>Attack the rule in section 8. What does it let through that it should not?</div>
 <div class="q"><span class="n">6</span><strong>Superseded by F38 above, and it is now worth more than question 6 first
 said.</strong> Section 3b priced the lane-B level alone at about <span class="num">1.16</span> s. The three groups the board has
-already measured are worth <span class="num">1.30</span> s on v15 together, and the same arithmetic carries to v16 and to every file
+already measured are worth <span class="num">1.31</span> s on v16 together, and the same arithmetic carries to every file
 after it. Apply the correction to whatever file goes up, or keep the file a pure model output? Applying it is one command and no
 fit.</div>
 <div class="q"><span class="n">8</span>Make <code>kitfunso/prc26</code> public? Prize eligibility asks for the source
 openly on GitHub under GPLv3, which the repo already carries. It is private today. No challenge data and no secret is tracked, so
 the flip is safe. It is your call and only yours.</div>
 <div class="q"><span class="n">9</span>Push the unpushed commits? The entire campaign since <code>3d79428</code> exists on this
-machine alone. <code>git rev-list --count origin/master..master</code> prints the count; it was 68 on 7 September. That is a backup
+machine alone. <code>git rev-list --count origin/master..master</code> prints the count; it was 79 on 7 September. That is a backup
 question before it is an eligibility one.</div>
 
 <div class="q"><span class="n">10</span>How far do we take the probe idea, and do we take it at all? This is now the largest number
@@ -590,7 +623,7 @@ on the page, and it is a judgement call rather than a measurement. <code>docs/PB
 Group probes: the airport by month by 6 h cut is 75 files for <strong>3.31 s</strong>, and 1.22 s of that is what ANY partition into
 75 groups gives, because the board measures each group's sum instead of estimating it. Single-row probes: shrink the group to one row
 and the file reads that row's label outright, since the score moves by <code>2&delta;e + &delta;&sup2;</code> and &delta; is ours to
-choose. Lane B is concentrated enough that 75 of those are worth <strong>16.90 s</strong>, against the roughly 10 s between v15 and
+choose. Lane B is concentrated enough that 75 of those are worth <strong>16.90 s</strong>, against the roughly 9 s between v16 and
 the leader, and the ranking file carries the same tail to aim at, 25 lane-B rows predicted over 6 h against 19 on the holdout. The
 selector is what binds: prediction is the best label-free ranking tried and reaches about a fifth of the oracle ranking. A learned risk model on
 out-of-fold lane-B residuals was tried and lost, 10.35 s at the same 75 files, so the 16.90 s is what the best selector on hand
