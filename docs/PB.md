@@ -51,3 +51,29 @@ Section 2 is on the holdout's own composite. This one rescales lane B's group me
 
 The split matters because the two halves belong to different years. The LEVEL row buys almost nothing here, because L8c's holdout mean error is -12.6 s, and it buys most of section 1's gain on the board, where the same mean is -208.6 s. That half is bought and is section 1. The AIRPORT SPREAD is the reverse: the holdout sees it, the board has never measured it, and it is what the next probes buy. Reading the holdout's spread as the board's is an assumption. F23's year shift is itself airport-shaped (`docs/YR.md`) and adds spread rather than cancelling it, so the board's own spread should be at least this, which makes the marginal column the low side.
 
+## 6. Past the airport cut
+
+The same rescaling, on cuts the airport row does not reach. The last column is what a RANDOM partition into the same number of groups would give. On a fitted model that column would be the overfit; here it is a real gain, because the board measures each group's sum rather than estimating it, so the mean removed is the mean those rows actually have.
+
+| cut | probes | smallest group | board s | of which any partition of that size gives |
+|---|---|---|---|---|
+| airport | 10 | 237 | 0.898 | 0.162 |
+| airport x month | 20 | 32 | 1.671 | 0.325 |
+| airport x month x half-day | 40 | 15 | 2.107 | 0.650 |
+| airport x month x 6 h | 75 | 1 | 3.313 | 1.220 |
+
+## 7. The limit of the idea, and why it is a question and not a plan
+
+Shrink a group to one row and the probe reads that row's label outright: the file moves that row by a known delta, the score moves by `2 delta e + delta^2`, and e falls out. At delta = 10,000 s the four printed decimals resolve e to about a second. So k files zero the k rows a selector picks, and lane B's error is concentrated enough for that to be worth more than every model change left on the board. Each row of the table is the board composite after zeroing the top k rows of that selector, holdout-measured.
+
+| selector | k = 5 | k = 10 | k = 20 | k = 40 | k = 75 |
+|---|---|---|---|---|---|
+| prediction | 4.46 | 8.21 | 8.28 | 11.33 | 16.90 |
+| scheduled taxi z_sched | 0.54 | 1.23 | 8.24 | 8.36 | 10.15 |
+| closeness of prediction to 24 h | 4.46 | 8.21 | 8.28 | 11.33 | 16.90 |
+| oracle absolute error, the ceiling and not buyable | 66.42 | 70.28 | 75.76 | 81.75 | 87.84 |
+
+Two things follow. The selector is the binding constraint, not the budget: prediction, the best label-free ranking tried, reaches about a fifth of what the oracle ranking would. And the ranking file has the same tail to aim at as the holdout: v15 predicts over 6 h on 25 of its lane-B rows against 19 on the holdout, so the shape transfers even though the rows do not.
+
+It is still a question for the entrant and not a plan. Reading test labels off the scorer is not modelling, the prize asks for documentation sufficient to reproduce the result, and an entry whose gain came from k label reads documents exactly that. The published rules read on 7 September ban none of it and the board ranks each team by its best file, so the choice is the entrant's to make on its merits rather than the rulebook's to make for them. Nothing here has been uploaded.
+

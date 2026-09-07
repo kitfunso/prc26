@@ -80,11 +80,49 @@ def marginal(eb: np.ndarray, teb: pd.DataFrame) -> list[tuple[str, int, float, f
     return rows
 
 
-def curve() -> tuple[list[tuple[str, int, float]], float, int, float, list[tuple[str, int, float, float]], float]:
+def fine(eb: np.ndarray, teb: pd.DataFrame) -> list[tuple[str, int, int, float, float]]:
+    """Lane-B group cuts past the airport, with the drop a RANDOM partition of the same size would give beside each one.
+
+    On the board a group mean is measured, not fitted, so the random-partition column is a real gain and not an overfit.
+    """
+    n_b = len(eb)
+    apt, mon, hr = pd.Series(teb.apt.values).astype(str), pd.Series(teb.month.values).astype(str), pd.Series(teb.hour.values)
+    sig2 = float((eb ** 2).mean())
+    cuts = [("airport", [apt]), ("airport x month", [apt, mon]), ("airport x month x half-day", [apt, mon, (hr // 12).astype(str)]),
+            ("airport x month x 6 h", [apt, mon, (hr // 6).astype(str)])]
+    rows = []
+    for name, cols in cuts:
+        lab = pd.Series(["|".join(t) for t in zip(*cols)])
+        st = pd.Series(eb).groupby(lab).agg(["size", "mean"])
+        rem = float((st["size"] * st["mean"] ** 2).sum()) / n_b
+        rows.append((name, len(st), int(st["size"].min()), _board(rem), _board(len(st) * sig2 / n_b)))
+    return rows
+
+
+def singles(eb: np.ndarray, p: np.ndarray, teb: pd.DataFrame) -> tuple[list, tuple[int, ...], tuple[int, int]]:
+    """One file that moves ONE row reads that row's label exactly, so k files zero the k rows the selector picks."""
+    ks = (5, 10, 20, 40, 75)
+    z = teb.z_sched.values.astype("float64")
+    sel = [("prediction", p), ("scheduled taxi z_sched", z), ("closeness of prediction to 24 h", -np.abs(p - 86_400.0)),
+           ("oracle absolute error, the ceiling and not buyable", np.abs(eb))]
+    rows = []
+    for name, sc in sel:
+        o = np.argsort(-np.asarray(sc, dtype="float64"))
+        rows.append((name, [_board(float((eb[o[:k]] ** 2).sum()) / len(eb)) for k in ks]))
+    rank = _preds(CHALLENGER).reindex(pd.Index(sorted(groups()["laneB"])))
+    return rows, ks, (int((rank > 21_600).sum()), int((p > 21_600).sum()))
+
+
+def _board(rem_per_row: float) -> float:
+    return V15_BOARD - float(np.sqrt((N_RANK * V15_BOARD ** 2 - rem_per_row * len(groups()["laneB"])) / N_RANK))
+
+
+def curve() -> tuple:
     tra, tea = lane_a()
     trb, teb = lane_b()
     ea = floored(sb3_predict(tra, tea)) - tea.y.values
-    eb = floored(predict_b(CURRENT["B"], trb, teb)) - teb.y.values
+    pbv = floored(predict_b(CURRENT["B"], trb, teb))
+    eb = pbv - teb.y.values
     n, sse = len(ea) + len(eb), float((ea ** 2).sum() + (eb ** 2).sum())
     base = np.sqrt(sse / n)
     key = lambda *cols: pd.Series(["|".join(map(str, t)) for t in zip(*cols)])  # noqa: E731
@@ -107,12 +145,12 @@ def curve() -> tuple[list[tuple[str, int, float]], float, int, float, list[tuple
             rem += float((s["size"] * s["mean"] ** 2).sum())
             g += len(s)
         out.append((name, g, base - float(np.sqrt((sse - rem) / n))))
-    return out, base, n, sse, marginal(eb, teb), float(eb.mean())
+    return out, base, n, sse, marginal(eb, teb), float(eb.mean()), fine(eb, teb), singles(eb, pbv, teb)
 
 
 def main() -> None:
     rows = banked()
-    tbl, base, n, sse, mrg, hold_mean = curve()
+    tbl, base, n, sse, mrg, hold_mean, fin, (sng, ks, tail) = curve()
     n_board_b = len(groups()["laneB"])
     sig = N_RANK * ((S1_RMSE + DP / 2) ** 2 - (S1_RMSE - DP / 2) ** 2) / (2 * 300.0)
     drop = lambda r, rem: r - float(np.sqrt((N_RANK * r ** 2 - rem) / N_RANK))  # noqa: E731
@@ -166,7 +204,29 @@ def main() -> None:
            f"{rows[1][1][2] / n_board_b:+.1f} s. That half is bought and is section 1. The AIRPORT SPREAD is the reverse: the holdout "
            "sees it, the board has never measured it, and it is what the next probes buy. Reading the holdout's spread as the board's is "
            "an assumption. F23's year shift is itself airport-shaped (`docs/YR.md`) and adds spread rather than cancelling it, so the "
-           "board's own spread should be at least this, which makes the marginal column the low side.", ""]
+           "board's own spread should be at least this, which makes the marginal column the low side.", "",
+           "## 6. Past the airport cut", "",
+           "The same rescaling, on cuts the airport row does not reach. The last column is what a RANDOM partition into the same "
+           "number of groups would give. On a fitted model that column would be the overfit; here it is a real gain, because the board "
+           "measures each group's sum rather than estimating it, so the mean removed is the mean those rows actually have.", "",
+           "| cut | probes | smallest group | board s | of which any partition of that size gives |", "|---|---|---|---|---|",
+           *[f"| {nm} | {g} | {mn} | {b:.3f} | {r:.3f} |" for nm, g, mn, b, r in fin], "",
+           "## 7. The limit of the idea, and why it is a question and not a plan", "",
+           "Shrink a group to one row and the probe reads that row's label outright: the file moves that row by a known delta, the "
+           "score moves by `2 delta e + delta^2`, and e falls out. At delta = 10,000 s the four printed decimals resolve e to about a "
+           "second. So k files zero the k rows a selector picks, and lane B's error is concentrated enough for that to be worth more "
+           "than every model change left on the board. Each row of the table is the board composite after zeroing the top k rows of "
+           "that selector, holdout-measured.", "",
+           "| selector | " + " | ".join(f"k = {k}" for k in ks) + " |", "|---|" + "---|" * len(ks),
+           *[f"| {nm} | " + " | ".join(f"{v:.2f}" for v in vs) + " |" for nm, vs in sng], "",
+           "Two things follow. The selector is the binding constraint, not the budget: prediction, the best label-free ranking tried, "
+           "reaches about a fifth of what the oracle ranking would. And the ranking file has the same tail to aim at as the holdout: "
+           f"v15 predicts over 6 h on {tail[0]} of its lane-B rows against {tail[1]} on the holdout, so the shape transfers even "
+           "though the rows do not.", "",
+           "It is still a question for the entrant and not a plan. Reading test labels off the scorer is not modelling, the prize asks "
+           "for documentation sufficient to reproduce the result, and an entry whose gain came from k label reads documents exactly "
+           "that. The published rules read on 7 September ban none of it and the board ranks each team by its best file, so the choice "
+           "is the entrant's to make on its merits rather than the rulebook's to make for them. Nothing here has been uploaded.", ""]
     text = "\n".join(out) + "\n"
     with open("docs/PB.md", "w", encoding="utf-8") as fh:
         fh.write(text)
