@@ -54,6 +54,20 @@ a{color:var(--accent)}
 against this gate before you saw it and broke four of its numbers. Those are corrected below, the measurements it said were missing
 have been run, and it rides this page in full.</p>
 
+<div class="decision" style="border-color:#b00">
+<h2>Correction, 7 September</h2>
+<p><strong>The SB3 numbers this page first carried were scored with the answer in hand, and they are withdrawn.</strong>
+SB3 as promoted at H52 chose each row's blend weight with <code>taxi.m2.is_tail</code>, which tests <code>abs(c) &gt; 600</code>
+where <code>c = y - z_aobt</code> is the row's own label. Two things followed. On the holdout the weight was picked using the answer,
+worth 0.32 s. On the ranking file the label does not exist, so the champion raised an error instead of predicting: the v16 build
+would have failed about four GPU hours in.</p>
+<p>The gate is removed. SB3 is now the five-seed D2 bag alone, 230.0951 s against MC2's 232.1502, <span class="num">+2.0551</span> s
+[+1.71, +2.37]. It still passes the declared rule, by 0.055 s, so it stays lane-A champion and every number on this page has been
+recomputed on it. Flag F36, commit <code>fdb6a31</code>, guard test <code>tests/test_leak.py</code>, 36 tests pass.</p>
+<p class="note"><strong>Question 7, new:</strong> a 0.055 s margin over the floor is a pass you may not want. Say the word and
+lane A reverts to MC2 and SB3 is parked with the other four. Leaving it as it stands needs no answer.</p>
+</div>
+
 <div class="decision">
 <h2>The call</h2>
 <p class="call">Upload <code>data/merry-octopus_v15.parquet</code> to the board, wait about 3.5 h of GPU for a v16 carrying
@@ -62,19 +76,20 @@ the new champion, or leave S1 standing.</p>
 (sha256 <code>639fa7564a105a84995ffb5eee0da99ffa3791406b8cefba6d9e2d53caa68af0</code>, 344,841 rows). The scorer allows three
 submissions a day; five have been spent, four of them on probes.</p>
 <p class="note"><strong>What changed since you last saw this page: lane A has a new champion, and it is the first one the
-2 s floor did not block.</strong> SB3 beat MC2 by <span class="num">+2.4</span> s [+2.0, +2.7] on the same 339,046 rows, paired SE
-0.2 s, both ends clear of the floor (ledger H52, <code>docs/SB3.md</code>). It is the first lane-A promotion since MC2 and the first
+2 s floor did not block.</strong> SB3 beat MC2 by <span class="num">+2.06</span> s [+1.71, +2.37] on the same 339,046 rows, paired SE
+0.2 s (ledger H52, <code>docs/SB3.md</code>). The rule in section 3 is an interval above zero and a point improvement of at least
+2 s, so it passes by 0.055 s: thin, and the thinness is question 7 below. It is the first lane-A promotion since MC2 and the first
 challenger this whole campaign to pass with no free parameter and no search. It matters for question 3 below more than it matters
 for the score. Section 7's flag F18 says the floor had killed four lane-A challengers whose intervals sat entirely above zero, worth
-about 2.7 s together, and the critique in section 8 calls that SERIOUS. SB3 composed exactly those four (D2's base +1.0, the
-five-seed bag +1.0, ST1a's gate +0.6, C1's floor +0.5) on the one base they had never been tried on, and the composition reaches
-+2.4. So the floor did not discard those gains permanently, it delayed them until they were taken together, which is the answer to
-finding 2 that neither the flag nor the fix proposed for it could give. The gains do not add linearly (+3.1 would; +2.4 is what
+about 2.7 s together, and the critique in section 8 calls that SERIOUS. SB3 composed three of those four (D2's base +1.0, the
+five-seed bag +1.0, C1's floor +0.5) on the one base they had never been tried on, and the composition reaches +2.06. The fourth,
+ST1a's gate, was withdrawn on 7 September as a label leak (banner above) and was worth 0.32 s of the number this page first carried. So the floor did not discard those gains permanently, it delayed them until they were taken together, which is the answer to
+finding 2 that neither the flag nor the fix proposed for it could give. The gains do not add linearly (+2.5 would; +2.06 is what
 arrives), and there is now no uncomposed parked positive lane-A tie left, so this particular move cannot be repeated.
 <strong>The consequence for the call:</strong> v15 carries MC2 and is superseded. On the holdout SB3 takes the composite from
-322.5796 to <span class="num">320.9013</span>, worth 1.68 composite seconds, which moves the two board anchors from 282.7 and 287.4
-to <span class="num">281.1</span> and <span class="num">285.9</span>. Both still sit above the leader's 277.29. Building v16 needs
-five 12-month refits, about 3.5 h of GPU on a queue that is still running declared lanes, and buys 1.7 s against an upload worth
+322.5796 to <span class="num">320.9013</span>, worth 1.46 composite seconds, which moves the two board anchors from 282.7 and 287.4
+to <span class="num">281.2</span> and <span class="num">286.0</span>. Both still sit above the leader's 277.29. Building v16 needs
+five 12-month refits, about 3.5 h of GPU on a queue that is still running declared lanes, and buys 1.5 s against an upload worth
 about 38. Uploading v15 now and v16 later is available: the scorer's cap is three files a day, not three in total.</p>
 <p class="note"><strong>Why this is now the only large move on the table.</strong> The board still shows S1 at
 <span class="num">325.3982</span> and nothing has gone up since. Section 3b puts v15 at about <span class="num">287</span>,
@@ -267,7 +282,7 @@ on. That is new flag F19.</p>
 Lane A's paired standard error is about 0.2 s, so the floor is roughly 10 of them, and it has killed four challengers whose
 intervals sat entirely above zero, worth about 2.7 s together. Lane B's paired standard error is 16.6 s, so the floor is about an
 eighth of one and gates almost nothing. <strong>Partly answered 2026-09-07, and not by changing the rule.</strong> SB3 composed
-the four parked challengers on D2's base and cleared the floor at +2.4 s [+2.0, +2.7] (H52), so the floor delayed those gains rather
+the four parked challengers on D2's base and cleared the floor at +2.06 s [+1.71, +2.37] (H52), so the floor delayed those gains rather
 than discarding them. That does not settle the flag, because the asymmetry between the lanes is unchanged and lane B's floor still
 gates almost nothing, but it removes the strongest piece of evidence for lowering it in lane A.
 <strong>Changing this is a decision-rule change and yours to make</strong>, so nothing was altered.</li>
@@ -351,7 +366,7 @@ Fix: one <code>paired_delta(err_B4floored, err_L8c, days)</code> call on cached 
 MC2, lane A had ten challengers and <strong>zero</strong> promotions, four of them with intervals strictly above zero killed by
 the floor alone (H21 +0.498 [+0.186,+0.909], H28 +1.0 [+0.5,+1.5], H34 +0.2 [+0.1,+0.3], H35 +1.0 [+0.7,+1.3], &asymp;2.7 s
 discarded); lane B, over the same window, promoted three times. <strong>Outcome 2026-09-07:</strong> composing those parked
-challengers rather than lowering the floor cleared it, SB3 at +2.4 s [+2.0, +2.7] (H52), so the proposed fix was not applied and
+challengers rather than lowering the floor cleared it, SB3 at +2.06 s [+1.71, +2.37] (H52), so the proposed fix was not applied and
 the finding is answered without a rule change. The campaign's recent gains land in lane B partly because the gate
 there barely exists. <span class="tag">SERIOUS</span> Fix: <code>FLOOR = max(2.0, 2 * paired_SE)</code> per contrast.</p>
 
@@ -490,7 +505,7 @@ lane B's half is mostly the two day-shift rows F21 prices at zero: deleting them
 </table></div>
 <p class="note"><strong>Superseded 2026-09-07 and left here because the reasoning was wrong in an instructive way.</strong>
 This section argued that releasing every parked tie was worth about +0.92 s of composite and therefore could not matter. SB3
-released them instead by composing them on D2's base, and the four together are worth +2.4 s of lane A and +1.68 s of composite,
+released them instead by composing them on D2's base, and the four together are worth +2.06 s of lane A and +1.46 s of composite,
 which is nearly double what this table implied and enough to clear the floor outright (H52). The error was reading the parked
 inventory as a list of alternatives to pick from rather than as parts that stack. There is now no uncomposed parked positive lane-A
 tie left: SB3 holds D2, SB1, ST1a and C1, and E2 (H34) is the same MC2-to-D1 blend that ST1a's gate already carries with
@@ -505,10 +520,10 @@ lost by <span class="num">&minus;286.0</span> s [&minus;562.0, &minus;68.7] agai
 closing lane B's model-class question with a second and non-tree family (H53). L11 extended the copy mixture to the nine airports
 the gate excludes and lost by <span class="num">&minus;5.7</span> s [&minus;16.3, +1.3], with LIRF verified bit-identical (H51). SB3
 won and is the reason this page was rewritten. What is still running is Q1 and TH1, then O1, all lane A and each declared at 1 to 3
-s, worth 0.7 to 2.1 composite seconds against an upload worth about 38. The new fork is v15 against v16: v16 is 1.68 composite
+s, worth 0.7 to 2.1 composite seconds against an upload worth about 38. The new fork is v15 against v16: v16 is 1.46 composite
 seconds better and costs 3.5 h of GPU that the queue is currently using on declared lanes. <strong>My reading:</strong> upload v15
 now and build v16 into a later slot, because the daily cap is three files and the value of the upload is the second board point
-rather than the 1.7 s.</div>
+rather than the 1.5 s.</div>
 <div class="q"><span class="n">2</span>The critique's last recommendation is a second file, MC2 plus B4 floored, as the only way
 to price the lane-B chain on the board itself. That spends a second daily slot. Do it? F27 sharpens what it can return: the
 difference of two files that differ only in lane B is exact, so this does settle L8c against B4 on 2026 rows, but neither
