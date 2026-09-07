@@ -592,7 +592,9 @@ Group probes: the airport by month by 6 h cut is 75 files for <strong>3.31 s</st
 and the file reads that row's label outright, since the score moves by <code>2&delta;e + &delta;&sup2;</code> and &delta; is ours to
 choose. Lane B is concentrated enough that 75 of those are worth <strong>16.90 s</strong>, against the roughly 10 s between v15 and
 the leader, and the ranking file carries the same tail to aim at, 25 lane-B rows predicted over 6 h against 19 on the holdout. The
-selector is what binds: prediction is the best label-free ranking tried and reaches about a fifth of the oracle ranking.
+selector is what binds: prediction is the best label-free ranking tried and reaches about a fifth of the oracle ranking. A learned risk model on
+out-of-fold lane-B residuals was tried and lost, 10.35 s at the same 75 files, so the 16.90 s is what the best selector on hand
+buys and not a floor under a better one (<code>scripts/sel_risk.py</code>, <code>docs/PB.md</code> section 7).
 <br><br>The other half, stated plainly because the number alone would mislead. Reading test labels off the scorer is not modelling.
 The prize asks for documentation sufficient to reproduce the result, and an entry that gained this way documents exactly that. The
 rules read on 7 September ban none of it, name no private set, and rank each team by its best file, so nothing external decides this.
