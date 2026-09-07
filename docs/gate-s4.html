@@ -69,6 +69,33 @@ lane A reverts to MC2 and SB3 is parked with the other four. Leaving it as it st
 </div>
 
 <div class="decision">
+<h2>New since you last opened this page</h2>
+<p><strong>Two findings landed after 01:21 on 7 September. Neither changes a model. One adds a decision, one adds two
+actions.</strong></p>
+<p><strong>1. The board has already paid for a correction nobody has applied.</strong> F27 read the scorer as closed. It closed one
+question. A lane's squared error is quadratic in the 2026 truths and unreachable at any number of files, which is what F27 proved.
+A group's <em>error sum</em> is linear, so a submission measures it exactly. Probes P1, P3s and P5s did exactly that, and the three
+sums they bought are permanent: for any later file the sum is the old sum plus the sum of the prediction change, and both
+prediction vectors sit on disk. So the measurement carries to v15, to v16, and to anything after them, at no further cost.</p>
+<div class="wrap"><table>
+<tr><th>file</th><th class="num">January sum (s)</th><th class="num">July+ sum (s)</th><th class="num">lane B sum (s)</th><th class="num">SSE removed (Ms&sup2;)</th><th class="num">worth</th></tr>
+<tr><td class="id">S1, scored 325.3982</td><td class="num">&minus;3,297,233</td><td class="num">+3,148,928</td><td class="num">&minus;1,041,701</td><td class="num">328.6</td><td class="num">1.47 s</td></tr>
+<tr><td class="id">v15, built, never scored</td><td class="num">&minus;829,824</td><td class="num">+1,611,428</td><td class="num">&minus;1,103,490</td><td class="num">256.3</td><td class="num">1.30 s</td></tr>
+</table></div>
+<p class="note">Detail in <code>docs/PB.md</code>, flag F38, code <code>taxi/pb.py</code>, test <code>tests/test_pb.py</code>.
+<code>python -m taxi.pb &lt;src&gt; &lt;out&gt;</code> writes the corrected file. This supersedes question 6 below, which priced only
+the lane-B third of it. Removing an exactly measured group mean cannot cost squared error whatever the 2026 truth turns out to be,
+because the reduction is <code>n_g a_g&sup2; &ge; 0</code>. It is still a change to a submitted file, so it needs your yes.</p>
+<p><strong>2. Prize eligibility needs the repo public, and nobody had recorded that.</strong> Re-reading the challenge site live on
+7 September to check whether probing is allowed returned three things. Rank is the <em>best</em> RMSE across a team's submissions and
+no separate final or private set is named anywhere, so a probe cannot cost a place and the public board is the scored board. The cap
+is 3 files a day and 1 GB a bucket, against 2 MB a file. And prize eligibility, of which only the external-data clause was on record,
+also requires the source openly on GitHub under GPLv3 and documentation sufficient to reproduce the results.
+<code>kitfunso/prc26</code> carries the licence but is private and sits 64 commits ahead of <code>origin/master</code>. No challenge
+data and no secret is tracked. Publication is safe; it needs only your decision. Questions 8 and 9.</p>
+</div>
+
+<div class="decision">
 <h2>The call</h2>
 <p class="call">Upload <code>data/merry-octopus_v15.parquet</code> to the board, wait about 3.5 h of GPU for a v16 carrying
 the new champion, or leave S1 standing.</p>
@@ -534,8 +561,14 @@ flat, or something else? Section 9b prices what it releases: <span class="num">+
 <div class="q"><span class="n">4</span>Given that 55% of the gain sits in 1.56% of the rows, is the board score still the right
 thing to optimise, or should the remaining time go to the 65.7% of squared error under 3,000 s?</div>
 <div class="q"><span class="n">5</span>Attack the rule in section 8. What does it let through that it should not?</div>
-<div class="q"><span class="n">6</span>Section 3b measured v15 running <span class="num">&minus;208.6</span> s low on the average
-2026 lane-B row, from board data already paid for. Subtracting that constant from lane B is worth about
-<span class="num">1.16</span> s of board composite, needs no model and no new fit, and is a straight calibration to the scored
-set rather than to a holdout. Apply it to whatever file goes up, or keep the file a pure model output?</div>
+<div class="q"><span class="n">6</span><strong>Superseded by F38 above, and it is now worth more than question 6 first
+said.</strong> Section 3b priced the lane-B level alone at about <span class="num">1.16</span> s. The three groups the board has
+already measured are worth <span class="num">1.30</span> s on v15 together, and the same arithmetic carries to v16 and to every file
+after it. Apply the correction to whatever file goes up, or keep the file a pure model output? Applying it is one command and no
+fit.</div>
+<div class="q"><span class="n">8</span>Make <code>kitfunso/prc26</code> public? Prize eligibility asks for the source
+openly on GitHub under GPLv3, which the repo already carries. It is private today. No challenge data and no secret is tracked, so
+the flip is safe. It is your call and only yours.</div>
+<div class="q"><span class="n">9</span>Push the 64 commits? <code>master</code> is 64 ahead of <code>origin/master</code>, so the
+entire campaign since <code>3d79428</code> exists on this machine alone. That is a backup question before it is an eligibility one.</div>
 </main>
