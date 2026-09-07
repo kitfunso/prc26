@@ -1,5 +1,6 @@
 """PB claims a probe's gain is arithmetic, not an estimate: the SSE a measured group sum removes must be exact, overlaps and all."""
 import numpy as np
+import pytest
 
 from taxi.pb import removed
 
@@ -19,3 +20,18 @@ def test_a_measured_group_sum_can_never_cost_sse():
     w = (np.arange(200) % 4 == 0).astype(float)[:, None]  # one group, no structure in it at all
     err = rng.normal(size=200)
     assert removed(w, w.T @ err) >= 0
+
+
+def test_the_challenger_constant_names_the_newest_submission_that_exists():
+    """PB rescales everything to CHALLENGER's board projection, so a newer build must not leave the report describing the old file."""
+    import glob
+    import os
+    import re
+
+    from taxi.pb import CHALLENGER
+
+    built = glob.glob("data/merry-octopus_v*.parquet")
+    if not built:
+        pytest.skip("no submissions built here")
+    newest = max(built, key=lambda f: int(re.search(r"_v(\d+)", f).group(1)))
+    assert os.path.basename(newest) == os.path.basename(CHALLENGER), "update CHALLENGER and V15_BOARD in taxi/pb.py"
