@@ -13,42 +13,42 @@ and each lane's sum of squared truths) against the four available files (ours, a
 gives a rank-three system, so the split is unidentifiable however many files are spent on it. The board fixes exactly one
 equation, `n_A x rmse_A^2 + n_B x rmse_B^2 = SSE`. Every probe design that asks which lane is costing us is closed by this.
 
-## 2. What is exact: v15's per-lane board error sums
+## 2. What is exact: v16's per-lane board error sums
 
-S1's per-lane sums were measured by P1 and P3s/P5s, and v15 sits on disk beside S1, so the difference of the two
+S1's per-lane sums were measured by P1 and P3s/P5s, and v16 sits on disk beside S1, so the difference of the two
 prediction vectors carries the measurement across with no upload. These are 2026 ranking-set numbers for a file that has
 never been scored.
 
 | file | lane A sum (s) | lane A mean (s) | lane B sum (s) | lane B mean (s) |
 |---|---|---|---|---|
 | S1 (board 325.3982) | +893,396 | +2.63 | -1,041,701 | -196.9 |
-| v15 (not uploaded) | +1,885,094 | +5.55 | -1,103,490 | -208.6 |
+| v16 (not uploaded) | +1,897,034 | +5.59 | -1,103,490 | -208.6 |
 
-v15 runs +5.55 s high on the average 2026 lane-A row and -208.6 s low on the average lane-B row. Removing the lane-B
-level alone is worth about 1.16 s of board composite, at no model cost; it is a change to a submitted file and rides the gate.
+v16 runs +5.59 s high on the average 2026 lane-A row and -208.6 s low on the average lane-B row. Removing the lane-B
+level alone is worth about 1.17 s of board composite, at no model cost; it is a change to a submitted file and rides the gate.
 
-## 3. The family the board leaves open, and what v15 scores on it
+## 3. The family the board leaves open, and what v16 scores on it
 
-Name S1's board lane A and its board lane B follows exactly. S1's holdout lanes were 259.5 and 2,074.1; v15's champions
-are 232.1502 (MC2) and 1,808.1729 (L8c). Carrying v15's lanes across by the same ratio, or by the same additive shift,
+Name S1's board lane A and its board lane B follows exactly. S1's holdout lanes were 259.5 and 2,074.1; v16's champions
+are 230.0951 (SB3) and 1,808.1729 (L8c). Carrying its lanes across by the same ratio, or by the same additive shift,
 gives two projections per point. The point of the table is that both stay in a narrow band across the whole family.
 
-| S1 board lane A | forced S1 board lane B | ratio in A | ratio in B | v15 board, ratio carry | v15 board, additive carry |
+| S1 board lane A | forced S1 board lane B | ratio in A | ratio in B | v16 board, ratio carry | v16 board, additive carry |
 |---|---|---|---|---|---|
-| 190 | 2,141 | 0.732 | 1.032 | 286.19 | 282.85 |
-| 205 | 2,051 | 0.790 | 0.989 | 286.60 | 282.73 |
-| 220 | 1,948 | 0.848 | 0.939 | 287.04 | 282.77 |
-| 235 | 1,832 | 0.906 | 0.883 | 287.52 | 283.02 |
-| 250 | 1,700 | 0.963 | 0.820 | 288.02 | 283.49 |
-| 265 | 1,547 | 1.021 | 0.746 | 288.55 | 284.26 |
-| 280 | 1,367 | 1.079 | 0.659 | 289.11 | 285.42 |
-| 295 | 1,147 | 1.137 | 0.553 | 289.70 | 287.15 |
-| 310 | 857 | 1.195 | 0.413 | 290.32 | 289.86 |
+| 190 | 2,141 | 0.732 | 1.032 | 285.31 | 281.69 |
+| 205 | 2,051 | 0.790 | 0.989 | 285.58 | 281.46 |
+| 220 | 1,948 | 0.848 | 0.939 | 285.87 | 281.40 |
+| 235 | 1,832 | 0.906 | 0.883 | 286.18 | 281.53 |
+| 250 | 1,700 | 0.963 | 0.820 | 286.51 | 281.91 |
+| 265 | 1,547 | 1.021 | 0.746 | 286.85 | 282.58 |
+| 280 | 1,367 | 1.079 | 0.659 | 287.22 | 283.64 |
+| 295 | 1,147 | 1.137 | 0.553 | 287.61 | 285.27 |
+| 310 | 857 | 1.195 | 0.413 | 288.01 | 287.89 |
 
-Across the whole plausible family, v15 projects to **282.7 to 290.3**. The equal-ratio point (r = 0.8946 in both lanes)
-gives 287.42. The S4 gate carries two scalar anchors, 282.7 additive and 287.4 ratio. The additive one is reachable only under an
-additive carry AND a lane-B-heavy reading of the family (S1 board lane A near 200), so 287 is the honest single number to plan
-against and 283 is the optimistic corner of one corner.
+Across the whole plausible family, v16 projects to **281.4 to 288.0**. The equal-ratio point (r = 0.8946 in both lanes)
+gives 286.12, and that is the honest single number to plan against; 281.4 is the optimistic corner, and it needs an additive carry
+AND a lane-B-heavy reading of the family (S1 board lane A near 200) at once. The S4 gate's two scalar anchors, 282.7 additive and
+287.4 ratio, were computed for v15, whose lane A was MC2 at 232.1502; v16 puts SB3 there at 230.0951 and moves both.
 
 ## 4. Where the leader's lead has to sit
 
@@ -64,9 +64,9 @@ The same identity at 277.29. Their split is equally unmeasurable, so this is the
 | 250 | 1,000 |
 | 270 | 577 |
 
-Put v15 on the same board at the equal-ratio point: lane A 207.7, lane B 1,618, composite 287.42. Holding the leader's lane A equal
-to ours forces their lane B to 1,498, which is 7.4% better than ours. Holding their lane B equal to ours forces their lane A
-to 193.2, which is 7.0% better than ours. So the lead is about seven percent of one lane, or a mix of less in each. It is not
+Put v16 on the same board at the equal-ratio point: lane A 205.8, lane B 1,618, composite 286.12. Holding the leader's lane A equal
+to ours forces their lane B to 1,514, which is 6.4% better than ours. Holding their lane B equal to ours forces their lane A
+to 193.2, which is 6.1% better than ours. So the lead is about 6% of one lane, or a mix of less in each. It is not
 a different kind of model, and it is not concentrated in lane B's artifact rows the way the drop-k arithmetic in `docs/LEV.md`
 suggests on 2025 data.
 

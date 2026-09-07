@@ -21,12 +21,13 @@ from taxi.submit import build_submission
 
 BOARD = {"jan": -3_297_233.0, "jul": +3_148_928.0, "laneB": -1_041_701.0}  # S1 error sums (p - y), protocol section 3, row P1-P6
 S1_RMSE, N_RANK = 325.3982, 344_841
-CHALLENGER = "data/merry-octopus_v15.parquet"
+CHALLENGER = "data/merry-octopus_v16.parquet"
+CHAL_V = CHALLENGER.split("_")[-1].split(".")[0]  # the version tag the prose prints, so a rebuild moves one constant
 RISK = "data/sel_risk.parquet"  # written by scripts/sel_risk.py
 RISK_NAME = "learned risk model, scripts/sel_risk.py"
 DP = 1e-4  # the board prints RMSE to four decimals
 ORDER = ("jan", "jul", "laneB")
-V15_BOARD = 287.42  # the equal-ratio projection, docs/BL.md section 3
+CHAL_BOARD = 286.12  # the equal-ratio projection, docs/BL.md section 3
 
 
 def _preds(path: str) -> pd.Series:
@@ -46,7 +47,7 @@ def banked() -> list[tuple[str, np.ndarray, float]]:
     w = np.column_stack([ids.isin(gs[g]).astype(float) for g in ORDER])
     s1, ch = _preds(S1).reindex(ids), _preds(CHALLENGER).reindex(ids)
     rows = []
-    for name, p in (("S1, scored 325.3982", s1), ("v15, built and never scored", ch)):
+    for name, p in (("S1, scored 325.3982", s1), (f"{CHAL_V}, built and never scored", ch)):
         c = np.array([BOARD[g] + float((p - s1)[ids.isin(gs[g])].sum()) for g in ORDER])
         rows.append((name, c, removed(w, c)))
     return rows
@@ -76,7 +77,7 @@ def marginal(eb: np.ndarray, teb: pd.DataFrame) -> list[tuple[str, int, float, f
     for name, lab in cuts:
         s = pd.Series(eb).groupby(lab).agg(["size", "mean"])
         rem = float((s["size"] * s["mean"] ** 2).sum()) / n_b * n_board
-        cum = V15_BOARD - float(np.sqrt((N_RANK * V15_BOARD ** 2 - rem) / N_RANK))
+        cum = CHAL_BOARD - float(np.sqrt((N_RANK * CHAL_BOARD ** 2 - rem) / N_RANK))
         rows.append((name, len(s), cum, cum - prev))
         prev = cum
     return rows
@@ -128,7 +129,7 @@ def _risk(teb: pd.DataFrame) -> np.ndarray | None:
 
 
 def _board(rem_per_row: float) -> float:
-    return V15_BOARD - float(np.sqrt((N_RANK * V15_BOARD ** 2 - rem_per_row * len(groups()["laneB"])) / N_RANK))
+    return CHAL_BOARD - float(np.sqrt((N_RANK * CHAL_BOARD ** 2 - rem_per_row * len(groups()["laneB"])) / N_RANK))
 
 
 def curve() -> tuple:
@@ -168,7 +169,7 @@ def main() -> None:
     n_board_b = len(groups()["laneB"])
     sig = N_RANK * ((S1_RMSE + DP / 2) ** 2 - (S1_RMSE - DP / 2) ** 2) / (2 * 300.0)
     drop = lambda r, rem: r - float(np.sqrt((N_RANK * r ** 2 - rem) / N_RANK))  # noqa: E731
-    s1_gain, v15_gain = drop(S1_RMSE, rows[0][2]), drop(V15_BOARD, rows[1][2])
+    s1_gain, chal_gain = drop(S1_RMSE, rows[0][2]), drop(CHAL_BOARD, rows[1][2])
     body = [f"| {name} | {c[0]:+,.0f} | {c[1]:+,.0f} | {c[2]:+,.0f} | {rem / 1e6:,.1f} |" for name, c, rem in rows]
     by = dict(sng)
     risk_note = ""
@@ -189,8 +190,8 @@ def main() -> None:
            "The best correction inside the span of the three measured groups is `c' (W'W)^-1 c`, which is what handles lane B overlapping "
            "both months rather than three means applied in sequence.", "",
            "| file | January sum (s) | July+ sum (s) | lane B sum (s) | SSE it removes (Ms^2) |", "|---|---|---|---|---|", *body, "",
-           f"On S1's own scale that is {s1_gain:.2f} s of board composite; on v15 at its {V15_BOARD:.2f} projection (`docs/BL.md`) it is "
-           f"{v15_gain:.2f} s. Both are already paid for and neither has ever been applied to a submitted file.", "",
+           f"On S1's own scale that is {s1_gain:.2f} s of board composite; on {CHAL_V} at its {CHAL_BOARD:.2f} projection (`docs/BL.md`) it is "
+           f"{chal_gain:.2f} s. Both are already paid for and neither has ever been applied to a submitted file.", "",
            f"Board resolution: the score prints to four decimals, so an error sum read at c = 300 s is good to about {sig:,.0f} s, which is "
            f"{sig / 5290:.3f} s per row on a 5,290-row group and finer on anything larger. Precision does not bind.", "",
            "## 2. How the gain grows with the number of probes, on the 2025 development holdout", "",
@@ -217,7 +218,7 @@ def main() -> None:
            "bucket cap is 1 GB against 2 MB a file.", "",
            "## 5. What the probes the board has NOT bought are worth", "",
            "Section 2 is on the holdout's own composite. This one rescales lane B's group means to the board: the holdout's SSE removed "
-           f"per row, applied to the ranking file's {n_board_b:,} lane-B rows, read off v15's {V15_BOARD:.2f}.", "",
+           f"per row, applied to the ranking file's {n_board_b:,} lane-B rows, read off {CHAL_V}'s {CHAL_BOARD:.2f}.", "",
            "| cut | probes | cumulative (s) | marginal (s) |", "|---|---|---|---|",
            *[f"| {nm} | {g} | {c:.3f} | {m:+.3f} |" for nm, g, c, m in mrg], "",
            "The split matters because the two halves belong to different years. The LEVEL row buys almost nothing here, because L8c's "
@@ -242,7 +243,7 @@ def main() -> None:
            *[f"| {nm} | " + " | ".join(f"{v:.2f}" for v in vs) + " |" for nm, vs in sng], "",
            "Two things follow. The selector is the binding constraint, not the budget: prediction, the best label-free ranking tried, "
            f"reaches about a fifth of what the oracle ranking would. {risk_note}And the ranking file has the same tail to aim at as the holdout: "
-           f"v15 predicts over 6 h on {tail[0]} of its lane-B rows against {tail[1]} on the holdout, so the shape transfers even "
+           f"{CHAL_V} predicts over 6 h on {tail[0]} of its lane-B rows against {tail[1]} on the holdout, so the shape transfers even "
            "though the rows do not.", "",
            "It is still a question for the entrant and not a plan. Reading test labels off the scorer is not modelling, the prize asks "
            "for documentation sufficient to reproduce the result, and an entry whose gain came from k label reads documents exactly "

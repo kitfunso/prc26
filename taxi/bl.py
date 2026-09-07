@@ -1,8 +1,8 @@
 """BL: what the one board number can and cannot say about the lane split.
 
 Diagnostic, never a verdict. Three results. The lane SSE split is not measurable from the leaderboard at any number of
-submissions (proof in the report), so the board fixes only a one-parameter family of (lane A, lane B) pairs. v15's
-per-lane board error sums ARE exact, because S1's were measured and both files sit on disk. And v15's projected board
+submissions (proof in the report), so the board fixes only a one-parameter family of (lane A, lane B) pairs. The challenger's
+per-lane board error sums ARE exact, because S1's were measured and both files sit on disk. And its projected board
 score is almost flat along that family, which prices the S4 anchors far better than the two scalar guesses on the gate.
 """
 from __future__ import annotations
@@ -15,7 +15,9 @@ RANKING = "data/ranking.parquet"
 # docs/TRIAL-LEDGER.md section A (S1) and section C (P1, P3s, P5s).
 S1_BOARD, LEADER = 325.3982, 277.29
 S1_HOLD = {"A": 259.5, "B": 2074.1}
-V15_HOLD = {"A": 232.1502, "B": 1808.1729}
+CHAL = 16  # the newest built submission, data/merry-octopus_v16.parquet; nothing after S1 has been uploaded.
+CHAL_HOLD = {"A": 230.0951, "B": 1808.1729}
+CHAL_NAME = {"A": "SB3", "B": "L8c"}
 S1_SUM = {"B": -1_041_701.0, "A": +893_396.0}
 
 
@@ -33,9 +35,9 @@ def main() -> None:
     n = {k: len(v) for k, v in ids.items()}
     nt = n["A"] + n["B"]
     comp = lambda a, b: float(np.sqrt((sse(a, n["A"]) + sse(b, n["B"])) / nt))  # noqa: E731
-    p = {v: pd.read_parquet(f"data/merry-octopus_v{v}.parquet").set_index("MVT_ID_mvt").TAXITIME_SEC_mvt for v in (1, 15)}
-    d = p[15] - p[1]
-    v15_sum = {k: S1_SUM[k] + float(d.loc[ids[k]].sum()) for k in ("A", "B")}
+    p = {v: pd.read_parquet(f"data/merry-octopus_v{v}.parquet").set_index("MVT_ID_mvt").TAXITIME_SEC_mvt for v in (1, CHAL)}
+    d = p[CHAL] - p[1]
+    chal_sum = {k: S1_SUM[k] + float(d.loc[ids[k]].sum()) for k in ("A", "B")}
 
     board = sse(S1_BOARD, nt)
 
@@ -46,8 +48,8 @@ def main() -> None:
     rows, proj = [], []
     for a in range(190, 311, 15):
         b = lane_b(float(a))
-        mul = comp(V15_HOLD["A"] * a / S1_HOLD["A"], V15_HOLD["B"] * b / S1_HOLD["B"])
-        add = comp(V15_HOLD["A"] + a - S1_HOLD["A"], max(V15_HOLD["B"] + b - S1_HOLD["B"], 0.0))
+        mul = comp(CHAL_HOLD["A"] * a / S1_HOLD["A"], CHAL_HOLD["B"] * b / S1_HOLD["B"])
+        add = comp(CHAL_HOLD["A"] + a - S1_HOLD["A"], max(CHAL_HOLD["B"] + b - S1_HOLD["B"], 0.0))
         proj += [mul, add]
         rows.append(f"| {a} | {b:,.0f} | {a / S1_HOLD['A']:.3f} | {b / S1_HOLD['B']:.3f} | {mul:.2f} | {add:.2f} |")
 
@@ -55,13 +57,13 @@ def main() -> None:
              for a in range(150, 281, 20) if sse(LEADER, nt) > sse(float(a), n["A"])]
 
     eq = float(np.sqrt(board / (sse(S1_HOLD["A"], n["A"]) + sse(S1_HOLD["B"], n["B"]))))
-    va, vb = V15_HOLD["A"] * eq, V15_HOLD["B"] * eq
+    va, vb = CHAL_HOLD["A"] * eq, CHAL_HOLD["B"] * eq
     mid = comp(va, vb)
     # The leader's lane held equal to ours in turn: the other lane is then forced.
     ld = sse(LEADER, nt)
     lb_at_va = float(np.sqrt((ld - sse(va, n["A"])) / n["B"]))
     la_at_vb = float(np.sqrt((ld - sse(vb, n["B"])) / n["A"]))
-    gain = mid - float(np.sqrt((sse(mid, nt) - n["B"] * (v15_sum["B"] / n["B"]) ** 2) / nt))
+    gain = mid - float(np.sqrt((sse(mid, nt) - n["B"] * (chal_sum["B"] / n["B"]) ** 2) / nt))
 
     out = [
         "# BL: the lane split behind one board number", "",
@@ -75,31 +77,31 @@ def main() -> None:
         "and each lane's sum of squared truths) against the four available files (ours, all zeros, zeros in A only, zeros in B only)",
         "gives a rank-three system, so the split is unidentifiable however many files are spent on it. The board fixes exactly one",
         "equation, `n_A x rmse_A^2 + n_B x rmse_B^2 = SSE`. Every probe design that asks which lane is costing us is closed by this.", "",
-        "## 2. What is exact: v15's per-lane board error sums", "",
-        "S1's per-lane sums were measured by P1 and P3s/P5s, and v15 sits on disk beside S1, so the difference of the two",
+        f"## 2. What is exact: v{CHAL}'s per-lane board error sums", "",
+        f"S1's per-lane sums were measured by P1 and P3s/P5s, and v{CHAL} sits on disk beside S1, so the difference of the two",
         "prediction vectors carries the measurement across with no upload. These are 2026 ranking-set numbers for a file that has",
         "never been scored.", "",
         "| file | lane A sum (s) | lane A mean (s) | lane B sum (s) | lane B mean (s) |", "|---|---|---|---|---|",
         f"| S1 (board {S1_BOARD}) | {S1_SUM['A']:+,.0f} | {S1_SUM['A'] / n['A']:+.2f} | {S1_SUM['B']:+,.0f} | {S1_SUM['B'] / n['B']:+.1f} |",
-        f"| v15 (not uploaded) | {v15_sum['A']:+,.0f} | {v15_sum['A'] / n['A']:+.2f} | {v15_sum['B']:+,.0f} | {v15_sum['B'] / n['B']:+.1f} |", "",
-        f"v15 runs {v15_sum['A'] / n['A']:+.2f} s high on the average 2026 lane-A row and {v15_sum['B'] / n['B']:+.1f} s low on the average lane-B row. Removing the lane-B",
+        f"| v{CHAL} (not uploaded) | {chal_sum['A']:+,.0f} | {chal_sum['A'] / n['A']:+.2f} | {chal_sum['B']:+,.0f} | {chal_sum['B'] / n['B']:+.1f} |", "",
+        f"v{CHAL} runs {chal_sum['A'] / n['A']:+.2f} s high on the average 2026 lane-A row and {chal_sum['B'] / n['B']:+.1f} s low on the average lane-B row. Removing the lane-B",
         f"level alone is worth about {gain:.2f} s of board composite, at no model cost; it is a change to a submitted file and rides the gate.", "",
-        "## 3. The family the board leaves open, and what v15 scores on it", "",
-        f"Name S1's board lane A and its board lane B follows exactly. S1's holdout lanes were {S1_HOLD['A']} and {S1_HOLD['B']:,}; v15's champions",
-        f"are {V15_HOLD['A']} (MC2) and {V15_HOLD['B']:,} (L8c). Carrying v15's lanes across by the same ratio, or by the same additive shift,",
+        f"## 3. The family the board leaves open, and what v{CHAL} scores on it", "",
+        f"Name S1's board lane A and its board lane B follows exactly. S1's holdout lanes were {S1_HOLD['A']} and {S1_HOLD['B']:,}; v{CHAL}'s champions",
+        f"are {CHAL_HOLD['A']} ({CHAL_NAME['A']}) and {CHAL_HOLD['B']:,} ({CHAL_NAME['B']}). Carrying its lanes across by the same ratio, or by the same additive shift,",
         "gives two projections per point. The point of the table is that both stay in a narrow band across the whole family.", "",
-        "| S1 board lane A | forced S1 board lane B | ratio in A | ratio in B | v15 board, ratio carry | v15 board, additive carry |",
+        f"| S1 board lane A | forced S1 board lane B | ratio in A | ratio in B | v{CHAL} board, ratio carry | v{CHAL} board, additive carry |",
         "|---|---|---|---|---|---|", *rows, "",
-        f"Across the whole plausible family, v15 projects to **{min(proj):.1f} to {max(proj):.1f}**. The equal-ratio point (r = {eq:.4f} in both lanes)",
-        f"gives {mid:.2f}. The S4 gate carries two scalar anchors, 282.7 additive and 287.4 ratio. The additive one is reachable only under an",
-        "additive carry AND a lane-B-heavy reading of the family (S1 board lane A near 200), so 287 is the honest single number to plan",
-        "against and 283 is the optimistic corner of one corner.", "",
+        f"Across the whole plausible family, v{CHAL} projects to **{min(proj):.1f} to {max(proj):.1f}**. The equal-ratio point (r = {eq:.4f} in both lanes)",
+        f"gives {mid:.2f}, and that is the honest single number to plan against; {min(proj):.1f} is the optimistic corner, and it needs an additive carry",
+        "AND a lane-B-heavy reading of the family (S1 board lane A near 200) at once. The S4 gate's two scalar anchors, 282.7 additive and",
+        f"287.4 ratio, were computed for v15, whose lane A was MC2 at 232.1502; v{CHAL} puts {CHAL_NAME['A']} there at {CHAL_HOLD['A']} and moves both.", "",
         "## 4. Where the leader's lead has to sit", "",
         f"The same identity at {LEADER}. Their split is equally unmeasurable, so this is the locus, not a claim about their model.", "",
         "| leader board lane A | forced leader board lane B |", "|---|---|", *lrows, "",
-        f"Put v15 on the same board at the equal-ratio point: lane A {va:.1f}, lane B {vb:,.0f}, composite {mid:.2f}. Holding the leader's lane A equal",
+        f"Put v{CHAL} on the same board at the equal-ratio point: lane A {va:.1f}, lane B {vb:,.0f}, composite {mid:.2f}. Holding the leader's lane A equal",
         f"to ours forces their lane B to {lb_at_va:,.0f}, which is {100 * (1 - lb_at_va / vb):.1f}% better than ours. Holding their lane B equal to ours forces their lane A",
-        f"to {la_at_vb:.1f}, which is {100 * (1 - la_at_vb / va):.1f}% better than ours. So the lead is about seven percent of one lane, or a mix of less in each. It is not",
+        f"to {la_at_vb:.1f}, which is {100 * (1 - la_at_vb / va):.1f}% better than ours. So the lead is about {100 * (1 - la_at_vb / va):.0f}% of one lane, or a mix of less in each. It is not",
         "a different kind of model, and it is not concentrated in lane B's artifact rows the way the drop-k arithmetic in `docs/LEV.md`",
         "suggests on 2025 data.", "",
     ]
