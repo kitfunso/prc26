@@ -49,3 +49,15 @@ LK1, L6T, RD) ran or run in the foreground first; LK1's full-year pass runs deta
 - M3 is compared with MC2's OOF and holdout per airport, reported only; E1 carries the verdict.
 - G1: at least 20 rows per (airport, stand, runway), (airport, stand) fallback, then NaN; the fit rows are encoded out-of-month.
 - LK1 is a test (`tests/test_leak.py`) plus the full-year script (`taxi.lk1`).
+
+## Short searches
+
+Rule B of protocol section 3: a declared search under its declared k is a NOT-DONE row here, with the reason, or
+`tests/test_search_completion.py` goes red. Counts stay OUT of this table on purpose, so the contract does not churn
+once per trial; `python -m taxi.searches` prints declared against achieved from the study databases themselves.
+
+| search | why it stopped short | what is being done |
+|---|---|---|
+| O1 | Killed by hand 2026-09-07 when O2 was declared to supersede it, at 8 of 40 trials. Its 24 h budget was feasible against 22 h of measured need, so nothing forced the kill. | Restarted 2026-09-08 with the card to itself, queued behind O2. Best trial so far 212.68 against trial 0 (MC2's own cell) at 212.77. |
+| O2 | Its declared "40 trials or 10 h" cannot both hold: 40 trials at a measured 40 min each need 26.7 h, so the clock ended the run near trial 15, at 4 completed trials. | `TIMEOUT` raised to 40 h at the producer so the TRIAL COUNT ends the search, and restarted 2026-09-08. |
+| NN3 | `study.optimize(n_trials=TRIALS)` counts trials ATTEMPTED while the report counts trials COMPLETED, so 2 pruned trials would have ended it at 38 of 40. | Now budgets completed trials through a stop callback, the shape `taxi/o2.py` already used. The running study tops itself up on the next pass. |
