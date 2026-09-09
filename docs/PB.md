@@ -9,9 +9,9 @@ The best correction inside the span of the three measured groups is `c' (W'W)^-1
 | file | January sum (s) | July+ sum (s) | lane B sum (s) | SSE it removes (Ms^2) |
 |---|---|---|---|---|
 | S1, scored 325.3982 | -3,297,233 | +3,148,928 | -1,041,701 | 328.6 |
-| v16, built and never scored | -872,200 | +1,665,744 | -1,103,490 | 257.7 |
+| v17, scored 296.2490 | -903,828 | +1,642,366 | -1,103,490 | 257.3 |
 
-On S1's own scale that is 1.47 s of board composite; on v16 at its MEASURED 296.27 board result (`taxi.ceil`) it is 1.26 s. Both are already paid for and neither has ever been applied to a submitted file.
+On S1's own scale that is 1.47 s of board composite; on v17 at its MEASURED 296.25 board result (`taxi.ceil`) it is 1.26 s. Both are already paid for and neither has ever been applied to a submitted file.
 
 Board resolution: the score prints to four decimals, so an error sum read at c = 300 s is good to about 37 s, which is 0.007 s per row on a 5,290-row group and finer on anything larger. Precision does not bind.
 
@@ -33,7 +33,7 @@ The champion pair (SB3, L8c) on the 344,419-row holdout at 321.1269 s composite,
 
 ## 3. Reading
 
-The three sums already on the board remove 257.7 Ms^2 from the challenger file and cost nothing further. Beyond them the curve says the efficient direction is lane B: 1.5% of the rows and about half the squared error, so its group means carry far more SSE per probe than lane A's, and lane A's own refinements are the worst rows on the page. The holdout's coarse gain is an order of magnitude under the board's at the same granularity, which is the year shift, and is exactly why this table is a shape and not a forecast.
+The three sums already on the board remove 257.3 Ms^2 from the challenger file and cost nothing further. Beyond them the curve says the efficient direction is lane B: 1.5% of the rows and about half the squared error, so its group means carry far more SSE per probe than lane A's, and lane A's own refinements are the worst rows on the page. The holdout's coarse gain is an order of magnitude under the board's at the same granularity, which is the year shift, and is exactly why this table is a shape and not a forecast.
 
 ## 4. Why the airport cut is the one to buy
 
@@ -41,12 +41,12 @@ The three sums already on the board remove 257.7 Ms^2 from the challenger file a
 
 ## 5. What the probes the board has NOT bought are worth
 
-Section 2 is on the holdout's own composite. This one rescales lane B's group means to the board: the holdout's SSE removed per row, applied to the ranking file's 5,290 lane-B rows, read off v16's MEASURED 296.27.
+Section 2 is on the holdout's own composite. This one rescales lane B's group means to the board: the holdout's SSE removed per row, applied to the ranking file's 5,290 lane-B rows, read off v17's MEASURED 296.25.
 
 | cut | probes | cumulative (s) | marginal (s) |
 |---|---|---|---|
 | lane B, one group | 1 | 0.004 | +0.004 |
-| lane B by airport | 10 | 0.871 | +0.867 |
+| lane B by airport | 10 | 0.872 | +0.867 |
 | lane B by airport x month | 20 | 1.621 | +0.749 |
 
 The split matters because the two halves belong to different years. The LEVEL row buys almost nothing here, because L8c's holdout mean error is -12.6 s, and it buys most of section 1's gain on the board, where the same mean is -208.6 s. That half is bought and is section 1. The AIRPORT SPREAD is the reverse: the holdout sees it, the board has never measured it, and it is what the next probes buy. Reading the holdout's spread as the board's is an assumption. F23's year shift is itself airport-shaped (`docs/YR.md`) and adds spread rather than cancelling it, so the board's own spread should be at least this, which makes the marginal column the low side.
@@ -57,7 +57,7 @@ The same rescaling, on cuts the airport row does not reach. The last column is w
 
 | cut | probes | smallest group | board s | of which any partition of that size gives |
 |---|---|---|---|---|
-| airport | 10 | 237 | 0.871 | 0.158 |
+| airport | 10 | 237 | 0.872 | 0.158 |
 | airport x month | 20 | 32 | 1.621 | 0.315 |
 | airport x month x half-day | 40 | 15 | 2.044 | 0.631 |
 | airport x month x 6 h | 75 | 1 | 3.213 | 1.184 |
@@ -69,12 +69,12 @@ Shrink a group to one row and the probe reads that row's label outright: the fil
 | selector | k = 5 | k = 10 | k = 20 | k = 40 | k = 75 |
 |---|---|---|---|---|---|
 | prediction | 4.33 | 7.96 | 8.03 | 10.98 | 16.37 |
-| scheduled taxi z_sched | 0.52 | 1.19 | 7.98 | 8.10 | 9.83 |
+| scheduled taxi z_sched | 0.52 | 1.19 | 7.98 | 8.10 | 9.84 |
 | closeness of prediction to 24 h | 4.33 | 7.96 | 8.03 | 10.98 | 16.37 |
 | learned risk model, scripts/sel_risk.py | 0.76 | 2.36 | 4.12 | 7.07 | 10.03 |
-| oracle absolute error, the ceiling and not buyable | 63.88 | 67.54 | 72.74 | 78.40 | 84.14 |
+| oracle absolute error, the ceiling and not buyable | 63.89 | 67.55 | 72.75 | 78.41 | 84.15 |
 
-Two things follow. The selector is the binding constraint, not the budget: prediction, the best label-free ranking tried, reaches about a fifth of what the oracle ranking would. A learned risk model on out-of-fold lane-B residuals is worse, 10.03 s at k = 75 against prediction's 16.37, though it ranks the absolute error better in correlation (`scripts/sel_risk.py` prints both). What pays here is the extreme tail and not the ordering, so that direction is closed. And the ranking file has the same tail to aim at as the holdout: v16 predicts over 6 h on 25 of its lane-B rows against 19 on the holdout, so the shape transfers even though the rows do not.
+Two things follow. The selector is the binding constraint, not the budget: prediction, the best label-free ranking tried, reaches about a fifth of what the oracle ranking would. A learned risk model on out-of-fold lane-B residuals is worse, 10.03 s at k = 75 against prediction's 16.37, though it ranks the absolute error better in correlation (`scripts/sel_risk.py` prints both). What pays here is the extreme tail and not the ordering, so that direction is closed. And the ranking file has the same tail to aim at as the holdout: v17 predicts over 6 h on 25 of its lane-B rows against 19 on the holdout, so the shape transfers even though the rows do not.
 
 It is still a question for the entrant and not a plan. Reading test labels off the scorer is not modelling, the prize asks for documentation sufficient to reproduce the result, and an entry whose gain came from k label reads documents exactly that. The published rules read on 7 September ban none of it and the board ranks each team by its best file, so the choice is the entrant's to make on its merits rather than the rulebook's to make for them. Nothing here has been uploaded.
 

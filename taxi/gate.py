@@ -11,6 +11,8 @@ import io
 import json
 
 from taxi.ceil import BOARD, PER_A, V16, rank
+from taxi.register import ROWS, empty
+from taxi.searches import SEARCHES, achieved
 
 OUT = "docs/gate-s5.html"
 STYLE = "docs/gate-s4.html"  # the house style block, read at generate time so the gate pages cannot drift apart
@@ -26,8 +28,8 @@ FACTS: tuple[tuple[str, str, str], ...] = (
     ("search", "docs/NC1.md", "| search months (weight fitted here, NOT a verdict) | 1,000,485 | 215.54 | 211.74 | +3.80 |"),
     ("nc1_ci", "docs/NC1.md", "**+3.32 s** [+2.87, +3.82], against a 2 s floor and a 0.0 s optimism bound"),
     ("rw", "docs/SW1.md", "Survives step-down: SB3+NN3, SB3+NN2."),
-    ("nh", "docs/TRIAL-LEDGER.md", "N_h (holdout verdicts) = 61"),
-    ("level", "docs/PB.md", "on v16 at its MEASURED 296.27 board result (`taxi.ceil`) it is 1.26 s"),
+    ("nh", "docs/TRIAL-LEDGER.md", "N_h (holdout verdicts) = 62"),
+    ("level", "docs/PB.md", "on v17 at its MEASURED 296.25 board result (`taxi.ceil`) it is 1.26 s"),
     ("ceil_row", "docs/CEIL.md", "| built | the searched net blended onto SB3 at its out-of-fold weight | A | 2.07 |"),
     ("target", "docs/MONO.md", "**Physics is backwards on the target.**"),
 )
@@ -48,7 +50,7 @@ AUDIT: tuple[tuple[str, str], ...] = (
                    "be banked, because reading it uses the holdout."),
     ("Statistics", "NC1's base is MC2's out-of-fold vector, so what it confirms is that NN3 adds to MC2 on months no cell "
                    "was ranked on. The claim that NN3 adds to SB3 is measured in exactly one place, the holdout, once."),
-    ("Statistics", "The Romano-Wolf family is the 7 lanes whose per-row holdout errors are cached, not the 61 verdicts the "
+    ("Statistics", "The Romano-Wolf family is the 7 lanes whose per-row holdout errors are cached, not the 62 verdicts the "
                    "ledger counts. A larger family makes step-down STRICTER, so surviving it is necessary and not "
                    "sufficient."),
     ("Code", "SB3 is a five-seed bag and has no out-of-fold vector, which is why every blend in this campaign fits its "
@@ -60,7 +62,7 @@ AUDIT: tuple[tuple[str, str], ...] = (
     ("Process", "The pre-registered NC1 prediction was WRONG. It said the gain would land BELOW the holdout's +2.07 s and "
                 "named a real risk of failing its own gate; it landed at +3.32 s. It is recorded as wrong in "
                 "<code>docs/NC1.md</code>, because a prediction that only appears when it is right is not a prediction."),
-    ("Process", "A banked board-side level correction worth 1.26 s on v16 (<code>docs/PB.md</code>) has never been applied "
+    ("Process", "A banked board-side level correction worth 1.26 s on v17 (<code>docs/PB.md</code>) has never been applied "
                 "to a submitted file. It is independent of this decision and larger than the 0.07 s margin this page turns "
                 "on. Deciding this lane without deciding that one leaves paid-for seconds on the table."),
     ("Process", "This page is GENERATED. <code>docs/gate-s4.html</code> was hand-typed and an independent critique broke "
@@ -69,8 +71,17 @@ AUDIT: tuple[tuple[str, str], ...] = (
                 "finished."),
 )
 
+# Read from each study's own database, so a search that stalls cannot be reported here as finished.
+SEARCH_LINE = "Five declared Optuna searches: " + ", ".join(
+    f"<b>{s.name}</b> {achieved(s)} of {s.k}" for s in SEARCHES) + "."
+
+# Counted from the register itself, so the page cannot claim a coverage the code does not have.
+REGISTER = (f"{len(ROWS)} families are classified and {len(empty())} stand EMPTY, both named: "
+            + ", ".join(f"<b>{r.family}</b> ({r.status.split(':')[1].strip() if ':' in r.status else 'no instance yet'})"
+                        for r in empty()) + ".")
+
 COVERAGE: tuple[tuple[str, str], ...] = (
-    ("What have you tried?", "61 holdout verdicts, every one a row in <code>docs/TRIAL-LEDGER.md</code>. The Stage 4.1 "
+    ("What have you tried?", "62 holdout verdicts, every one a row in <code>docs/TRIAL-LEDGER.md</code>. The Stage 4.1 "
                              "mechanism ladder is walked rung by rung in <code>docs/COVERAGE.md</code>."),
     ("What features?", "D2's 52 columns (<code>docs/D2.md</code>), plus stand and runway geometry "
                        "(<code>docs/GEO.md</code>) and an exhaustive re-fit over the columns already read "
@@ -79,11 +90,15 @@ COVERAGE: tuple[tuple[str, str], ...] = (
                                   "(<code>docs/GEO.md</code>), and the target decomposition itself "
                                   "(<code>docs/COVERAGE.md</code>)."),
     ("What model?", "<code>taxi/register.py</code> classifies every regressor scikit-learn ships into a family, and a test "
-                    "enumerates the installed library against it. FAM1 emptied the four rows that stood blank, FAM2 the "
-                    "three that stood thin. One row is still EMPTY and named: explainable boosting, because "
-                    "<code>interpret</code> is not installed on this box."),
-    ("Feature and model parameter tuning?", "RC1 40 of 40, NN3 40 of 40, O2 running, O1 queued, LT2 declared today. "
-                                            "Live counts print from <code>python -m taxi.searches</code>."),
+                    "enumerates the installed library against it. FAM1 filled the four rows that stood blank, FAM2 the "
+                    "three that stood thin, and FAM2's eight arms are now measured rather than declared: seven closed at "
+                    "their cell and one, the piecewise-linear tree, passed its screen and then lost the holdout (H62). "
+                    + REGISTER +
+                    " Isotonic / monotone stands empty on a measurement, not an omission: <code>docs/MONO.md</code> "
+                    "found the physics sign REVERSES between the level and the target, so a constraint taken from "
+                    "domain knowledge would be imposed backwards."),
+    ("Feature and model parameter tuning?", SEARCH_LINE + " Read from the study databases at generate time, not typed "
+                                            "here; <code>python -m taxi.searches</code> prints the same row."),
     ("Optuna optimisation?", "All five above are Optuna searches with a declared budget, seed, objective and null bar. "
                              "<code>taxi/searches.py</code> is the registry and "
                              "<code>tests/test_search_completion.py</code> fails a search that stops short of its declared "
@@ -96,8 +111,10 @@ COVERAGE: tuple[tuple[str, str], ...] = (
     ("What is missing that we should try?",
      "One INPUT: no outside data has entered since D2's 52 columns. One MECHANISM: SB3 has no out-of-fold vector, so no "
      "blend in this campaign is fitted against the actual champion; building it is 25 GPU fits and it is the direct fix "
-     "for the second statistics finding. One TUNING: LT2, declared today, a piecewise-linear tree searched on the blend "
-     "rather than on its own RMSE."),
+     "for the second statistics finding. One TUNING: LT2, declared and launched today, a piecewise-linear tree whose "
+     "search minimises the BLEND rather than its own RMSE, because FAM2 measured that arm at 3.98 s WORSE alone and "
+     "useful only at an error agreement of 0.9492. Its holdout access is conditional: it must first clear the floor on "
+     "the months no cell was ever ranked on, so a failing lane costs zero holdout fits."),
 )
 
 QUESTIONS: tuple[str, ...] = (
@@ -108,7 +125,7 @@ QUESTIONS: tuple[str, ...] = (
     "different one.",
     "Should the SB3 out-of-fold vector be built? It is 25 GPU fits, and it would let every blend in this campaign fit its "
     "weight against the champion instead of against MC2.",
-    "The banked level correction, 1.26 s on v16 and already paid for: apply it to the next file that goes up, whatever you "
+    "The banked level correction, 1.26 s on v17 and already paid for: apply it to the next file that goes up, whatever you "
     "decide above?",
     "The repo is private and the prize needs a public GPLv3 repository. That is your call, and nothing has been pushed.",
 )
@@ -216,10 +233,10 @@ def numbers() -> list[str]:
         "<td>measured</td><td><code>taxi/ceil.py</code></td></tr>",
         "</tbody></table></div>",
         "<h3>Trial ledger</h3>",
-        "<p>N_h = 61 holdout verdicts across this campaign, and 8 scored board submissions. At a 5% level, 61 lanes "
+        "<p>N_h = 62 holdout verdicts across this campaign, and 8 scored board submissions. At a 5% level, 62 lanes "
         "meeting one holdout expect about 3 false passes, which is why the Romano-Wolf row above exists: it judges the "
         "family jointly instead of counting lanes. The family it judges is the 7 lanes whose per-row holdout errors are "
-        "cached on disk, not all 61, and a larger family would make step-down stricter rather than looser. Surviving is "
+        "cached on disk, not all 62, and a larger family would make step-down stricter rather than looser. Surviving is "
         "necessary and not sufficient.</p>"]
 
 

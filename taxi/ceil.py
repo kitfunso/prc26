@@ -8,10 +8,9 @@ from __future__ import annotations
 import json
 
 BOARD = "data/board.json"
-# Three REAL anchors, each a scored file: S1 (holdout composite 365.24, board 325.3982), v16 (321.1269, 296.2745) and
-# v15 (322.5796, 298.0671). v15 and v16 differ on 329,648 lane-A rows and ZERO lane-B rows, so that pair is a controlled
-# lane-A experiment and PER_A below is measured off it rather than differentiated out of the pooled slope (CAL3).
-ANCHORS = ((365.24, 325.3982), (321.1269, 296.2745), (322.5796, 298.0671))
+# Every scored file is an anchor: S1, v16, v15, v17. The v15/v16 pair moves lane A alone, so PER_A is measured off it (CAL3)
+# rather than differentiated out of the pooled slope; v17 joins the line but cannot calibrate PER_A (ledger S7 says why).
+ANCHORS = ((365.24, 325.3982), (321.1269, 296.2745), (322.5796, 298.0671), (321.1716, 296.2490))
 LANE_N, LANE_RMSE = (339046, 5373), (230.0951, 1808.1729)  # v16's own lanes: the point the per-lane rates differentiate at
 # The controlled pair: MC2 lane A costs 2.0551 holdout seconds against SB3 (H52/H53a) and cost 1.7926 board seconds.
 CAL3 = ((232.1502 - 230.0951), (298.0671 - 296.2745))
@@ -39,6 +38,7 @@ def per_lane() -> tuple[float, float]:
 
 
 V16 = ANCHORS[1][1]  # MEASURED, not projected: the bucket's merry-octopus_v16.parquet_result.json
+V17 = ANCHORS[3][1]  # our BEST scored file, and the one the board ranks us on; v16 stays the base every lane-A gain stacks on
 PER_A, PER_B = per_lane()
 
 # (tier, name, lane, holdout seconds, source, quote, what it rests on). QUOTE is the verbatim string the source doc must still
@@ -110,7 +110,7 @@ def main(out: str = "docs/CEIL.md") -> None:
            f"was uploaded and scored: **{V16:.4f}**, rank **{rank(V16, board)}**, {gap:.2f} s behind the lead. That is a MEASURED "
            f"number, so nothing on this page rests on a projection band any more. It also killed the old one: v16 was projected "
            f"at 286.12 across a 281.4 to 288.0 family and scored {V16:.4f}, above the whole band, because every board number in "
-           f"this repo was fitted from the single S1 anchor. Two scored anchors now fix the line, board = {line()[0]:.4f} + "
+           f"this repo was fitted from the single S1 anchor. {len(ANCHORS)} scored anchors now fix the line, board = {line()[0]:.4f} + "
            f"{line()[1]:.6f} x holdout composite, and the per-lane rates below are differentiated from it at v16 instead of "
            f"assumed: one holdout second of lane A is {PER_A:.4f} s of board, one of lane B is {PER_B:.4f} s. The campaign "
            f"assumed 0.633 and 0.0776, so every gain priced before today was overstated by about 27%.", "",
