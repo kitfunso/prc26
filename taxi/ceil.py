@@ -47,8 +47,9 @@ PER_A, PER_B = per_lane()
 ITEMS = [
     ("built", "the searched net blended onto SB3 at its out-of-fold weight", "A", 2.07, "docs/SW1.md",
      "| SB3+NN3 | 228.03 | +2.07 |",
-     "BUILT and measured on the untouched holdout, weight 0.5189 fitted out of fold on 1,723,531 rows. It CLEARS the 2 s "
-     "floor; what holds it is the k = 40 optimism bound added on top, and `docs/NN3.md` records the arithmetic"),
+     "BUILT and measured on the untouched holdout, weight 0.5189 fitted out of fold on 1,723,531 rows. It clears the 2 s "
+     "floor at +2.07 s with a lower bound of +1.1 s, and NC1 retired the k = 40 bound that was held against it. The floor "
+     "still sits INSIDE its interval, so the margin is 0.07 s and the decision is Keith's"),
     ("reachable", "stand and runway geometry, the share that survives the calendar", "A", 0.597, "docs/GEO.md",
      "**+0.597 s of lane A**",
      "capped at +3.295 s with the congestion interaction; 26% of it survives, and no lane is written"),
@@ -130,14 +131,18 @@ def main(out: str = "docs/CEIL.md") -> None:
            f"rank {rank(V16, board)} to {rank(tiers_at['built'], board)}. State the blocker exactly, because the campaign has "
            f"stated it loosely: at +2.07 s the lane CLEARS the 2 s floor. It is held by the k = 40 optimism bound that "
            f"`docs/NN3.md` adds on top, for a hurdle of 3.0 s.", "",
-           f"Two things are now known about that bound and they do not agree. `docs/SW1.md` puts the lane against the six "
-           f"others that met these rows and it survives Romano-Wolf step-down at 5% family-wise error, so it is not an artifact "
-           f"of the campaign meeting one holdout 60 times. And `taxi.nn3.score` reads only the training frame, so the 40 cells "
-           f"were ranked on training folds and the +2.07 was measured once on rows the search never saw, which is the case an "
-           f"optimism bound is not usually written for. Neither fact retires the bound: step-down controls multiplicity ACROSS "
-           f"lanes and the bound controls selection WITHIN one, and no lane in this campaign has yet re-measured NN3's cell as "
-           f"a fixed k = 1 spec. That is the experiment that would settle it on the rule's own terms, and until it is run the "
-           f"rule stands and SB3 stays.", "",
+           f"That bound is now retired, by measurement rather than by argument. `docs/NC1.md` took NN3's winning cell as a "
+           f"FIXED k = 1 spec and read it on months 4, 5, 9 and 10, which `taxi.nn3.score` never ranked a cell on: against one "
+           f"base the blend gains +3.80 s on the months that chose the cell and +3.32 s on the months that did not, so the "
+           f"selection advantage is about 0.48 s, not the 1.0 s the bound assumed. The holdout never took part in choosing the "
+           f"cell at all, so the +2.07 needed no such correction in the first place. `docs/SW1.md` closes the other "
+           f"multiplicity, the campaign meeting one holdout 60 times: the lane survives Romano-Wolf step-down at 5% "
+           f"family-wise error over the seven cached lanes.", "",
+           f"So every objection this campaign has instrumented is now answered, and `taxi.verdict` passes the lane on its own "
+           f"rule: +2.07 s against a 2 s floor with a lower bound of +1.1 s. Say the caveat as loudly as the result. The "
+           f"margin is 0.07 s, the floor sits INSIDE the interval [+1.1, +2.9], so these rows cannot rule out a true gain "
+           f"below the floor, and the 1.81 s of board above is a projection off the measured per-lane rate, not a scored "
+           f"file. This is a Stage 6 promotion decision and it is Keith's alone. Nothing here builds a file or uploads one.", "",
            f"Spending the reachable rows on top of it reaches {tiers_at['reachable']:.2f}, rank "
            f"{rank(tiers_at['reachable'], board)}; every oracle as well reaches {tiers_at['oracle']:.2f}, and that column includes "
            f"two that a real model has already been built for and lost. The lead is {gap:.2f} s away, so first place is inside "
