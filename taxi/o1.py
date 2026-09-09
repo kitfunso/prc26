@@ -10,11 +10,12 @@ import optuna
 from taxi.champ import COLS_D1, champion_holdout, lane_a
 from taxi.m2 import is_tail
 from taxi.mc1 import cv_a, predict_cb, stages_cb
+from taxi.searches import reap
 from taxi.verdict import paired_delta, rmse
 from taxi.w1 import verdict_line
 
 STORAGE, STUDY = "sqlite:///data/o1.db", "o1"
-N_TRIALS, TIMEOUT = 40, 24 * 3600
+N_TRIALS, TIMEOUT = 40, 40 * 3600  # 33 min/trial measured over trials 0-7: the trial count ends the search, never the clock
 MC2_CELL = dict(learning_rate=0.1, depth=8, l2_leaf_reg=3.0, border_count=254, random_strength=1.0, bagging_temperature=1.0)
 
 
@@ -37,6 +38,7 @@ def objective(trial: optuna.Trial, tra) -> float:
 def main() -> None:
     tra, tea = lane_a()
     study = optuna.create_study(study_name=STUDY, storage=STORAGE, direction="minimize", sampler=optuna.samplers.TPESampler(seed=0), load_if_exists=True)
+    reap(study)
     if not study.trials:
         study.enqueue_trial(MC2_CELL)  # trial 0 = the incumbent, so the study carries MC2's own CV on the same data
     done = [t for t in study.trials if t.state == optuna.trial.TrialState.COMPLETE]
