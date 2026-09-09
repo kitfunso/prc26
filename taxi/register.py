@@ -1,0 +1,85 @@
+"""The model-class register as DATA, so a missing family fails a test instead of reading as complete.
+
+`docs/COVERAGE.md` section 4 kept this as prose in a table, and that is how ridge went missing for 60 ledger rows: a class
+nobody tried produced no row, so the section read as complete precisely because the gap left no trace. Here every row names the
+scikit-learn estimators it owns, and `tests/test_model_class_register.py` enumerates the installed library against it. A new
+family cannot be silently absent, because the library itself is the checklist.
+"""
+from __future__ import annotations
+
+from typing import NamedTuple
+
+
+class Row(NamedTuple):
+    family: str
+    covers: tuple[str, ...]  # scikit-learn regressor class names this family owns; empty for a family sklearn does not ship
+    instance: str  # the campaign lane that instantiated it, or "" while the row stands empty
+    status: str
+
+
+# Families sklearn ships. Every regressor in `all_estimators("regressor")` belongs to exactly one row.
+SKLEARN: tuple[Row, ...] = (
+    Row("constant / group mean", ("DummyRegressor",),
+        "B0 global, B1 per airport, B2 airport x hour x weekday", "TRIED (H1-H4)"),
+    Row("ordinary least squares",
+        ("LinearRegression", "Lars", "LarsCV", "OrthogonalMatchingPursuit", "OrthogonalMatchingPursuitCV"),
+        "B4 per-airport OLS, B3 gap family", "TRIED (H5-H11)"),
+    Row("penalised linear",
+        ("Ridge", "RidgeCV", "Lasso", "LassoCV", "LassoLars", "LassoLarsCV", "LassoLarsIC", "ElasticNet", "ElasticNetCV",
+         "SGDRegressor", "PassiveAggressiveRegressor"),
+        "RC1 ridge (Optuna over 6 knobs); FAM2-en elastic net", "TRIED (RC1) + FAM2"),
+    Row("Bayesian linear", ("ARDRegression", "BayesianRidge"), "FAM2-brr", "FAM2"),
+    Row("robust / quantile linear", ("HuberRegressor", "QuantileRegressor", "TheilSenRegressor", "RANSACRegressor"),
+        "lane B `taxi.l2.huber`; FAM2-hub on lane A", "lane B TRIED + FAM2"),
+    Row("non-Gaussian GLM", ("PoissonRegressor", "GammaRegressor", "TweedieRegressor"),
+        "FAM2-twd, Tweedie on the level", "FAM2"),
+    Row("latent-factor regression", ("PLSRegression", "PLSCanonical", "CCA"), "FAM2-pls", "FAM2"),
+    Row("support-vector regression", ("SVR", "NuSVR", "LinearSVR"), "FAM2-svr, the linear case", "FAM2"),
+    Row("kernel methods", ("KernelRidge", "GaussianProcessRegressor"),
+        "FAM1-nys, an RBF kernel approximated by Nystroem then ridged", "TRIED (FAM1)"),
+    Row("k-nearest neighbours", ("KNeighborsRegressor", "RadiusNeighborsRegressor"), "FAM1-knn", "TRIED (FAM1)"),
+    Row("single decision tree", ("DecisionTreeRegressor", "ExtraTreeRegressor"),
+        "none, and none is planned: it is a random forest of one, so FAM1-rf covers the class", "subsumed"),
+    Row("bagged trees", ("RandomForestRegressor", "BaggingRegressor"), "FAM1-rf", "TRIED (FAM1)"),
+    Row("randomised trees", ("ExtraTreesRegressor",), "FAM1-et", "TRIED (FAM1)"),
+    Row("gradient-boosted trees", ("GradientBoostingRegressor", "HistGradientBoostingRegressor"),
+        "M1, M2, D1, D2 LightGBM; MC1, MC2, SB1-SB3 CatBoost; X1 XGBoost", "TRIED, and the champion"),
+    Row("adaptive boosting", ("AdaBoostRegressor",), "FAM2-ada", "FAM2"),
+    Row("feed-forward neural net", ("MLPRegressor",), "NN1, NN2, NN3", "TRIED (H57-H59)"),
+    Row("isotonic / monotone", ("IsotonicRegression",), "", "EMPTY"),
+    Row("ensembles and stacking", ("StackingRegressor", "VotingRegressor"),
+        "E1, ST1, BF, the SB seed bags", "TRIED (H21, H52)"),
+    # Wrappers around another estimator, and the multi-output-only penalised fits. Neither is a model class, and the target
+    # here is one scalar column, so these are carried to keep the enumeration total rather than to be built.
+    Row("not a model class: meta-wrapper or multi-output only",
+        ("MultiOutputRegressor", "RegressorChain", "TransformedTargetRegressor", "MultiTaskElasticNet",
+         "MultiTaskElasticNetCV", "MultiTaskLasso", "MultiTaskLassoCV"),
+        "", "N/A"),
+)
+
+# Families with no scikit-learn estimator, so the enumeration above cannot reach them. They are listed by hand and an entry
+# here is a claim the reviewer must check, not a claim the test can.
+OUTSIDE: tuple[Row, ...] = (
+    Row("generalised additive (spline basis, penalised)", (),
+        "RC1's `knots` arms ARE an additive spline fit under an L2 penalty", "TRIED inside RC1"),
+    Row("prior-fitted transformer", (), "M3 and TP2 lane A, LP1 lane B", "TRIED (H12, H55)"),
+    Row("piecewise-linear trees", (), "FAM2-lt, LightGBM `linear_tree`", "FAM2"),
+    Row("explainable boosting (GA2M)", (), "", "EMPTY: `interpret` is not installed on this box"),
+)
+
+ROWS: tuple[Row, ...] = SKLEARN + OUTSIDE
+
+
+def empty() -> tuple[Row, ...]:
+    return tuple(r for r in ROWS if r.status.startswith("EMPTY"))
+
+
+def table() -> str:
+    head = ["| model class | instance | status |", "|---|---|---|"]
+    return "\n".join(head + [f"| {r.family} | {r.instance or '(none)'} | {r.status} |" for r in ROWS])
+
+
+if __name__ == "__main__":
+    print(table())
+    print(f"\n{len(ROWS)} families, {len(empty())} standing EMPTY, "
+          f"{sum(len(r.covers) for r in ROWS)} scikit-learn regressors classified.")
