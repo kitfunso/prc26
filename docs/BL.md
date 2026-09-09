@@ -4,7 +4,7 @@ Regenerate with `python -m taxi.bl`. Arithmetic only, no fit. Diagnostic: it dec
 
 Ranking DEP rows 344,841: lane A 339,551, lane B 5,290. S1 scored 325.3982 (total SSE 36,513,140,500 s^2).
 
-Leaderboard read 2026-09-07 04:17 UTC: 225 submissions, 60 teams scored. The leader is youthful-giraffe at 265.7612; we are 25 of 60 at 324.7339 on 5 submissions. Every leader number below moves when that snapshot does.
+Leaderboard read 2026-09-08 22:14 UTC: 473 submissions, 79 teams scored. The leader is youthful-giraffe at 248.4818; we are 21 of 79 at 296.249 on 8 submissions. Every leader number below moves when that snapshot does.
 
 ## 1. The split is not measurable, at any number of submissions
 
@@ -54,45 +54,48 @@ AND a lane-B-heavy reading of the family (S1 board lane A near 200) at once. The
 
 ## 4. Where the leader's lead has to sit
 
-The same identity at 265.7612. Their split is equally unmeasurable, so this is the locus, not a claim about their model.
+The same identity at 248.4818. Their split is equally unmeasurable, so this is the locus, not a claim about their model.
 
 | leader board lane A | forced leader board lane B |
 |---|---|
-| 150 | 1,778 |
-| 170 | 1,658 |
-| 190 | 1,512 |
-| 210 | 1,332 |
-| 230 | 1,099 |
-| 250 | 770 |
+| 150 | 1,606 |
+| 170 | 1,473 |
+| 190 | 1,307 |
+| 210 | 1,093 |
+| 230 | 793 |
+| 250 | 115 |
 
 Put v16 on the same board at the equal-ratio point: lane A 205.8, lane B 1,618, composite 286.12. Holding the leader's lane A equal
-to ours forces their lane B to 1,373, which is 15.1% better than ours. Holding their lane B equal to ours forces their lane A
-to 176.0, which is 14.5% better than ours. So the lead is about 15% of one lane, or a mix of less in each. It is not
+to ours forces their lane B to 1,142, which is 29.4% better than ours. Holding their lane B equal to ours forces their lane A
+to 148.1, which is 28.0% better than ours. So the lead is about 28% of one lane, or a mix of less in each. It is not
 a different kind of model, and it is not concentrated in lane B's artifact rows the way the drop-k arithmetic in `docs/LEV.md`
 suggests on 2025 data.
 
 ## 5. What a holdout second is worth, and what first place costs
 
-Every verdict in this campaign is a holdout number and the prize is a board number. The equal-ratio carry converts one to the
-other, so the price of first place can be read in the same units the ledger uses. Each row moves ONE lane and holds the other.
+Every verdict in this campaign is a holdout number and the prize is a board number. A GAIN is converted at the per-lane rates
+`taxi.ceil` measures off three scored files, not at the equal ratio of section 3: v15 and v16 differ on lane A only, so that
+pair prices lane A directly at 0.8723. Lane B has no controlled pair, so its 0.0572 inherits the pooled slope's
+unquantified error and is a FLOOR, which makes every lane-B row below the most optimistic reading available. Each row moves
+ONE lane and holds the other, anchored on v16's MEASURED board.
 
 | lane | holdout gain (s) | holdout lane A | holdout lane B | board |
 |---|---|---|---|---|
-| A | 0 | 230.10 | 1,808.17 | 286.12 |
-| A | 1 | 229.10 | 1,808.17 | 285.48 |
-| A | 2 | 228.10 | 1,808.17 | 284.85 |
-| A | 3 | 227.10 | 1,808.17 | 284.22 |
-| A | 5 | 225.10 | 1,808.17 | 282.97 |
-| A | 10 | 220.10 | 1,808.17 | 279.85 |
-| A | 15 | 215.10 | 1,808.17 | 276.77 |
-| B | 25 | 230.10 | 1,783.17 | 284.19 |
-| B | 50 | 230.10 | 1,758.17 | 282.27 |
-| B | 100 | 230.10 | 1,708.17 | 278.47 |
-| B | 150 | 230.10 | 1,658.17 | 274.74 |
+| A | 0 | 230.10 | 1,808.17 | 296.27 |
+| A | 1 | 229.10 | 1,808.17 | 295.40 |
+| A | 2 | 228.10 | 1,808.17 | 294.53 |
+| A | 3 | 227.10 | 1,808.17 | 293.66 |
+| A | 5 | 225.10 | 1,808.17 | 291.91 |
+| A | 10 | 220.10 | 1,808.17 | 287.55 |
+| A | 15 | 215.10 | 1,808.17 | 283.19 |
+| B | 25 | 230.10 | 1,783.17 | 294.84 |
+| B | 50 | 230.10 | 1,758.17 | 293.41 |
+| B | 100 | 230.10 | 1,708.17 | 290.56 |
+| B | 150 | 230.10 | 1,658.17 | 287.70 |
 
-A holdout second of lane A is worth about -0.633 s of board, and a second of lane B about -0.0776 s.
-Reaching 265.7612 on lane A alone needs holdout lane A at **196.7 s**, a gain of **33.4 s** on SB3's 230.0951.
-On lane B alone it needs **1,534.4 s**, a gain of **273.8 s** on L8c's 1,808.1729.
+A holdout second of lane A is worth -0.8723 s of board, and a second of lane B at most -0.0572 s.
+Reaching 248.4818 on lane A alone needs holdout lane A at **175.3 s**, a gain of **54.8 s** on SB3's 230.0951.
+On lane B alone it needs **972.5 s**, a gain of **at least 835.7 s** on L8c's 1,808.1729 ('at least', because lane B's rate is a floor, so the true requirement is larger).
 
 Set that against what the diagnostics have already priced with the holdout's own answers in hand. `docs/GEO.md` caps every
 stand-and-runway geometric feature, main effect and congestion interaction together, at +3.295 s of lane A, and puts the share

@@ -12,6 +12,8 @@ import duckdb
 import numpy as np
 import pandas as pd
 
+from taxi.ceil import V16
+
 from taxi.cb1 import lane_b
 from taxi.champ import CURRENT, lane_a, predict_b
 from taxi.l2 import floored
@@ -27,7 +29,7 @@ RISK = "data/sel_risk.parquet"  # written by scripts/sel_risk.py
 RISK_NAME = "learned risk model, scripts/sel_risk.py"
 DP = 1e-4  # the board prints RMSE to four decimals
 ORDER = ("jan", "jul", "laneB")
-CHAL_BOARD = 286.12  # the equal-ratio projection, docs/BL.md section 3
+CHAL_BOARD = V16  # v16's MEASURED board result; S1's anchor above is measured too, so both ends of the carry now are
 
 
 def _preds(path: str) -> pd.Series:
@@ -190,7 +192,7 @@ def main() -> None:
            "The best correction inside the span of the three measured groups is `c' (W'W)^-1 c`, which is what handles lane B overlapping "
            "both months rather than three means applied in sequence.", "",
            "| file | January sum (s) | July+ sum (s) | lane B sum (s) | SSE it removes (Ms^2) |", "|---|---|---|---|---|", *body, "",
-           f"On S1's own scale that is {s1_gain:.2f} s of board composite; on {CHAL_V} at its {CHAL_BOARD:.2f} projection (`docs/BL.md`) it is "
+           f"On S1's own scale that is {s1_gain:.2f} s of board composite; on {CHAL_V} at its MEASURED {CHAL_BOARD:.2f} board result (`taxi.ceil`) it is "
            f"{chal_gain:.2f} s. Both are already paid for and neither has ever been applied to a submitted file.", "",
            f"Board resolution: the score prints to four decimals, so an error sum read at c = 300 s is good to about {sig:,.0f} s, which is "
            f"{sig / 5290:.3f} s per row on a 5,290-row group and finer on anything larger. Precision does not bind.", "",
@@ -218,7 +220,7 @@ def main() -> None:
            "bucket cap is 1 GB against 2 MB a file.", "",
            "## 5. What the probes the board has NOT bought are worth", "",
            "Section 2 is on the holdout's own composite. This one rescales lane B's group means to the board: the holdout's SSE removed "
-           f"per row, applied to the ranking file's {n_board_b:,} lane-B rows, read off {CHAL_V}'s {CHAL_BOARD:.2f}.", "",
+           f"per row, applied to the ranking file's {n_board_b:,} lane-B rows, read off {CHAL_V}'s MEASURED {CHAL_BOARD:.2f}.", "",
            "| cut | probes | cumulative (s) | marginal (s) |", "|---|---|---|---|",
            *[f"| {nm} | {g} | {c:.3f} | {m:+.3f} |" for nm, g, c, m in mrg], "",
            "The split matters because the two halves belong to different years. The LEVEL row buys almost nothing here, because L8c's "
