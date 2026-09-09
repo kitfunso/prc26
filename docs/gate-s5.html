@@ -1,0 +1,124 @@
+<meta charset="utf-8">
+<title>Promote SB3+NN3, or hold</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#F6F7F5;--ink:#1C232B;--muted:#5B6570;--line:#D8DDD9;--accent:#1F4FB0;--amber:#B0680A;--tint:#E9EEF9;--tint-amber:#FBF1E3;--code:#EEF0EC;--win:#1F6B3A;--tint-win:#E6F2EA;--lose:#9B2C2C;--tint-lose:#F8E7E7}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#171B1F;--ink:#E6E9E6;--muted:#9AA4AE;--line:#333A41;--accent:#8FB0F0;--amber:#E0A050;--tint:#1E2A42;--tint-amber:#3A2A12;--code:#22282E;--win:#7FCB9A;--tint-win:#16301F;--lose:#E39B9B;--tint-lose:#3A1A1A}}
+:root[data-theme="dark"]{--bg:#171B1F;--ink:#E6E9E6;--muted:#9AA4AE;--line:#333A41;--accent:#8FB0F0;--amber:#E0A050;--tint:#1E2A42;--tint-amber:#3A2A12;--code:#22282E;--win:#7FCB9A;--tint-win:#16301F;--lose:#E39B9B;--tint-lose:#3A1A1A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "IBM Plex Sans",system-ui,sans-serif}
+main{max-width:76ch;margin:0 auto;padding:40px 24px 80px}
+h1{font-size:30px;line-height:1.2;font-weight:600;margin:6px 0 10px;text-wrap:balance}
+h2{font-size:19px;font-weight:600;margin:40px 0 10px;text-wrap:balance}
+h3{font-size:16px;font-weight:600;margin:24px 0 6px}
+p{margin:0 0 12px}
+.eyebrow{font:500 12px/1.4 "IBM Plex Mono",monospace;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:18px;color:var(--muted);margin-bottom:22px}
+.headline{border-left:4px solid var(--accent);background:var(--tint);padding:14px 18px;margin:18px 0}
+.headline p:last-child{margin:0}
+.decision{border:1px solid var(--amber);background:var(--tint-amber);padding:14px 18px;margin:18px 0;border-radius:2px}
+.decision h2{margin:0 0 8px;font-size:17px}
+.call{font-weight:600}
+.wrap{overflow-x:auto;margin:10px 0 16px}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:13px}
+td.num,th.num{text-align:right;white-space:nowrap}
+td.id{font-family:"IBM Plex Mono",monospace;font-size:13px;white-space:nowrap}
+tr.win td{background:var(--tint-win)}
+tr.lose td{background:var(--tint-lose)}
+.note{font-size:14px;color:var(--muted)}
+.tag{display:inline-block;font:500 11px/1.4 "IBM Plex Mono",monospace;letter-spacing:.03em;padding:1px 6px;border:1px solid var(--line);border-radius:2px;margin-right:6px;color:var(--muted)}
+.tag.win{color:var(--win);border-color:var(--win)}
+.tag.lose{color:var(--lose);border-color:var(--lose)}
+.tag.amber{color:var(--amber);border-color:var(--amber)}
+code,pre{font-family:"IBM Plex Mono",monospace;font-size:13.5px}
+code{background:var(--code);padding:1px 5px;border-radius:2px}
+pre{background:var(--code);padding:12px 14px;overflow-x:auto;border-radius:2px;line-height:1.5}
+ol,ul{padding-left:22px;margin:0 0 12px}
+li{margin-bottom:6px}
+.q{margin:12px 0;padding:10px 14px;border-left:3px solid var(--line)}
+.q .n{font:500 12px/1.4 "IBM Plex Mono",monospace;color:var(--muted);display:block;margin-bottom:2px}
+.rule{border:1px dashed var(--line);padding:12px 16px;margin:12px 0;border-radius:2px}
+.rule strong{color:var(--accent)}
+.crit{margin:10px 0;padding:10px 14px;background:var(--code);border-radius:2px}
+.crit .r{margin-top:6px;padding-top:6px;border-top:1px solid var(--line);font-size:14px}
+a{color:var(--accent)}
+</style>
+
+<main>
+<p class="eyebrow">PRC Data Challenge 2026 &middot; merry-octopus &middot; Stage 6 promotion gate</p>
+<h1>Promote SB3+NN3, or hold</h1>
+<p class="lede">A blend that is built, measured on the untouched holdout, and now clears every objection this campaign has instrumented. It passes <code>taxi.verdict</code> on that module's own rule by 0.07 s, with the floor sitting inside its interval. That last clause is the whole decision.</p>
+<div class="decision">
+<h2>The two numbers</h2>
+<div class="wrap"><table><thead><tr><th>lane A</th><th class="num">holdout RMSE</th><th class="num">board RMSE</th><th class="num">rank</th></tr></thead><tbody>
+<tr><td>SB3, the champion, as scored</td><td class="num">230.10</td><td class="num">296.27</td><td class="num">22</td></tr>
+<tr class="win"><td>SB3+NN3, the challenger</td><td class="num">228.03</td><td class="num">294.47</td><td class="num">19</td></tr>
+</tbody></table></div>
+<p class="note">The board column: v16 is MEASURED, and the challenger is that same file with lane A replaced, converted at the measured per-lane rate of 0.8723 board seconds per holdout lane-A second. Snapshot 2026-09-08 22:14 UTC, 473 submissions across 79 teams, leader 248.4818. Our best scored file stands at 296.2490, rank 21.</p>
+<p class="call">The move is 1.81 board seconds and 3 places. The lead is 47.79 s away and stays away.</p>
+</div>
+<h2>1. The honest table: nominated early, judged late</h2>
+<p>Stage 5.3 asks for the spec to be chosen on rows the verdict does not judge, and for the haircut between that and the as-run number to be its own figure. This lane has both, because <code>taxi/data.py</code> declares five fold pairs and NN3's search ranked its 40 cells on only three of them. Months 4, 5, 9 and 10 are rows no cell in this campaign was ever chosen on, and NN3's own five-fold refit had already written predictions for them.</p>
+<div class="wrap"><table><thead><tr><th>rows</th><th class="num">n</th><th class="num">base</th><th class="num">blend</th><th class="num">gain</th><th>what it is</th></tr></thead><tbody>
+<tr><td>search months, 2+3, 6+8, 11+12</td><td class="num">1,000,485</td><td class="num">215.54</td><td class="num">211.74</td><td class="num">+3.80</td><td>where the cell and the weight were chosen. NOT a verdict.</td></tr>
+<tr class="win"><td>held months, 4+5, 9+10</td><td class="num">723,046</td><td class="num">209.11</td><td class="num">205.79</td><td class="num">+3.32</td><td>nominate-early, judge-late. Cell and weight both fixed by rows disjoint from every judged row.</td></tr>
+<tr class="win"><td>untouched holdout, Jan and Jul</td><td class="num">339,046</td><td class="num">230.10</td><td class="num">228.03</td><td class="num">+2.07</td><td>as-run, against SB3 rather than MC2. The number the board conversion uses.</td></tr>
+</tbody></table></div>
+<p><strong>The haircut is 0.48 s and it is measured, not bounded.</strong> +3.80 on the months that chose the cell against +3.32 on the months that did not. <code>docs/NN3.md</code> had carried a k = 40 optimism bound of 1.0 s against this lane, which is twice the selection advantage that actually exists. The holdout row never took part in choosing anything, so it needed no such correction at all.</p>
+<p class="note">The first two rows use MC2's out-of-fold vector as the base and the third uses SB3, because a five-seed bag has no out-of-fold vector. The rows are not on one scale and only the GAIN column carries across them. That is a real limit and it is in the self-audit below.</p>
+<h2>2. Every number, with its interval</h2>
+<div class="wrap"><table><thead><tr><th>claim</th><th class="num">effect</th><th>95% paired</th><th>hurdle</th><th>verdict</th><th>source</th></tr></thead><tbody>
+<tr class="win"><td>SB3+NN3 against SB3, untouched holdout</td><td class="num">+2.07 s</td><td>[+1.12, +2.92]</td><td>floor 2.0 s, bound now 0.0 s</td><td>PASS by 0.07 s</td><td><code>docs/SW1.md</code></td></tr>
+<tr class="win"><td>The same blend on months no cell was ranked on</td><td class="num">+3.32 s</td><td>[+2.87, +3.82]</td><td>floor 2.0 s, bound 0.0 s (k = 1)</td><td>PASS, whole interval clear</td><td><code>docs/NC1.md</code></td></tr>
+<tr><td>Selection advantage of the 40-cell search</td><td class="num">0.48 s</td><td>measured as the gap between the two rows above</td><td>the retired bound assumed 1.0 s</td><td>bound retired</td><td><code>docs/NC1.md</code></td></tr>
+<tr class="win"><td>Romano-Wolf step-down, 5% family-wise error</td><td class="num">t = +4.48</td><td>RW p 0.0000</td><td>7 cached lanes meeting one holdout</td><td>SURVIVES</td><td><code>docs/SW1.md</code></td></tr>
+<tr><td>Board carry of one holdout lane-A second</td><td class="num">0.8723 s</td><td>from the controlled v15 / v16 pair, no interval</td><td>one controlled experiment</td><td>measured</td><td><code>taxi/ceil.py</code></td></tr>
+</tbody></table></div>
+<h3>Trial ledger</h3>
+<p>N_h = 61 holdout verdicts across this campaign, and 8 scored board submissions. At a 5% level, 61 lanes meeting one holdout expect about 3 false passes, which is why the Romano-Wolf row above exists: it judges the family jointly instead of counting lanes. The family it judges is the 7 lanes whose per-row holdout errors are cached on disk, not all 61, and a larger family would make step-down stricter rather than looser. Surviving is necessary and not sufficient.</p>
+<h2>3. The decision rule, restated</h2>
+<div class="rule">
+<p>A challenger replaces the champion when its paired improvement on the untouched holdout has a lower bound above zero AND a point estimate at or above <strong>2.0 s</strong>, with an optimism bound added on top for the number of cells the lane searched. Ties promote the simpler model. The holdout is read once per lane and never to choose anything.</p>
+<p>SB3+NN3 now meets that rule: lower bound +1.12, point estimate +2.07, and the bound that used to sit on top of it has been retired by measurement rather than by argument.</p>
+<p><strong>This verdict is only as good as this rule. Attack the rule, not just the numbers.</strong> The two places it is softest: 2.0 s is a constant chosen once and never derived, and it sits INSIDE the interval, so a true gain of 1.5 s would produce these rows about as readily as a true gain of 2.5 s.</p>
+</div>
+<h2>4. Caution flags, all of them</h2>
+<ul>
+<li>The margin is <strong>0.07 s</strong>. Nothing on this page makes it bigger.</li>
+<li>The floor sits inside the interval [+1.12, +2.92], so these rows cannot rule out a true gain below the floor.</li>
+<li>The board column is a projection off one controlled experiment. It has no interval, and every board projection this campaign made before that experiment was wrong by about 27%.</li>
+<li>The blend weight was fitted against MC2 and is applied to SB3. It is not the best weight for SB3, and the holdout's own oracle says the gap is about 0.26 s.</li>
+<li>The judged rows are two months of one year.</li>
+<li>A banked 1.26 s of board, already paid for, has still never been applied to a submitted file.</li>
+</ul>
+<h2>5. Mandated self-audit: what else is wrong with what I did?</h2>
+<p>Stage 5.6 asks for findings across four categories before any verdict, with no minimum count and no category left silent. <code>docs/gate-s4.html</code> never carried one. Eleven findings follow; none of them is filler and four of them argue against the lane this page is asking you to promote.</p>
+<h3>Data (2)</h3><ul><li>The judged rows are TWO months. The holdout is 339,046 lane-A rows but only January and July 2025, so a gain that is seasonal reads here as a level gain and nothing in this campaign can tell the two apart. The ranking file is a different period again.</li><li>Lane A does not predict taxi time. It predicts <code>c = y - z_aobt</code>, two clock definitions disagreeing, and <code>docs/MONO.md</code> measures the physics sign FLIPPING between the level and that target. That is why every feature-side lane caps under a second: geometry at +0.597 s, an exhaustive re-fit over the columns already read at +0.10 s. This lane does not fix that and does not claim to.</li></ul>
+<h3>Statistics (4)</h3><ul><li>The margin over the floor is 0.07 s and the floor sits INSIDE the interval [+1.12, +2.92]. These rows cannot rule out a true gain below the floor. That is the whole of the case against promoting.</li><li>The blend weight is fitted against the WRONG base. 0.5189 was fitted out of fold against MC2 and then applied to SB3, which is 2.06 s better on holdout lane A. The holdout's own oracle weight puts 0.611 on SB3 and reaches 227.76 s, so the shipped weight leaves about 0.26 s unclaimed. That figure cannot be banked, because reading it uses the holdout.</li><li>NC1's base is MC2's out-of-fold vector, so what it confirms is that NN3 adds to MC2 on months no cell was ranked on. The claim that NN3 adds to SB3 is measured in exactly one place, the holdout, once.</li><li>The Romano-Wolf family is the 7 lanes whose per-row holdout errors are cached, not the 61 verdicts the ledger counts. A larger family makes step-down STRICTER, so surviving it is necessary and not sufficient.</li></ul>
+<h3>Code (2)</h3><ul><li>SB3 is a five-seed bag and has no out-of-fold vector, which is why every blend in this campaign fits its weight against MC2's. That is a limitation of the code rather than a modelling choice, and it is the direct cause of the finding two rows above. It is buildable: five seeds by five folds of CatBoost on the card.</li><li><code>taxi/verdict.py</code> sets <code>FLOOR = 2.0</code> as a module constant. Every verdict in this campaign is decided by it, and it has never been derived from anything. Question 2 below is the first time it has been put to you.</li></ul>
+<h3>Process (3)</h3><ul><li>The pre-registered NC1 prediction was WRONG. It said the gain would land BELOW the holdout's +2.07 s and named a real risk of failing its own gate; it landed at +3.32 s. It is recorded as wrong in <code>docs/NC1.md</code>, because a prediction that only appears when it is right is not a prediction.</li><li>A banked board-side level correction worth 1.26 s on v16 (<code>docs/PB.md</code>) has never been applied to a submitted file. It is independent of this decision and larger than the 0.07 s margin this page turns on. Deciding this lane without deciding that one leaves paid-for seconds on the table.</li><li>This page is GENERATED. <code>docs/gate-s4.html</code> was hand-typed and an independent critique broke four of its figures. Every number here is grepped out of the document that produced it by <code>tests/test_gate_sources.py</code>, so a stale gate fails a test instead of reaching you looking finished.</li></ul>
+<h2>6. Coverage interrogation</h2>
+<p>Your nine questions from 5 September, answered in writing, each with a pointer. Two of them are yours to grade and answering them myself is banned.</p>
+<div class="wrap"><table><thead><tr><th>question</th><th>answer</th></tr></thead><tbody>
+<tr><td>1. What have you tried?</td><td>61 holdout verdicts, every one a row in <code>docs/TRIAL-LEDGER.md</code>. The Stage 4.1 mechanism ladder is walked rung by rung in <code>docs/COVERAGE.md</code>.</td></tr>
+<tr><td>2. What features?</td><td>D2's 52 columns (<code>docs/D2.md</code>), plus stand and runway geometry (<code>docs/GEO.md</code>) and an exhaustive re-fit over the columns already read (<code>docs/EXH.md</code>).</td></tr>
+<tr><td>3. What feature engineering?</td><td>Spline bases and frequency encoding (<code>docs/RC1.md</code>), geometry (<code>docs/GEO.md</code>), and the target decomposition itself (<code>docs/COVERAGE.md</code>).</td></tr>
+<tr><td>4. What model?</td><td><code>taxi/register.py</code> classifies every regressor scikit-learn ships into a family, and a test enumerates the installed library against it. FAM1 emptied the four rows that stood blank, FAM2 the three that stood thin. One row is still EMPTY and named: explainable boosting, because <code>interpret</code> is not installed on this box.</td></tr>
+<tr><td>5. Feature and model parameter tuning?</td><td>RC1 40 of 40, NN3 40 of 40, O2 running, O1 queued, LT2 declared today. Live counts print from <code>python -m taxi.searches</code>.</td></tr>
+<tr><td>6. Optuna optimisation?</td><td>All five above are Optuna searches with a declared budget, seed, objective and null bar. <code>taxi/searches.py</code> is the registry and <code>tests/test_search_completion.py</code> fails a search that stops short of its declared k without saying so.</td></tr>
+<tr><td>7. Are the agents being detailed enough?</td><td>Yours to grade, not mine. The self-audit above and this table are what make grading possible; self-grading them is banned.</td></tr>
+<tr><td>8. Full effort used to find a suitable model?</td><td>Yours to grade. The honest counterweight is in the self-audit: the lead is 47.79 s away and every measured route in this campaign is worth about 3 s.</td></tr>
+<tr><td>9. What is missing that we should try?</td><td>One INPUT: no outside data has entered since D2's 52 columns. One MECHANISM: SB3 has no out-of-fold vector, so no blend in this campaign is fitted against the actual champion; building it is 25 GPU fits and it is the direct fix for the second statistics finding. One TUNING: LT2, declared today, a piecewise-linear tree searched on the blend rather than on its own RMSE.</td></tr>
+</tbody></table></div>
+<h2>7. The gate</h2>
+<p>Nothing is built, nothing is uploaded and nothing is pushed until you answer. Three scorer slots are free today.</p>
+<div class="q"><span class="n">Q1</span>Promote SB3+NN3, or hold on SB3? A yes builds one file and spends one of three scorer slots. A no costs nothing and the lane stays on the shelf with its numbers.</div>
+<div class="q"><span class="n">Q2</span>Is 2.0 s the right floor? It is a constant chosen once, it decides every verdict in this campaign, and this is the first time it has been put to you. If the answer is a smaller floor, NN2 promotes as well and the question becomes a different one.</div>
+<div class="q"><span class="n">Q3</span>Should the SB3 out-of-fold vector be built? It is 25 GPU fits, and it would let every blend in this campaign fit its weight against the champion instead of against MC2.</div>
+<div class="q"><span class="n">Q4</span>The banked level correction, 1.26 s on v16 and already paid for: apply it to the next file that goes up, whatever you decide above?</div>
+<div class="q"><span class="n">Q5</span>The repo is private and the prize needs a public GPLv3 repository. That is your call, and nothing has been pushed.</div>
+<p class="note">Regenerate this page with <code>python -m taxi.gate</code>. Every figure on it is grepped out of the document that produced it, so it cannot go stale in silence.</p>
+</main>
