@@ -4,6 +4,10 @@ O1, O2 and NN3 were each declared correctly in protocol section 4 and each stopp
 anything going red: O1 killed by hand at 8 of 40, O2 ended by a 10 h clock that 40 trials could never fit inside,
 NN3 counting attempts where its own report counts completions. `tests/test_search_completion.py` reads this file
 and the study databases so that cannot happen silently again.
+
+A fourth shape was found on 2026-09-10 and closed here: the declared rate itself can be wrong. `declared_s` was a
+hand-copied mean over COMPLETE trials, which cannot see the wall clock burned by trials that never complete, so O2's
+real 73.4 min a trial read as 40 and rule A called an infeasible search feasible. The rate is now READ from the study.
 """
 from __future__ import annotations
 
@@ -12,8 +16,10 @@ import os
 import sqlite3
 import sys
 from dataclasses import dataclass
+from datetime import datetime
 
 SHORT_DOC, SHORT_MARK = "docs/NOTDONE-PLAN.md", "## Short searches"
+MIN_TRIALS = 3  # fewer completions than this and one slow trial sets the rate, so the study has no rate yet
 
 
 @dataclass(frozen=True)
@@ -23,12 +29,12 @@ class Search:
     db: str
     study: str
     k: int
-    trial_s: float
+    declared_s: float  # the rate that justified the clock, frozen at declaration; `measured_s` is what the study did
     clock: str
     doc: str
 
 
-# trial_s is MEASURED from each study's own completed trials, never an estimate: O1 32.75 min over 8, O2 40.0 over 4,
+# declared_s is what was on the record when each clock was set: O1 32.75 min over 8, O2 40.0 over 4,
 # NN3 6.6 over 30, all read 2026-09-08 and rounded up. RC1 predates its own study, so its rate is a timed full-size
 # trial in the SLOWEST corner of its space (knots=8, 6.2 min; knots=0 reads 2.3), recorded before the search launched. LT2's 21 min is the same shape: its slowest declared corner timed at 100 trees
 # on 2026-09-09 and scaled to the 3000 the tie `n_estimators = 60 / lr` reaches at the low end of the rate, before its first trial.
@@ -56,6 +62,35 @@ def achieved(s: Search) -> int:
                                "WHERE s.study_name = ? AND t.state = 'COMPLETE'", (s.study,)).fetchone()[0])
     finally:
         con.close()
+
+
+def measured_s(s: Search) -> float | None:
+    """Wall seconds per COMPLETED trial, read off the study: first start to last completion over the completion count.
+
+    Not the mean of the trials' own durations. A trial that fails or is pruned still burns clock and still crowds out a
+    completion, so the number that decides whether k fits inside the wall clock has to count that time. O2 reads 36.5 min
+    by own-duration and 73.4 by this, which is the whole difference between feasible and not.
+    """
+    if not os.path.exists(s.db):
+        return None
+    con = sqlite3.connect(f"file:{s.db}?mode=ro", uri=True)
+    try:
+        rows = con.execute("SELECT t.state, t.datetime_start, t.datetime_complete FROM trials t "
+                           "JOIN studies st ON st.study_id = t.study_id WHERE st.study_name = ?", (s.study,)).fetchall()
+    finally:
+        con.close()
+    starts = [datetime.fromisoformat(a) for _, a, _ in rows if a]
+    ends = [datetime.fromisoformat(b) for _, _, b in rows if b]
+    n = sum(1 for st, _, _ in rows if st == "COMPLETE")
+    if n < MIN_TRIALS or not starts or not ends:
+        return None
+    return (max(ends) - min(starts)).total_seconds() / n
+
+
+def rate_s(s: Search) -> tuple[float, str]:
+    """The rate feasibility is judged on: the study's own when it has one, the declared rate while it does not."""
+    m = measured_s(s)
+    return (m, "measured") if m is not None else (s.declared_s, "declared")
 
 
 def reap(study: "optuna.Study") -> int:
@@ -89,12 +124,14 @@ def main() -> None:
     if len(sys.argv) == 3 and sys.argv[1] == "remaining":
         print(remaining(sys.argv[2]))
         return
-    print("| search | k achieved | k declared | measured min/trial | need (h) | declared clock (h) | feasible |")
-    print("|---|---|---|---|---|---|---|")
+    print("| search | k achieved | k declared | declared min/trial | measured min/trial | need (h) | clock (h) | feasible |")
+    print("|---|---|---|---|---|---|---|---|")
     for s in SEARCHES:
-        need, clk = s.k * s.trial_s, clock_s(s)
-        print(f"| {s.name} | {achieved(s)} | {s.k} | {s.trial_s / 60:.0f} | {need / 3600:.1f} | {clk / 3600:.0f} | "
-              f"{'yes' if need <= clk else 'NO'} |")
+        r, src = rate_s(s)
+        need, clk, m = s.k * r, clock_s(s), measured_s(s)
+        print(f"| {s.name} | {achieved(s)} | {s.k} | {s.declared_s / 60:.0f} | "
+              f"{'-' if m is None else format(m / 60, '.0f')} | {need / 3600:.1f} | {clk / 3600:.0f} | "
+              f"{'yes' if need <= clk else 'NO'} ({src}) |")
 
 
 if __name__ == "__main__":

@@ -4,16 +4,21 @@ import os
 
 import pytest
 
-from taxi.searches import SEARCHES, SHORT_DOC, SHORT_MARK, achieved, clock_s
+from taxi.searches import SEARCHES, SHORT_DOC, SHORT_MARK, achieved, clock_s, rate_s
 
 IDS = [s.name for s in SEARCHES]
 
 
 @pytest.mark.parametrize("s", SEARCHES, ids=IDS)
 def test_the_declared_trial_count_fits_inside_the_declared_clock(s):
-    """Rule A. O2 declared 40 trials or 10 h at a measured 40 min a trial, so its clock always ended it near trial 15."""
-    need = s.k * s.trial_s
-    assert need <= clock_s(s), (f"{s.name}: {s.k} trials x {s.trial_s / 60:.0f} min needs {need / 3600:.1f} h "
+    """Rule A. O2 declared 40 trials or 10 h at a measured 40 min a trial, so its clock always ended it near trial 15.
+
+    The rate comes from `rate_s`, which prefers the study's own wall clock over the hand-written declaration. Checking
+    the declaration against itself is how this rule passed O2 twice: the number it was given was the one that was wrong.
+    """
+    r, src = rate_s(s)
+    need = s.k * r
+    assert need <= clock_s(s), (f"{s.name}: {s.k} trials x {r / 60:.0f} min ({src}) needs {need / 3600:.1f} h "
                                 f"against a declared clock of {clock_s(s) / 3600:.1f} h")
 
 

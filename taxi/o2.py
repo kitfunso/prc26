@@ -27,7 +27,8 @@ from taxi.verdict import paired_delta, rmse, score
 from taxi.w1 import verdict_line
 
 FOLDS = (CV_FOLDS[0], CV_FOLDS[2], CV_FOLDS[4])  # declared subset: Feb/Mar, Jun/Aug, Nov/Dec, so one trial spans both seasons
-ITER, TRIALS, TIMEOUT = 8000, 40, 40 * 3600  # 40 min/trial measured over trials 0-3, so the old 10 h clock ended it at ~trial 15
+ITER, TRIALS, TIMEOUT = 8000, 40, 56 * 3600  # 73 min/trial READ off the study on 2026-09-10, not the 40 the first four
+# trials showed: 14 of 35 trials never completed and their wall clock is invisible to a mean over completions.
 STORAGE, CACHE = "sqlite:///data/cache/o2.db", "data/cache/o2"
 BASE_CV = 211.8  # docs/D2.md over five folds; trial 0 re-reads D2's cell on THIS objective so the search carries its own base
 
