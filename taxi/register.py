@@ -7,6 +7,8 @@ family cannot be silently absent, because the library itself is the checklist.
 """
 from __future__ import annotations
 
+import io
+
 from typing import NamedTuple
 
 
@@ -27,14 +29,16 @@ SKLEARN: tuple[Row, ...] = (
     Row("penalised linear",
         ("Ridge", "RidgeCV", "Lasso", "LassoCV", "LassoLars", "LassoLarsCV", "LassoLarsIC", "ElasticNet", "ElasticNetCV",
          "SGDRegressor", "PassiveAggressiveRegressor"),
-        "RC1 ridge (Optuna over 6 knobs); FAM2-en elastic net", "TRIED (RC1) + FAM2"),
-    Row("Bayesian linear", ("ARDRegression", "BayesianRidge"), "FAM2-brr", "FAM2"),
+        "RC1 ridge (Optuna over 6 knobs); FAM2-en elastic net", "TRIED (RC1, FAM2): en closed at 295.87"),
+    Row("Bayesian linear", ("ARDRegression", "BayesianRidge"), "FAM2-brr", "TRIED (FAM2): closed at 295.57"),
     Row("robust / quantile linear", ("HuberRegressor", "QuantileRegressor", "TheilSenRegressor", "RANSACRegressor"),
-        "lane B `taxi.l2.huber`; FAM2-hub on lane A", "lane B TRIED + FAM2"),
+        "lane B `taxi.l2.huber`; FAM2-hub on lane A", "TRIED (lane B, FAM2): hub closed at 269.42"),
     Row("non-Gaussian GLM", ("PoissonRegressor", "GammaRegressor", "TweedieRegressor"),
-        "FAM2-twd, Tweedie on the level", "FAM2"),
-    Row("latent-factor regression", ("PLSRegression", "PLSCanonical", "CCA"), "FAM2-pls", "FAM2"),
-    Row("support-vector regression", ("SVR", "NuSVR", "LinearSVR"), "FAM2-svr, the linear case", "FAM2"),
+        "FAM2-twd, Tweedie on the level", "TRIED (FAM2): closed at 272.42"),
+    Row("latent-factor regression", ("PLSRegression", "PLSCanonical", "CCA"), "FAM2-pls",
+        "TRIED (FAM2): closed at 295.98"),
+    Row("support-vector regression", ("SVR", "NuSVR", "LinearSVR"), "FAM2-svr, the linear case",
+        "TRIED (FAM2): closed at 274.98"),
     Row("kernel methods", ("KernelRidge", "GaussianProcessRegressor"),
         "FAM1-nys, an RBF kernel approximated by Nystroem then ridged", "TRIED (FAM1)"),
     Row("k-nearest neighbours", ("KNeighborsRegressor", "RadiusNeighborsRegressor"), "FAM1-knn", "TRIED (FAM1)"),
@@ -44,7 +48,7 @@ SKLEARN: tuple[Row, ...] = (
     Row("randomised trees", ("ExtraTreesRegressor",), "FAM1-et", "TRIED (FAM1)"),
     Row("gradient-boosted trees", ("GradientBoostingRegressor", "HistGradientBoostingRegressor"),
         "M1, M2, D1, D2 LightGBM; MC1, MC2, SB1-SB3 CatBoost; X1 XGBoost", "TRIED, and the champion"),
-    Row("adaptive boosting", ("AdaBoostRegressor",), "FAM2-ada", "FAM2"),
+    Row("adaptive boosting", ("AdaBoostRegressor",), "FAM2-ada", "TRIED (FAM2): closed at 428.12"),
     Row("feed-forward neural net", ("MLPRegressor",), "NN1, NN2, NN3", "TRIED (H57-H59)"),
     Row("isotonic / monotone", ("IsotonicRegression",), "", "EMPTY"),
     Row("ensembles and stacking", ("StackingRegressor", "VotingRegressor"),
@@ -63,7 +67,8 @@ OUTSIDE: tuple[Row, ...] = (
     Row("generalised additive (spline basis, penalised)", (),
         "RC1's `knots` arms ARE an additive spline fit under an L2 penalty", "TRIED inside RC1"),
     Row("prior-fitted transformer", (), "M3 and TP2 lane A, LP1 lane B", "TRIED (H12, H55)"),
-    Row("piecewise-linear trees", (), "FAM2-lt, LightGBM `linear_tree`", "FAM2"),
+    Row("piecewise-linear trees", (), "FAM2-lt, LightGBM `linear_tree`; LT2 tunes its cell",
+        "TRIED (FAM2, H62): the only arm to pass its screen, and it lost the holdout"),
     Row("explainable boosting (GA2M)", (), "", "EMPTY: `interpret` is not installed on this box"),
 )
 
@@ -74,12 +79,26 @@ def empty() -> tuple[Row, ...]:
     return tuple(r for r in ROWS if r.status.startswith("EMPTY"))
 
 
+HEAD = "| model class | instance | status |\n|---|---|---|"
+
+
 def table() -> str:
-    head = ["| model class | instance | status |", "|---|---|---|"]
-    return "\n".join(head + [f"| {r.family} | {r.instance or '(none)'} | {r.status} |" for r in ROWS])
+    return "\n".join([HEAD] + [f"| {r.family} | {r.instance or '(none)'} | {r.status} |" for r in ROWS])
+
+
+def sync_doc(path: str = "docs/COVERAGE.md") -> str:
+    """Swap the doc's table for the generated one. Builds the whole file in memory before opening it for write, because
+    an `open(path, "w")` in the same expression as its content truncates the doc when that expression raises."""
+    doc = io.open(path, encoding="utf-8").read()
+    i = doc.index(HEAD)
+    out = doc[:i] + table() + doc[doc.index("\n\n", i):]
+    assert len(out) > len(table()) + 1000, "refusing to write a doc that lost its prose"
+    io.open(path, "w", encoding="utf-8", newline="\n").write(out)
+    return f"{path}: register table synced, {len(ROWS)} families"
 
 
 if __name__ == "__main__":
     print(table())
+    print(sync_doc())
     print(f"\n{len(ROWS)} families, {len(empty())} standing EMPTY, "
           f"{sum(len(r.covers) for r in ROWS)} scikit-learn regressors classified.")

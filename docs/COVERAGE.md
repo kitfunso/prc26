@@ -109,26 +109,26 @@ is the thing that goes red.
 |---|---|---|
 | constant / group mean | B0 global, B1 per airport, B2 airport x hour x weekday | TRIED (H1-H4) |
 | ordinary least squares | B4 per-airport OLS, B3 gap family | TRIED (H5-H11) |
-| penalised linear | RC1 ridge (Optuna over 6 knobs); FAM2-en elastic net | TRIED (RC1) + FAM2 |
-| Bayesian linear | FAM2-brr | FAM2 |
-| robust / quantile linear | lane B `taxi.l2.huber`; FAM2-hub on lane A | lane B TRIED + FAM2 |
-| non-Gaussian GLM | FAM2-twd, Tweedie on the level | FAM2 |
-| latent-factor regression | FAM2-pls | FAM2 |
-| support-vector regression | FAM2-svr, the linear case | FAM2 |
+| penalised linear | RC1 ridge (Optuna over 6 knobs); FAM2-en elastic net | TRIED (RC1, FAM2): en closed at 295.87 |
+| Bayesian linear | FAM2-brr | TRIED (FAM2): closed at 295.57 |
+| robust / quantile linear | lane B `taxi.l2.huber`; FAM2-hub on lane A | TRIED (lane B, FAM2): hub closed at 269.42 |
+| non-Gaussian GLM | FAM2-twd, Tweedie on the level | TRIED (FAM2): closed at 272.42 |
+| latent-factor regression | FAM2-pls | TRIED (FAM2): closed at 295.98 |
+| support-vector regression | FAM2-svr, the linear case | TRIED (FAM2): closed at 274.98 |
 | kernel methods | FAM1-nys, an RBF kernel approximated by Nystroem then ridged | TRIED (FAM1) |
 | k-nearest neighbours | FAM1-knn | TRIED (FAM1) |
 | single decision tree | none, and none is planned: it is a random forest of one, so FAM1-rf covers the class | subsumed |
 | bagged trees | FAM1-rf | TRIED (FAM1) |
 | randomised trees | FAM1-et | TRIED (FAM1) |
 | gradient-boosted trees | M1, M2, D1, D2 LightGBM; MC1, MC2, SB1-SB3 CatBoost; X1 XGBoost | TRIED, and the champion |
-| adaptive boosting | FAM2-ada | FAM2 |
+| adaptive boosting | FAM2-ada | TRIED (FAM2): closed at 428.12 |
 | feed-forward neural net | NN1, NN2, NN3 | TRIED (H57-H59) |
 | isotonic / monotone | (none) | EMPTY |
 | ensembles and stacking | E1, ST1, BF, the SB seed bags | TRIED (H21, H52) |
 | not a model class: meta-wrapper or multi-output only | (none) | N/A |
 | generalised additive (spline basis, penalised) | RC1's `knots` arms ARE an additive spline fit under an L2 penalty | TRIED inside RC1 |
 | prior-fitted transformer | M3 and TP2 lane A, LP1 lane B | TRIED (H12, H55) |
-| piecewise-linear trees | FAM2-lt, LightGBM `linear_tree` | FAM2 |
+| piecewise-linear trees | FAM2-lt, LightGBM `linear_tree`; LT2 tunes its cell | TRIED (FAM2, H62): the only arm to pass its screen, and it lost the holdout |
 | explainable boosting (GA2M) | (none) | EMPTY: `interpret` is not installed on this box |
 
 This table is GENERATED from `taxi/register.py` and pinned by `tests/test_model_class_register.py`, which enumerates `sklearn.utils.all_estimators('regressor')` against it: a family the installed library ships and no row owns fails the test. Hand-editing the table here is drift, so edit the module. Four rows stood empty when this register was first written, and all four are FAM1's arms. The register is the answer to
