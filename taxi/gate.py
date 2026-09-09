@@ -28,7 +28,7 @@ FACTS: tuple[tuple[str, str, str], ...] = (
     ("search", "docs/NC1.md", "| search months (weight fitted here, NOT a verdict) | 1,000,485 | 215.54 | 211.74 | +3.80 |"),
     ("nc1_ci", "docs/NC1.md", "**+3.32 s** [+2.87, +3.82], against a 2 s floor and a 0.0 s optimism bound"),
     ("rw", "docs/SW1.md", "Survives step-down: SB3+NN3, SB3+NN2."),
-    ("nh", "docs/TRIAL-LEDGER.md", "N_h (holdout verdicts) = 62"),
+    ("nh", "docs/TRIAL-LEDGER.md", "N_h (holdout verdicts) = 63"),
     ("level", "docs/PB.md", "on v17 at its MEASURED 296.25 board result (`taxi.ceil`) it is 1.26 s"),
     ("ceil_row", "docs/CEIL.md", "| built | the searched net blended onto SB3 at its out-of-fold weight | A | 2.07 |"),
     ("target", "docs/MONO.md", "**Physics is backwards on the target.**"),
@@ -81,7 +81,7 @@ REGISTER = (f"{len(ROWS)} families are classified and {len(empty())} stand EMPTY
                         for r in empty()) + ".")
 
 COVERAGE: tuple[tuple[str, str], ...] = (
-    ("What have you tried?", "62 holdout verdicts, every one a row in <code>docs/TRIAL-LEDGER.md</code>. The Stage 4.1 "
+    ("What have you tried?", "63 holdout verdicts, every one a row in <code>docs/TRIAL-LEDGER.md</code>. The Stage 4.1 "
                              "mechanism ladder is walked rung by rung in <code>docs/COVERAGE.md</code>."),
     ("What features?", "D2's 52 columns (<code>docs/D2.md</code>), plus stand and runway geometry "
                        "(<code>docs/GEO.md</code>) and an exhaustive re-fit over the columns already read "
@@ -233,10 +233,10 @@ def numbers() -> list[str]:
         "<td>measured</td><td><code>taxi/ceil.py</code></td></tr>",
         "</tbody></table></div>",
         "<h3>Trial ledger</h3>",
-        "<p>N_h = 62 holdout verdicts across this campaign, and 8 scored board submissions. At a 5% level, 62 lanes "
+        "<p>N_h = 63 holdout verdicts across this campaign, and 8 scored board submissions. At a 5% level, 63 lanes "
         "meeting one holdout expect about 3 false passes, which is why the Romano-Wolf row above exists: it judges the "
         "family jointly instead of counting lanes. The family it judges is the 7 lanes whose per-row holdout errors are "
-        "cached on disk, not all 62, and a larger family would make step-down stricter rather than looser. Surviving is "
+        "cached on disk, not all 63, and a larger family would make step-down stricter rather than looser. Surviving is "
         "necessary and not sufficient.</p>"]
 
 

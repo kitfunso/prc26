@@ -22,12 +22,13 @@ PLAN = PLAN_CAT + ("dur", "slip", "d_ae", "d_al", "d_es", "aobt_sec", "aobt_m5",
 # Stand, type and operator columns (L3, D2, L5): built from the same file's rows, so the ranking file carries them too.
 STAND = ("notyp", "d_as", "occ", "t_occ", "airline")
 # R1 runway share and H1 holiday flags: outside FEATURES for the same reason as PLAN.
-EXTRA = ("rwy_share", "hol", "hol_prev", "hol_next", "rq", "rec_taxi", "d_rec")
+EXTRA = ("rwy_share", "hol", "hol_prev", "hol_next", "rq", "rec_taxi", "d_rec", "ntp6", "ntp24", "lb6", "dt_ntp")
 COUNTRY = dict(ED="DE", EG="GB", EH="NL", LE="ES", LF="FR", LI="IT", LS="CH", LT="TR")
 LABELS = ("y", "c")
 WINDOW = 900.0
 HOUR = 3600.0
 RECENT = 10  # Q1: takeoffs averaged for the recent taxi level, not swept
+OUT_W = (6 * HOUR, 24 * HOUR)  # L12: the two outage windows, not swept
 
 # Ranking blanks BLOCK_TIME_UTC_mvt and TAXITIME_SEC_mvt on departures, so the view never selects them.
 VIEW = """
@@ -98,6 +99,7 @@ def features(paths: list[str], window: float = WINDOW) -> pd.DataFrame:
     df["occ"], df["t_occ"] = _occupancy(df, con.sql(ONBLOCK.format(files=_files(paths))).df())
     df["rwy_share"] = _rwy_share(df)
     df["rq"], df["rec_taxi"] = _local(df)
+    df["ntp6"], df["ntp24"], df["lb6"], df["dt_ntp"] = _outage(df)
     df["d_rec"] = df.z_aobt.values - df.rec_taxi.values
     df["hol"], df["hol_prev"], df["hol_next"] = _holidays(df)
     df["notyp"] = df.notyp.astype(np.int8)
@@ -136,6 +138,28 @@ def _local(df: pd.DataFrame, k: int = RECENT) -> tuple[np.ndarray, np.ndarray]:
         lo = np.maximum(pos - k, 0)
         rec[ix] = np.where(pos - lo >= 3, (cs[pos] - cs[lo]) / np.maximum(pos - lo, 1), np.nan)
     return rq, rec
+
+
+def _outage(df: pd.DataFrame) -> tuple[np.ndarray, ...]:
+    """L12: how badly the airport's own recording was failing just before this anchor.
+
+    A lane-B block time copied from the schedule is a feed failure, and the failures burst: P(copy) is 0.50 on the row after a copy
+    against 0.15 otherwise. The copy itself is invisible in 2026, so the burst is read off two markers that are not.
+    """
+    t_off, anc = df.t_off.values, df.t_off.values - df.z_anchor.values
+    marks = (np.asarray(df.notyp.values, float), np.asarray(df.notyp.values, float), 1.0 - np.asarray(df.has_fpl.values, float))
+    out = [np.full(len(df), np.nan) for _ in range(4)]
+    for ix in df.groupby("apt").indices.values():
+        j, a = ix[np.argsort(t_off[ix])], anc[ix]
+        s, pos = t_off[j], np.searchsorted(t_off[j], a, "left")
+        for k, (c, w) in enumerate(zip(marks, (OUT_W[0], OUT_W[1], OUT_W[0]))):
+            cs, lo = np.concatenate([[0.0], np.cumsum(c[j])]), np.searchsorted(s, a - w, "left")
+            out[k][ix] = np.where(pos > lo, (cs[pos] - cs[lo]) / np.maximum(pos - lo, 1), np.nan)
+        sn = s[marks[0][j] > 0]
+        if len(sn):
+            p = np.searchsorted(sn, a, "left")
+            out[3][ix] = np.where(p > 0, a - sn[np.maximum(p - 1, 0)], np.nan)
+    return tuple(out)
 
 
 def _holidays(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, np.ndarray]:

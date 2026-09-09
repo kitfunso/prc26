@@ -75,8 +75,8 @@ def per_row(tr: pd.DataFrame, te: pd.DataFrame, prob: Prob) -> np.ndarray:
 CELLS: dict[str, Prob] = {"L5a": shrunk, "L5b": logistic}
 
 
-def cv(trb: pd.DataFrame, cells: dict[str, Any], pred: Pred, champ: Champ = ("L4b", champion)) -> tuple[str, list[str]]:
-    """Month-pair CV of the named champion and every cell, all floored; returns the best cell and the table lines."""
+def cv(trb: pd.DataFrame, cells: dict[str, Any], pred: Pred, champ: Champ = ("L4b", champion)) -> tuple[str, list[str], dict[str, float]]:
+    """Month-pair CV of the named champion and every cell, all floored; returns the best cell, the table lines and every CV RMSE."""
     names = [champ[0], *cells]
     lines = ["| fold | " + " | ".join(f"{k} RMSE" for k in names) + " |", "|---|" + "---|" * len(names)]
     sq, n = {k: 0.0 for k in names}, 0
@@ -94,21 +94,27 @@ def cv(trb: pd.DataFrame, cells: dict[str, Any], pred: Pred, champ: Champ = ("L4
     best = min(cells, key=cvr.get)
     lines.append("\nCV RMSE over the five folds (every cell floored at 0 s): " + ", ".join(f"{k} {v:.1f} s" for k, v in cvr.items()) + f"; best declared cell {best}.")
     print(lines[-1], flush=True)
-    return best, lines
+    return best, lines, cvr
 
 
 def judge(cells: dict[str, Any], pred: Pred, title: str, blurb: str, path: str, champ: Champ = ("L4b", champion), k: int = K,
           same_as: str | None = None) -> None:
     """CV over the declared cells, then the CV winner alone against the floored champion on the lane-B holdout (not touched when the winner
-    is same_as, the champion under a cell name); writes the report to path."""
+    is same_as, or lost the CV outright); writes the report to path.
+
+    A cell CV already rejected cannot decide anything on the holdout, so reading it there spends a read on a foregone verdict: L12 spent
+    one before this gate existed.
+    """
     tr, te = load(TRAIN_MONTHS), load(HOLDOUT_MONTHS)
     trb, teb = (d[~d.has_fpl].reset_index(drop=True) for d in (tr, te))
-    best, lines = cv(trb, cells, pred, champ)
+    best, lines, cvr = cv(trb, cells, pred, champ)
     name = champ[0]
-    if best == same_as:
+    if best == same_as or cvr[best] >= cvr[name]:
+        why = (f"The CV winner {best} is {name} itself" if best == same_as else
+               f"The CV winner {best} reads {cvr[best]:.1f} s against {name}'s {cvr[name]:.1f} s, so no declared cell beat the champion")
         text = "\n".join([f"# {title}, Jan+Jul 2025 development holdout", "", f"Train months {TRAIN_MONTHS}. {blurb} k = {k}.", "",
                           "## Month-pair CV (lane-B rows of the fold)", ""] + lines + ["", "## Holdout: not touched", "",
-                          f"The CV winner {best} is {name} itself; by the declaration no cell meets the holdout and {name} stays."]) + "\n"
+                          f"{why}; by the declaration no cell meets the holdout and {name} stays."]) + "\n"
         with open(path, "w", encoding="utf-8") as fh:
             fh.write(text)
         print(text)
