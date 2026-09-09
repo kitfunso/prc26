@@ -1,6 +1,7 @@
 """MC1/MC2: CatBoost on the GPU in the M2 recipe, one declared cell each, k = 1. MC1 on W1-A's columns vs W1-A; MC2 on D1's columns vs D1."""
 from __future__ import annotations
 
+import os
 import sys
 import time
 from typing import Callable, NamedTuple
@@ -16,36 +17,43 @@ from taxi.m2 import K, TAIL, is_tail
 from taxi.verdict import paired_delta, rmse
 from taxi.w1 import COLS_A, verdict_line
 
-CELL = dict(depth=8, learning_rate=0.1, l2_leaf_reg=3.0, border_count=254, random_seed=0, task_type="GPU", devices="0", verbose=0, allow_writing_files=False)
+CELL = dict(depth=8, learning_rate=0.1, l2_leaf_reg=3.0, border_count=254, random_seed=0, task_type="GPU", devices="0",
+            verbose=int(os.environ.get("TAXI_CB_VERBOSE", "0")), allow_writing_files=False)
+# TAXI_CB_VERBOSE is the watchdog's heartbeat: an unattended search prints nothing between trials, so gpu_queue.sh had
+# no way to tell a slow fit from a frozen one and killed three healthy 91 min trials on 2026-09-09.
 MAX_ITER, PATIENCE = 5000, 100
 # Lane name: its columns and the champion it was declared against.
 LANES = {"MC1": (COLS_A, "W1-A"), "MC2": (COLS_D1, "D1"), "D2": (COLS_D2, "MC2")}
 Models = tuple[CatBoostClassifier, CatBoostRegressor, CatBoostRegressor]
 
 
-def pool(df: pd.DataFrame, cols: list[str], label: np.ndarray | None = None) -> Pool:
+def pool(df: pd.DataFrame, cols: list[str], label: np.ndarray | None = None, w: np.ndarray | None = None) -> Pool:
     x = df[cols].copy()
     cats = [c for c in CAT if c in cols]
     for c in cats:
         x[c] = x[c].astype(str)  # CatBoost takes strings for categorical columns; a missing value becomes its own level
-    return Pool(x, label, cat_features=cats)
+    return Pool(x, label, cat_features=cats, weight=w)
 
 
 def fit(kind: str, x: pd.DataFrame, label: np.ndarray, va: tuple[pd.DataFrame, np.ndarray] | None, iters: int, cols: list[str],
-        over: dict | None = None, loss: str | None = None):
-    """One stage; over replaces CELL entries (SB1 seed, O1 cells), loss replaces the regressors' RMSE (T1b)."""
+        over: dict | None = None, loss: str | None = None, w: np.ndarray | None = None, patience: int | None = None):
+    """One stage; over replaces CELL entries (SB1 seed, O1 cells), loss replaces the regressors' RMSE (T1b), w weights the fit rows (RW1).
+
+    patience is an argument so O2 can search early stopping; the default reproduces every earlier lane exactly.
+    """
     model = (CatBoostClassifier if kind == "clf" else CatBoostRegressor)(
         **{**CELL, **(over or {})}, iterations=iters, loss_function="Logloss" if kind == "clf" else (loss or "RMSE"))
     if va is None:
-        model.fit(pool(x, cols, label))
+        model.fit(pool(x, cols, label, w))
     else:
-        model.fit(pool(x, cols, label), eval_set=pool(va[0], cols, va[1]), early_stopping_rounds=PATIENCE, use_best_model=True)
+        model.fit(pool(x, cols, label, w), eval_set=pool(va[0], cols, va[1]),
+                  early_stopping_rounds=PATIENCE if patience is None else patience, use_best_model=True)
     return model
 
 
 def stages_cb(tr: pd.DataFrame, va: pd.DataFrame | None = None, iters: tuple[int, int, int] = (MAX_ITER,) * 3,
               cols: list[str] = COLS_A, over: dict | None = None, loss: str | None = None, fwd: Callable | None = None,
-              tail: float = TAIL) -> Models:
+              tail: float = TAIL, w: np.ndarray | None = None, patience: int | None = None) -> Models:
     """M2 recipe: tail classifier, tail regressor, body regressor; fwd (T1a) transforms the regression target, predict_cb's inv undoes it."""
     f = fwd or (lambda c: c)
     t = is_tail(tr, tail)
@@ -53,9 +61,9 @@ def stages_cb(tr: pd.DataFrame, va: pd.DataFrame | None = None, iters: tuple[int
     if va is not None:
         vt = is_tail(va, tail)
         parts = [(va, vt.astype(int)), (va[vt], f(va.c.values[vt])), (va[~vt], f(va.c.values[~vt]))]
-    clf = fit("clf", tr, t.astype(int), parts[0], iters[0], cols, over)
-    r_tail = fit("reg", tr[t], f(tr.c.values[t]), parts[1], iters[1], cols, over, loss)
-    r_body = fit("reg", tr[~t], f(tr.c.values[~t]), parts[2], iters[2], cols, over, loss)
+    clf = fit("clf", tr, t.astype(int), parts[0], iters[0], cols, over, w=w, patience=patience)
+    r_tail = fit("reg", tr[t], f(tr.c.values[t]), parts[1], iters[1], cols, over, loss, None if w is None else w[t], patience)
+    r_body = fit("reg", tr[~t], f(tr.c.values[~t]), parts[2], iters[2], cols, over, loss, None if w is None else w[~t], patience)
     return clf, r_tail, r_body
 
 
