@@ -55,7 +55,10 @@ seconds a lane-B-only reading suggests.
 
 `taxi/s2.py` builds the upload from all twelve months of 2025. Every verdict in this campaign trains on ten, because January and
 July are the holdout. `COLS_D1` carries no month, season or day-of-week column, so nothing tells either model which month it is in;
-the only difference is which rows are present. That difference has never been priced. It is priceable without touching the holdout:
+the only difference is which rows are present. That difference has never been priced. The COLUMN half of that sentence was
+closed 2026-09-07 by `docs/SE.md`: a season column is worth +0.088 s in sample at month, +1.411 s at month, airport and hour,
+and -0.042 s on the holdout in the only form the month-pair folds can actually validate, so what follows prices the only half that
+moves anything. It is priceable without touching the holdout:
 judge the even days of February and August, and let the arms differ only in whether the odd days of those months are in
 training,
 each arm holding the same row count so capacity is not the variable.

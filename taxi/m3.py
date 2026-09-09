@@ -22,14 +22,17 @@ CACHE = "data/cache/m3"
 HOLDOUT = "data/cache/m3_holdout.parquet"
 
 
-def numeric(fit: pd.DataFrame, va: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, list[int]]:
-    """Categoricals as integer codes shared by both frames (missing stays NaN); TabPFN takes those columns by index."""
-    both = pd.concat([fit[COLS], va[COLS]]).reset_index(drop=True)
-    for c in CATEGORICAL:
+def numeric(fit: pd.DataFrame, va: pd.DataFrame, cols: list[str] | None = None,
+            cats: tuple[str, ...] = CATEGORICAL) -> tuple[np.ndarray, np.ndarray, list[int]]:
+    """Categoricals as integer codes shared by both frames (missing stays NaN); TabPFN takes those columns by index.
+    cols and cats are arguments so TP2 can pass D2's wider set; the defaults reproduce M3 exactly."""
+    cols = COLS if cols is None else cols
+    both = pd.concat([fit[cols], va[cols]]).reset_index(drop=True)
+    for c in cats:
         codes = pd.Categorical(both[c]).codes.astype(float)
         both[c] = np.where(codes < 0, np.nan, codes)
     x = both.values.astype(float)
-    return x[: len(fit)], x[len(fit):], [COLS.index(c) for c in CATEGORICAL]
+    return x[: len(fit)], x[len(fit):], [cols.index(c) for c in cats]
 
 
 def fit_predict(fit: pd.DataFrame, va: pd.DataFrame) -> tuple[np.ndarray, float, float]:

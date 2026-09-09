@@ -5,6 +5,7 @@ import json
 import os
 import sys
 from dataclasses import dataclass, field
+from functools import lru_cache
 from typing import Callable
 
 import numpy as np
@@ -17,6 +18,7 @@ from taxi.m2 import is_tail
 from taxi.mc1 import CV, Prep, cv_a, predict_cb, stages_cb
 from taxi.verdict import paired_delta, rmse
 from taxi.w1 import verdict_line
+from taxi.weather import join, load_metar
 
 CACHE = "data/cache/lanes"
 MIN_ROWS = 20  # G1: a target-encoding group needs this many fit rows, else the (airport, stand) fallback, else NaN
@@ -55,6 +57,28 @@ def target_encode(fit: pd.DataFrame, rows: pd.DataFrame | None) -> pd.DataFrame:
     return fit.assign(te_stand=out)
 
 
+WL_BASE = ("w_sknt", "w_vsby", "w_tmpf", "w_ceil", "w_p01i")
+WL_LAGS = (3600.0, 10800.0)
+WL_COLS = tuple(f"{p}{c}_{int(l // 3600)}h" for l in WL_LAGS for c in WL_BASE for p in ("", "d"))
+
+
+@lru_cache(maxsize=1)
+def _metar() -> pd.DataFrame:
+    return load_metar()
+
+
+def weather_traj(fit: pd.DataFrame, rows: pd.DataFrame | None) -> pd.DataFrame:
+    """WL1: each METAR column as it read 1 h and 3 h before the anchor, and the change since. A front arriving and one clearing read alike in levels."""
+    d = fit if rows is None else rows
+    out = d.copy()
+    for lag in WL_LAGS:
+        h, back = int(lag // 3600), join(d[["apt", "t_off", "z_anchor"]], _metar(), lag)
+        for c in WL_BASE:
+            out[f"{c}_{h}h"] = back[c].values
+            out[f"d{c}_{h}h"] = d[c].values - back[c].values
+    return out
+
+
 MC2_ROUNDS = lambda: final_rounds("MC2", "docs/MC2.md")  # noqa: E731  read at run time: docs/MC2.md is the recorded source
 LANES: dict[str, tuple[Callable[[], dict[str, Lane]], int, str, bool]] = {
     "WS1": (lambda: {"WS1": Lane(lag=600.0, rounds=MC2_ROUNDS())}, 1,
@@ -82,6 +106,10 @@ LANES: dict[str, tuple[Callable[[], dict[str, Lane]], int, str, bool]] = {
            "queue already exists); rec_taxi is the mean plan taxi z_aobt of the last 10 airport takeoffs that left the ground before the "
            "anchor, and d_rec is this flight's own z_aobt minus it. Three cells: the runway queue, the recent level, both. The CV winner "
            "meets the holdout only if its CV beats MC2's own CV on the same folds and data.", True),
+    "WL1": (lambda: {"WL1": Lane(cols=(*COLS_D1, *WL_COLS), prep=weather_traj)}, 1,
+            "Weather trajectory on MC2's cell: the five continuous METAR columns (wind, visibility, temperature, ceiling, precipitation) as they "
+            "read 1 h and 3 h before the anchor, and the change since, twenty columns. W1 gave the model the level at the anchor and nothing else, "
+            "so a front arriving and a front clearing are the same row to it.", False),
     "H1": (lambda: {"H1": Lane(cols=(*COLS_D1, "hol", "hol_prev", "hol_next"))}, 1,
            "Public holiday in the airport's country on the takeoff day, the day before and the day after (`holidays` 0.103, country from the ICAO "
            "prefix), three flags on MC2's cell.", False),
