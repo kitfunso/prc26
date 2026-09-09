@@ -30,12 +30,14 @@ class Search:
 
 # trial_s is MEASURED from each study's own completed trials, never an estimate: O1 32.75 min over 8, O2 40.0 over 4,
 # NN3 6.6 over 30, all read 2026-09-08 and rounded up. RC1 predates its own study, so its rate is a timed full-size
-# trial in the SLOWEST corner of its space (knots=8, 6.2 min; knots=0 reads 2.3), recorded before the search launched.
+# trial in the SLOWEST corner of its space (knots=8, 6.2 min; knots=0 reads 2.3), recorded before the search launched. LT2's 21 min is the same shape: its slowest declared corner timed at 100 trees
+# on 2026-09-09 and scaled to the 3000 the tie `n_estimators = 60 / lr` reaches at the low end of the rate, before its first trial.
 SEARCHES = (
     Search("O1", "taxi.o1", "data/o1.db", "o1", 40, 33 * 60, "TIMEOUT", "docs/O1.md"),
     Search("O2", "taxi.o2", "data/cache/o2.db", "o2", 40, 40 * 60, "TIMEOUT", "docs/O2.md"),
     Search("NN3", "taxi.nn3", "data/cache/nn3.db", "nn3", 40, 7 * 60, "BUDGET_S", "docs/NN3.md"),
     Search("RC1", "taxi.rc1", "data/cache/rc1.db", "rc1", 40, 7 * 60, "BUDGET_S", "docs/RC1.md"),
+    Search("LT2", "taxi.lt2", "data/cache/lt2.db", "lt2", 40, 21 * 60, "TIMEOUT", "docs/LT2.md"),
 )
 
 

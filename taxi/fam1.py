@@ -121,13 +121,13 @@ ARMS = (("nys", "kernel (RBF via Nystroem, then ridge)", arm_nys), ("et", "rando
         ("rf", "bagged trees (random forest)", arm_rf), ("knn", "k-nearest neighbours", arm_knn))
 
 
-def oof(tra: pd.DataFrame, fn, budget: float) -> tuple[np.ndarray, float, str]:
-    """Out-of-fold `c` over the three declared folds. The TIME trigger is measured on fold 1 and never on a result."""
+def oof(tra: pd.DataFrame, fn, budget: float, folds: tuple = FOLDS) -> tuple[np.ndarray, float, str]:
+    """Out-of-fold `c` over the declared folds. The TIME trigger is measured on fold 1 and never on a result."""
     p, spent, note = np.full(len(tra), np.nan), 0.0, ""
-    for n, fold in enumerate(FOLDS):
-        if n and spent / n * (len(FOLDS) - n) > budget - spent:
-            note = (f"stopped after {n} of {len(FOLDS)} folds: {spent / 60:.0f} min spent, "
-                    f"{spent / n * (len(FOLDS) - n) / 60:.0f} min needed against {(budget - spent) / 60:.0f} min left")
+    for n, fold in enumerate(folds):
+        if n and spent / n * (len(folds) - n) > budget - spent:
+            note = (f"stopped after {n} of {len(folds)} folds: {spent / 60:.0f} min spent, "
+                    f"{spent / n * (len(folds) - n) / 60:.0f} min needed against {(budget - spent) / 60:.0f} min left")
             break
         m = tra.month.isin(fold).values
         t0 = time.time()
