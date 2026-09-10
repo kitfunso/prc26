@@ -63,6 +63,36 @@ PARTNERS = {
 }
 
 
+def verify(out: str, parent: str, ids: np.ndarray, m: np.ndarray) -> str:
+    """Read the written file back and check what the declaration promises: same rows, lane B untouched, nothing unusable.
+
+    The three v18 to v20 files were each checked by hand after the fact, which is the shape of check that gets skipped on the
+    fourth. `m` is the lane mask the caller already holds, so the lane-B claim is exact here and cannot be made from a file
+    alone. Everything aligns on the CHILD's own ids, because `build_submission` writes the template's row order and rounds to
+    integer seconds, so neither the ranking frame's order nor its exact values survive into the file.
+    """
+    a, par = pd.read_parquet(out), pd.read_parquet(parent)
+    key = a.MVT_ID_mvt.values.astype("float64")
+    v = a.TAXITIME_SEC_mvt.values.astype("float64")
+    b = pd.Series(par.TAXITIME_SEC_mvt.values.astype("float64"), index=par.MVT_ID_mvt.values.astype("float64")).reindex(key)
+    lane = pd.Series(np.asarray(m, dtype="float64"), index=np.asarray(ids, dtype="float64")).reindex(key)
+    checks = (
+        (len(a) == len(ids), f"{len(a)} rows written against {len(ids)} ranking rows"),
+        (not lane.isna().any(), f"{int(lane.isna().sum())} written ids are not ranking ids"),
+        (not b.isna().any(), f"{int(b.isna().sum())} written ids are missing from {parent}"),
+        (bool(np.isfinite(v).all()), f"{int((~np.isfinite(v)).sum())} rows are NaN or infinite"),
+        (float(v.min()) >= 0.0, f"minimum {v.min()} is below the declared floor of 0"),
+    )
+    for ok, why in checks:
+        if not ok:
+            raise ValueError(f"{out}: {why}")
+    mask, bv = lane.to_numpy() > 0.5, b.to_numpy()
+    if not np.array_equal(v[~mask], bv[~mask]):
+        raise ValueError(f"{out}: {int((v[~mask] != bv[~mask]).sum())} lane-B rows moved, and lane B is carried unchanged")
+    return (f"verified: {len(a)} rows, lane B identical to {parent} on {int((~mask).sum())} rows, "
+            f"lane A moved on {int((v[mask] != bv[mask]).sum())} of {int(mask.sum())} after rounding to whole seconds")
+
+
 def main(out: str, partner: str, parent: str = PARENT) -> None:
     w, arm, spec = PARTNERS[partner]
     metar = load_metar()
@@ -84,6 +114,7 @@ def main(out: str, partner: str, parent: str = PARENT) -> None:
     print(f"lane B: {int((~m).sum())} rows from {parent}, unchanged")
     print(f"{out}: {len(sub)} rows, sha256 {hashlib.sha256(open(out, 'rb').read()).hexdigest()}, "
           f"spec lane A SB3 + {partner} at w={w:.4f} ({spec}), lane B from {parent}, floor 0")
+    print(verify(out, parent, rk.id.values, m), flush=True)
 
 
 if __name__ == "__main__":

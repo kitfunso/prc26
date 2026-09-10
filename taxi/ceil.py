@@ -12,15 +12,18 @@ BOARD = "data/board.json"
 # moves lane A alone, so PER_A is measured off it (CAL3) rather than differentiated out of the pooled slope; v17 joins the line
 # but cannot calibrate PER_A (ledger S7 says why). A file with no board result of its own does not belong here.
 SCORED = {"S1": (365.24, 325.3982), "v16": (321.1269, 296.2745), "v15": (322.5796, 298.0671),
-          "v17": (321.1716, 296.2490), "v18": (319.6704, 294.9917), "v20": (320.4961, 295.2957)}
+          "v17": (321.1716, 296.2490), "v18": (319.6704, 294.9917), "v19": (319.9404, 295.5028),
+          "v20": (320.4961, 295.2957)}
 ANCHORS = tuple(SCORED.values())
 BEST = min(SCORED, key=lambda k: SCORED[k][1])  # the file the board ranks us on, and the one `taxi.pb` must price against
 LANE_N, LANE_RMSE = (339046, 5373), (230.0951, 1808.1729)  # v16's own lanes: the point the per-lane rates differentiate at
 # Every CONTROLLED lane-A pair the campaign has scored: two files whose lane B is identical, so the board delta is lane A alone.
-# CAL3 is the first and is what PER_A is still measured off. S8 and S10 added two more on 2026-09-10 and they DISAGREE with it and
-# with each other, which is the finding `docs/CEIL.md` now carries: the rate is a property of the model, not of the lanes.
+# CAL3 is the first and is what PER_A is still measured off. S8, S9 and S10 added three more on 2026-09-10, spanning 0.43 to 0.99
+# against CAL3's 0.87, so the carry is a property of the MODEL and not of the lanes: v19 carries more holdout gain than v20 and
+# less board gain, which is an ORDER inversion, not a scale error. `docs/CEIL.md` carries the finding.
 PAIRS = (("v15/v16, MC2 against SB3 (H52/H53a)", 232.1502 - 230.0951, 298.0671 - 296.2745),
          ("v17/v18, SB3+RC1 against SB3+NN3 (S8)", 230.1585 - 228.0256, 296.2490 - 294.9917),
+         ("v17/v19, SB3+RC1 against SB3+NN2 (S9)", 230.1585 - 228.41, 296.2490 - 295.5028),
          ("v17/v20, SB3+RC1 against SB3+LT2 (S10)", 230.1585 - 229.20, 296.2490 - 295.2957))
 CAL3 = PAIRS[0][1:]
 
@@ -49,6 +52,7 @@ def per_lane() -> tuple[float, float]:
 V16 = SCORED["v16"][1]  # MEASURED, not projected: the bucket's merry-octopus_v16.parquet_result.json
 V17 = SCORED["v17"][1]  # v16 stays the base every lane-A gain stacks on, so V17 is kept for the files that already cite it
 V18 = SCORED["v18"][1]  # our BEST scored file since 2026-09-10, and the one the board ranks us on
+V19 = SCORED["v19"][1]  # NN2: better than v20 on the holdout, worse on the board. The inversion the page above is about
 PER_A, PER_B = per_lane()
 
 # (tier, name, lane, holdout seconds, source, quote, what it rests on). QUOTE is the verbatim string the source doc must still
@@ -124,17 +128,25 @@ def main(out: str = "docs/CEIL.md") -> None:
            f"{line()[1]:.6f} x holdout composite, and the per-lane rates below are differentiated from it at v16 instead of "
            f"assumed: one holdout second of lane A is {PER_A:.4f} s of board, one of lane B is {PER_B:.4f} s. The campaign "
            f"assumed 0.633 and 0.0776, so every gain priced before today was overstated by about 27%.", "",
-           "## PER_A is not a constant, and this page still uses one", "",
-           "Three CONTROLLED lane-A pairs have now been scored: two files whose lane B is byte-identical, so the board delta is "
-           "lane A alone and both ends are exact arithmetic on fixed rows, with no measurement noise anywhere in the ratio.", "",
+           "## The holdout and the ranking set disagree about which model is better", "",
+           f"{len(PAIRS)} CONTROLLED lane-A pairs have now been scored: two files whose lane B is byte-identical, so the board "
+           f"delta is lane A alone and both ends are exact arithmetic on fixed rows, with no measurement noise in the ratio.", "",
            "| pair | holdout s of lane A | board s | implied rate |", "|---|---|---|---|",
            *[f"| {n} | {h:.4f} | {b:.4f} | {b / h:.4f} |" for n, h, b in PAIRS], "",
-           f"The rate spans {min(b / h for _, h, b in PAIRS):.2f} to {max(b / h for _, h, b in PAIRS):.2f} and the two largest "
-           f"holdout gains, 2.13 s and 2.06 s, transferred at 0.59 and 0.87. So the shortfall does not track the size of the gain; "
-           f"it tracks WHICH MODEL made it, which is what a rate assumed to be a property of the lanes cannot represent. Every "
-           f"projected number below still multiplies by PER_A = {PER_A:.4f}, the first pair, because re-fitting a rate on three "
-           f"model-specific transfers would only dress the same error differently. Read the projections as an upper end: the one "
-           f"row here that has since been MEASURED, the searched net, projected {V16 - 2.07 * PER_A:.2f} and scored {V18:.4f}.", "",
+           f"The rate spans {min(b / h for _, h, b in PAIRS):.2f} to {max(b / h for _, h, b in PAIRS):.2f}, and the three files "
+           f"uploaded on 2026-09-10 are the sharp version of what that means. v19 beats v20 on the holdout by 0.79 s of lane A, "
+           f"228.41 against 229.20, and LOSES to it on the board by 0.21 s, {V19:.4f} against {SCORED['v20'][1]:.4f}. That is an "
+           f"ORDER inversion, not a scale error, and no single rate can produce it: a rate rescales differences, it cannot "
+           f"reverse their sign. So a projection of the form board = V17 - gain x PER_A is not merely imprecise for a model it "
+           f"has not seen, it can rank two models the wrong way round, which is the one job this page is asked to do.", "",
+           f"Everything below still multiplies by PER_A = {PER_A:.4f} and is now a DIAGNOSTIC in the protocol's sense: it cannot "
+           f"decide which model to build or upload. Two measured rows say why. The searched net projected "
+           f"{V16 - 2.07 * PER_A:.2f} and scored {V18:.4f}. Its own sibling NN2 projected 295.46 and scored {V19:.4f}, close on "
+           f"the point and wrong on the rank.", "",
+           "The cause is not identified. The holdout is Jan + Jul 2025 and the ranking set is a different, unseen period, so a "
+           "model whose lane-A gain concentrates in the months the holdout happens to hold carries less of it forward than one "
+           "whose gain is flat across the year. That is a hypothesis and the campaign has no measurement of it: testing it needs "
+           "each model's holdout gain split by month, which is arithmetic on caches already on disk and is not yet done.", "",
            "## Every measured gain, applied in order", "",
            "| tier | gain | lane | holdout s | board s | board after | rank | source |",
            "|---|---|---|---|---|---|---|---|", *rows, "",

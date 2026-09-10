@@ -1,18 +1,23 @@
 # CEIL: the best board score still reachable, and where it ranks
 
-Regenerate with `python -m taxi.ceil`. Arithmetic only: no fit, no cell declared, no verdict. Leaderboard snapshot `data/board.json` read 2026-09-10 05:41 UTC, 673 submissions across 95 scored teams. We are rank 30 at 294.9917 on 10 submissions; the leader is 245.0940. Our candidate file v16 was uploaded and scored: **296.2745**, rank **31**, 51.18 s behind the lead. That is a MEASURED number, so nothing on this page rests on a projection band any more. It also killed the old one: v16 was projected at 286.12 across a 281.4 to 288.0 family and scored 296.2745, above the whole band, because every board number in this repo was fitted from the single S1 anchor. 6 scored anchors now fix the line, board = 83.6863 + 0.661914 x holdout composite, and the per-lane rates below are differentiated from it at v16 instead of assumed: one holdout second of lane A is 0.8723 s of board, one of lane B is 0.0581 s. The campaign assumed 0.633 and 0.0776, so every gain priced before today was overstated by about 27%.
+Regenerate with `python -m taxi.ceil`. Arithmetic only: no fit, no cell declared, no verdict. Leaderboard snapshot `data/board.json` read 2026-09-10 05:41 UTC, 673 submissions across 95 scored teams. We are rank 30 at 294.9917 on 10 submissions; the leader is 245.0940. Our candidate file v16 was uploaded and scored: **296.2745**, rank **31**, 51.18 s behind the lead. That is a MEASURED number, so nothing on this page rests on a projection band any more. It also killed the old one: v16 was projected at 286.12 across a 281.4 to 288.0 family and scored 296.2745, above the whole band, because every board number in this repo was fitted from the single S1 anchor. 7 scored anchors now fix the line, board = 83.7534 + 0.661728 x holdout composite, and the per-lane rates below are differentiated from it at v16 instead of assumed: one holdout second of lane A is 0.8723 s of board, one of lane B is 0.0581 s. The campaign assumed 0.633 and 0.0776, so every gain priced before today was overstated by about 27%.
 
-## PER_A is not a constant, and this page still uses one
+## The holdout and the ranking set disagree about which model is better
 
-Three CONTROLLED lane-A pairs have now been scored: two files whose lane B is byte-identical, so the board delta is lane A alone and both ends are exact arithmetic on fixed rows, with no measurement noise anywhere in the ratio.
+4 CONTROLLED lane-A pairs have now been scored: two files whose lane B is byte-identical, so the board delta is lane A alone and both ends are exact arithmetic on fixed rows, with no measurement noise in the ratio.
 
 | pair | holdout s of lane A | board s | implied rate |
 |---|---|---|---|
 | v15/v16, MC2 against SB3 (H52/H53a) | 2.0551 | 1.7926 | 0.8723 |
 | v17/v18, SB3+RC1 against SB3+NN3 (S8) | 2.1329 | 1.2573 | 0.5895 |
+| v17/v19, SB3+RC1 against SB3+NN2 (S9) | 1.7485 | 0.7462 | 0.4268 |
 | v17/v20, SB3+RC1 against SB3+LT2 (S10) | 0.9585 | 0.9533 | 0.9946 |
 
-The rate spans 0.59 to 0.99 and the two largest holdout gains, 2.13 s and 2.06 s, transferred at 0.59 and 0.87. So the shortfall does not track the size of the gain; it tracks WHICH MODEL made it, which is what a rate assumed to be a property of the lanes cannot represent. Every projected number below still multiplies by PER_A = 0.8723, the first pair, because re-fitting a rate on three model-specific transfers would only dress the same error differently. Read the projections as an upper end: the one row here that has since been MEASURED, the searched net, projected 294.47 and scored 294.9917.
+The rate spans 0.43 to 0.99, and the three files uploaded on 2026-09-10 are the sharp version of what that means. v19 beats v20 on the holdout by 0.79 s of lane A, 228.41 against 229.20, and LOSES to it on the board by 0.21 s, 295.5028 against 295.2957. That is an ORDER inversion, not a scale error, and no single rate can produce it: a rate rescales differences, it cannot reverse their sign. So a projection of the form board = V17 - gain x PER_A is not merely imprecise for a model it has not seen, it can rank two models the wrong way round, which is the one job this page is asked to do.
+
+Everything below still multiplies by PER_A = 0.8723 and is now a DIAGNOSTIC in the protocol's sense: it cannot decide which model to build or upload. Two measured rows say why. The searched net projected 294.47 and scored 294.9917. Its own sibling NN2 projected 295.46 and scored 295.5028, close on the point and wrong on the rank.
+
+The cause is not identified. The holdout is Jan + Jul 2025 and the ranking set is a different, unseen period, so a model whose lane-A gain concentrates in the months the holdout happens to hold carries less of it forward than one whose gain is flat across the year. That is a hypothesis and the campaign has no measurement of it: testing it needs each model's holdout gain split by month, which is arithmetic on caches already on disk and is not yet done.
 
 ## Every measured gain, applied in order
 
@@ -23,7 +28,7 @@ The rate spans 0.59 to 0.99 and the two largest holdout gains, 2.13 s and 2.06 s
 | reachable | a better fit over the 49 columns already read | A | 0.10 | 0.09 | 293.86 | 29 | `docs/EXH.md` |
 | oracle | every other cached lane-A model stacked on top of that blend | A | 0.14 | 0.12 | 293.74 | 29 | `docs/BF.md` |
 | oracle | perfect copy membership at the nine untouched airports | B | 25.40 | 1.48 | 292.26 | 26 | `docs/LBC.md` |
-| oracle | a perfect call on the six day-shifted rows | B | 510.70 | 29.69 | 262.57 | 3 | `docs/DE.md` |
+| oracle | a perfect call on the six day-shifted rows | B | 510.70 | 29.69 | 262.58 | 3 | `docs/DE.md` |
 
 ## What each tier buys
 
@@ -31,7 +36,7 @@ The rate spans 0.59 to 0.99 and the two largest holdout gains, 2.13 s and 2.06 s
 |---|---|---|---|---|
 | built (run, measured on the untouched holdout, and held back only by the promotion floor) | 1.81 | 294.47 | 29 | no |
 | reachable (measured headroom with a route, none of it yet run) | 2.41 | 293.86 | 29 | no |
-| oracle (ceilings with the answers in hand, no route to any of them) | 33.71 | 262.57 | 3 | no |
+| oracle (ceilings with the answers in hand, no route to any of them) | 33.70 | 262.58 | 3 | no |
 
 ## The board around us
 
@@ -68,6 +73,6 @@ That bound is now retired, by measurement rather than by argument. `docs/NC1.md`
 
 So every objection this campaign has instrumented is now answered, and `taxi.verdict` passes the lane on its own rule: +2.07 s against a 2 s floor with a lower bound of +1.1 s. Say the caveat as loudly as the result. The margin is 0.07 s, the floor sits INSIDE the interval [+1.1, +2.9], so these rows cannot rule out a true gain below the floor, and the 1.81 s of board above is a projection off the measured per-lane rate, not a scored file. This is a Stage 6 promotion decision and it is Keith's alone. Nothing here builds a file or uploads one.
 
-Spending the reachable rows on top of it reaches 293.86, rank 29; every oracle as well reaches 262.57, and that column includes two that a real model has already been built for and lost. The lead is 51.18 s away, so first place is inside the oracle column and outside every route this campaign has found. `docs/BL.md` section 5 states it from the other end: first place on lane A alone needs holdout lane A at 171.4 s against SB3's 230.10, a gain of 58.7 s, against 2.91 s of lane-A seconds on this whole page.
+Spending the reachable rows on top of it reaches 293.86, rank 29; every oracle as well reaches 262.58, and that column includes two that a real model has already been built for and lost. The lead is 51.18 s away, so first place is inside the oracle column and outside every route this campaign has found. `docs/BL.md` section 5 states it from the other end: first place on lane A alone needs holdout lane A at 171.4 s against SB3's 230.10, a gain of 58.7 s, against 2.91 s of lane-A seconds on this whole page.
 
 The honest reading is unchanged in direction and smaller in size than it was. The remaining distance is not in the tuning and not in the features: `docs/COVERAGE.md` records that lane A's target is `AOBT_3_flt - BLOCK_TIME`, two clocks disagreeing rather than taxi physics, which is why GEO and EXH both cap under a second. Closing a 51 s gap needs a different reading of the target, not a better fit to this one.
