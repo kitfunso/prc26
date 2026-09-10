@@ -8,6 +8,7 @@ import pandas as pd
 import pytest
 
 import taxi.champ as champ
+import taxi.bnn3 as bnn3
 import taxi.mc1 as mc1
 import taxi.sb3 as sb3
 
@@ -33,12 +34,20 @@ def _stub(monkeypatch):
         monkeypatch.setattr(mod, "stages_cb", lambda *a, **k: model)
         monkeypatch.setattr(mod, "predict_cb", pred)
     monkeypatch.setattr(sb3, "SEEDS", (0,))
-    path = f"data/cache/sb3_seed0_{TAG}.parquet"
-    if os.path.exists(path):
-        os.remove(path)
+    # The net bag is the one fit no booster stub reaches. It is replaced whole rather than trained on eight rows, and it asserts the
+    # thing this file exists to check: the frame it predicts carries no label.
+    def _arm(tr, te):
+        assert "y" not in te.columns and "c" not in te.columns
+        return np.zeros(len(te))
+    monkeypatch.setattr(bnn3, "ARM", _arm)
+    paths = [f"data/cache/sb3_seed0_{TAG}.parquet", f"data/cache/nn3bag_{TAG}.parquet"]
+    for path in paths:
+        if os.path.exists(path):
+            os.remove(path)
     yield
-    if os.path.exists(path):
-        os.remove(path)
+    for path in paths:
+        if os.path.exists(path):
+            os.remove(path)
 
 
 @pytest.mark.parametrize("name", [*champ.CHAMPIONS_A, *champ.COMPOSED_A])

@@ -21,12 +21,12 @@ CHAMPIONS_A = {"W1-A": (COLS_A, "W1", "docs/W1.md", "lgb"), "D1": (COLS_D1, "D1"
                "MC2": (COLS_D1, "MC2", "docs/MC2.md", "cb")}
 # Composed lane-A champions: built from parts each fixed by an earlier run, so they carry a module instead of a cell (SB3, H52).
 # Their bases stay out of CHAMPIONS_A on purpose, because that registry feeds _fingerprint and would invalidate every cache below.
-COMPOSED_A = {"SB3": "taxi.sb3"}
+COMPOSED_A = {"SB3": "taxi.sb3", "SB3+NN3": "taxi.bnn3"}
 # The registry's current champion per lane; verdict wording promotes only against these names.
-# SB3 keeps lane A at H53 on a corrected number: its ST1a gate read each row's own label and is withdrawn, taking the verdict from
-# +2.38 to +2.0551 [+1.71, +2.37]. Section 3 asks for an interval above zero and a point improvement of at least 2 s, so it still passes,
-# by 0.055 s. Thin, and flagged as such on the gate surface.
-CURRENT = {"A": "SB3", "B": "L8c"}
+# SB3+NN3 takes lane A on Keith's 2026-09-10 sign-off, at +2.0695 s [+1.12, +2.92] over SB3, above the 2 s floor by 0.07 s and a survivor
+# of SW1's Romano-Wolf step-down at 5% FWER. The floor sits INSIDE that interval, so the promotion leans on the step-down as much as on
+# the point estimate. SB3 itself held lane A from H53 on a margin as thin (+2.0551 [+1.71, +2.37]); both are flagged on the gate surface.
+CURRENT = {"A": "SB3+NN3", "B": "L8c"}
 
 
 def predict_b(name: str, tr: pd.DataFrame, te: pd.DataFrame) -> np.ndarray:
@@ -68,8 +68,10 @@ def _code_fp(name: str) -> int:
     if name not in COMPOSED_A:
         return 0
     from importlib import import_module
-    with open(import_module(COMPOSED_A[name]).__file__, "rb") as fh:
-        return int.from_bytes(hashlib.sha256(fh.read()).digest()[:8], "big")
+    # DEPS names the modules a composed champion takes its spec FROM, so a weight edited where it lives invalidates the cache here too.
+    mod = import_module(COMPOSED_A[name])
+    files = [mod.__file__] + [import_module(d).__file__ for d in getattr(mod, "DEPS", ())]
+    return sum(int.from_bytes(hashlib.sha256(open(f, "rb").read()).digest()[:8], "big") for f in files)
 
 
 def _cache_fp(name: str, tra: pd.DataFrame, tea: pd.DataFrame) -> int:

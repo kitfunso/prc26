@@ -12,7 +12,7 @@ import duckdb
 import numpy as np
 import pandas as pd
 
-from taxi.ceil import V17
+from taxi.ceil import V18
 
 from taxi.cb1 import lane_b
 from taxi.champ import CURRENT, lane_a, predict_b
@@ -23,13 +23,13 @@ from taxi.submit import build_submission
 
 BOARD = {"jan": -3_297_233.0, "jul": +3_148_928.0, "laneB": -1_041_701.0}  # S1 error sums (p - y), protocol section 3, row P1-P6
 S1_RMSE, N_RANK = 325.3982, 344_841
-CHALLENGER = "data/merry-octopus_v17.parquet"
+CHALLENGER = "data/merry-octopus_v18.parquet"
 CHAL_V = CHALLENGER.split("_")[-1].split(".")[0]  # the version tag the prose prints, so a rebuild moves one constant
 RISK = "data/sel_risk.parquet"  # written by scripts/sel_risk.py
 RISK_NAME = "learned risk model, scripts/sel_risk.py"
 DP = 1e-4  # the board prints RMSE to four decimals
 ORDER = ("jan", "jul", "laneB")
-CHAL_BOARD = V17  # v17's MEASURED board result; S1's anchor above is measured too, so both ends of the carry now are
+CHAL_BOARD = V18  # v18's MEASURED board result; S1's anchor above is measured too, so both ends of the carry now are
 
 
 def _preds(path: str) -> pd.Series:

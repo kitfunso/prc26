@@ -70,7 +70,8 @@ OUTSIDE: tuple[Row, ...] = (
     Row("prior-fitted transformer", (), "M3 and TP2 lane A, LP1 lane B", "TRIED (H12, H55)"),
     Row("piecewise-linear trees", (), "FAM2-lt one fixed cell, then LT2's cell searched over 40 TPE trials",
         "TRIED (FAM2 H62, LT2 H64): cleared both screens, lost the holdout at +0.9 s against a 2 s floor"),
-    Row("explainable boosting (GA2M)", (), "", "EMPTY: `interpret` is not installed on this box"),
+    Row("explainable boosting (GA2M)", (), "FAM3-ebm, one fixed cell of `interpret` 0.7.8",
+        "TRIED (FAM3): closed at 237.10, +0.13 s of blend against a 1.0 s gate"),
 )
 
 ROWS: tuple[Row, ...] = SKLEARN + OUTSIDE

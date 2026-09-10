@@ -129,15 +129,16 @@ is the thing that goes red.
 | generalised additive (spline basis, penalised) | RC1's `knots` arms ARE an additive spline fit under an L2 penalty | TRIED inside RC1 |
 | prior-fitted transformer | M3 and TP2 lane A, LP1 lane B | TRIED (H12, H55) |
 | piecewise-linear trees | FAM2-lt one fixed cell, then LT2's cell searched over 40 TPE trials | TRIED (FAM2 H62, LT2 H64): cleared both screens, lost the holdout at +0.9 s against a 2 s floor |
-| explainable boosting (GA2M) | (none) | EMPTY: `interpret` is not installed on this box |
+| explainable boosting (GA2M) | FAM3-ebm, one fixed cell of `interpret` 0.7.8 | TRIED (FAM3): closed at 237.10, +0.13 s of blend against a 1.0 s gate |
 
-This table is GENERATED from `taxi/register.py` and pinned by `tests/test_model_class_register.py`, which enumerates `sklearn.utils.all_estimators('regressor')` against it: a family the installed library ships and no row owns fails the test. Hand-editing the table here is drift, so edit the module. Four rows stood empty when this register was first written, and all four are FAM1's arms. The register is the answer to
+This table is GENERATED from `taxi/register.py` and pinned by `tests/test_model_class_register.py`, which enumerates `sklearn.utils.all_estimators('regressor')` against it: a family the installed library ships and no row owns fails the test. Hand-editing the table here is drift, so edit the module. Four rows stood empty when this register was first written, and all four are FAM1's arms. As of 2026-09-10 **no row stands EMPTY**: FAM3-ebm closed the last one, explainable boosting, by measurement rather than by a missing library. The register is the answer to
 "what is missing" for question 4; it is not the answer to whether a family is worth running, which is each lane's own gate.
 
 The prose that used to stand here is kept below, because two of its closures are still the honest reading and one of them was
 wrong. It closed k-nearest by an argument from GEO's key-oracle cap and the MLP by an argument from BF's frontier. The MLP
-argument was FALSIFIED by measurement: NN1 to NN3 ran anyway and NN2 is the largest honest lane-A gain in the campaign
-(+1.7 s, H59), refused only by the 2 s floor. That is the case for the register: an argument that a family cannot help is not
+argument was FALSIFIED by measurement: NN1 to NN3 ran anyway, and the net is now HALF THE CHAMPION. SB3+NN3 took lane A on
+2026-09-10 at +2.07 s [+1.12, +2.92], the largest honest lane-A gain in the campaign and the first to clear the 2 s floor that
+had refused NN2's +1.7 s at H59. That is the case for the register: an argument that a family cannot help is not
 a measurement that it did not, and this file could not tell the two apart.
 
 > Never run, and each one closed by a measurement rather than left open (rewritten 2026-09-07; the 2026-09-05 version of this line is in git history): k-nearest rows on stand, runway and hour is a function of those three columns, which GEO caps at +2.330 s of lane A with 26% of that surviving the calendar, and as a blend partner it must clear BF's frontier that TabPFN, the least correlated partner measured at 0.8462, missed by 0.06. Neural nets: TabPFN IS the transformer instance and it ran on both lanes (M3 264.27 s on lane A, LP1 -286.0 s on lane B); an MLP is neither better in level nor less correlated, so BF closes it too. Median or L1 regression is closed by the scorer, because RMSE's optimal point prediction is the conditional mean and L1 fits the median; M1's huber cell already measured that direction. Per-airport LightGBM in lane B is closed by LBX, which found a representation gap and not a tuning gap, and by APT on lane A, where every cross-fitted per-airport recalibration is worse than none. XGBoost RAN as X1 (ledger H56) and lost. Blends are closed in closed form by BF. The lane-B campaign beyond the M1 grid RAN as L1 to L10 and CB1, worth +157.5 s from B4 to L8c, so flag F9 is answered.

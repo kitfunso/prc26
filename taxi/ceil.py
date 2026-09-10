@@ -8,12 +8,21 @@ from __future__ import annotations
 import json
 
 BOARD = "data/board.json"
-# Every scored file is an anchor: S1, v16, v15, v17. The v15/v16 pair moves lane A alone, so PER_A is measured off it (CAL3)
-# rather than differentiated out of the pooled slope; v17 joins the line but cannot calibrate PER_A (ledger S7 says why).
-ANCHORS = ((365.24, 325.3982), (321.1269, 296.2745), (322.5796, 298.0671), (321.1716, 296.2490))
+# Every scored file, KEYED, because six unlabelled pairs put v15 after v16 and made `ANCHORS[1]` a puzzle. The v15/v16 pair
+# moves lane A alone, so PER_A is measured off it (CAL3) rather than differentiated out of the pooled slope; v17 joins the line
+# but cannot calibrate PER_A (ledger S7 says why). A file with no board result of its own does not belong here.
+SCORED = {"S1": (365.24, 325.3982), "v16": (321.1269, 296.2745), "v15": (322.5796, 298.0671),
+          "v17": (321.1716, 296.2490), "v18": (319.6704, 294.9917), "v20": (320.4961, 295.2957)}
+ANCHORS = tuple(SCORED.values())
+BEST = min(SCORED, key=lambda k: SCORED[k][1])  # the file the board ranks us on, and the one `taxi.pb` must price against
 LANE_N, LANE_RMSE = (339046, 5373), (230.0951, 1808.1729)  # v16's own lanes: the point the per-lane rates differentiate at
-# The controlled pair: MC2 lane A costs 2.0551 holdout seconds against SB3 (H52/H53a) and cost 1.7926 board seconds.
-CAL3 = ((232.1502 - 230.0951), (298.0671 - 296.2745))
+# Every CONTROLLED lane-A pair the campaign has scored: two files whose lane B is identical, so the board delta is lane A alone.
+# CAL3 is the first and is what PER_A is still measured off. S8 and S10 added two more on 2026-09-10 and they DISAGREE with it and
+# with each other, which is the finding `docs/CEIL.md` now carries: the rate is a property of the model, not of the lanes.
+PAIRS = (("v15/v16, MC2 against SB3 (H52/H53a)", 232.1502 - 230.0951, 298.0671 - 296.2745),
+         ("v17/v18, SB3+RC1 against SB3+NN3 (S8)", 230.1585 - 228.0256, 296.2490 - 294.9917),
+         ("v17/v20, SB3+RC1 against SB3+LT2 (S10)", 230.1585 - 229.20, 296.2490 - 295.2957))
+CAL3 = PAIRS[0][1:]
 
 
 def line() -> tuple[float, float]:
@@ -33,12 +42,13 @@ def per_lane() -> tuple[float, float]:
     1.87x. Lane B has no controlled pair, so its rate carries that same unquantified error and is a floor, not a number.
     """
     _, b = line()
-    n, comp = sum(LANE_N), ANCHORS[1][0]
+    n, comp = sum(LANE_N), SCORED["v16"][0]
     return CAL3[1] / CAL3[0], b * LANE_N[1] * LANE_RMSE[1] / (n * comp)
 
 
-V16 = ANCHORS[1][1]  # MEASURED, not projected: the bucket's merry-octopus_v16.parquet_result.json
-V17 = ANCHORS[3][1]  # our BEST scored file, and the one the board ranks us on; v16 stays the base every lane-A gain stacks on
+V16 = SCORED["v16"][1]  # MEASURED, not projected: the bucket's merry-octopus_v16.parquet_result.json
+V17 = SCORED["v17"][1]  # v16 stays the base every lane-A gain stacks on, so V17 is kept for the files that already cite it
+V18 = SCORED["v18"][1]  # our BEST scored file since 2026-09-10, and the one the board ranks us on
 PER_A, PER_B = per_lane()
 
 # (tier, name, lane, holdout seconds, source, quote, what it rests on). QUOTE is the verbatim string the source doc must still
@@ -114,6 +124,17 @@ def main(out: str = "docs/CEIL.md") -> None:
            f"{line()[1]:.6f} x holdout composite, and the per-lane rates below are differentiated from it at v16 instead of "
            f"assumed: one holdout second of lane A is {PER_A:.4f} s of board, one of lane B is {PER_B:.4f} s. The campaign "
            f"assumed 0.633 and 0.0776, so every gain priced before today was overstated by about 27%.", "",
+           "## PER_A is not a constant, and this page still uses one", "",
+           "Three CONTROLLED lane-A pairs have now been scored: two files whose lane B is byte-identical, so the board delta is "
+           "lane A alone and both ends are exact arithmetic on fixed rows, with no measurement noise anywhere in the ratio.", "",
+           "| pair | holdout s of lane A | board s | implied rate |", "|---|---|---|---|",
+           *[f"| {n} | {h:.4f} | {b:.4f} | {b / h:.4f} |" for n, h, b in PAIRS], "",
+           f"The rate spans {min(b / h for _, h, b in PAIRS):.2f} to {max(b / h for _, h, b in PAIRS):.2f} and the two largest "
+           f"holdout gains, 2.13 s and 2.06 s, transferred at 0.59 and 0.87. So the shortfall does not track the size of the gain; "
+           f"it tracks WHICH MODEL made it, which is what a rate assumed to be a property of the lanes cannot represent. Every "
+           f"projected number below still multiplies by PER_A = {PER_A:.4f}, the first pair, because re-fitting a rate on three "
+           f"model-specific transfers would only dress the same error differently. Read the projections as an upper end: the one "
+           f"row here that has since been MEASURED, the searched net, projected {V16 - 2.07 * PER_A:.2f} and scored {V18:.4f}.", "",
            "## Every measured gain, applied in order", "",
            "| tier | gain | lane | holdout s | board s | board after | rank | source |",
            "|---|---|---|---|---|---|---|---|", *rows, "",
@@ -131,18 +152,18 @@ def main(out: str = "docs/CEIL.md") -> None:
            f"rank {rank(V16, board)} to {rank(tiers_at['built'], board)}. State the blocker exactly, because the campaign has "
            f"stated it loosely: at +2.07 s the lane CLEARS the 2 s floor. It is held by the k = 40 optimism bound that "
            f"`docs/NN3.md` adds on top, for a hurdle of 3.0 s.", "",
-           f"That bound is now retired, by measurement rather than by argument. `docs/NC1.md` took NN3's winning cell as a "
-           f"FIXED k = 1 spec and read it on months 4, 5, 9 and 10, which `taxi.nn3.score` never ranked a cell on: against one "
-           f"base the blend gains +3.80 s on the months that chose the cell and +3.32 s on the months that did not, so the "
-           f"selection advantage is about 0.48 s, not the 1.0 s the bound assumed. The holdout never took part in choosing the "
-           f"cell at all, so the +2.07 needed no such correction in the first place. `docs/SW1.md` closes the other "
-           f"multiplicity, the campaign meeting one holdout 60 times: the lane survives Romano-Wolf step-down at 5% "
-           f"family-wise error over the seven cached lanes.", "",
-           f"So every objection this campaign has instrumented is now answered, and `taxi.verdict` passes the lane on its own "
-           f"rule: +2.07 s against a 2 s floor with a lower bound of +1.1 s. Say the caveat as loudly as the result. The "
-           f"margin is 0.07 s, the floor sits INSIDE the interval [+1.1, +2.9], so these rows cannot rule out a true gain "
-           f"below the floor, and the 1.81 s of board above is a projection off the measured per-lane rate, not a scored "
-           f"file. This is a Stage 6 promotion decision and it is Keith's alone. Nothing here builds a file or uploads one.", "",
+           "That bound is now retired, by measurement rather than by argument. `docs/NC1.md` took NN3's winning cell as a "
+           "FIXED k = 1 spec and read it on months 4, 5, 9 and 10, which `taxi.nn3.score` never ranked a cell on: against one "
+           "base the blend gains +3.80 s on the months that chose the cell and +3.32 s on the months that did not, so the "
+           "selection advantage is about 0.48 s, not the 1.0 s the bound assumed. The holdout never took part in choosing the "
+           "cell at all, so the +2.07 needed no such correction in the first place. `docs/SW1.md` closes the other "
+           "multiplicity, the campaign meeting one holdout 60 times: the lane survives Romano-Wolf step-down at 5% "
+           "family-wise error over the seven cached lanes.", "",
+           "So every objection this campaign has instrumented is now answered, and `taxi.verdict` passes the lane on its own "
+           "rule: +2.07 s against a 2 s floor with a lower bound of +1.1 s. Say the caveat as loudly as the result. The "
+           "margin is 0.07 s, the floor sits INSIDE the interval [+1.1, +2.9], so these rows cannot rule out a true gain "
+           "below the floor, and the 1.81 s of board above is a projection off the measured per-lane rate, not a scored "
+           "file. This is a Stage 6 promotion decision and it is Keith's alone. Nothing here builds a file or uploads one.", "",
            f"Spending the reachable rows on top of it reaches {tiers_at['reachable']:.2f}, rank "
            f"{rank(tiers_at['reachable'], board)}; every oracle as well reaches {tiers_at['oracle']:.2f}, and that column includes "
            f"two that a real model has already been built for and lost. The lead is {gap:.2f} s away, so first place is inside "

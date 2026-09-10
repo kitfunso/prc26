@@ -1,6 +1,5 @@
 """PB claims a probe's gain is arithmetic, not an estimate: the SSE a measured group sum removes must be exact, overlaps and all."""
 import numpy as np
-import pytest
 
 from taxi.pb import removed
 
@@ -22,16 +21,19 @@ def test_a_measured_group_sum_can_never_cost_sse():
     assert removed(w, w.T @ err) >= 0
 
 
-def test_the_challenger_constant_names_the_newest_submission_that_exists():
-    """PB rescales everything to CHALLENGER's board projection, so a newer build must not leave the report describing the old file."""
-    import glob
-    import os
-    import re
+def test_the_challenger_constant_names_our_best_scored_file():
+    """PB rescales everything to CHALLENGER's MEASURED board result, so it must name the file the board actually ranks us on.
 
+    This test asked for the NEWEST BUILT file until 2026-09-10, which held while every build beat the last one. v18, v19 and
+    v20 are siblings off v17: the newest build is now neither the best nor necessarily scored at all, and pointing the carry at
+    an unscored file would make `CHAL_BOARD` a projection, which is the one thing it says it is not.
+    """
+    import os
+
+    from taxi.ceil import BEST, SCORED
     from taxi.pb import CHALLENGER
 
-    built = glob.glob("data/merry-octopus_v*.parquet")
-    if not built:
-        pytest.skip("no submissions built here")
-    newest = max(built, key=lambda f: int(re.search(r"_v(\d+)", f).group(1)))
-    assert os.path.basename(newest) == os.path.basename(CHALLENGER), "update CHALLENGER and V15_BOARD in taxi/pb.py"
+    assert os.path.basename(CHALLENGER) == f"merry-octopus_{BEST}.parquet", "update CHALLENGER and CHAL_BOARD in taxi/pb.py"
+    for v in SCORED:
+        if v.startswith("v"):
+            assert os.path.exists(f"data/merry-octopus_{v}.parquet"), f"{v} carries a board score but no file was built"
