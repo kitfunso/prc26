@@ -97,7 +97,7 @@ def main() -> None:
     best, lines = cv(trb)
     p0, p1 = floored(b4(trb, teb, "B")), floored(per_band(trb, teb, CELLS[best]))
     e0, e1 = p0 - teb.y.values, p1 - teb.y.values
-    v, m = paired_delta(e0, e1, teb.day.values), touched(trb, teb)
+    v, m = paired_delta(e0, e1, teb.day.values, lane="B"), touched(trb, teb)
     jan, jul = teb.month.values == 1, teb.month.values == 7
     row = lambda name, e: f"| {name} | {rmse(e):.1f} | {rmse(e[jan]):.1f} | {rmse(e[jul]):.1f} | {e.min():.0f} | {e.max():.0f} |"
     report = ["# L4: lane-B band mixture, Jan+Jul 2025 development holdout", "",

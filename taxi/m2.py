@@ -9,7 +9,7 @@ import pandas as pd
 
 from taxi.data import CV_FOLDS, HOLDOUT_MONTHS, TRAIN_MONTHS, load
 from taxi.m1 import BASE, CAT, MAX_ROUNDS, MODEL_FEATURES, PATIENCE, chosen_cells, expected_max, matrix, predict, train
-from taxi.verdict import FLOOR, paired_delta, rmse
+from taxi.verdict import paired_delta, rmse
 
 TAIL = 600.0
 K = 1  # one declared configuration (M1's chosen lane-A cell for all three boosters), so the optimism bound is zero
@@ -85,7 +85,7 @@ def main() -> None:
     e1 = predict(train(tra, "A", cell, rounds=m1_rounds), tea, "A") - tea.y.values
     v = paired_delta(e1, e2, tea.day.values)
     bound = expected_max(K) * (v.hi - v.lo) / 3.92
-    clears = v.win and v.delta >= bound + FLOOR
+    clears = v.win and v.delta >= bound + v.floor
     vt, jan, jul = is_tail(tea), tea.month.values == 1, tea.month.values == 7
     row = lambda name, e: f"| {name} | {rmse(e):.1f} | {rmse(e[jan]):.1f} | {rmse(e[jul]):.1f} | {rmse(e[vt]):.1f} | {rmse(e[~vt]):.1f} |"
     report = ["# M2: two-stage tail model, lane A, Jan+Jul 2025 development holdout", "",
@@ -96,7 +96,7 @@ def main() -> None:
               "| model | RMSE | Jan | Jul | tail rows | body rows |", "|---|---|---|---|---|---|", row("M1", e1), row("M2", e2), "",
               f"Classifier mean p: tail rows {prob[vt].mean():.3f}, body rows {prob[~vt].mean():.3f}; p > 0.5 on {int((prob > 0.5).sum())} rows.", "",
               f"Improvement M2 vs M1: {v.delta:+.1f} s [{v.lo:+.1f}, {v.hi:+.1f}]; paired SE {(v.hi - v.lo) / 3.92:.1f} s; "
-              f"optimism bound for k = {K}: {bound:.1f} s; floor {FLOOR:.0f} s. "
+              f"optimism bound for k = {K}: {bound:.1f} s; floor {v.floor:.0f} s. "
               f"Verdict: {'WIN, clears bound plus floor, M2 promoted' if clears else ('WIN on the interval but inside bound plus floor, not promoted' if v.win else 'tie or lose, M1 stays')}.", ""]
     text = "\n".join(report) + "\n"
     with open("docs/M2.md", "w", encoding="utf-8") as fh:

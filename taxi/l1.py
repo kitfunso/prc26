@@ -93,7 +93,7 @@ def main() -> None:
     fn, cell = cells[best]
     e1 = fn(trb, teb, tr_all, cell, max(final[best], 1))[0] - teb.y.values
     e0 = b4(trb, teb, "B") - teb.y.values
-    v = paired_delta(e0, e1, teb.day.values)
+    v = paired_delta(e0, e1, teb.day.values, lane="B")
     jan, jul = teb.month.values == 1, teb.month.values == 7
     row = lambda name, e: f"| {name} | {rmse(e):.1f} | {rmse(e[jan]):.1f} | {rmse(e[jul]):.1f} | {e.min():.0f} | {e.max():.0f} |"
     report = ["# L1: lane-B campaign, Jan+Jul 2025 development holdout", "",

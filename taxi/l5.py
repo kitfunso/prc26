@@ -121,7 +121,7 @@ def judge(cells: dict[str, Any], pred: Pred, title: str, blurb: str, path: str, 
         return
     p0, p1 = floored(champ[1](trb, teb)), floored(pred(trb, teb, cells[best]))
     e0, e1 = p0 - teb.y.values, p1 - teb.y.values
-    v, m = paired_delta(e0, e1, teb.day.values), touched(trb, teb)
+    v, m = paired_delta(e0, e1, teb.day.values, lane="B"), touched(trb, teb)
     jan, jul = teb.month.values == 1, teb.month.values == 7
     row = lambda name, e: f"| {name} | {rmse(e):.1f} | {rmse(e[jan]):.1f} | {rmse(e[jul]):.1f} | {e.min():.0f} | {e.max():.0f} |"
     report = [f"# {title}, Jan+Jul 2025 development holdout", "",

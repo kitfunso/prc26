@@ -70,7 +70,7 @@ def after() -> None:
     old_b = pd.read_parquet(L6A_PRE)
     assert np.array_equal(old_b.id.values, teb.id.values)
     e0, e1 = floored(old_b.pred.values) - yb, floored(predict_b(lb, trb, teb)) - yb
-    v = paired_delta(e0, e1, teb.day.values)
+    v = paired_delta(e0, e1, teb.day.values, lane="B")
     lines.append(f"| {lb} | B | {rmse(e0):.1f} | {rmse(e1):.1f} | {v.delta:+.1f} [{v.lo:+.1f}, {v.hi:+.1f}] | floored (H22) |")
     verdicts.append(verdict_line(f"{lb} on A1 anchors", lb, v, k=1))
     report = ["# A1: anchor guard, every champion re-verdicted on the fixed data (Jan+Jul 2025 development holdout)", "",

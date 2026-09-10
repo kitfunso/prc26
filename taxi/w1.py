@@ -11,7 +11,7 @@ from taxi.baselines import b1, b4
 from taxi.data import CV_FOLDS, HOLDOUT_MONTHS, TRAIN_MONTHS, load
 from taxi.m1 import MODEL_FEATURES, chosen_cells, expected_max
 from taxi.m2 import K, is_tail, predict_m2, stages
-from taxi.verdict import FLOOR, Verdict, paired_delta, rmse
+from taxi.verdict import Verdict, paired_delta, rmse
 from taxi.weather import PULL, WEATHER, join, load_metar
 
 COLS_A = [*MODEL_FEATURES, *WEATHER]
@@ -61,12 +61,12 @@ def verdict_line(name: str, champ: str, v: Verdict, k: int = K) -> str:
     """Promotion wording only when the comparator is a current registry champion (critique S3, finding 2)."""
     from taxi.champ import CURRENT
     bound = expected_max(k) * (v.hi - v.lo) / 3.92
-    clears = v.win and v.delta >= bound + FLOOR
+    clears = v.win and v.delta >= bound + v.floor
     word = (f"WIN, clears bound plus floor, {name} promoted" if champ in CURRENT.values() else
             f"WIN, clears bound plus floor against {champ}, NOT promoted: the current champions are {CURRENT}") if clears else (
         f"WIN on the interval but inside bound plus floor, {champ} stays" if v.win else f"tie or lose, {champ} stays")
     return (f"Improvement {name} vs {champ}: {v.delta:+.1f} s [{v.lo:+.1f}, {v.hi:+.1f}]; paired SE {(v.hi - v.lo) / 3.92:.1f} s; "
-            f"optimism bound for k = {k}: {bound:.1f} s; floor {FLOOR:.0f} s. Verdict: {word}.")
+            f"optimism bound for k = {k}: {bound:.1f} s; floor {v.floor:.0f} s. Verdict: {word}.")
 
 
 def coverage(df: pd.DataFrame, name: str) -> str:
@@ -83,7 +83,7 @@ def main() -> None:
     trb, teb = (d[~d.has_fpl].reset_index(drop=True) for d in (tr, te))
     # Lane B first: seconds of work, and its verdict does not depend on lane A.
     eb0, eb1 = b4(trb, teb, "B") - teb.y.values, b4w(trb, teb) - teb.y.values
-    vb = paired_delta(eb0, eb1, teb.day.values)
+    vb = paired_delta(eb0, eb1, teb.day.values, lane="B")
     jan_b, jul_b = teb.month.values == 1, teb.month.values == 7
     rowb = lambda name, e: f"| {name} | {rmse(e):.1f} | {rmse(e[jan_b]):.1f} | {rmse(e[jul_b]):.1f} | {e.min():.0f} | {e.max():.0f} |"
     lane_b = [f"## Lane B holdout verdict vs champion B4 ({len(teb)} rows)", "", "| model | RMSE | Jan | Jul | min error | max error |",

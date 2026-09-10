@@ -37,7 +37,7 @@ def drop_table(teb: pd.DataFrame, e0: np.ndarray, e1: np.ndarray, a: str, b: str
     for k in DROPS:
         keep = np.ones(len(teb), bool)
         keep[order[:k]] = False
-        v = paired_delta(e0[keep], e1[keep], teb.day.values[keep])
+        v = paired_delta(e0[keep], e1[keep], teb.day.values[keep], lane="B")
         out.append(f"| {k} | {int(keep.sum())} | {v.champion:.1f} | {v.challenger:.1f} | {v.delta:+.1f} [{v.lo:+.1f}, {v.hi:+.1f}] |")
     return out
 
@@ -46,7 +46,7 @@ def main() -> None:
     trb, teb = lane_b()
     e = errors(trb, teb)
     days = teb.day.values
-    chain = paired_delta(e["B4"], e["L8c"], days)
+    chain = paired_delta(e["B4"], e["L8c"], days, lane="B")
     bound = expected_max(CHAIN_CELLS) * (chain.hi - chain.lo) / 3.92
     steps = [(CHAIN[i], CHAIN[i + 1]) for i in range(len(CHAIN) - 1)]
     lines = ["# CB1: the lane-B chain judged end to end (holdout Jan+Jul 2025, floored)", "",
@@ -58,10 +58,10 @@ def main() -> None:
              f"| B4 floored | L8c floored | {chain.champion:.1f} | {chain.challenger:.1f} | {chain.delta:+.1f} [{chain.lo:+.1f}, {chain.hi:+.1f}] |", "",
              f"Priced once for the whole lane at k = {CHAIN_CELLS} declared cells: expected max {expected_max(CHAIN_CELLS):.2f} x SE gives a bound of "
              f"{bound:.1f} s against an observed {chain.delta:+.1f} s. Verdict: "
-             f"{'clears the chain bound' if chain.delta >= bound + 2.0 and chain.lo > 0 else 'does NOT clear the chain bound'}.", "",
+             f"{'clears the chain bound' if chain.delta >= bound + chain.floor and chain.lo > 0 else 'does NOT clear the chain bound'}.", "",
              "## 2. Each step, for the record", "", "| step | RMSE champion | RMSE challenger | improvement [95%] |", "|---|---|---|---|"]
     for a, b in steps:
-        v = paired_delta(e[a], e[b], days)
+        v = paired_delta(e[a], e[b], days, lane="B")
         lines.append(f"| {a} to {b} | {v.champion:.1f} | {v.challenger:.1f} | {v.delta:+.1f} [{v.lo:+.1f}, {v.hi:+.1f}] |")
     lines += ["", "## 3. Does the L8c step survive the extreme rows?", "",
               "Rows removed in descending order of the champion's absolute error, the construction the control table below reproduces from `docs/LB-CONC.md`. If the lead collapses as the biggest "

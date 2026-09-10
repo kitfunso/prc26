@@ -5,7 +5,23 @@ from dataclasses import dataclass
 
 import numpy as np
 
-FLOOR = 2.0
+from taxi.ceil import PER_A, PER_B
+
+FLOOR = 2.0  # parsimony tolerance in the metric's OWN seconds: "within this of the best cell, prefer the simpler one"
+BOARD_FLOOR = 2.0 * PER_A  # what promotion costs, in BOARD seconds, pinned so lane A's bar stays exactly 2.0 holdout s
+
+
+def promote_floor(lane: str) -> float:
+    """Holdout seconds a challenger on `lane` must gain to be worth `BOARD_FLOOR` on the board.
+
+    A holdout second is not one thing. `taxi.ceil` measures lane A at 0.8723 board seconds per holdout second off the controlled
+    v15/v16 pair, and puts lane B at 0.0581. One flat holdout floor therefore asked lane A for 1.74 board seconds and lane B for
+    0.10, so the two lanes competed at a 15x handicap in the only currency the prize is decided in. Lane B's rate is a FLOOR, not
+    a measurement (`docs/BL.md` section 5: no controlled lane-B pair has ever been scored), so dividing by it gives the most
+    demanding bar available. If the pooled derivation understates lane B the way it understated lane A, by 1.87x, the true lane-B
+    bar is nearer 16 s than 30 s; that stays unmeasured until a controlled lane-B pair is scored.
+    """
+    return BOARD_FLOOR / (PER_A if lane == "A" else PER_B)
 
 
 @dataclass(frozen=True)
@@ -15,14 +31,19 @@ class Verdict:
     delta: float
     lo: float
     hi: float
+    lane: str = "A"
+
+    @property
+    def floor(self) -> float:
+        return promote_floor(self.lane)
 
     @property
     def win(self) -> bool:
-        return self.lo > 0 and self.delta >= FLOOR
+        return self.lo > 0 and self.delta >= self.floor
 
     def line(self) -> str:
         tag = "WIN" if self.win else "tie or lose"
-        return f"improvement {self.delta:+.1f} s [{self.lo:+.1f}, {self.hi:+.1f}], floor {FLOOR:.0f} s: {tag}"
+        return f"improvement {self.delta:+.1f} s [{self.lo:+.1f}, {self.hi:+.1f}], floor {self.floor:.0f} s: {tag}"
 
 
 def rmse(err: np.ndarray) -> float:
@@ -34,7 +55,7 @@ def score(pred: np.ndarray, te) -> str:
     return f", RMSE {rmse(pred - te.y.values):.2f}" if "y" in te.columns else ""
 
 
-def paired_delta(err_champion, err_challenger, days, reps: int = 2000, seed: int = 0, block: int = 1) -> Verdict:
+def paired_delta(err_champion, err_challenger, days, reps: int = 2000, seed: int = 0, block: int = 1, lane: str = "A") -> Verdict:
     """Champion RMSE minus challenger RMSE on the same rows, resampling whole days; positive favours the challenger."""
     a = np.asarray(err_champion, dtype=float)
     b = np.asarray(err_challenger, dtype=float)
@@ -48,7 +69,7 @@ def paired_delta(err_champion, err_challenger, days, reps: int = 2000, seed: int
     tot = n[pick].sum(axis=1)
     d = np.sqrt(sse_a[pick].sum(axis=1) / tot) - np.sqrt(sse_b[pick].sum(axis=1) / tot)
     lo, hi = np.percentile(d, [2.5, 97.5])
-    return Verdict(rmse(a), rmse(b), rmse(a) - rmse(b), float(lo), float(hi))
+    return Verdict(rmse(a), rmse(b), rmse(a) - rmse(b), float(lo), float(hi), lane)
 
 
 def level_ci(err, days, reps: int = 2000, seed: int = 0) -> tuple[float, float, float, float]:

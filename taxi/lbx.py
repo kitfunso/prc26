@@ -69,7 +69,7 @@ def main() -> None:
         e = p - y
         rows.append(f"| {name} | {rmse(e):,.1f} | {rmse(e[ok_te]):.1f} | {rmse(e[~ok_te]):,.0f} |")
         if name != "L8c (champion, 2 columns)":
-            v = paired_delta((champ - y)[ok_te], e[ok_te], day[ok_te])
+            v = paired_delta((champ - y)[ok_te], e[ok_te], day[ok_te], lane="B")
             vs.append(f"| {name} | {v.delta:+.1f} | [{v.lo:+.1f}, {v.hi:+.1f}] | {'WIN' if v.lo > 0 else 'lose' if v.hi < 0 else 'tie'} |")
 
     sq = lambda d, m: 100 * np.sum(d.y.values[m] ** 2) / np.sum(d.y.values ** 2)  # noqa: E731

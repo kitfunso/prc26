@@ -150,7 +150,7 @@ def main() -> None:
               "| lambda | lane B RMSE | paired against the champion [95%] |", "|---|---|---|"]
     for lam in (0.25, 0.5, 1.0):
         q = floored(pb + lam * ph * np.maximum(mag - pb, 0.0))
-        v = paired_delta(e, q - y, teb.day.values)
+        v = paired_delta(e, q - y, teb.day.values, lane="B")
         lines.append(f"| {lam:.2f} | {rmse(q - y):.1f} | {v.delta:+.1f} [{v.lo:+.1f}, {v.hi:+.1f}] |")
     lines += ["", "Every weight loses, and the loss grows with the weight. The champion already predicts high where the artifacts are: "
               "in the top decile of P(artifact) it over-predicts on a truth mean near 4,900 s. The level is not the missing piece. No "

@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 from taxi.data import CV_FOLDS, HOLDOUT_MONTHS, TRAIN_MONTHS, load
-from taxi.verdict import FLOOR, paired_delta, rmse
+from taxi.verdict import FLOOR, paired_delta, promote_floor, rmse
 
 CAPS = (3600.0, 7200.0, 14400.0, None)
 Model = Callable[[pd.DataFrame, pd.DataFrame, str], np.ndarray]
@@ -86,7 +86,7 @@ def cap_sweep(tr: pd.DataFrame, lane: str) -> tuple[float | None, list[str]]:
 
 
 def ladder(tr: pd.DataFrame, te: pd.DataFrame, lane: str, cap: float | None) -> tuple[str, dict[str, np.ndarray], list[str]]:
-    lines = [f"| lane {lane} | RMSE | Jan | Jul | improvement vs champion [95%] | verdict (floor 2 s) |",
+    lines = [f"| lane {lane} | RMSE | Jan | Jul | improvement vs champion [95%] | verdict (floor {promote_floor(lane):.0f} s) |",
              "|---|---|---|---|---|---|"]
     fit = admit(tr, lane, cap)
     champ, err_champ, preds = "", np.empty(0), {}
@@ -99,7 +99,7 @@ def ladder(tr: pd.DataFrame, te: pd.DataFrame, lane: str, cap: float | None) -> 
             lines.append(f"| {name} | {rmse(err):.1f} | {jan:.1f} | {jul:.1f} | first rung | champion |")
             champ, err_champ = name, err
             continue
-        v = paired_delta(err_champ, err, te.day.values)
+        v = paired_delta(err_champ, err, te.day.values, lane=lane)
         tag = "WIN, promoted" if v.win else "tie or lose"
         lines.append(f"| {name} | {v.challenger:.1f} | {jan:.1f} | {jul:.1f} | {champ}: {v.delta:+.1f} s [{v.lo:+.1f}, {v.hi:+.1f}] | {tag} |")
         if v.win:

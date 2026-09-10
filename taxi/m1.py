@@ -170,16 +170,16 @@ def main() -> None:
         bst = train(trl, lane, cell, rounds=rounds)
         p_m1, p_b4 = predict(bst, tel, lane), b4(trl, tel, lane)
         e_m1, e_b4 = p_m1 - tel.y.values, p_b4 - tel.y.values
-        v = paired_delta(e_b4, e_m1, tel.day.values)
+        v = paired_delta(e_b4, e_m1, tel.day.values, lane=lane)
         bound = expected_max(k) * (v.hi - v.lo) / 3.92
-        clears = v.win and v.delta >= bound + FLOOR
+        clears = v.win and v.delta >= bound + v.floor
         jan, jul = tel.month.values == 1, tel.month.values == 7
         report += [f"## Lane {lane}: holdout verdict vs champion B4 ({len(tel)} rows)", "",
                    "| model | RMSE | Jan | Jul |", "|---|---|---|---|",
                    f"| B4 | {rmse(e_b4):.1f} | {rmse(e_b4[jan]):.1f} | {rmse(e_b4[jul]):.1f} |",
                    f"| M1 | {rmse(e_m1):.1f} | {rmse(e_m1[jan]):.1f} | {rmse(e_m1[jul]):.1f} |", "",
                    f"Improvement M1 vs B4: {v.delta:+.1f} s [{v.lo:+.1f}, {v.hi:+.1f}]; paired SE {(v.hi - v.lo) / 3.92:.1f} s; "
-                   f"optimism bound for k = {k}: {bound:.1f} s; floor {FLOOR:.0f} s. "
+                   f"optimism bound for k = {k}: {bound:.1f} s; floor {v.floor:.0f} s. "
                    f"Verdict: {'WIN, clears bound plus floor, M1 promoted' if clears else ('WIN on the interval but inside bound plus floor, not promoted' if v.win else 'tie or lose')}.", "",
                    f"### Lane {lane}: feature gain share (final fit)", ""] + importance(bst) + [""]
         lane_te[lane], lane_err[lane] = tel, (e_m1 if clears else e_b4, e_m1, e_b4)

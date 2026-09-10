@@ -120,7 +120,7 @@ def main() -> None:
     trb, teb = prep(trb), prep(teb)
     p0, p1 = floored(b4(trb, teb, "B")), floored(CELLS[best](trb, teb, final[best] or None)[0])
     e0, e1 = p0 - teb.y.values, p1 - teb.y.values
-    v = paired_delta(e0, e1, teb.day.values)
+    v = paired_delta(e0, e1, teb.day.values, lane="B")
     jan, jul = teb.month.values == 1, teb.month.values == 7
     row = lambda name, e: f"| {name} | {rmse(e):.1f} | {rmse(e[jan]):.1f} | {rmse(e[jul]):.1f} | {e.min():.0f} | {e.max():.0f} |"
     counts = ", ".join(f"{name} {int((reg == i).sum())} ({(reg == i).mean():.1%}, mean y {trb.y.values[reg == i].mean():.0f} s)" for i, name in enumerate(("normal", "copy", "day")))

@@ -14,8 +14,9 @@ import pandas as pd
 from taxi.cb1 import lane_b
 from taxi.champ import CURRENT, champion_holdout, lane_a, predict_b
 from taxi.l2 import floored
+from taxi.ceil import PER_A, PER_B
 from taxi.m2 import is_tail
-from taxi.verdict import FLOOR, paired_delta, rmse
+from taxi.verdict import paired_delta, promote_floor, rmse
 
 REPS = 2000
 
@@ -34,15 +35,15 @@ def crossing(e0: np.ndarray, days: np.ndarray, mask: np.ndarray, test) -> tuple[
 
 
 def block(name: str, e0: np.ndarray, days: np.ndarray, sets: list[tuple[str, np.ndarray]], price) -> list[str]:
-    r0 = rmse(e0)
-    out = ["| rows improved | n | their RMSE now | interval clears zero at | 2 s floor met at | binding | their RMSE then | composite (s) |",
+    r0, fl = rmse(e0), promote_floor(name)
+    out = [f"| rows improved | n | their RMSE now | interval clears zero at | {fl:.0f} s floor met at | binding | their RMSE then | composite (s) |",
            "|---|---|---|---|---|---|---|---|"]
     for label, mask in sets:
         sub = rmse(e0[mask])
         d_ci, g_ci = crossing(e0, days, mask, lambda v: v.lo > 0)
-        d_fl, g_fl = crossing(e0, days, mask, lambda v: v.delta >= FLOOR)
+        d_fl, g_fl = crossing(e0, days, mask, lambda v: v.delta >= fl)
         d, g = (d_ci, g_ci) if d_ci > d_fl else (d_fl, g_fl)
-        bind = "interval" if d_ci > d_fl else "2 s floor"
+        bind = "interval" if d_ci > d_fl else f"{fl:.0f} s floor"
         out.append(f"| {label} | {int(mask.sum()):,} | {sub:,.1f} s | {d_ci * 100:.2f}% ({g_ci:+.2f} s) | "
                    f"{d_fl * 100:.2f}% ({g_fl:+.2f} s) | {bind} | {sub * (1 - d):,.1f} s | {price(g):+.3f} |")
     return [f"### Lane {name}, champion {CURRENT[name]} at {r0:,.2f} s", ""] + out + [""]
@@ -60,6 +61,7 @@ def ledger_se(path: str = "docs/TRIAL-LEDGER.md") -> dict[str, list[float]]:
 
 
 def main(out: str = "docs/MDE.md") -> None:
+    fl_a, fl_b = promote_floor("A"), promote_floor("B")
     tra, tea = lane_a()
     trb, teb = lane_b()
     ea = floored(champion_holdout(CURRENT["A"], tra, tea)) - tea.y.values
@@ -80,15 +82,17 @@ def main(out: str = "docs/MDE.md") -> None:
     share = [f"| worst {k} rows | {float((eb[worst[:k]] ** 2).sum()) / sb * 100:.1f}% |" for k in (1, 2, 5, 20, 100)]
     se = ledger_se()
     med = {k: st.median(v) for k, v in se.items()}
-    real = [f"| {k} | {len(v)} | {min(v) * 1.96:.1f} s | {med[k] * 1.96:.1f} s | {max(v) * 1.96:.1f} s | "
-            f"{'the 2 s floor' if med[k] * 1.96 < FLOOR else 'the interval, by ' + format(med[k] * 1.96 / FLOOR, '.0f') + 'x'} |"
+    fl = {k: promote_floor(k) for k in se}
+    real = [f"| {k} | {len(v)} | {min(v) * 1.96:.1f} s | {med[k] * 1.96:.1f} s | {max(v) * 1.96:.1f} s | {fl[k]:.0f} s | "
+            f"{format(fl[k], '.0f') + ' s floor' if med[k] * 1.96 < fl[k] else 'the interval, by ' + format(med[k] * 1.96 / fl[k], '.1f') + 'x'} |"
             for k, v in se.items()]
 
     lines = ["# MDE: the smallest gain each lane's verdict can see (diagnostic, never a verdict)", "",
              f"Regenerate with `python -m taxi.mde`. Champions {CURRENT['A']} and {CURRENT['B']}, floored, holdout Jan + Jul 2025. "
              f"No cell is declared and nothing here decides a verdict. Protocol Stage 0 asks for the detectable-effect floor before "
              f"any modelling and this campaign never wrote one down. The decision rule needs BOTH halves: the 95% paired day-block "
-             f"interval above zero AND a point gain of at least {FLOOR:.0f} s of lane RMSE. This prices what a challenger must "
+             f"interval above zero AND a point gain of at least the lane's own floor, {fl_a:.0f} s on lane A and {fl_b:.0f} s on "
+             f"lane B, which are the same {2.0 * PER_A:.2f} board seconds priced at each lane's measured carry. This prices what a challenger must "
              f"actually deliver to satisfy them, by shrinking the champion's own errors on a named set of rows until the rule "
              f"fires. Shrinking real errors is the most generous challenger there is: it never mis-fires on a row it does not "
              f"improve, so every number below is a LOWER bound on what a real model has to do.", "",
@@ -102,11 +106,12 @@ def main(out: str = "docs/MDE.md") -> None:
              "## 2. What the interval actually cost, on this campaign's real challengers", "",
              f"Every holdout verdict in `docs/TRIAL-LEDGER.md` that recorded a paired standard error, grouped by lane. The "
              f"minimum detectable effect is 1.96 SE: below it a challenger's interval contains zero however good its point estimate is.", "",
-             "| lane | verdicts | smallest MDE | median MDE | largest MDE | what binds |", "|---|---|---|---|---|---|", *real, "",
+             "| lane | verdicts | smallest MDE | median MDE | largest MDE | promotion floor | what binds |", "|---|---|---|---|---|---|---|", *real, "",
              f"Lane A's machinery is not the constraint: its median challenger had to beat {med['A'] * 1.96:.1f} s of lane RMSE to clear "
-             f"zero, and the rule asks for {FLOOR:.0f}. Lane B's is: its median challenger had to beat {med['B'] * 1.96:.0f} s, "
-             f"{med['B'] * 1.96 / FLOOR:.0f} times the nominal floor and worth {med['B'] * 1.96 * 0.087:.1f} s of composite. The 2 s floor "
-             f"has never been the binding constraint on a lane-B lane; the interval has, every time.", "",
+             f"zero, and the rule asks for {fl_a:.0f}. On lane B the two halves are now close: its median challenger had to beat "
+             f"{med['B'] * 1.96:.0f} s against a floor of {fl_b:.0f} s, so {'the interval' if med['B'] * 1.96 > fl_b else 'the floor'} binds. "
+             f"Under the flat 2 s floor this was never a contest, because 2 s of lane B is {2.0 * PER_B:.2f} board seconds and the "
+             f"interval asked for {med['B'] * 1.96 * PER_B:.2f}.", "",
              "## 3. Why lane B's interval is so wide", "",
              "| rows | share of lane-B squared error |", "|---|---|", *share, "",
              f"Lane B is {nb:,} rows against lane A's {na:,}, and its squared error is concentrated in a handful of them "

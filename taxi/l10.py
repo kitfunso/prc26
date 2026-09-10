@@ -64,7 +64,7 @@ def main() -> None:
     rounds = int(np.median(its))
     p, _ = run(trb, teb, cell, rounds)
     l10, base, y = floored(p), floored(predict_b(CURRENT["B"], trb, teb)), teb.y.values
-    vd = paired_delta(base - y, l10 - y, teb.day.values)
+    vd = paired_delta(base - y, l10 - y, teb.day.values, lane="B")
     jan, jul = teb.month.values == 1, teb.month.values == 7
     row = lambda n, e: f"| {n} | {rmse(e):.1f} | {rmse(e[jan]):.1f} | {rmse(e[jul]):.1f} |"  # noqa: E731
 

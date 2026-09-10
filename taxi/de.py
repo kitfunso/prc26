@@ -131,7 +131,7 @@ def main() -> None:
               "## 4. The ceiling", ""]
     o = p.copy()
     o[sh] = DAY + normal
-    v = paired_delta(p - y, o - y, teb.day.values)
+    v = paired_delta(p - y, o - y, teb.day.values, lane="B")
     lines += [f"Predicting {DAY + normal:,.0f} s on exactly the {int(sh.sum())} day-shifted holdout rows and changing nothing else takes lane B "
               f"from {rmse(p - y):,.1f} s to {rmse(o - y):,.1f} s, **{v.delta:+,.1f} s** [{v.lo:+,.1f}, {v.hi:+,.1f}]. That is about "
               f"{v.delta * rmse(p - y) * len(teb) / (322.5796 * (len(teb) + len(tea))):.0f} s of composite, larger than the whole distance from "
@@ -144,7 +144,7 @@ def main() -> None:
                     ("only the block time moved", sh & (teb.z_sched.values <= 40000))):
         z = p.copy()
         z[sub] = DAY + normal
-        u = paired_delta(p - y, z - y, teb.day.values)
+        u = paired_delta(p - y, z - y, teb.day.values, lane="B")
         lines.append(f"| {nm} | {int(sub.sum())} | {rmse(z - y):,.1f} | {u.delta:+.1f} [{u.lo:+.1f}, {u.hi:+.1f}] |")
     lines += ["", "Most of the ceiling is one row, but not all of it, and the remainder is the part that matters. The single LFPG row is "
               "unreachable: its schedule is an ordinary 1,740 s and nothing marks it. The five LIRF rows are worth +85.5 s between them and they "
@@ -173,7 +173,7 @@ def main() -> None:
               "| shift | lane B RMSE | paired against the champion [95%] |", "|---|---|---|"]
     for s in (rate * DAY, 2 * rate * DAY, 100.0):
         q = floored(p + s)
-        w = paired_delta(p - y, q - y, teb.day.values)
+        w = paired_delta(p - y, q - y, teb.day.values, lane="B")
         lines.append(f"| {s:,.1f} s | {rmse(q - y):,.1f} | {w.delta:+.1f} [{w.lo:+.1f}, {w.hi:+.1f}] |")
     lines += ["", "The best of these lands under the 2 s floor, and the arithmetic says why it cannot do better. The gain from an optimal shift "
               "is n p squared A squared, so at a rate near one in two thousand the whole lane is worth a couple of seconds, and every row that "
@@ -187,7 +187,7 @@ def main() -> None:
     q = float((families(trb)[1]).sum()) / max(float((families(trb)[1]).sum() + sh_tr.sum()), 1.0)
     m2 = p.copy()
     m2[hi] = q * p[hi] + (1 - q) * (DAY + normal)
-    w = paired_delta(p - y, m2 - y, teb.day.values)
+    w = paired_delta(p - y, m2 - y, teb.day.values, lane="B")
     lines += ["", f"It loses on CV and it loses on the holdout: at q = {q:.2f} the same recipe scores {rmse(m2 - y):,.1f} s against "
               f"{rmse(p - y):,.1f}, {w.delta:+.1f} [{w.lo:+.1f}, {w.hi:+.1f}]. The reason is in section 1: a day-shifted row need not have a "
               f"strange schedule at all. Of the {int(hi.sum())} holdout rows the champion pushes over 40,000 s, {int((hi & sh).sum())} are "

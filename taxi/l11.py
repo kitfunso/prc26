@@ -67,7 +67,7 @@ def main() -> None:
     base, l11 = floored(predict_b(CURRENT["B"], trb, teb)), floored(predict(trb, teb))
     keep = np.isin(teb.apt.values, q)
     same = bool(np.allclose(base[keep], l11[keep]))
-    vd = paired_delta(base - y, l11 - y, teb.day.values)
+    vd = paired_delta(base - y, l11 - y, teb.day.values, lane="B")
     g = by_airport(teb, base, l11)
     jan, jul = teb.month.values == 1, teb.month.values == 7
     row = lambda n, e: f"| {n} | {rmse(e):.1f} | {rmse(e[jan]):.1f} | {rmse(e[jul]):.1f} |"  # noqa: E731

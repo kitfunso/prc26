@@ -59,9 +59,11 @@ AUDIT: tuple[tuple[str, str], ...] = (
     ("Code", "SB3 is a five-seed bag and has no out-of-fold vector, which is why every blend in this campaign fits its "
              "weight against MC2's. That is a limitation of the code rather than a modelling choice, and it is the direct "
              "cause of the finding two rows above. It is buildable: five seeds by five folds of CatBoost on the card."),
-    ("Code", "<code>taxi/verdict.py</code> sets <code>FLOOR = 2.0</code> as a module constant. Every verdict in this "
-             "campaign is decided by it, and it has never been derived from anything. Question 2 below is the first time "
-             "it has been put to you."),
+    ("Code", "<code>taxi/verdict.py</code> asked BOTH lanes for the same 2.0 holdout seconds until 2026-09-10, which is "
+             "1.74 board seconds from lane A and 0.10 from lane B, a 15x handicap in the currency the prize is decided in. "
+             "The floor is now denominated in board seconds and converted at each lane's own carry, so lane A's bar is "
+             "unchanged at 2.0 s and lane B's is 30.0 s. The LEVEL, 1.74 board seconds, is still a constant chosen once "
+             "and never derived; question 2 below is the first time it has been put to you."),
     ("Process", "The pre-registered NC1 prediction was WRONG. It said the gain would land BELOW the holdout's +2.07 s and "
                 "named a real risk of failing its own gate; it landed at +3.32 s. It is recorded as wrong in "
                 "<code>docs/NC1.md</code>, because a prediction that only appears when it is right is not a prediction."),
@@ -125,9 +127,10 @@ COVERAGE: tuple[tuple[str, str], ...] = (
 QUESTIONS: tuple[str, ...] = (
     "Promote SB3+NN3, or hold on SB3? A yes builds one file and spends one of three scorer slots. A no costs nothing and "
     "the lane stays on the shelf with its numbers.",
-    "Is 2.0 s the right floor? It is a constant chosen once, it decides every verdict in this campaign, and this is the "
-    "first time it has been put to you. If the answer is a smaller floor, NN2 promotes as well and the question becomes a "
-    "different one.",
+    "Is 1.74 board seconds the right floor? The currency is now settled: a challenger must be worth that much on the "
+    "board, which is 2.0 s on lane A and 30.0 s on lane B. The LEVEL is not. It is a constant chosen once, it decides "
+    "every verdict in this campaign, and this is the first time it has been put to you. If the answer is a smaller floor, "
+    "NN2 promotes as well and the question becomes a different one.",
     "Should the SB3 out-of-fold vector be built? It is 25 GPU fits, and it would let every blend in this campaign fit its "
     "weight against the champion instead of against MC2.",
     "The banked level correction, 1.26 s on v17 and already paid for: apply it to the next file that goes up, whatever you "
