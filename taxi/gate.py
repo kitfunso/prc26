@@ -10,13 +10,14 @@ from __future__ import annotations
 import io
 import json
 
-from taxi.ceil import BOARD, PER_A, V16, rank
+from taxi.ceil import BOARD, PER_A, V16, V18, rank
 from taxi.register import ROWS, empty
 from taxi.searches import SEARCHES, achieved
 
 OUT = "docs/gate-s5.html"
 STYLE = "docs/gate-s4.html"  # the house style block, read at generate time so the gate pages cannot drift apart
 GAIN_A = 2.07  # the holdout lane-A seconds this lane would ship at, quoted from `docs/SW1.md` and pinned below
+N_H = 64  # holdout verdicts. The FACTS pin below greps the ledger for this exact number, so the prose cannot drift from it.
 
 # (key, source, verbatim quote the source must still contain). `tests/test_gate_sources.py` greps every one.
 FACTS: tuple[tuple[str, str, str], ...] = (
@@ -28,7 +29,7 @@ FACTS: tuple[tuple[str, str, str], ...] = (
     ("search", "docs/NC1.md", "| search months (weight fitted here, NOT a verdict) | 1,000,485 | 215.54 | 211.74 | +3.80 |"),
     ("nc1_ci", "docs/NC1.md", "**+3.32 s** [+2.87, +3.82], against a 2 s floor and a 0.0 s optimism bound"),
     ("rw", "docs/SW1.md", "Survives step-down: SB3+NN3, SB3+NN2."),
-    ("nh", "docs/TRIAL-LEDGER.md", "N_h (holdout verdicts) = 64"),
+    ("nh", "docs/TRIAL-LEDGER.md", f"N_h (holdout verdicts) = {N_H}"),
     ("level", "docs/PB.md", "on v17 at its MEASURED 296.25 board result (`taxi.ceil`) it is 1.26 s"),
     ("ceil_row", "docs/CEIL.md", "| built | the searched net blended onto SB3 at its out-of-fold weight | A | 2.07 |"),
     ("target", "docs/MONO.md", "**Physics is backwards on the target.**"),
@@ -146,10 +147,9 @@ def check() -> dict[str, str]:
 def board() -> dict:
     """The live snapshot, read through `taxi.ceil`'s own rank helper so the two pages cannot disagree about a rank."""
     b = json.load(io.open(BOARD, encoding="utf-8"))
-    after = V16 - GAIN_A * PER_A
     return dict(fetched=b["fetched_utc"], teams=b["teams"], subs=b["submissions"], us=b["us"]["score"],
-                us_rank=b["us"]["rank"], lead=b["leader"]["score"], v16=V16, v16_rank=rank(V16, b["board"]),
-                after=after, after_rank=rank(after, b["board"]), moved=GAIN_A * PER_A)
+                us_rank=b["us"]["rank"], subs_us=b["us"]["subs"], lead=b["leader"]["score"], v16=V16, v16_rank=rank(V16, b["board"]),
+                after=V18, after_rank=rank(V18, b["board"]), moved=V16 - V18, projected=V16 - GAIN_A * PER_A)
 
 
 def style() -> str:
@@ -159,15 +159,15 @@ def style() -> str:
 
 def head(b: dict) -> list[str]:
     return [
-        '<meta charset="utf-8">', "<title>Promote SB3+NN3, or hold</title>",
+        '<meta charset="utf-8">', "<title>SB3+NN3, promoted and scored</title>",
         '<link rel="preconnect" href="https://fonts.googleapis.com">',
         '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;'
         '0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">',
         style(), "", "<main>",
-        '<p class="eyebrow">PRC Data Challenge 2026 &middot; merry-octopus &middot; Stage 6 promotion gate</p>',
-        "<h1>Promote SB3+NN3, or hold</h1>",
-        '<p class="lede">A blend that is built, measured on the untouched holdout, and now clears every objection this '
-        'campaign has instrumented. It passes <code>taxi.verdict</code> on that module\'s own rule by 0.07 s, with the '
+        '<p class="eyebrow">PRC Data Challenge 2026 &middot; merry-octopus &middot; Stage 6 promotion gate, DECIDED</p>',
+        "<h1>SB3+NN3, promoted and scored</h1>",
+        '<p class="lede">Keith signed this gate off on 2026-09-10 and the file has since been scored, so the board '
+        'column below is no longer a projection. The case is kept below exactly as it was put. It passes <code>taxi.verdict</code> on that module\'s own rule by 0.07 s, with the '
         "floor sitting inside its interval. That last clause is the whole decision.</p>",
         '<div class="decision">', "<h2>The two numbers</h2>",
         '<div class="wrap"><table><thead><tr><th>lane A</th><th class="num">holdout RMSE</th>'
@@ -177,12 +177,16 @@ def head(b: dict) -> list[str]:
         f'<tr class="win"><td>SB3+NN3, the challenger</td><td class="num">228.03</td>'
         f'<td class="num">{b["after"]:.2f}</td><td class="num">{b["after_rank"]}</td></tr>',
         "</tbody></table></div>",
-        f'<p class="note">The board column: v16 is MEASURED, and the challenger is that same file with lane A replaced, '
-        f'converted at the measured per-lane rate of {PER_A:.4f} board seconds per holdout lane-A second. Snapshot '
-        f'{b["fetched"]} UTC, {b["subs"]} submissions across {b["teams"]} teams, leader {b["lead"]:.4f}. Our best scored '
-        f'file stands at {b["us"]:.4f}, rank {b["us_rank"]}.</p>',
-        f'<p class="call">The move is {b["moved"]:.2f} board seconds and {b["v16_rank"] - b["after_rank"]} places. The '
-        f'lead is {b["v16"] - b["lead"]:.2f} s away and stays away.</p>', "</div>"]
+        f'<p class="note">Both board figures are MEASURED, from the bucket\'s own result files. This page '
+        f'projected {b["projected"]:.2f} for the challenger, by converting the holdout gain at the per-lane rate of '
+        f'{PER_A:.4f}, and the scorer returned {b["after"]:.4f}. The projection was optimistic by '
+        f'{b["after"] - b["projected"]:.2f} s, which is the finding <code>docs/CEIL.md</code> now carries: that rate is '
+        f'a property of the model, not of the lanes. Snapshot {b["fetched"]} UTC, {b["subs"]} submissions across '
+        f'{b["teams"]} teams, leader {b["lead"]:.4f}.</p>',
+        f'<p class="call">The move is {b["moved"]:.2f} board seconds, worth {b["v16_rank"] - b["after_rank"]} place{"" if b["v16_rank"] - b["after_rank"] == 1 else "s"} '
+        f'against a frozen board. The board did not freeze: we hold rank {b["us_rank"]} today and held 27 when v16 '
+        f'was scored, so the gain was real and the field still moved past us. The lead is '
+        f'{b["after"] - b["lead"]:.2f} s away and stays away.</p>', "</div>"]
 
 
 def honest() -> list[str]:
@@ -213,7 +217,7 @@ def honest() -> list[str]:
         "them. That is a real limit and it is in the self-audit below.</p>"]
 
 
-def numbers() -> list[str]:
+def numbers(b: dict) -> list[str]:
     return [
         "<h2>2. Every number, with its interval</h2>",
         '<div class="wrap"><table><thead><tr><th>claim</th><th class="num">effect</th><th>95% paired</th>'
@@ -235,7 +239,8 @@ def numbers() -> list[str]:
         "<td>measured</td><td><code>taxi/ceil.py</code></td></tr>",
         "</tbody></table></div>",
         "<h3>Trial ledger</h3>",
-        "<p>N_h = 63 holdout verdicts across this campaign, and 8 scored board submissions. At a 5% level, 63 lanes "
+        f"<p>N_h = {N_H} holdout verdicts across this campaign, and {b['subs_us']} scored board submissions, both read "
+        f"from their own sources rather than typed here. At a 5% level, {N_H} lanes "
         "meeting one holdout expect about 3 false passes, which is why the Romano-Wolf row above exists: it judges the "
         "family jointly instead of counting lanes. The family it judges is the 7 lanes whose per-row holdout errors are "
         "cached on disk, not all 63, and a larger family would make step-down stricter rather than looser. Surviving is "
@@ -308,7 +313,7 @@ def questions() -> list[str]:
 def main(out: str = OUT) -> None:
     check()
     b = board()
-    page = head(b) + honest() + numbers() + rule() + flags() + audit() + coverage() + questions()
+    page = head(b) + honest() + numbers(b) + rule() + flags() + audit() + coverage() + questions()
     io.open(out, "w", encoding="utf-8", newline="\n").write("\n".join(page) + "\n")
     print(f"{out}: {len(FACTS)} pinned figures verified, {len(AUDIT)} audit findings, {sum(len(x) for x in page):,} chars")
 
