@@ -8,16 +8,16 @@ Regenerate with `python -m taxi.ceil`. Arithmetic only: no fit, no cell declared
 
 | pair | holdout s of lane A | board s | implied rate |
 |---|---|---|---|
-| v15/v16, MC2 against SB3 (H52/H53a) | 2.0551 | 1.7926 | 0.8723 |
-| v17/v18, SB3+RC1 against SB3+NN3 (S8) | 2.1329 | 1.2573 | 0.5895 |
-| v17/v19, SB3+RC1 against SB3+NN2 (S9) | 1.7485 | 0.7462 | 0.4268 |
-| v17/v20, SB3+RC1 against SB3+LT2 (S10) | 0.9585 | 0.9533 | 0.9946 |
+| v15/v16, MC2 to SB3 | 2.0551 | 1.7926 | 0.8723 |
+| v17/v18, SB3+RC1 to SB3+NN3 | 2.1328 | 1.2573 | 0.5895 |
+| v17/v19, SB3+RC1 to SB3+NN2 | 1.7437 | 0.7462 | 0.4279 |
+| v17/v20, SB3+RC1 to SB3+LT2 | 0.9949 | 0.9533 | 0.9582 |
 
-The rate spans 0.43 to 0.99, and the three files uploaded on 2026-09-10 are the sharp version of what that means. v19 beats v20 on the holdout by 0.79 s of lane A, 228.41 against 229.20, and LOSES to it on the board by 0.21 s, 295.5028 against 295.2957. That is an ORDER inversion, not a scale error, and no single rate can produce it: a rate rescales differences, it cannot reverse their sign. So a projection of the form board = V17 - gain x PER_A is not merely imprecise for a model it has not seen, it can rank two models the wrong way round, which is the one job this page is asked to do.
+The rate spans 0.43 to 0.96, and the three files uploaded on 2026-09-10 are the sharp version of what that means. v19 beats v20 on the holdout by 0.75 s of lane A and LOSES to it on the board by 0.21 s, 295.5028 against 295.2957. That is an ORDER inversion, not a scale error, and no single rate can produce it: a rate rescales differences, it cannot reverse their sign. So a projection of the form board = V17 - gain x PER_A is not merely imprecise for a model it has not seen, it can rank two models the wrong way round, which is the one job this page is asked to do.
 
 Everything below still multiplies by PER_A = 0.8723 and is now a DIAGNOSTIC in the protocol's sense: it cannot decide which model to build or upload. Two measured rows say why. The searched net projected 294.47 and scored 294.9917. Its own sibling NN2 projected 295.46 and scored 295.5028, close on the point and wrong on the rank.
 
-The cause is not identified. The holdout is Jan + Jul 2025 and the ranking set is a different, unseen period, so a model whose lane-A gain concentrates in the months the holdout happens to hold carries less of it forward than one whose gain is flat across the year. That is a hypothesis and the campaign has no measurement of it: testing it needs each model's holdout gain split by month, which is arithmetic on caches already on disk and is not yet done.
+The cause is PARTLY identified and `docs/MS1.md` holds the measurement. Splitting each pair's holdout gain by month ranks the 4 controlled pairs perfectly: the lane that put the least of its gain in January, 11%, kept the least on the board, 0.43, and the lane that put the most in January, 43%, kept 0.96, with no exception across all four (rank correlation +1.00, exact permutation p = 0.042). The magnitudes do not follow: two lanes that split at 35% and 33% carried at 0.87 and 0.59. So month share is a proxy for the mechanism and not the mechanism, and four points against a hypothesis written after the inversion was seen is a tie-break rule, not a model. It is enough to prefer a candidate whose gain spreads across the holdout year over one that concentrates it in July.
 
 ## Every measured gain, applied in order
 
@@ -69,7 +69,7 @@ v16 runs 208.6 s low on the average 2026 lane-B row, but that level was measured
 
 The first row is not headroom. It is a file that could be written today: SB3 with NN3 blended in at the weight fitted out of fold takes v16 from 296.27 to 294.47, 1.81 s of board and rank 31 to 29. State the blocker exactly, because the campaign has stated it loosely: at +2.07 s the lane CLEARS the 2 s floor. It is held by the k = 40 optimism bound that `docs/NN3.md` adds on top, for a hurdle of 3.0 s.
 
-That bound is now retired, by measurement rather than by argument. `docs/NC1.md` took NN3's winning cell as a FIXED k = 1 spec and read it on months 4, 5, 9 and 10, which `taxi.nn3.score` never ranked a cell on: against one base the blend gains +3.80 s on the months that chose the cell and +3.32 s on the months that did not, so the selection advantage is about 0.48 s, not the 1.0 s the bound assumed. The holdout never took part in choosing the cell at all, so the +2.07 needed no such correction in the first place. `docs/SW1.md` closes the other multiplicity, the campaign meeting one holdout 60 times: the lane survives Romano-Wolf step-down at 5% family-wise error over the seven cached lanes.
+That bound is now retired, by measurement rather than by argument. `docs/NC1.md` took NN3's winning cell as a FIXED k = 1 spec and read it on months 4, 5, 9 and 10, which `taxi.nn3.score` never ranked a cell on: against one base the blend gains +3.80 s on the months that chose the cell and +3.32 s on the months that did not, so the selection advantage is about 0.48 s, not the 1.0 s the bound assumed. The holdout never took part in choosing the cell at all, so the +2.07 needed no such correction in the first place. `docs/SW1.md` closes the other multiplicity, the campaign meeting one holdout 60 times: the lane survives Romano-Wolf step-down at 5% family-wise error over the eight cached lanes.
 
 So every objection this campaign has instrumented is now answered, and `taxi.verdict` passes the lane on its own rule: +2.07 s against a 2 s floor with a lower bound of +1.1 s. Say the caveat as loudly as the result. The margin is 0.07 s, the floor sits INSIDE the interval [+1.1, +2.9], so these rows cannot rule out a true gain below the floor, and the 1.81 s of board above is a projection off the measured per-lane rate, not a scored file. This is a Stage 6 promotion decision and it is Keith's alone. Nothing here builds a file or uploads one.
 

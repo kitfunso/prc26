@@ -6,6 +6,8 @@ N x alpha bound, does not over-punish lanes whose errors are almost the same vec
 """
 from __future__ import annotations
 
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -17,6 +19,7 @@ from taxi.verdict import paired_delta, rmse
 REPS, SEED, ALPHA = 2000, 0, 0.05
 NN2_W = 0.4160  # NN2's recorded out-of-fold blend weight; never re-fitted here
 NN3_W = 0.5189  # NN3's own, from `docs/NN3.md`; each blend lane keeps the weight its verdict used
+LT2_W = 0.5307  # LT2's, from `docs/LT2.md`
 
 
 def cached(name: str, ids: np.ndarray) -> np.ndarray:
@@ -24,19 +27,28 @@ def cached(name: str, ids: np.ndarray) -> np.ndarray:
     return pd.DataFrame({"id": ids}).merge(d[["id", "pred"]], on="id", how="left").pred.values
 
 
+# (lane, cache key, blend weight on that lane against SB3, or None to take the cached vector as a level). Read from DISK, not
+# typed: this page's own text calls the family "the lanes whose vectors are cached", and a hand-listed family drifts the moment
+# a vector is written. LT2's arrived on 2026-09-10 for `taxi.ms1` and would have been silently absent here.
+MEMBERS = (("MC2", "mc2_holdout", None), ("D1", "d1_holdout", None), ("M3", "m3_holdout", None),
+           ("W1-A", "w1a_holdout", None), ("SB3+NN2", "nn2_holdout", NN2_W), ("SB3+NN3", "nn3_holdout", NN3_W),
+           ("SB3+LT2", "lt2_holdout", LT2_W))
+
+
 def family(tea: pd.DataFrame, sb3: np.ndarray) -> dict[str, np.ndarray]:
-    """The cached lane-A challengers, each floored the way its own verdict floored it."""
+    """The cached lane-A challengers, each floored the way its own verdict floored it. Absent caches are skipped, and a
+    bigger family only makes step-down STRICTER, so a lane arriving here can never manufacture a survivor."""
     ids = tea.id.values
-    seeds = [cached("mc2_holdout", ids)] + [cached(f"sb1_seed{i}_holdout", ids) for i in (1, 2, 3, 4)]
-    nn2 = floored(cached("nn2_holdout", ids))
-    nn3 = floored(cached("nn3_holdout", ids))
-    return {"MC2": floored(cached("mc2_holdout", ids)),
-            "D1": floored(cached("d1_holdout", ids)),
-            "M3": floored(cached("m3_holdout", ids)),
-            "W1-A": floored(cached("w1a_holdout", ids)),
-            "SB1": floored(np.mean(seeds, axis=0)),
-            "SB3+NN2": floored(NN2_W * nn2 + (1 - NN2_W) * sb3),
-            "SB3+NN3": floored(NN3_W * nn3 + (1 - NN3_W) * sb3)}
+    out = {}
+    for name, key, w in MEMBERS:
+        if not os.path.exists(f"data/cache/{key}.parquet"):
+            continue
+        v = floored(cached(key, ids))
+        out[name] = v if w is None else floored(w * v + (1 - w) * sb3)
+    if all(os.path.exists(f"data/cache/sb1_seed{i}_holdout.parquet") for i in (1, 2, 3, 4)):
+        seeds = [cached("mc2_holdout", ids)] + [cached(f"sb1_seed{i}_holdout", ids) for i in (1, 2, 3, 4)]
+        out["SB1"] = floored(np.mean(seeds, axis=0))
+    return out
 
 
 def boot(errs: dict[str, np.ndarray], e0: np.ndarray, days: np.ndarray) -> tuple[np.ndarray, np.ndarray]:

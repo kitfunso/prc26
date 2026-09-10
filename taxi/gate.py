@@ -18,6 +18,7 @@ OUT = "docs/gate-s5.html"
 STYLE = "docs/gate-s4.html"  # the house style block, read at generate time so the gate pages cannot drift apart
 GAIN_A = 2.07  # the holdout lane-A seconds this lane would ship at, quoted from `docs/SW1.md` and pinned below
 N_H = 64  # holdout verdicts. The FACTS pin below greps the ledger for this exact number, so the prose cannot drift from it.
+FAM = 8  # lanes in the Romano-Wolf family, pinned to SW1's own header: SB3+LT2 joined on 2026-09-10 and this read 7
 
 # (key, source, verbatim quote the source must still contain). `tests/test_gate_sources.py` greps every one.
 FACTS: tuple[tuple[str, str, str], ...] = (
@@ -28,7 +29,8 @@ FACTS: tuple[tuple[str, str, str], ...] = (
     ("held", "docs/NC1.md", "| held months (THE VERDICT) | 723,046 | 209.11 | 205.79 | +3.32 |"),
     ("search", "docs/NC1.md", "| search months (weight fitted here, NOT a verdict) | 1,000,485 | 215.54 | 211.74 | +3.80 |"),
     ("nc1_ci", "docs/NC1.md", "**+3.32 s** [+2.87, +3.82], against a 2 s floor and a 0.0 s optimism bound"),
-    ("rw", "docs/SW1.md", "Survives step-down: SB3+NN3, SB3+NN2."),
+    ("rw", "docs/SW1.md", "Survives step-down: SB3+NN3, SB3+NN2, SB3+LT2."),
+    ("fam", "docs/SW1.md", f"{FAM} challengers, each tested against it on identical rows"),
     ("nh", "docs/TRIAL-LEDGER.md", f"N_h (holdout verdicts) = {N_H}"),
     ("level", "docs/PB.md", "on v17 at its MEASURED 296.25 board result (`taxi.ceil`) it is 1.26 s"),
     ("ceil_row", "docs/CEIL.md", "| built | the searched net blended onto SB3 at its out-of-fold weight | A | 2.07 |"),
@@ -51,9 +53,9 @@ AUDIT: tuple[tuple[str, str], ...] = (
                    "be banked, because reading it uses the holdout."),
     ("Statistics", "NC1's base is MC2's out-of-fold vector, so what it confirms is that NN3 adds to MC2 on months no cell "
                    "was ranked on. The claim that NN3 adds to SB3 is measured in exactly one place, the holdout, once."),
-    ("Statistics", "The Romano-Wolf family is the 7 lanes whose per-row holdout errors are cached, not the 62 verdicts the "
-                   "ledger counts. A larger family makes step-down STRICTER, so surviving it is necessary and not "
-                   "sufficient."),
+    ("Statistics", f"The Romano-Wolf family is the {FAM} lanes whose per-row holdout errors are cached, not the {N_H} "
+                   f"verdicts the ledger counts. A larger family makes step-down STRICTER, so surviving it is necessary "
+                   f"and not sufficient."),
     ("Code", "SB3 is a five-seed bag and has no out-of-fold vector, which is why every blend in this campaign fits its "
              "weight against MC2's. That is a limitation of the code rather than a modelling choice, and it is the direct "
              "cause of the finding two rows above. It is buildable: five seeds by five folds of CatBoost on the card."),
@@ -242,9 +244,9 @@ def numbers(b: dict) -> list[str]:
         f"<p>N_h = {N_H} holdout verdicts across this campaign, and {b['subs_us']} scored board submissions, both read "
         f"from their own sources rather than typed here. At a 5% level, {N_H} lanes "
         "meeting one holdout expect about 3 false passes, which is why the Romano-Wolf row above exists: it judges the "
-        "family jointly instead of counting lanes. The family it judges is the 7 lanes whose per-row holdout errors are "
-        "cached on disk, not all 63, and a larger family would make step-down stricter rather than looser. Surviving is "
-        "necessary and not sufficient.</p>"]
+        f"family jointly instead of counting lanes. The family it judges is the {FAM} lanes whose per-row holdout errors "
+        f"are cached on disk, not all {N_H}, and a larger family would make step-down stricter rather than looser. "
+        f"Surviving is necessary and not sufficient.</p>"]
 
 
 def rule() -> list[str]:

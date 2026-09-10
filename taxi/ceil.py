@@ -7,6 +7,8 @@ from __future__ import annotations
 
 import json
 
+from typing import NamedTuple
+
 BOARD = "data/board.json"
 # Every scored file, KEYED, because six unlabelled pairs put v15 after v16 and made `ANCHORS[1]` a puzzle. The v15/v16 pair
 # moves lane A alone, so PER_A is measured off it (CAL3) rather than differentiated out of the pooled slope; v17 joins the line
@@ -17,15 +19,36 @@ SCORED = {"S1": (365.24, 325.3982), "v16": (321.1269, 296.2745), "v15": (322.579
 ANCHORS = tuple(SCORED.values())
 BEST = min(SCORED, key=lambda k: SCORED[k][1])  # the file the board ranks us on, and the one `taxi.pb` must price against
 LANE_N, LANE_RMSE = (339046, 5373), (230.0951, 1808.1729)  # v16's own lanes: the point the per-lane rates differentiate at
-# Every CONTROLLED lane-A pair the campaign has scored: two files whose lane B is identical, so the board delta is lane A alone.
-# CAL3 is the first and is what PER_A is still measured off. S8, S9 and S10 added three more on 2026-09-10, spanning 0.43 to 0.99
-# against CAL3's 0.87, so the carry is a property of the MODEL and not of the lanes: v19 carries more holdout gain than v20 and
-# less board gain, which is an ORDER inversion, not a scale error. `docs/CEIL.md` carries the finding.
-PAIRS = (("v15/v16, MC2 against SB3 (H52/H53a)", 232.1502 - 230.0951, 298.0671 - 296.2745),
-         ("v17/v18, SB3+RC1 against SB3+NN3 (S8)", 230.1585 - 228.0256, 296.2490 - 294.9917),
-         ("v17/v19, SB3+RC1 against SB3+NN2 (S9)", 230.1585 - 228.41, 296.2490 - 295.5028),
-         ("v17/v20, SB3+RC1 against SB3+LT2 (S10)", 230.1585 - 229.20, 296.2490 - 295.2957))
-CAL3 = PAIRS[0][1:]
+
+
+class Pair(NamedTuple):
+    """One CONTROLLED lane-A pair: two scored files whose lane B is byte-identical, so the board delta is lane A alone."""
+
+    label: str
+    parent: str
+    child: str
+    base: str  # the lane `parent` ships on lane A, named as `taxi.ms1.lanes` names it
+    chal: str
+    hold: float  # holdout lane-A seconds, measured off the cached per-row vectors and quoted from `docs/MS1.md`
+
+    @property
+    def board(self) -> float:
+        return SCORED[self.parent][1] - SCORED[self.child][1]
+
+    @property
+    def carry(self) -> float:
+        return self.board / self.hold
+
+
+# Both halves used to be typed. The v17/v20 row read 0.9585 because its 229.20 was never measured anywhere: it was SB3's
+# 230.0951 minus the one-decimal "+0.9 s" `docs/LT2.md` published, and the measured blend is 229.1635. Board deltas are now
+# COMPUTED off SCORED and holdout gains quoted from `docs/MS1.md`, which reads them off the vectors; the test greps that table.
+PAIRS = (Pair("v15/v16, MC2 to SB3", "v15", "v16", "MC2", "SB3", 2.0551),
+         Pair("v17/v18, SB3+RC1 to SB3+NN3", "v17", "v18", "SB3+RC1", "SB3+NN3", 2.1328),
+         Pair("v17/v19, SB3+RC1 to SB3+NN2", "v17", "v19", "SB3+RC1", "SB3+NN2", 1.7437),
+         Pair("v17/v20, SB3+RC1 to SB3+LT2", "v17", "v20", "SB3+RC1", "SB3+LT2", 0.9949))
+BY_CHILD = {p.child: p for p in PAIRS}
+CAL3 = PAIRS[0]  # the first controlled pair, and the one PER_A is still measured off
 
 
 def line() -> tuple[float, float]:
@@ -46,7 +69,7 @@ def per_lane() -> tuple[float, float]:
     """
     _, b = line()
     n, comp = sum(LANE_N), SCORED["v16"][0]
-    return CAL3[1] / CAL3[0], b * LANE_N[1] * LANE_RMSE[1] / (n * comp)
+    return CAL3.carry, b * LANE_N[1] * LANE_RMSE[1] / (n * comp)
 
 
 V16 = SCORED["v16"][1]  # MEASURED, not projected: the bucket's merry-octopus_v16.parquet_result.json
@@ -132,10 +155,11 @@ def main(out: str = "docs/CEIL.md") -> None:
            f"{len(PAIRS)} CONTROLLED lane-A pairs have now been scored: two files whose lane B is byte-identical, so the board "
            f"delta is lane A alone and both ends are exact arithmetic on fixed rows, with no measurement noise in the ratio.", "",
            "| pair | holdout s of lane A | board s | implied rate |", "|---|---|---|---|",
-           *[f"| {n} | {h:.4f} | {b:.4f} | {b / h:.4f} |" for n, h, b in PAIRS], "",
-           f"The rate spans {min(b / h for _, h, b in PAIRS):.2f} to {max(b / h for _, h, b in PAIRS):.2f}, and the three files "
-           f"uploaded on 2026-09-10 are the sharp version of what that means. v19 beats v20 on the holdout by 0.79 s of lane A, "
-           f"228.41 against 229.20, and LOSES to it on the board by 0.21 s, {V19:.4f} against {SCORED['v20'][1]:.4f}. That is an "
+           *[f"| {p.label} | {p.hold:.4f} | {p.board:.4f} | {p.carry:.4f} |" for p in PAIRS], "",
+           f"The rate spans {min(p.carry for p in PAIRS):.2f} to {max(p.carry for p in PAIRS):.2f}, and the three files "
+           f"uploaded on 2026-09-10 are the sharp version of what that means. v19 beats v20 on the holdout by "
+           f"{BY_CHILD['v19'].hold - BY_CHILD['v20'].hold:.2f} s of lane A and LOSES to it on the board by "
+           f"{V19 - SCORED['v20'][1]:.2f} s, {V19:.4f} against {SCORED['v20'][1]:.4f}. That is an "
            f"ORDER inversion, not a scale error, and no single rate can produce it: a rate rescales differences, it cannot "
            f"reverse their sign. So a projection of the form board = V17 - gain x PER_A is not merely imprecise for a model it "
            f"has not seen, it can rank two models the wrong way round, which is the one job this page is asked to do.", "",
@@ -143,10 +167,15 @@ def main(out: str = "docs/CEIL.md") -> None:
            f"decide which model to build or upload. Two measured rows say why. The searched net projected "
            f"{V16 - 2.07 * PER_A:.2f} and scored {V18:.4f}. Its own sibling NN2 projected 295.46 and scored {V19:.4f}, close on "
            f"the point and wrong on the rank.", "",
-           "The cause is not identified. The holdout is Jan + Jul 2025 and the ranking set is a different, unseen period, so a "
-           "model whose lane-A gain concentrates in the months the holdout happens to hold carries less of it forward than one "
-           "whose gain is flat across the year. That is a hypothesis and the campaign has no measurement of it: testing it needs "
-           "each model's holdout gain split by month, which is arithmetic on caches already on disk and is not yet done.", "",
+           f"The cause is PARTLY identified and `docs/MS1.md` holds the measurement. Splitting each pair's holdout gain by "
+           f"month ranks the {len(PAIRS)} controlled pairs perfectly: the lane that put the least of its gain in January, 11%, "
+           f"kept the least on the board, {min(p.carry for p in PAIRS):.2f}, and the lane that put the most in January, 43%, "
+           f"kept {max(p.carry for p in PAIRS):.2f}, with no exception across all four (rank correlation +1.00, exact "
+           f"permutation p = 0.042). The magnitudes do not follow: two lanes that split at 35% and 33% carried at "
+           f"{BY_CHILD['v16'].carry:.2f} and {BY_CHILD['v18'].carry:.2f}. So month share is a proxy for the mechanism and not "
+           f"the mechanism, and four points against a hypothesis written after the inversion was seen is a tie-break rule, not "
+           f"a model. It is enough to prefer a candidate whose gain spreads across the holdout year over one that concentrates "
+           f"it in July.", "",
            "## Every measured gain, applied in order", "",
            "| tier | gain | lane | holdout s | board s | board after | rank | source |",
            "|---|---|---|---|---|---|---|---|", *rows, "",
@@ -170,7 +199,7 @@ def main(out: str = "docs/CEIL.md") -> None:
            "selection advantage is about 0.48 s, not the 1.0 s the bound assumed. The holdout never took part in choosing the "
            "cell at all, so the +2.07 needed no such correction in the first place. `docs/SW1.md` closes the other "
            "multiplicity, the campaign meeting one holdout 60 times: the lane survives Romano-Wolf step-down at 5% "
-           "family-wise error over the seven cached lanes.", "",
+           "family-wise error over the eight cached lanes.", "",
            "So every objection this campaign has instrumented is now answered, and `taxi.verdict` passes the lane on its own "
            "rule: +2.07 s against a 2 s floor with a lower bound of +1.1 s. Say the caveat as loudly as the result. The "
            "margin is 0.07 s, the floor sits INSIDE the interval [+1.1, +2.9], so these rows cannot rule out a true gain "
