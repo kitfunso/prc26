@@ -1,44 +1,44 @@
 # CEIL: the best board score still reachable, and where it ranks
 
-Regenerate with `python -m taxi.ceil`. Arithmetic only: no fit, no cell declared, no verdict. Leaderboard snapshot `data/board.json` read 2026-09-08 22:14 UTC, 473 submissions across 79 scored teams. We are rank 21 at 296.2490 on 8 submissions; the leader is 248.4818. Our candidate file v16 was uploaded and scored: **296.2745**, rank **22**, 47.79 s behind the lead. That is a MEASURED number, so nothing on this page rests on a projection band any more. It also killed the old one: v16 was projected at 286.12 across a 281.4 to 288.0 family and scored 296.2745, above the whole band, because every board number in this repo was fitted from the single S1 anchor. 4 scored anchors now fix the line, board = 86.2452 + 0.654835 x holdout composite, and the per-lane rates below are differentiated from it at v16 instead of assumed: one holdout second of lane A is 0.8723 s of board, one of lane B is 0.0575 s. The campaign assumed 0.633 and 0.0776, so every gain priced before today was overstated by about 27%.
+Regenerate with `python -m taxi.ceil`. Arithmetic only: no fit, no cell declared, no verdict. Leaderboard snapshot `data/board.json` read 2026-09-10 00:30 UTC, 640 submissions across 94 scored teams. We are rank 27 at 296.2490 on 8 submissions; the leader is 245.2901. Our candidate file v16 was uploaded and scored: **296.2745**, rank **28**, 50.98 s behind the lead. That is a MEASURED number, so nothing on this page rests on a projection band any more. It also killed the old one: v16 was projected at 286.12 across a 281.4 to 288.0 family and scored 296.2745, above the whole band, because every board number in this repo was fitted from the single S1 anchor. 4 scored anchors now fix the line, board = 86.2452 + 0.654835 x holdout composite, and the per-lane rates below are differentiated from it at v16 instead of assumed: one holdout second of lane A is 0.8723 s of board, one of lane B is 0.0575 s. The campaign assumed 0.633 and 0.0776, so every gain priced before today was overstated by about 27%.
 
 ## Every measured gain, applied in order
 
 | tier | gain | lane | holdout s | board s | board after | rank | source |
 |---|---|---|---|---|---|---|---|
-| built | the searched net blended onto SB3 at its out-of-fold weight | A | 2.07 | 1.81 | 294.47 | 19 | `docs/SW1.md` |
-| reachable | stand and runway geometry, the share that survives the calendar | A | 0.60 | 0.52 | 293.95 | 19 | `docs/GEO.md` |
-| reachable | a better fit over the 49 columns already read | A | 0.10 | 0.09 | 293.86 | 19 | `docs/EXH.md` |
-| oracle | every other cached lane-A model stacked on top of that blend | A | 0.14 | 0.12 | 293.74 | 19 | `docs/BF.md` |
-| oracle | perfect copy membership at the nine untouched airports | B | 25.40 | 1.46 | 292.28 | 17 | `docs/LBC.md` |
+| built | the searched net blended onto SB3 at its out-of-fold weight | A | 2.07 | 1.81 | 294.47 | 26 | `docs/SW1.md` |
+| reachable | stand and runway geometry, the share that survives the calendar | A | 0.60 | 0.52 | 293.95 | 26 | `docs/GEO.md` |
+| reachable | a better fit over the 49 columns already read | A | 0.10 | 0.09 | 293.86 | 26 | `docs/EXH.md` |
+| oracle | every other cached lane-A model stacked on top of that blend | A | 0.14 | 0.12 | 293.74 | 26 | `docs/BF.md` |
+| oracle | perfect copy membership at the nine untouched airports | B | 25.40 | 1.46 | 292.28 | 25 | `docs/LBC.md` |
 | oracle | a perfect call on the six day-shifted rows | B | 510.70 | 29.38 | 262.90 | 3 | `docs/DE.md` |
 
 ## What each tier buys
 
 | tier | board s | board after | rank | clears the lead |
 |---|---|---|---|---|
-| built (run, measured on the untouched holdout, and held back only by the promotion floor) | 1.81 | 294.47 | 19 | no |
-| reachable (measured headroom with a route, none of it yet run) | 2.41 | 293.86 | 19 | no |
+| built (run, measured on the untouched holdout, and held back only by the promotion floor) | 1.81 | 294.47 | 26 | no |
+| reachable (measured headroom with a route, none of it yet run) | 2.41 | 293.86 | 26 | no |
 | oracle (ceilings with the answers in hand, no route to any of them) | 33.37 | 262.90 | 3 | no |
 
 ## The board around us
 
 | rank | team | score | submissions |
 |---|---|---|---|
-| 12 | vibrant-tornado | 284.8509 | 3 |
-| 13 | dynamic-hamburger | 285.3884 | 9 |
-| 14 | intelligent-ladder | 285.6822 | 10 |
-| 15 | dependable-quicksand | 288.2147 | 12 |
-| 16 | zestful-fountain | 291.4829 | 4 |
-| 17 | lighthearted-ladder | 292.6878 | 3 |
-| 18 | resourceful-horse | 293.2086 | 16 |
-| 19 | hardworking-kiwi | 294.5583 | 3 |
-| 20 | playful-village | 294.7626 | 7 |
-| 21 | merry-octopus | 296.2490 | 8 |
-| 22 | resilient-kiwi | 296.4736 | 6 |
-| 23 | natural-kiwi | 298.8203 | 2 |
-| 24 | victorious-quartz | 298.9287 | 7 |
-| 25 | courageous-yarn | 300.1855 | 2 |
+| 16 | vibrant-tornado | 284.8509 | 3 |
+| 17 | dynamic-hamburger | 285.2168 | 12 |
+| 18 | intelligent-ladder | 285.6822 | 11 |
+| 19 | dependable-quicksand | 288.2147 | 13 |
+| 20 | victorious-quartz | 289.4683 | 16 |
+| 21 | merry-quicksand | 289.6732 | 4 |
+| 22 | zestful-fountain | 290.0659 | 5 |
+| 23 | playful-village | 291.0141 | 10 |
+| 24 | delightful-ostrich | 291.5834 | 10 |
+| 25 | lighthearted-ladder | 292.6878 | 3 |
+| 26 | hardworking-kiwi | 294.5583 | 3 |
+| 27 | merry-octopus | 296.2490 | 8 |
+| 28 | resilient-kiwi | 296.4736 | 6 |
+| 29 | natural-kiwi | 298.7900 | 3 |
 
 ## Measured, real, and closed on the rules
 
@@ -50,12 +50,12 @@ v16 runs 208.6 s low on the average 2026 lane-B row, but that level was measured
 
 ## Reading
 
-The first row is not headroom. It is a file that could be written today: SB3 with NN3 blended in at the weight fitted out of fold takes v16 from 296.27 to 294.47, 1.81 s of board and rank 22 to 19. State the blocker exactly, because the campaign has stated it loosely: at +2.07 s the lane CLEARS the 2 s floor. It is held by the k = 40 optimism bound that `docs/NN3.md` adds on top, for a hurdle of 3.0 s.
+The first row is not headroom. It is a file that could be written today: SB3 with NN3 blended in at the weight fitted out of fold takes v16 from 296.27 to 294.47, 1.81 s of board and rank 28 to 26. State the blocker exactly, because the campaign has stated it loosely: at +2.07 s the lane CLEARS the 2 s floor. It is held by the k = 40 optimism bound that `docs/NN3.md` adds on top, for a hurdle of 3.0 s.
 
 That bound is now retired, by measurement rather than by argument. `docs/NC1.md` took NN3's winning cell as a FIXED k = 1 spec and read it on months 4, 5, 9 and 10, which `taxi.nn3.score` never ranked a cell on: against one base the blend gains +3.80 s on the months that chose the cell and +3.32 s on the months that did not, so the selection advantage is about 0.48 s, not the 1.0 s the bound assumed. The holdout never took part in choosing the cell at all, so the +2.07 needed no such correction in the first place. `docs/SW1.md` closes the other multiplicity, the campaign meeting one holdout 60 times: the lane survives Romano-Wolf step-down at 5% family-wise error over the seven cached lanes.
 
 So every objection this campaign has instrumented is now answered, and `taxi.verdict` passes the lane on its own rule: +2.07 s against a 2 s floor with a lower bound of +1.1 s. Say the caveat as loudly as the result. The margin is 0.07 s, the floor sits INSIDE the interval [+1.1, +2.9], so these rows cannot rule out a true gain below the floor, and the 1.81 s of board above is a projection off the measured per-lane rate, not a scored file. This is a Stage 6 promotion decision and it is Keith's alone. Nothing here builds a file or uploads one.
 
-Spending the reachable rows on top of it reaches 293.86, rank 19; every oracle as well reaches 262.90, and that column includes two that a real model has already been built for and lost. The lead is 47.79 s away, so first place is inside the oracle column and outside every route this campaign has found. `docs/BL.md` section 5 states it from the other end: first place on lane A alone needs holdout lane A at 175.3 s against SB3's 230.10, a gain of 54.8 s, against 2.91 s of lane-A seconds on this whole page.
+Spending the reachable rows on top of it reaches 293.86, rank 26; every oracle as well reaches 262.90, and that column includes two that a real model has already been built for and lost. The lead is 50.98 s away, so first place is inside the oracle column and outside every route this campaign has found. `docs/BL.md` section 5 states it from the other end: first place on lane A alone needs holdout lane A at 171.6 s against SB3's 230.10, a gain of 58.5 s, against 2.91 s of lane-A seconds on this whole page.
 
-The honest reading is unchanged in direction and smaller in size than it was. The remaining distance is not in the tuning and not in the features: `docs/COVERAGE.md` records that lane A's target is `AOBT_3_flt - BLOCK_TIME`, two clocks disagreeing rather than taxi physics, which is why GEO and EXH both cap under a second. Closing a 48 s gap needs a different reading of the target, not a better fit to this one.
+The honest reading is unchanged in direction and smaller in size than it was. The remaining distance is not in the tuning and not in the features: `docs/COVERAGE.md` records that lane A's target is `AOBT_3_flt - BLOCK_TIME`, two clocks disagreeing rather than taxi physics, which is why GEO and EXH both cap under a second. Closing a 51 s gap needs a different reading of the target, not a better fit to this one.

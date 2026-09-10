@@ -68,8 +68,8 @@ OUTSIDE: tuple[Row, ...] = (
     Row("generalised additive (spline basis, penalised)", (),
         "RC1's `knots` arms ARE an additive spline fit under an L2 penalty", "TRIED inside RC1"),
     Row("prior-fitted transformer", (), "M3 and TP2 lane A, LP1 lane B", "TRIED (H12, H55)"),
-    Row("piecewise-linear trees", (), "FAM2-lt, LightGBM `linear_tree`; LT2 tunes its cell",
-        "TRIED (FAM2, H62): the only arm to pass its screen, and it lost the holdout"),
+    Row("piecewise-linear trees", (), "FAM2-lt one fixed cell, then LT2's cell searched over 40 TPE trials",
+        "TRIED (FAM2 H62, LT2 H64): cleared both screens, lost the holdout at +0.9 s against a 2 s floor"),
     Row("explainable boosting (GA2M)", (), "", "EMPTY: `interpret` is not installed on this box"),
 )
 

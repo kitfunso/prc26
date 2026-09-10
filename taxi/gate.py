@@ -28,7 +28,7 @@ FACTS: tuple[tuple[str, str, str], ...] = (
     ("search", "docs/NC1.md", "| search months (weight fitted here, NOT a verdict) | 1,000,485 | 215.54 | 211.74 | +3.80 |"),
     ("nc1_ci", "docs/NC1.md", "**+3.32 s** [+2.87, +3.82], against a 2 s floor and a 0.0 s optimism bound"),
     ("rw", "docs/SW1.md", "Survives step-down: SB3+NN3, SB3+NN2."),
-    ("nh", "docs/TRIAL-LEDGER.md", "N_h (holdout verdicts) = 63"),
+    ("nh", "docs/TRIAL-LEDGER.md", "N_h (holdout verdicts) = 64"),
     ("level", "docs/PB.md", "on v17 at its MEASURED 296.25 board result (`taxi.ceil`) it is 1.26 s"),
     ("ceil_row", "docs/CEIL.md", "| built | the searched net blended onto SB3 at its out-of-fold weight | A | 2.07 |"),
     ("target", "docs/MONO.md", "**Physics is backwards on the target.**"),
