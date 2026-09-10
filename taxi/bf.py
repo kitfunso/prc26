@@ -1,19 +1,24 @@
 """BF: the blend frontier for lane A. Diagnostic, never a verdict (protocol section 2): what a partner model must be to move SB3 by the floor."""
 from __future__ import annotations
 
-import os
 from itertools import combinations
 
 import numpy as np
-import pandas as pd
 
 from taxi.champ import champion_holdout, lane_a
 from taxi.l2 import floored
 from taxi.sb3 import predict as sb3_predict
+from taxi.sw1 import on_disk, raw
 from taxi.verdict import rmse
 
 FLOOR = 2.0
 LEVELS = (230, 240, 250, 265, 280, 300)
+
+# Partners come from `taxi.sw1.LANES`, so a vector written for any other page enters this table on the next run. They used to be
+# typed here, and on 2026-09-10 that list still read MC2, D1, M3 and NN2 while NN3, LT2 and RC1 were already cached.
+NOTE = {"D1": "LightGBM, a different library", "M3": "TabPFN per airport, a different architecture",
+        "W1-A": "the weather champion, MC2's family on 49 columns plus METAR", "SB3+RC1": "ridge on the same columns",
+        "SB3+NN2": "a bagged neural net", "SB3+NN3": "the searched neural net", "SB3+LT2": "LightGBM linear_tree"}
 
 
 def agreement(e0: np.ndarray, ex: np.ndarray) -> float:
@@ -56,14 +61,11 @@ def needed_rho(r0: float, rx: float, gain: float = FLOOR) -> float:
 def main() -> None:
     tra, tea = lane_a()
     y = tea.y.values
-    cached = lambda p: floored(pd.read_parquet(p).set_index("id").pred.reindex(tea.id.values).values)  # noqa: E731
     e0 = sb3_predict(tra, tea) - y
     r0 = rmse(e0)
-    partners = [("MC2, CatBoost, the champion's own family", floored(champion_holdout("MC2", tra, tea))),
-                ("D1, LightGBM, a different library", cached("data/cache/d1_holdout.parquet")),
-                ("M3, TabPFN per airport, a different architecture", cached("data/cache/m3_holdout.parquet"))]
-    if os.path.exists("data/cache/nn2_holdout.parquet"):
-        partners.append(("NN2, a bagged neural net", cached("data/cache/nn2_holdout.parquet")))
+    partners = [(f"{n.removeprefix('SB3+')}, {NOTE.get(n, 'a cached lane-A model')}", raw(n, tea.id.values))
+                for n in on_disk() if n != "MC2"]
+    partners.insert(0, ("MC2, CatBoost, the champion's own family", floored(champion_holdout("MC2", tra, tea))))
     rows, gains, rhos = [], [], []
     for name, p in partners:
         w, b, rho = best_blend(e0, p - y)
@@ -108,13 +110,9 @@ def main() -> None:
            f"The best of the {len(srows)} subsets is **{full[0]}** at {full[1]:.2f} s, {full[2]:+.2f} s against a {FLOOR:.0f} s floor. "
            f"The best single partner buys {max(gains):+.2f} s, so putting every cached model in one stack adds "
            f"{full[2] - max(gains):+.2f} s on top of the best pair.", "",
-           ("Every lane-A model whose holdout predictions are on disk is in the table. NN1 is NOT: it reached the largest pairwise "
-            "gain of the campaign (+1.40 s at agreement 0.9169) and its predictions were never written to a file, so the bound "
-            "below is measured without the one partner that came closest. NN2 caches both of its vectors and enters this table "
-            "automatically on the next run."
-            if not os.path.exists("data/cache/nn2_holdout.parquet") else
-            "Every lane-A model whose holdout predictions are on disk is in the table, NN2 included. NN1 is not: it was superseded "
-            "by NN2 and its own predictions were never written to a file."), "",
+           ("The table holds every lane-A model whose holdout predictions are on disk, read from `taxi.sw1.LANES`: "
+            + ", ".join(n.removeprefix("SB3+") for n in on_disk()) + ". NN1 is not among them: it was superseded by NN2 and its "
+            "own predictions were never written to a file."), "",
            (f"The bound clears the {FLOOR:.0f} s floor, so a stack chosen out of fold is worth declaring as its own lane; the "
             f"declared version has to give back whatever the oracle weights are worth."
             if full[2] >= FLOOR else

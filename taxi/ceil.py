@@ -93,8 +93,8 @@ ITEMS = [
     ("reachable", "a better fit over the 49 columns already read", "A", 0.10, "docs/EXH.md",
      "worth about 0.10 s of lane A",
      "what an exhaustive search of the existing feature set could still find"),
-    ("oracle", "every other cached lane-A model stacked on top of that blend", "A", 0.14, "docs/BF.md",
-     "adds +0.14 s on top of the best pair",
+    ("oracle", "every other cached lane-A model stacked on top of that blend", "A", 0.59, "docs/BF.md",
+     "adds +0.59 s on top of the best pair",
      "BF's own increment over the best pair, so the net above is counted once; the stack weights are read off the holdout's "
      "own answers, so no out-of-fold stack reaches even this"),
     ("oracle", "perfect copy membership at the nine untouched airports", "B", 25.4, "docs/LBC.md",

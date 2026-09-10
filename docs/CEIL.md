@@ -26,9 +26,9 @@ The cause is PARTLY identified and `docs/MS1.md` holds the measurement. Splittin
 | built | the searched net blended onto SB3 at its out-of-fold weight | A | 2.07 | 1.81 | 294.47 | 29 | `docs/SW1.md` |
 | reachable | stand and runway geometry, the share that survives the calendar | A | 0.60 | 0.52 | 293.95 | 29 | `docs/GEO.md` |
 | reachable | a better fit over the 49 columns already read | A | 0.10 | 0.09 | 293.86 | 29 | `docs/EXH.md` |
-| oracle | every other cached lane-A model stacked on top of that blend | A | 0.14 | 0.12 | 293.74 | 29 | `docs/BF.md` |
-| oracle | perfect copy membership at the nine untouched airports | B | 25.40 | 1.48 | 292.26 | 26 | `docs/LBC.md` |
-| oracle | a perfect call on the six day-shifted rows | B | 510.70 | 29.69 | 262.58 | 3 | `docs/DE.md` |
+| oracle | every other cached lane-A model stacked on top of that blend | A | 0.59 | 0.51 | 293.35 | 29 | `docs/BF.md` |
+| oracle | perfect copy membership at the nine untouched airports | B | 25.40 | 1.48 | 291.87 | 26 | `docs/LBC.md` |
+| oracle | a perfect call on the six day-shifted rows | B | 510.70 | 29.69 | 262.18 | 3 | `docs/DE.md` |
 
 ## What each tier buys
 
@@ -36,7 +36,7 @@ The cause is PARTLY identified and `docs/MS1.md` holds the measurement. Splittin
 |---|---|---|---|---|
 | built (run, measured on the untouched holdout, and held back only by the promotion floor) | 1.81 | 294.47 | 29 | no |
 | reachable (measured headroom with a route, none of it yet run) | 2.41 | 293.86 | 29 | no |
-| oracle (ceilings with the answers in hand, no route to any of them) | 33.70 | 262.58 | 3 | no |
+| oracle (ceilings with the answers in hand, no route to any of them) | 34.09 | 262.18 | 3 | no |
 
 ## The board around us
 
@@ -73,6 +73,6 @@ That bound is now retired, by measurement rather than by argument. `docs/NC1.md`
 
 So every objection this campaign has instrumented is now answered, and `taxi.verdict` passes the lane on its own rule: +2.07 s against a 2 s floor with a lower bound of +1.1 s. Say the caveat as loudly as the result. The margin is 0.07 s, the floor sits INSIDE the interval [+1.1, +2.9], so these rows cannot rule out a true gain below the floor, and the 1.81 s of board above is a projection off the measured per-lane rate, not a scored file. This is a Stage 6 promotion decision and it is Keith's alone. Nothing here builds a file or uploads one.
 
-Spending the reachable rows on top of it reaches 293.86, rank 29; every oracle as well reaches 262.58, and that column includes two that a real model has already been built for and lost. The lead is 51.18 s away, so first place is inside the oracle column and outside every route this campaign has found. `docs/BL.md` section 5 states it from the other end: first place on lane A alone needs holdout lane A at 171.4 s against SB3's 230.10, a gain of 58.7 s, against 2.91 s of lane-A seconds on this whole page.
+Spending the reachable rows on top of it reaches 293.86, rank 29; every oracle as well reaches 262.18, and that column includes two that a real model has already been built for and lost. The lead is 51.18 s away, so first place is inside the oracle column and outside every route this campaign has found. `docs/BL.md` section 5 states it from the other end: first place on lane A alone needs holdout lane A at 171.4 s against SB3's 230.10, a gain of 58.7 s, against 3.36 s of lane-A seconds on this whole page.
 
 The honest reading is unchanged in direction and smaller in size than it was. The remaining distance is not in the tuning and not in the features: `docs/COVERAGE.md` records that lane A's target is `AOBT_3_flt - BLOCK_TIME`, two clocks disagreeing rather than taxi physics, which is why GEO and EXH both cap under a second. Closing a 51 s gap needs a different reading of the target, not a better fit to this one.

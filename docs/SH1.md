@@ -2,7 +2,7 @@
 
 Diagnostic, never a verdict, no cell chosen. Regenerate with `python -m taxi.sh1`. Declared in protocol section 4 before the code was written. Stage 5.3 of the protocol asks that a spec be nominated on early rows and judged on untouched late rows, with the haircut reported as its own number, and this campaign had never run it: the whole repo returned zero matches for "selection-honest". The development holdout is two whole months, so the split needs no new fit. Nomination reads ONE month and picks the `argmin` of its RMSE; the judged number is that model's RMSE on the other month, which the nomination never saw. The as-run column is the champion this campaign actually promoted while reading both months, scored on the same judged rows. A positive haircut means the campaign's reported numbers are optimistic by that much.
 
-## Lane A: 7 models, 339,046 holdout rows, promoted champion SB3
+## Lane A: 10 models, 339,046 holdout rows, promoted champion SB3+NN3
 
 | model | January RMSE | July RMSE | both months |
 |---|---|---|---|
@@ -11,16 +11,19 @@ Diagnostic, never a verdict, no cell chosen. Regenerate with `python -m taxi.sh1
 | D1 | 216.38 | 259.93 | 241.35 |
 | M3 | 240.99 | 281.83 | 264.27 |
 | W1-A | 221.04 | 272.83 | 250.90 |
-| SB1 | 205.24 | 250.33 | 231.17 |
+| SB3+RC1 | 204.40 | 249.20 | 230.16 |
 | SB3+NN2 | 203.94 | 246.58 | 228.41 |
+| SB3+NN3 | 202.62 | 246.81 | 228.03 |
+| SB3+LT2 | 203.34 | 248.24 | 229.16 |
+| SB1 | 205.24 | 250.33 | 231.17 |
 
 | direction | nominated on one month alone | its RMSE on the judged month | promoted while reading both | its RMSE on the same rows | haircut |
 |---|---|---|---|---|---|
-| nominate on January, judge on July | SB3+NN2 | 246.58 | SB3 | 249.11 | -2.53 |
-| nominate on July, judge on January | SB3+NN2 | 203.94 | SB3 | 204.37 | -0.43 |
+| nominate on January, judge on July | SB3+NN3 | 246.81 | SB3+NN3 | 246.81 | +0.00 |
+| nominate on July, judge on January | SB3+NN2 | 203.94 | SB3+NN3 | 202.62 | +1.32 |
 
-- January nominates **SB3+NN2**, NOT the promoted SB3; on July that costs -2.53 s against the promoted champion.
-- July nominates **SB3+NN2**, NOT the promoted SB3; on January that costs -0.43 s against the promoted champion.
+- January nominates **SB3+NN3**; on July that costs +0.00 s against the promoted champion.
+- July nominates **SB3+NN2**, NOT the promoted SB3+NN3; on January that costs +1.32 s against the promoted champion.
 
 ## Lane B: 8 models, 5,373 holdout rows, promoted champion L8c
 

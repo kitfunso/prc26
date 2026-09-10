@@ -18,7 +18,7 @@ OUT = "docs/gate-s5.html"
 STYLE = "docs/gate-s4.html"  # the house style block, read at generate time so the gate pages cannot drift apart
 GAIN_A = 2.07  # the holdout lane-A seconds this lane would ship at, quoted from `docs/SW1.md` and pinned below
 N_H = 64  # holdout verdicts. The FACTS pin below greps the ledger for this exact number, so the prose cannot drift from it.
-FAM = 8  # lanes in the Romano-Wolf family, pinned to SW1's own header: SB3+LT2 joined on 2026-09-10 and this read 7
+FAM = 9  # lanes in the Romano-Wolf family, pinned to SW1's own header: SB3+RC1 joined on 2026-09-10 when `taxi.sw1` stopped retyping the catalogue
 
 # (key, source, verbatim quote the source must still contain). `tests/test_gate_sources.py` greps every one.
 FACTS: tuple[tuple[str, str, str], ...] = (

@@ -10,7 +10,6 @@ is what decomposes additively across months, so the split is read on SSE and the
 from __future__ import annotations
 
 import itertools
-import os
 
 import numpy as np
 import pandas as pd
@@ -19,24 +18,15 @@ from taxi.ceil import PAIRS
 from taxi.champ import lane_a
 from taxi.l2 import floored
 from taxi.sb3 import predict as sb3_predict
-from taxi.sw1 import NN2_W, NN3_W, cached
+from taxi.sw1 import lane, on_disk
 from taxi.verdict import rmse
-
-RC1_W, LT2_W = 0.013593, 0.5307  # the shipped out-of-fold weights, from ledger S7 and `docs/LT2.md`; never re-fitted here
 
 
 def lanes(tra: pd.DataFrame, tea: pd.DataFrame) -> dict[str, np.ndarray]:
-    """Every lane a declared pair needs, built from cached vectors alone. A lane whose cache is absent is simply not returned."""
+    """Every lane a declared pair needs, from `taxi.sw1.LANES` and cached vectors alone. An absent cache is not returned, and
+    `main` then reports the pair as missing rather than filling it in."""
     ids, sb3 = tea.id.values, floored(sb3_predict(tra, tea))
-    out = {"SB3": sb3}
-    for name, key, w in (("MC2", "mc2_holdout", None), ("SB3+RC1", "rc1_holdout", RC1_W),
-                         ("SB3+NN2", "nn2_holdout", NN2_W), ("SB3+NN3", "nn3_holdout", NN3_W),
-                         ("SB3+LT2", "lt2_holdout", LT2_W)):
-        if not os.path.exists(f"data/cache/{key}.parquet"):
-            continue
-        v = floored(cached(key, ids))
-        out[name] = v if w is None else floored(w * v + (1 - w) * sb3)
-    return out
+    return {"SB3": sb3} | {n: lane(n, ids, sb3) for n in on_disk()}
 
 
 def spearman(a: list[float], b: list[float]) -> tuple[float, float]:

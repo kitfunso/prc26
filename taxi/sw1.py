@@ -27,24 +27,38 @@ def cached(name: str, ids: np.ndarray) -> np.ndarray:
     return pd.DataFrame({"id": ids}).merge(d[["id", "pred"]], on="id", how="left").pred.values
 
 
-# (lane, cache key, blend weight on that lane against SB3, or None to take the cached vector as a level). Read from DISK, not
-# typed: this page's own text calls the family "the lanes whose vectors are cached", and a hand-listed family drifts the moment
-# a vector is written. LT2's arrived on 2026-09-10 for `taxi.ms1` and would have been silently absent here.
-MEMBERS = (("MC2", "mc2_holdout", None), ("D1", "d1_holdout", None), ("M3", "m3_holdout", None),
-           ("W1-A", "w1a_holdout", None), ("SB3+NN2", "nn2_holdout", NN2_W), ("SB3+NN3", "nn3_holdout", NN3_W),
-           ("SB3+LT2", "lt2_holdout", LT2_W))
+RC1_W = 0.013593  # SB3+RC1's, from ledger S7; the weight the v17 file shipped at
+
+# THE catalogue of cached lane-A holdout vectors: lane name -> (cache key, blend weight against SB3, or None when the cached
+# vector is already a level). `taxi.bf` and `taxi.ms1` read it too. It was typed in all three until 2026-09-10, and BF's copy
+# was the one nobody updated: NN3 and LT2 were absent from the stack bound `docs/CEIL.md` quotes.
+LANES = {"MC2": ("mc2_holdout", None), "D1": ("d1_holdout", None), "M3": ("m3_holdout", None),
+         "W1-A": ("w1a_holdout", None), "SB3+RC1": ("rc1_holdout", RC1_W), "SB3+NN2": ("nn2_holdout", NN2_W),
+         "SB3+NN3": ("nn3_holdout", NN3_W), "SB3+LT2": ("lt2_holdout", LT2_W)}
+
+
+def on_disk(names: tuple[str, ...] = ()) -> tuple[str, ...]:
+    """The catalogue entries whose vector is actually written, in registry order. Empty `names` means every entry."""
+    want = names or tuple(LANES)
+    return tuple(n for n in want if os.path.exists(f"data/cache/{LANES[n][0]}.parquet"))
+
+
+def raw(name: str, ids: np.ndarray) -> np.ndarray:
+    """The cached vector as written: for a blend lane that is the PARTNER alone, which is what `taxi.bf` blends itself."""
+    return floored(cached(LANES[name][0], ids))
+
+
+def lane(name: str, ids: np.ndarray, sb3: np.ndarray) -> np.ndarray:
+    """The lane as its own verdict read it: the cached level, or the partner blended onto SB3 at the weight that shipped."""
+    v, w = raw(name, ids), LANES[name][1]
+    return v if w is None else floored(w * v + (1 - w) * sb3)
 
 
 def family(tea: pd.DataFrame, sb3: np.ndarray) -> dict[str, np.ndarray]:
     """The cached lane-A challengers, each floored the way its own verdict floored it. Absent caches are skipped, and a
     bigger family only makes step-down STRICTER, so a lane arriving here can never manufacture a survivor."""
     ids = tea.id.values
-    out = {}
-    for name, key, w in MEMBERS:
-        if not os.path.exists(f"data/cache/{key}.parquet"):
-            continue
-        v = floored(cached(key, ids))
-        out[name] = v if w is None else floored(w * v + (1 - w) * sb3)
+    out = {n: lane(n, ids, sb3) for n in on_disk()}
     if all(os.path.exists(f"data/cache/sb1_seed{i}_holdout.parquet") for i in (1, 2, 3, 4)):
         seeds = [cached("mc2_holdout", ids)] + [cached(f"sb1_seed{i}_holdout", ids) for i in (1, 2, 3, 4)]
         out["SB1"] = floored(np.mean(seeds, axis=0))
