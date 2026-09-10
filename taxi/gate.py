@@ -94,9 +94,11 @@ COVERAGE: tuple[tuple[str, str], ...] = (
                     "three that stood thin, and FAM2's eight arms are now measured rather than declared: seven closed at "
                     "their cell and one, the piecewise-linear tree, passed its screen and then lost the holdout (H62). "
                     + REGISTER +
-                    " Isotonic / monotone stands empty on a measurement, not an omission: <code>docs/MONO.md</code> "
-                    "found the physics sign REVERSES between the level and the target, so a constraint taken from "
-                    "domain knowledge would be imposed backwards."),
+                    " Isotonic / monotone is closed by a fitted model, not by the argument that stood here before: "
+                    "<code>docs/MONO.md</code> found the physics sign REVERSES between the level and the target, and "
+                    "<code>docs/MO1.md</code> then imposed the MEASURED sign, read off each fold's own training rows, on "
+                    "M1's lane-A cell with the same cell fitted free beside it. The constraint cost +0.55 s out of fold, "
+                    "221.16 free against 221.71 constrained, and missed the 1.0 s screen at +0.96."),
     ("Feature and model parameter tuning?", SEARCH_LINE + " Read from the study databases at generate time, not typed "
                                             "here; <code>python -m taxi.searches</code> prints the same row."),
     ("Optuna optimisation?", "All five above are Optuna searches with a declared budget, seed, objective and null bar. "

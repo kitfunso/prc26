@@ -123,7 +123,7 @@ is the thing that goes red.
 | gradient-boosted trees | M1, M2, D1, D2 LightGBM; MC1, MC2, SB1-SB3 CatBoost; X1 XGBoost | TRIED, and the champion |
 | adaptive boosting | FAM2-ada | TRIED (FAM2): closed at 428.12 |
 | feed-forward neural net | NN1, NN2, NN3 | TRIED (H57-H59) |
-| isotonic / monotone | (none) | EMPTY |
+| isotonic / monotone | MO1-mono, M1's lane-A cell under `monotone_constraints` | TRIED (MO1): closed, +0.55 s worse out of fold than the same cell free |
 | ensembles and stacking | E1, ST1, BF, the SB seed bags | TRIED (H21, H52) |
 | not a model class: meta-wrapper or multi-output only | (none) | N/A |
 | generalised additive (spline basis, penalised) | RC1's `knots` arms ARE an additive spline fit under an L2 penalty | TRIED inside RC1 |

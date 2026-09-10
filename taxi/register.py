@@ -50,7 +50,8 @@ SKLEARN: tuple[Row, ...] = (
         "M1, M2, D1, D2 LightGBM; MC1, MC2, SB1-SB3 CatBoost; X1 XGBoost", "TRIED, and the champion"),
     Row("adaptive boosting", ("AdaBoostRegressor",), "FAM2-ada", "TRIED (FAM2): closed at 428.12"),
     Row("feed-forward neural net", ("MLPRegressor",), "NN1, NN2, NN3", "TRIED (H57-H59)"),
-    Row("isotonic / monotone", ("IsotonicRegression",), "", "EMPTY"),
+    Row("isotonic / monotone", ("IsotonicRegression",), "MO1-mono, M1's lane-A cell under `monotone_constraints`",
+        "TRIED (MO1): closed, +0.55 s worse out of fold than the same cell free"),
     Row("ensembles and stacking", ("StackingRegressor", "VotingRegressor"),
         "E1, ST1, BF, the SB seed bags", "TRIED (H21, H52)"),
     # Wrappers around another estimator, and the multi-output-only penalised fits. Neither is a model class, and the target
