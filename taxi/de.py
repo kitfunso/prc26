@@ -57,6 +57,63 @@ def taxonomy(trb: pd.DataFrame, teb: pd.DataFrame, p: np.ndarray) -> list[str]:
     return out
 
 
+PBANDS = ((0, 900), (900, 1800), (1800, 3600), (3600, 7200), (7200, BIG), (BIG, 1e12))
+
+
+def reachable(teb: pd.DataFrame, p: np.ndarray, big: np.ndarray) -> list[str]:
+    """The same squared error, banded on the model's own PREDICTION rather than on the truth.
+
+    The table above bands on y, which no model can see at predict time. A band defined on the prediction IS reachable: if one
+    of them held a systematic offset, a per-band constant would collect it with no new feature and no new fit. `bias share`
+    is n x mean(e) squared over that band's SSE, the fraction a per-band constant could remove. The drop-k rows below then
+    ask the other half of the question: whether what is left is a structure or one row.
+    """
+    e = p - teb.y.values
+    sse = float((e ** 2).sum())
+    out = ["| band, on the prediction | rows | share of lane-B squared error | mean signed error | bias share of the band |",
+           "|---|---|---|---|---|"]
+    for lo, hi in PBANDS:
+        m = (p >= lo) & (p < hi)
+        if not m.any():
+            continue
+        eb = e[m]
+        b = float(len(eb) * eb.mean() ** 2 / (eb ** 2).sum())
+        nm = f"{lo:,.0f} to {hi:,.0f} s" if hi < 1e11 else f"over {lo:,.0f} s"
+        out.append(f"| {nm} | {int(m.sum()):,} | {(eb ** 2).sum() / sse * 100:.1f}% | {eb.mean():+,.0f} s | {b * 100:.1f}% |")
+    q = p.copy()
+    for lo, hi in PBANDS:
+        m = (p >= lo) & (p < hi)
+        if m.any():
+            q[m] = p[m] - e[m].mean()
+    v = paired_delta(e, floored(q) - teb.y.values, teb.day.values, lane="B")
+    out += ["", f"Two bands are not flat. Both are tiny and neither is a lane, and the way to see that is to grant the whole "
+            f"table its own constants: subtract each band's OWN holdout mean error, fitted on the rows it is scored on. That is "
+            f"an oracle, not a model, so it can only be an upper bound. It takes lane B from {rmse(e):,.1f} s to "
+            f"{rmse(floored(q) - teb.y.values):,.1f} s, {v.delta:+,.1f} [{v.lo:+,.1f}, {v.hi:+,.1f}] against a promotion floor "
+            f"of {v.floor:.0f} s. A real per-band constant, fitted on the training months, would have to beat that ceiling from "
+            "below.", ""]
+    o = np.argsort(-(e ** 2))
+    out += ["And the concentration, by dropping the worst rows one at a time. Nothing is predicted here; the rows are removed "
+            "from the score to show what carries it.", "",
+            "| lane-B holdout | rows | RMSE | share of the lane's squared error dropped | of the dropped rows, over 12 h |",
+            "|---|---|---|---|---|", f"| all rows | {len(e):,} | {rmse(e):,.1f} | | |"]
+    for k in (1, 5, 10, 50):
+        keep = np.ones(len(e), bool)
+        keep[o[:k]] = False
+        out.append(f"| worst {k} dropped | {int(keep.sum()):,} | {rmse(e[keep]):,.1f} | "
+                   f"{(1 - (e[keep] ** 2).sum() / sse) * 100:.1f}% | {int(big[o[:k]].sum())} of {k} |")
+    i = o[0]
+    out += ["", f"The lane is not a population, it is a handful of rows. One row of {len(e):,} carries "
+            f"{(e[i] ** 2) / sse * 100:.1f}% of the squared error ({teb.apt.values[i]}, prediction {p[i]:,.0f} s against a "
+            f"truth of {teb.y.values[i]:,.0f} s), the worst five carry "
+            f"{(1 - (e[o[5:]] ** 2).sum() / sse) * 100:.1f}%, and "
+            f"{int(big[o[:10]].sum())} of the worst ten are the over-12-hour rows section 2 tabulates one by one. So the "
+            "concentration is not a new structure to search: it IS the artifact family, which section 4 prices and closes. "
+            f"Below it, the remaining {int((~big).sum()):,} rows score {rmse(e[~big]):,.1f} s and the band table above says "
+            "their error is spread, not offset.", ""]
+    return out
+
+
 def cv_mixture(trb: pd.DataFrame) -> list[str]:
     """The only blind answer with any structure: split the champion's own high predictions between the two artifact values."""
     out = ["| fold | eval rows | predictions over 40,000 s | fit copies | fit day-shifts | q | champion | mixed | gain |",
@@ -104,6 +161,10 @@ def main() -> None:
               "reachable from the features, because a copied row's z_sched IS its answer.", "",
               "## 2. How much error it carries", ""]
     lines += taxonomy(trb, teb, p)
+    lines += ["", "### The same error, banded on what the model can actually see", "",
+              "Bands on y are a post-mortem. A band on the model's own prediction is a lane: a per-band constant needs no new "
+              "feature and no new fit, so if one of these bands held a systematic offset it would be free to collect.", ""]
+    lines += reachable(teb, p, big)
     lines += ["", f"Of {int(big.sum())} holdout rows over 12 h, {int((big & cp).sum())} are schedule copies and {int((big & sh).sum())} are day-shifted. "
               "Every one of them, with the champion on it:", "",
               "| airport | day | truth | z_sched | prediction | family |", "|---|---|---|---|---|---|"]
@@ -201,7 +262,10 @@ def main() -> None:
               "gain has an ordinary schedule and no mark on it; the five that are marked share their mark with twice as many ordinary flights "
               "and with the schedule copies, so a rule keyed on it loses more than it wins; the 2026 arrivals carry no day-shifted rows at all "
               "and cannot price the rate; a uniform shift at the measured rate lands under the 2 s floor by the n p squared A squared "
-              "arithmetic; and the one structured split loses three of five folds, pools negative and loses on the holdout. Flag F21 carries "
+              "arithmetic; and the one structured split loses three of five folds, pools negative and loses on the holdout. Section 2 "
+              "closes the last blind route with it: banded on the model's OWN prediction, which is the only banding a model can "
+              "act on, the lane holds no offset worth collecting, and an oracle that fits a constant per band on the very rows "
+              "it is scored on lands under the lane-B promotion floor with an interval through zero. Flags F21 and F43 carry "
               "this so no later report re-opens it as an opportunity, and so that a board gap of a few tens of seconds is not read as proof "
               "that a better recipe exists."]
     text = "\n".join(lines) + "\n"

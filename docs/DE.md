@@ -28,6 +28,34 @@ Where the champion's holdout squared error sits, by the same bands:
 | stale, 1 to 12 h | 193 | 12.1% | 6,577 s | 9,188 s |
 | over 12 h | 13 | 67.2% | 53,295 s | 67,841 s |
 
+### The same error, banded on what the model can actually see
+
+Bands on y are a post-mortem. A band on the model's own prediction is a lane: a per-band constant needs no new feature and no new fit, so if one of these bands held a systematic offset it would be free to collect.
+
+| band, on the prediction | rows | share of lane-B squared error | mean signed error | bias share of the band |
+|---|---|---|---|---|
+| 0 to 900 s | 1,385 | 3.3% | -63 s | 1.0% |
+| 900 to 1,800 s | 3,621 | 65.6% | -54 s | 0.1% |
+| 1,800 to 3,600 s | 156 | 4.7% | +372 s | 2.6% |
+| 3,600 to 7,200 s | 123 | 6.3% | +1,262 s | 17.8% |
+| 7,200 to 43,200 s | 77 | 10.9% | +635 s | 1.6% |
+| over 43,200 s | 11 | 9.3% | -4,442 s | 13.3% |
+
+Two bands are not flat. Both are tiny and neither is a lane, and the way to see that is to grant the whole table its own constants: subtract each band's OWN holdout mean error, fitted on the rows it is scored on. That is an oracle, not a model, so it can only be an upper bound. It takes lane B from 1,808.2 s to 1,783.2 s, +24.9 [-11.5, +67.1] against a promotion floor of 30 s. A real per-band constant, fitted on the training months, would have to beat that ceiling from below.
+
+And the concentration, by dropping the worst rows one at a time. Nothing is predicted here; the rows are removed from the score to show what carries it.
+
+| lane-B holdout | rows | RMSE | share of the lane's squared error dropped | of the dropped rows, over 12 h |
+|---|---|---|---|---|
+| all rows | 5,373 | 1,808.2 | | |
+| worst 1 dropped | 5,372 | 1,408.5 | 39.3% | 1 of 1 |
+| worst 5 dropped | 5,368 | 1,034.0 | 67.3% | 4 of 5 |
+| worst 10 dropped | 5,363 | 979.7 | 70.7% | 6 of 10 |
+| worst 50 dropped | 5,323 | 770.4 | 82.0% | 6 of 50 |
+
+The lane is not a population, it is a handful of rows. One row of 5,373 carries 39.3% of the squared error (LFPG, prediction 1,115 s against a truth of 84,240 s), the worst five carry 67.3%, and 6 of the worst ten are the over-12-hour rows section 2 tabulates one by one. So the concentration is not a new structure to search: it IS the artifact family, which section 4 prices and closes. Below it, the remaining 5,360 rows score 1,037.2 s and the band table above says their error is spread, not offset.
+
+
 Of 13 holdout rows over 12 h, 6 are schedule copies and 6 are day-shifted. Every one of them, with the champion on it:
 
 | airport | day | truth | z_sched | prediction | family |
@@ -111,4 +139,4 @@ It loses on CV and it loses on the holdout: at q = 0.62 the same recipe scores 1
 
 ## 6. What this closes
 
-The largest single gain in the campaign is real, measured, and out of reach by every route tested. Knowing which six rows carry it is worth more than the distance from our board score to the leader. Nothing reaches them: the one row that holds most of the gain has an ordinary schedule and no mark on it; the five that are marked share their mark with twice as many ordinary flights and with the schedule copies, so a rule keyed on it loses more than it wins; the 2026 arrivals carry no day-shifted rows at all and cannot price the rate; a uniform shift at the measured rate lands under the 2 s floor by the n p squared A squared arithmetic; and the one structured split loses three of five folds, pools negative and loses on the holdout. Flag F21 carries this so no later report re-opens it as an opportunity, and so that a board gap of a few tens of seconds is not read as proof that a better recipe exists.
+The largest single gain in the campaign is real, measured, and out of reach by every route tested. Knowing which six rows carry it is worth more than the distance from our board score to the leader. Nothing reaches them: the one row that holds most of the gain has an ordinary schedule and no mark on it; the five that are marked share their mark with twice as many ordinary flights and with the schedule copies, so a rule keyed on it loses more than it wins; the 2026 arrivals carry no day-shifted rows at all and cannot price the rate; a uniform shift at the measured rate lands under the 2 s floor by the n p squared A squared arithmetic; and the one structured split loses three of five folds, pools negative and loses on the holdout. Section 2 closes the last blind route with it: banded on the model's OWN prediction, which is the only banding a model can act on, the lane holds no offset worth collecting, and an oracle that fits a constant per band on the very rows it is scored on lands under the lane-B promotion floor with an interval through zero. Flags F21 and F43 carry this so no later report re-opens it as an opportunity, and so that a board gap of a few tens of seconds is not read as proof that a better recipe exists.
