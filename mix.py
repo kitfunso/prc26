@@ -12,17 +12,20 @@ import pandas as pd
 from catboost import CatBoostClassifier, Pool
 
 from data import CACHE, rmse
-from features import CAT, DAY, NUM, build
+from features import CAT, DAY, NUM, OCC, WX, build
 from train import BASE, FOLDS, HOLDOUT, LGB, RESULTS, fit_predict, report
 
 Z = ("z_aobt", "z_eobt", "z_sched")
 CLF_LGB = dict(objective="multiclass", num_class=4, learning_rate=0.05, num_leaves=127, min_child_samples=50, feature_fraction=0.8,
                bagging_fraction=0.8, bagging_freq=1, lambda_l2=3.0, n_estimators=4000, verbose=-1, random_state=0, n_jobs=12)
 CLF_CB = dict(loss_function="MultiClass", task_type="GPU", depth=8, learning_rate=0.1, l2_leaf_reg=3, iterations=4000,
-              od_type="Iter", od_wait=200, random_seed=0, verbose=0, thread_count=8)
+              od_type="Iter", od_wait=200, random_seed=0, verbose=0, thread_count=8, gpu_ram_part=0.5)
 CONFIGS: dict[str, dict] = {
     "mix_lgb": dict(clf=dict(family="lgb", params=CLF_LGB), reg=dict(family="lgb", params={**LGB, "n_jobs": 12}, cat=CAT, num=NUM + DAY), cat=CAT, num=NUM + DAY),
     "mix_cb": dict(clf=dict(family="cb", params=CLF_CB), reg=dict(params=BASE, cat=CAT, num=NUM + DAY), cat=CAT, num=NUM + DAY),
+    "mix_lgb_occ": dict(clf=dict(family="lgb", params=CLF_LGB), reg=dict(family="lgb", params={**LGB, "n_jobs": 12}, cat=CAT, num=NUM + DAY + OCC), cat=CAT, num=NUM + DAY + OCC),
+    "mix_lgb_wx": dict(clf=dict(family="lgb", params=CLF_LGB), reg=dict(family="lgb", params={**LGB, "n_jobs": 12}, cat=CAT, num=NUM + DAY + OCC + WX), cat=CAT, num=NUM + DAY + OCC + WX),
+    "mix_cb_wx": dict(clf=dict(family="cb", params=CLF_CB), reg=dict(params={**BASE, "thread_count": 8, "gpu_ram_part": 0.5}, cat=CAT, num=NUM + DAY + OCC + WX), cat=CAT, num=NUM + DAY + OCC + WX),
 }
 
 

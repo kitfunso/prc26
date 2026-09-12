@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 from data import CACHE, departures, load_raw, secs
+from weather import WX, join
 
 W = 900.0
 CAT = ["apt", "runway", "stand", "actype", "wake", "segment", "operator", "ftype", "frule", "ades", "airline"]
@@ -12,6 +13,7 @@ NUM = ["hour", "wday", "mod", "has_plan", "notyp", "z_aobt", "z_eobt", "z_lobt",
        "d_ae", "d_al", "d_es", "d_as", "dur", "slip", "aobt_sec", "aobt_m5", "eobt_m5", "lobt_sec",
        "queue", "dep_before", "dep_after", "arr_anchor", "arr_off", "rq", "rwy_share", "push_anchor"]
 DAY = ["n_day", "nB_day", "b_share", "day_dae_med", "day_zs_med", "day_za_med", "h_nB"]
+OCC = ["occ", "t_occ"]
 
 
 def anchor(df: pd.DataFrame) -> np.ndarray:
@@ -47,6 +49,20 @@ def traffic(dep: pd.DataFrame, arr: pd.DataFrame) -> pd.DataFrame:
             out["rq"][ix[jx]] = _between(sr, t[ix][jx] - W, t[ix][jx])
             out["rwy_share"][ix[jx]] = _between(sr, t[ix][jx] - 3600, t[ix][jx]) / np.maximum(den[jx], 1)
     return pd.DataFrame(out, index=dep.index)
+
+
+def occupancy(dep: pd.DataFrame, blk: pd.DataFrame) -> pd.DataFrame:
+    """First arrival that parks on the departure's stand after its anchor: did it park before takeoff, and how long before."""
+    t, a = dep["t_off"].values, dep["t_off"].values - dep["z_anchor"].values
+    nxt = np.full(len(dep), np.inf)
+    parked = {k: np.sort(g["t"].values) for k, g in blk.groupby(["apt", "stand"])}
+    for key, ix in dep.groupby(["apt", "stand"], observed=True).indices.items():
+        s = parked.get(key)
+        if s is not None and len(s):
+            pos = np.minimum(np.searchsorted(s, a[ix], "right"), len(s) - 1)
+            nxt[ix] = np.where(pos < len(s), s[pos], np.inf)
+    occ = nxt < t
+    return pd.DataFrame({"occ": occ.astype(int), "t_occ": np.where(occ, t - nxt, np.nan)}, index=dep.index)
 
 
 def daylevel(f: pd.DataFrame) -> pd.DataFrame:
@@ -89,9 +105,12 @@ def build(refresh: bool = False) -> pd.DataFrame:
     f["wake"] = dep["WK_TBL_CAT_flt"]; f["segment"] = dep["MARKET_SEGMENT_flt"]; f["operator"] = dep["AIRCRAFT_OPERATOR_flt"]
     f["ftype"] = dep["FLIGHT_TYPE_flt"]; f["frule"] = dep["FLIGHT_RULE_mvt"]; f["ades"] = dep["ADES_flt"]
     f["airline"] = dep["FLIGHT_mvt"].astype(str).str[:3].where(dep["FLIGHT_mvt"].notna(), "NA")
-    arr = raw[raw["PHASE_mvt"] == "ARR"][["ADES_mvt", "MVT_TIME_UTC_mvt"]].rename(columns={"ADES_mvt": "apt"})
+    arr = raw[raw["PHASE_mvt"] == "ARR"][["ADES_mvt", "MVT_TIME_UTC_mvt", "STAND_mvt", "BLOCK_TIME_UTC_mvt"]].rename(columns={"ADES_mvt": "apt"})
     arr["t"] = secs(arr["MVT_TIME_UTC_mvt"], pd.Timestamp(0, tz="UTC"))
-    f = pd.concat([f, traffic(f, arr), daylevel(f)], axis=1)
+    blk = arr.dropna(subset=["STAND_mvt", "BLOCK_TIME_UTC_mvt"]).assign(stand=lambda d: d["STAND_mvt"].astype(str))
+    blk["t"] = secs(blk["BLOCK_TIME_UTC_mvt"], pd.Timestamp(0, tz="UTC"))
+    f["stand"] = f["stand"].astype(str)
+    f = pd.concat([f, traffic(f, arr), daylevel(f), occupancy(f, blk), join(f)], axis=1)
     for c in CAT:
         f[c] = f[c].astype(str).fillna("NA").astype("category")
     f = f.reset_index(drop=True)
