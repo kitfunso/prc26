@@ -11,6 +11,7 @@ CAT = ["apt", "runway", "stand", "actype", "wake", "segment", "operator", "ftype
 NUM = ["hour", "wday", "mod", "has_plan", "notyp", "z_aobt", "z_eobt", "z_lobt", "z_iobt", "z_sched", "z_anchor",
        "d_ae", "d_al", "d_es", "d_as", "dur", "slip", "aobt_sec", "aobt_m5", "eobt_m5", "lobt_sec",
        "queue", "dep_before", "dep_after", "arr_anchor", "arr_off", "rq", "rwy_share", "push_anchor"]
+DAY = ["n_day", "nB_day", "b_share", "day_dae_med", "day_zs_med", "day_za_med", "h_nB"]
 
 
 def anchor(df: pd.DataFrame) -> np.ndarray:
@@ -48,6 +49,20 @@ def traffic(dep: pd.DataFrame, arr: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(out, index=dep.index)
 
 
+def daylevel(f: pd.DataFrame) -> pd.DataFrame:
+    """Airport-day aggregates from the same file: outage days (many rows without a plan) change the off-block mechanism."""
+    g = f.groupby(["split", "apt", "day"])
+    out = pd.DataFrame(index=f.index)
+    out["n_day"] = g["id"].transform("size")
+    out["nB_day"] = g["has_plan"].transform(lambda s: (s == 0).sum())
+    out["b_share"] = out["nB_day"] / out["n_day"]
+    out["day_dae_med"] = g["d_ae"].transform("median")
+    out["day_zs_med"] = g["z_sched"].transform("median")
+    out["day_za_med"] = g["z_aobt"].transform("median")
+    out["h_nB"] = f.groupby(["split", "apt", "day", "hour"])["has_plan"].transform(lambda s: (s == 0).sum())
+    return out
+
+
 def build(refresh: bool = False) -> pd.DataFrame:
     out = CACHE / "feat.parquet"
     if out.exists() and not refresh:
@@ -76,7 +91,7 @@ def build(refresh: bool = False) -> pd.DataFrame:
     f["airline"] = dep["FLIGHT_mvt"].astype(str).str[:3].where(dep["FLIGHT_mvt"].notna(), "NA")
     arr = raw[raw["PHASE_mvt"] == "ARR"][["ADES_mvt", "MVT_TIME_UTC_mvt"]].rename(columns={"ADES_mvt": "apt"})
     arr["t"] = secs(arr["MVT_TIME_UTC_mvt"], pd.Timestamp(0, tz="UTC"))
-    f = pd.concat([f, traffic(f, arr)], axis=1)
+    f = pd.concat([f, traffic(f, arr), daylevel(f)], axis=1)
     for c in CAT:
         f[c] = f[c].astype(str).fillna("NA").astype("category")
     f = f.reset_index(drop=True)

@@ -8,17 +8,28 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import lightgbm as lgb
+import xgboost as xgb
 from catboost import CatBoostRegressor, Pool
 
 from data import CACHE, rmse
-from features import CAT, NUM, build
+from features import CAT, DAY, NUM, build
 
 HOLDOUT = (1, 7)
 FOLDS = ((2, 3), (4, 5), (6, 8), (9, 10), (11, 12))
 BASE = dict(loss_function="RMSE", task_type="GPU", depth=8, learning_rate=0.1, l2_leaf_reg=3, iterations=6000,
             od_type="Iter", od_wait=200, random_seed=0, verbose=0, border_count=254)
+LGB = dict(objective="regression", learning_rate=0.05, num_leaves=255, min_child_samples=50, feature_fraction=0.8,
+           bagging_fraction=0.8, bagging_freq=1, lambda_l2=3.0, max_bin=255, n_estimators=8000, verbose=-1, random_state=0, n_jobs=20)
+XGB = dict(objective="reg:squarederror", learning_rate=0.05, max_depth=9, min_child_weight=20, subsample=0.8, colsample_bytree=0.8,
+           reg_lambda=3.0, max_bin=256, n_estimators=8000, tree_method="hist", device="cuda", enable_categorical=True,
+           max_cat_to_onehot=1, random_state=0)
 CONFIGS: dict[str, dict] = {
     "cb0": dict(params=BASE, cat=CAT, num=NUM),
+    "cb1": dict(params=BASE, cat=CAT, num=NUM + DAY),
+    "lgb0": dict(family="lgb", params=LGB, cat=CAT, num=NUM),
+    "lgb1": dict(family="lgb", params=LGB, cat=CAT, num=NUM + DAY),
+    "xgb0": dict(family="xgb", params=XGB, cat=CAT, num=NUM),
 }
 RESULTS = Path("docs/RESULTS.md")
 
@@ -38,11 +49,24 @@ def boot_delta(y: np.ndarray, p0: np.ndarray, p1: np.ndarray, day: np.ndarray, n
 def fit_predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame | None = None, iters: int | None = None) -> tuple[np.ndarray, int]:
     cols = cfg["cat"] + cfg["num"]
     params = dict(cfg["params"])
+    w = cfg["weight"](tr) if "weight" in cfg else None
+    fam = cfg.get("family", "cb")
+    if fam == "lgb":
+        n = iters or params.pop("n_estimators")
+        m = lgb.LGBMRegressor(**{**params, "n_estimators": n})
+        m.fit(tr[cols], tr["y"], sample_weight=w, eval_set=[(va[cols], va["y"])] if va is not None else None,
+              callbacks=[lgb.early_stopping(200, verbose=False)] if va is not None else None, categorical_feature=cfg["cat"])
+        return m.predict(te[cols]), (m.best_iteration_ or n) if va is not None else n
+    if fam == "xgb":
+        n = iters or params.pop("n_estimators")
+        m = xgb.XGBRegressor(**{**params, "n_estimators": n}, early_stopping_rounds=200 if va is not None else None)
+        m.fit(tr[cols], tr["y"], sample_weight=w, eval_set=[(va[cols], va["y"])] if va is not None else None, verbose=False)
+        return m.predict(te[cols]), (m.best_iteration or n) if va is not None else n
     if iters:
         params.update(iterations=iters, od_type=None, od_wait=None)
         params = {k: v for k, v in params.items() if v is not None}
     m = CatBoostRegressor(**params)
-    pool = Pool(tr[cols], tr["y"], cat_features=cfg["cat"])
+    pool = Pool(tr[cols], tr["y"], cat_features=cfg["cat"], weight=w)
     m.fit(pool, eval_set=Pool(va[cols], va["y"], cat_features=cfg["cat"]) if va is not None else None, use_best_model=va is not None)
     return m.predict(Pool(te[cols], cat_features=cfg["cat"])), m.get_best_iteration() or params["iterations"]
 
@@ -52,7 +76,8 @@ def report(y: pd.Series, p: np.ndarray, f: pd.DataFrame) -> dict[str, float]:
     out = {"all": rmse(y, p), "laneA": rmse(y[a], p[a]), "laneB": rmse(y[~a], p[~a])}
     for m in HOLDOUT:
         k = f["month"].values == m
-        out[f"m{m}"] = rmse(y[k], p[k])
+        if k.any():
+            out[f"m{m}"] = rmse(y[k], p[k])
     return {k: round(v, 2) for k, v in out.items()}
 
 

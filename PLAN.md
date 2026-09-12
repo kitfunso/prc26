@@ -27,7 +27,8 @@ lane B (5,290 rows with no plan, ~1,618 s). Reaching 245 needs lane B ~1,000 s o
 - Predictions are floored at 0 (no upper clip). Month and year are never features; hour/wday are.
 - Optuna: price 2-3 trials in wall time before setting the budget; SQLite study; CV only, holdout untouched.
 - Every result line: per lane and per month, plus a paired day-block bootstrap against the previous best.
-- Lane B is a mechanism mixture (schedule copy, day shift, physics); the RMSE-optimal answer is its conditional mean.
+- Both lanes are a stamp mixture (AOBT / EOBT / schedule copy / physical); `mix.py` writes the conditional mean out
+  explicitly: multiclass P(class) x known stamp gap + regressor on physical rows. Fold 0: 253 vs 285 plain CatBoost.
 
 ## Files
 data.py (load + features, cached), explore.py (steps 1-3 numbers), train.py (CV, tune, refit),
