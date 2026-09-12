@@ -25,3 +25,8 @@
 | lb_lirf (rest from mix_cb_wx) | {"all": 258.8, "laneA": 213.13, "laneB": 1496.48} | {"all": 343.19, "laneA": 249.26, "laneB": 1905.05, "m1": 346.23, "m7": 340.71} | LIRF laneB 4362.9 -> 4389.0 | vs mix_cb_wx: -0.38 [-2.44, +1.59] |
 | ra_cb (B from mix_cb_wx) | {"all": 255.22, "laneA": 210.31, "laneB": 1474.08} | {"all": 329.51, "laneA": 230.34, "laneB": 1900.6, "m1": 343.14, "m7": 318.11} | (2345, 2428, 5015) | 3506s |
 | blend:ra_cb+ra_lgb w=[0.732, 0.268] | {"all": 254.42, "laneA": 209.37, "laneB": 1473.38} | {"all": 328.67, "laneA": 229.1, "laneB": 1900.6, "m1": 342.57, "m7": 317.02} | - | -  vs mix_cb_wx: +14.13 [+2.12, +42.41] |
+| nn3 (B from mix_cb_wx) | {"all": 260.06, "laneA": 216.21, "laneB": 1474.08} | {"all": 332.6, "laneA": 234.79, "laneB": 1900.6, "m1": 346.81, "m7": 320.68} | epochs [33, 23, 19, 22, 21]+22 | 803s |
+| ra_cb_s1 (B from mix_cb_wx) | {"all": 255.12, "laneA": 210.19, "laneB": 1474.08} | {"all": 329.48, "laneA": 230.29, "laneB": 1900.6, "m1": 343.17, "m7": 318.03} | (2332, 2224, 4565) | 8400s |
+| blend:ra_cb+ra_cb_s1+ra_lgb+nn3 w=[0.304, 0.328, 0.084, 0.285] | {"all": 253.21, "laneA": 207.89, "laneB": 1473.38} | {"all": 327.08, "laneA": 226.79, "laneB": 1900.6, "m1": 341.6, "m7": 314.9} | - | -  vs mix_cb_wx: +15.72 [+3.56, +44.22] |
+| blend:ra_cb+ra_cb_s1+ra_lgb w=[0.382, 0.409, 0.209] | {"all": 254.05, "laneA": 208.91, "laneB": 1473.38} | {"all": 328.39, "laneA": 228.7, "laneB": 1900.6, "m1": 342.34, "m7": 316.7} | - | -  vs mix_cb_wx: +14.41 [+2.41, +42.70] |
+| v23 candidate 0.304 ra_cb + 0.328 ra_cb_s1 + 0.084 ra_lgb + 0.285 nn3 vs v22 blend (holdout, paired day-block bootstrap) | - | all 328.67 -> 327.01, laneA 229.11 -> 226.77 | - | all +1.66 [+1.18, +2.28], laneA +2.33 [+1.75, +2.98] |

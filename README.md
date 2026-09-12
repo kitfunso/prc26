@@ -50,14 +50,17 @@ Holdout = January and July 2025, never used for model choice. CV = five folds ov
 by month pair. Every result line reports per lane (A = has a flight plan, B = no plan) and per month.
 Predictions are floored at 0. Board uploads are logged in `LEDGER.md` with the expected and actual score.
 
-## Reproduce the submitted file (v22)
+## Reproduce the submitted file (v23)
 
-v22 = 0.732 * CatBoost residual lane-A model (`ra_cb`) + 0.268 * LightGBM residual lane-A model (`ra_lgb`).
-Lane A (rows with a flight plan) predicts the residual to the AOBT stamp: a tail classifier (|residual| > 600 s)
-gates a tail regressor and a body regressor, and the AOBT stamp is added back. Lane B (no plan) keeps the
-CatBoost mixture (`mix_cb_wx`) as the donor. Weights are non-negative least squares on the CV out-of-fold
-predictions (`blend.py`), never on the holdout. Holdout Jan+Jul 2025: 328.67 all, 229.10 lane A, 1900.60 lane B
-(`docs/RESULTS.md`). The stamp mixture (v21) hedged between stamps under squared loss; the residual model does not.
+v23 = 0.304 * CatBoost residual lane-A model (`ra_cb`) + 0.328 * the same model at seed 1 (`ra_cb_s1`)
++ 0.084 * LightGBM residual lane-A model (`ra_lgb`) + 0.285 * MLP residual lane-A model (`nn3`).
+Lane A (rows with a flight plan) predicts the residual to the AOBT stamp. The tree models gate a tail regressor
+(|residual| > 600 s) and a body regressor with a tail classifier; the MLP fits the residual directly, so it does
+not share the trees' gating error. The AOBT stamp is added back. Lane B (no plan) keeps the CatBoost mixture
+(`mix_cb_wx`) as the donor. Weights are non-negative least squares on the CV out-of-fold predictions (`blend.py`),
+never on the holdout. Holdout Jan+Jul 2025: 327.08 all, 226.79 lane A, 1900.60 lane B (`docs/RESULTS.md`);
+paired day-block bootstrap against the v22 blend +1.66 [+1.18, +2.28]. The stamp mixture (v21) hedged between
+stamps under squared loss; the residual model does not.
 
 ```
 pip install -r requirements.txt            # Python 3.12, CUDA GPU for CatBoost
@@ -67,12 +70,16 @@ python data.py && python features.py       # caches under data/cache/
 python mix.py cv mix_cb_wx                 # lane-B donor: CV + holdout line in docs/RESULTS.md, iteration counts at the end
 python mix.py fit mix_cb_wx 2309 3779      # -> data/mix_cb_wx_rank.parquet
 python lanea.py cv ra_cb mix_cb_wx         # residual lane A, lane B copied from the donor
+python lanea.py cv ra_cb_s1 mix_cb_wx
 python lanea.py cv ra_lgb mix_cb_wx
-python blend.py ra_cb ra_lgb --base=mix_cb_wx
+python nn.py cv nn3 mix_cb_wx              # MLP on the residual, GPU, early stopping on the last 10% of fit days
+python blend.py ra_cb ra_cb_s1 ra_lgb nn3 --base=mix_cb_wx
 python lanea.py fit ra_cb mix_cb_wx 2345 2428 5015   # full 2025 refit at the CV iteration counts -> data/ra_cb_rank.parquet
+python lanea.py fit ra_cb_s1 mix_cb_wx 2332 2224 4565
 python lanea.py fit ra_lgb mix_cb_wx 220 289 418
-python combine.py data/merry-octopus_v22.parquet data/ra_cb_rank.parquet:0.732 data/ra_lgb_rank.parquet:0.268
-python board.py check data/merry-octopus_v22.parquet
+python nn.py fit nn3 mix_cb_wx             # early stopping on the last 10% of 2025 days, no iteration argument
+python combine.py data/merry-octopus_v23.parquet data/ra_cb_rank.parquet:0.304 data/ra_cb_s1_rank.parquet:0.328 data/ra_lgb_rank.parquet:0.084 data/nn3_rank.parquet:0.285
+python board.py check data/merry-octopus_v23.parquet
 ```
 
 `laneb.py` is a LIRF-only schedule-copy cell for lane B; it lost to the donor on every fold and is not shipped.
