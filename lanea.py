@@ -20,6 +20,7 @@ CLF_LGB_BIN = {**{k: v for k, v in CLF_LGB.items() if k != "num_class"}, "object
 CONFIGS: dict[str, dict] = {
     "ra_lgb": dict(clf=dict(family="lgb", params=CLF_LGB_BIN), reg=dict(family="lgb", params={**LGB, "n_jobs": 12}, cat=CAT, num=NUM + DAY + OCC + WX), cat=CAT, num=NUM + DAY + OCC + WX),
     "ra_cb": dict(clf=dict(family="cb", params={**CLF_CB, "loss_function": "Logloss"}), reg=dict(params=REG, cat=CAT, num=NUM + DAY + OCC + WX), cat=CAT, num=NUM + DAY + OCC + WX),
+    "ra_cb_s1": dict(clf=dict(family="cb", params={**CLF_CB, "loss_function": "Logloss", "random_seed": 1}), reg=dict(params={**REG, "random_seed": 1}, cat=CAT, num=NUM + DAY + OCC + WX), cat=CAT, num=NUM + DAY + OCC + WX),
 }
 
 
