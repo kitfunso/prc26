@@ -25,8 +25,33 @@ CONFIGS: dict[str, dict] = {
     "mix_cb": dict(clf=dict(family="cb", params=CLF_CB), reg=dict(params=BASE, cat=CAT, num=NUM + DAY), cat=CAT, num=NUM + DAY),
     "mix_lgb_occ": dict(clf=dict(family="lgb", params=CLF_LGB), reg=dict(family="lgb", params={**LGB, "n_jobs": 12}, cat=CAT, num=NUM + DAY + OCC), cat=CAT, num=NUM + DAY + OCC),
     "mix_lgb_wx": dict(clf=dict(family="lgb", params=CLF_LGB), reg=dict(family="lgb", params={**LGB, "n_jobs": 12}, cat=CAT, num=NUM + DAY + OCC + WX), cat=CAT, num=NUM + DAY + OCC + WX),
+    "mix_lgb_wx_s1": dict(clf=dict(family="lgb", params={**CLF_LGB, "random_state": 1}), reg=dict(family="lgb", params={**LGB, "n_jobs": 12, "random_state": 1}, cat=CAT, num=NUM + DAY + OCC + WX), cat=CAT, num=NUM + DAY + OCC + WX),
+    "mix_lgb_wxb": dict(bclf=True, clf=dict(family="lgb", params=CLF_LGB), reg=dict(family="lgb", params={**LGB, "n_jobs": 12}, cat=CAT, num=NUM + DAY + OCC + WX), cat=CAT, num=NUM + DAY + OCC + WX),
     "mix_cb_wx": dict(clf=dict(family="cb", params=CLF_CB), reg=dict(params={**BASE, "thread_count": 8, "gpu_ram_part": 0.5}, cat=CAT, num=NUM + DAY + OCC + WX), cat=CAT, num=NUM + DAY + OCC + WX),
+    "mix_cb_wxb": dict(bclf=True, clf=dict(family="cb", params=CLF_CB), reg=dict(params={**BASE, "thread_count": 8, "gpu_ram_part": 0.5}, cat=CAT, num=NUM + DAY + OCC + WX), cat=CAT, num=NUM + DAY + OCC + WX),
 }
+
+
+B_NUM = ["z_sched", "occ", "t_occ", "hour", "wday", "w_tmpf", "w_sknt", "nB_day", "b_share", "h_nB", "n_day", "day_zs_med", "queue", "dep_before", "notyp"]
+B_CAT = ["apt", "airline"]
+B_CLF = dict(objective="binary", learning_rate=0.03, num_leaves=8, min_child_samples=100, feature_fraction=0.8, bagging_fraction=0.8,
+             bagging_freq=1, lambda_l2=10.0, n_estimators=3000, verbose=-1, random_state=0, n_jobs=8)
+
+
+def fit_bclf(tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame | None, iters: int | None) -> tuple[np.ndarray, int]:
+    """Lane B only: P(schedule copy). Small model on the few fields that move it, so LIRF's 1k rows are not drowned by lane A."""
+    cols = B_CAT + B_NUM
+    b = tr["has_plan"].values == 0
+    y = (label(tr[b]) == 2).astype(int)
+    n = iters or B_CLF["n_estimators"]
+    m = lgb.LGBMClassifier(**{**B_CLF, "n_estimators": n})
+    if va is not None:
+        vb = va["has_plan"].values == 0
+        m.fit(tr[b][cols], y, eval_set=[(va[vb][cols], (label(va[vb]) == 2).astype(int))], categorical_feature=B_CAT,
+              callbacks=[lgb.early_stopping(100, verbose=False)])
+        return m.predict_proba(te[cols])[:, 1], m.best_iteration_ or n
+    m.fit(tr[b][cols], y, categorical_feature=B_CAT)
+    return m.predict_proba(te[cols])[:, 1], n
 
 
 def label(d: pd.DataFrame) -> np.ndarray:
@@ -52,15 +77,21 @@ def fit_clf(cfg: dict, tr: pd.DataFrame, lab: np.ndarray, te: pd.DataFrame, va: 
     return m.predict_proba(Pool(te[cols], cat_features=cfg["cat"])), m.get_best_iteration() or params["iterations"]
 
 
-def predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame | None = None, iters: tuple[int, int] | None = None) -> tuple[np.ndarray, tuple[int, int], np.ndarray]:
+def predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame | None = None, iters: tuple[int, ...] | None = None) -> tuple[np.ndarray, tuple[int, ...], np.ndarray]:
     lab, lab_va = label(tr), label(va) if va is not None else None
     P, it_c = fit_clf(cfg, tr, lab, te, va, lab_va, iters[0] if iters else None)
     for k, z in enumerate(Z):
         P[te[z].isna().values, k] = 0
     P /= P.sum(1, keepdims=True)
     mu, it_r = fit_predict(cfg["reg"], tr[lab == 3], te, va[lab_va == 3] if va is not None else None, iters[1] if iters else None)
+    its = (it_c, it_r)
+    if cfg.get("bclf"):
+        ps, it_b = fit_bclf(tr, te, va, iters[2] if iters else None)
+        tb = te["has_plan"].values == 0
+        P[tb] = np.column_stack([np.zeros(tb.sum()), np.zeros(tb.sum()), ps[tb], 1 - ps[tb]])
+        its = (it_c, it_r, it_b)
     yhat = sum(P[:, k] * np.nan_to_num(te[z].values) for k, z in enumerate(Z)) + P[:, 3] * mu
-    return yhat, (it_c, it_r), P
+    return yhat, its, P
 
 
 def cv(name: str) -> None:
@@ -73,7 +104,7 @@ def cv(name: str) -> None:
         p, it, _ = predict(cfg, tr[~va], tr[va], tr[va])
         oof[va] = p; its.append(it)
         print(f"fold {i} {months}: {rmse(tr['y'].values[va], p):.2f} at {it} iters, {time.time() - t0:.0f}s", flush=True)
-    it = tuple(int(np.mean([x[j] for x in its]) * 1.1) for j in range(2))
+    it = tuple(int(np.mean([x[j] for x in its]) * 1.1) for j in range(len(its[0])))
     ph, _, P = predict(cfg, tr, ho, iters=it)
     ph = np.maximum(ph, 0)
     pd.DataFrame({"id": tr["id"].values, "oof": oof}).to_parquet(CACHE / f"{name}_oof.parquet")
@@ -83,7 +114,7 @@ def cv(name: str) -> None:
     print(line)
 
 
-def fit(name: str, out: str, iters: tuple[int, int]) -> None:
+def fit(name: str, out: str, iters: tuple[int, ...]) -> None:
     cfg, f = CONFIGS[name], build()
     tr, rk = f[f["split"] == "train"], f[f["split"] == "rank"]
     p, _, _ = predict(cfg, tr, rk, iters=iters)
@@ -92,4 +123,4 @@ def fit(name: str, out: str, iters: tuple[int, int]) -> None:
 
 
 if __name__ == "__main__":
-    {"cv": lambda: cv(sys.argv[2]), "fit": lambda: fit(sys.argv[2], f"data/{sys.argv[2]}_rank.parquet", (int(sys.argv[3]), int(sys.argv[4])))}[sys.argv[1]]()
+    {"cv": lambda: cv(sys.argv[2]), "fit": lambda: fit(sys.argv[2], f"data/{sys.argv[2]}_rank.parquet", tuple(int(x) for x in sys.argv[3:]))}[sys.argv[1]]()

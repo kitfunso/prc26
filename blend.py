@@ -16,7 +16,7 @@ from train import HOLDOUT, RESULTS, boot_delta, report
 def load(names: list[str], kind: str) -> pd.DataFrame:
     out = None
     for n in names:
-        d = pd.read_parquet(CACHE / f"{n}_{kind}.parquet").rename(columns={"oof": n, "p": n})
+        d = pd.read_parquet(CACHE / f"{n}_{kind}.parquet").rename(columns={"oof": n, "p": n})[["id", n]]
         out = d if out is None else out.merge(d, on="id")
     return out
 
@@ -34,7 +34,7 @@ def main(names: list[str], base: str | None) -> None:
     pd.DataFrame({"id": ho["id"].values, "p": p_ho}).to_parquet(CACHE / f"{name.replace(':', '_')}_holdout.parquet")
     line = f"| {name} w={np.round(w, 3).tolist()} | {json.dumps(cv_all)} | {json.dumps(ho_all)} | - | - |\n"
     if base:
-        b = ho.merge(pd.read_parquet(CACHE / f"{base}_holdout.parquet").rename(columns={"p": "base"}), on="id")
+        b = ho.merge(pd.read_parquet(CACHE / f"{base}_holdout.parquet").rename(columns={"p": "base"})[["id", "base"]], on="id")
         d = boot_delta(b["y"].values, b["base"].values, p_ho, b["day"].values)
         line = line.rstrip("|\n") + f" vs {base}: {d[0]:+.2f} [{d[1]:+.2f}, {d[2]:+.2f}] |\n"
     RESULTS.open("a", encoding="utf-8").write(line)
