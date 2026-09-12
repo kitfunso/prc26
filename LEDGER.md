@@ -6,3 +6,4 @@ Upload rule: expected board gain > ~3 s over the current best, holdout CI exclud
 | file | date (UTC) | config | holdout Jan+Jul 2025 (A / B / all) | expected board | actual board | note |
 |---|---|---|---|---|---|---|
 | v18 (campaign 1) | 2026-09-10 | v1 blend | ~230 / ~1808 / n.a. | n.a. | 294.9917 | baseline carried over |
+| v21 | 2026-09-12 | 0.648 mix_cb_wx + 0.352 mix_lgb_wxb (NNLS on OOF) | 246.74 / 1891.47 / 340.21 | unknown, calibration point | pending | first upload of campaign 2; v1's holdout was better (~230 / ~1808) but holdout order does not carry to the board |

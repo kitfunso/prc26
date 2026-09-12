@@ -20,15 +20,29 @@ known timestamp, and a gradient-boosted regressor fitted only on physical rows g
 `yhat = sum_k P(k) * z_k + P(other) * mu(x)`. RMSE is minimised by the conditional mean, and the mixture is the
 conditional mean written out. See `docs/EXPLORE.md`, `docs/AUDIT.md` and `docs/RESULTS.md` for the numbers.
 
-## Features (`features.py`)
+## Features (`features.py`, `weather.py`)
 
-All from the challenge files only (no ADS-B, no weather in the shipped file). Per departure: gaps from takeoff to
-each stamp, differences between stamps, stamp rounding, calendar (hour, weekday; month is never a feature),
-categorical ids (airport, runway, stand, type, operator, destination, airline prefix), and counts of movements
-in the same file around the estimated off-block and the takeoff.
+From the challenge files: gaps from takeoff to each stamp, differences between stamps, stamp rounding, calendar
+(hour, weekday; month is never a feature), categorical ids (airport, runway, stand, type, operator, destination,
+airline prefix), counts of movements in the same file around the estimated off-block and the takeoff, airport-day
+aggregates (`DAY`), and stand occupancy (`OCC`): whether the next arrival parked on the departure's stand before
+its takeoff, and how long before. Occupancy carries most of the feature gain (`docs/RESULTS.md`, ablation lines).
+
+Weather (`WX`): IEM ASOS METAR archive, one CSV per airport under `data/weather/<pull date>/`, fetched with
+`python weather.py fetch 2026-09-05` (stations EDDF EDDM EGLL EHAM LEBL LEMD LFPG LIRF LSZH LTFM, UTC,
+2024-12-31 to the pull date; the shipped pull ends 2026-08-01, and later rows touch no anchor). Joined as-of the estimated off-block: wind, gust, visibility, temperature, ceiling,
+present-weather codes, a 3 h thunderstorm count and the age of the observation. Precipitation (`p01i`) is 0 on
+every European row, so it is dropped. No ADS-B.
 
 As-of rule: a feature may use any movement in the same file, before or after the takeoff (the rules allow it;
-`dep_after` and `arr_off` look forward). Airport-day aggregates (`DAY`) also come from the same file.
+`dep_after` and `arr_off` look forward).
+
+## Lane B (no flight plan)
+
+About half of the rank-set squared error sits on the ~5k departures without a plan, mostly LIRF, where the recorded
+off-block is often the schedule. A second, small LightGBM classifier fitted on lane B only gives P(schedule copy)
+and overrides the stamp probabilities on those rows (`bclf` in `mix.py`). It helps the LightGBM mixture
+(+3.65 s on holdout, CI excludes zero) and not the CatBoost one, so it enters only through the blend.
 
 ## Validation (`train.py`, `mix.py`)
 
@@ -36,13 +50,25 @@ Holdout = January and July 2025, never used for model choice. CV = five folds ov
 by month pair. Every result line reports per lane (A = has a flight plan, B = no plan) and per month.
 Predictions are floored at 0. Board uploads are logged in `LEDGER.md` with the expected and actual score.
 
-## Reproduce the submitted file
+## Reproduce the submitted file (v21)
+
+v21 = 0.648 * CatBoost mixture (`mix_cb_wx`) + 0.352 * LightGBM mixture with the lane-B classifier (`mix_lgb_wxb`).
+Weights are non-negative least squares on the CV out-of-fold predictions (`blend.py`), never on the holdout.
+Holdout Jan+Jul 2025: 340.21 all, 246.74 lane A, 1891.47 lane B (`docs/RESULTS.md`).
 
 ```
 pip install -r requirements.txt            # Python 3.12, CUDA GPU for CatBoost
 # put training_*.parquet, ranking.parquet, submitting.parquet in data/
+python weather.py fetch 2026-09-05         # data/weather/2026-09-05/<ICAO>.csv
 python data.py && python features.py       # caches under data/cache/
-python mix.py cv mix_cb                    # CV + holdout line in docs/RESULTS.md
-python mix.py fit mix_cb IT_CLF IT_REG     # iteration counts from that line -> data/mix_cb_rank.parquet
-python board.py check data/merry-octopus_vN.parquet
+python mix.py cv mix_cb_wx                 # CV + holdout line in docs/RESULTS.md, iteration counts at the end
+python mix.py cv mix_lgb_wxb
+python blend.py mix_cb_wx mix_lgb_wxb --base=mix_cb_wx
+python mix.py fit mix_cb_wx 2309 3779      # full 2025 refit at the CV iteration counts -> data/mix_cb_wx_rank.parquet
+python mix.py fit mix_lgb_wxb 147 1380 632
+python combine.py data/merry-octopus_v21.parquet data/mix_cb_wx_rank.parquet:0.648 data/mix_lgb_wxb_rank.parquet:0.352
+python board.py check data/merry-octopus_v21.parquet
 ```
+
+CatBoost on GPU is not bit-reproducible run to run; expect about 1 s of holdout noise. `tune.py` runs Optuna over
+the mixture regressor on CV folds only (`python tune.py N_TRIALS 2-3,6-8`, study in `data/optuna.db`).

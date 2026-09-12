@@ -1,12 +1,17 @@
 """IEM ASOS METAR archive (data/weather/<pull>/<ICAO>.csv) and its as-of join at the anchor time."""
 from __future__ import annotations
 
+import sys
+import urllib.request
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 RAW = Path(__file__).parent / "data" / "weather" / "2026-09-05"
+IEM = ("https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py?station={st}&data=all&year1=2024&month1=12&day1=31"
+       "&year2={y}&month2={m}&day2={d}&tz=Etc/UTC&format=onlycomma&latlon=no&elev=no&missing=M&trace=T&direct=no"
+       "&report_type=3&report_type=4")
 STATIONS = ("EDDF", "EDDM", "EGLL", "EHAM", "LEBL", "LEMD", "LFPG", "LIRF", "LSZH", "LTFM")
 LOOKBACK = 3 * 3600.0
 CODES = ("TS", "SN", "FZ", "RA", "SH", "FG", "BR")
@@ -53,6 +58,19 @@ def join(f: pd.DataFrame, metar: pd.DataFrame | None = None) -> pd.DataFrame:
     return pd.DataFrame(cols, index=f.index)
 
 
+def fetch(pull: str) -> None:
+    """`python weather.py fetch 2026-09-05`: one IEM ASOS CSV per station into data/weather/<pull>/."""
+    y, m, d = pull.split("-")
+    out = RAW.parent / pull
+    out.mkdir(parents=True, exist_ok=True)
+    for st in STATIONS:
+        with urllib.request.urlopen(IEM.format(st=st, y=y, m=int(m), d=int(d)), timeout=300) as r:
+            (out / f"{st}.csv").write_bytes(r.read())
+        print(st, (out / f"{st}.csv").stat().st_size)
+
+
 if __name__ == "__main__":
+    if sys.argv[1:2] == ["fetch"]:
+        fetch(sys.argv[2]); sys.exit()
     m = load_metar()
     print(m.groupby("apt").agg(n=("t", "size"), first=("t", "min"), last=("t", "max"), ts=("w_ts", "sum"), sn=("w_sn", "sum")).to_string())
