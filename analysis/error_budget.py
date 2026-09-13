@@ -1,9 +1,13 @@
-"""Where v25's holdout squared error sits, by lane and stamp class (|y - z| < 60 s = copy)."""
+"""Where a blend's holdout squared error sits, by lane and stamp class (|y - z| < 60 s = copy), lane B rows from
+laneb_holdout. `python analysis/error_budget.py [BLEND]`, default v26's lane A blend."""
+import sys
+
 import numpy as np
 import pandas as pd
 
 R = "C:/Users/skf_s/prc26/"
 SKIP = {"id", "y", "split", "apt", "has_plan", "day", "month", "lane"}
+BLEND = sys.argv[1] if len(sys.argv) > 1 else "blend_ra_cb_wz+ra_lgb_wz+nn3_wz"
 
 
 def vec(name: str) -> pd.Series:
@@ -17,7 +21,7 @@ def main() -> None:
     f = pd.read_parquet(R + "data/cache/feat.parquet", columns=["id", "has_plan", "y", "z_aobt", "z_eobt", "z_sched"])
     assert f["id"].is_unique
     f = f.set_index("id")
-    p = vec("data/cache/blend_ra_cb_arr+ra_lgb_arr+nn3_arr_holdout.parquet")
+    p = vec(f"data/cache/{BLEND}_holdout.parquet")
     lb = vec("data/cache/laneb_holdout.parquet")
     ix = lb.index.intersection(p.index)
     p.loc[ix] = lb.loc[ix].values
@@ -26,7 +30,7 @@ def main() -> None:
     e2 = (p - y) ** 2
     n, S = len(e2), e2.sum()
     A = (h["has_plan"] == 1).values
-    print(f"v25 holdout rows {n}, rmse {np.sqrt(S / n):.2f}, lane A {np.sqrt(e2[A].mean()):.2f}, lane B {np.sqrt(e2[~A].mean()):.2f}")
+    print(f"{BLEND} holdout rows {n}, rmse {np.sqrt(S / n):.2f}, lane A {np.sqrt(e2[A].mean()):.2f}, lane B {np.sqrt(e2[~A].mean()):.2f}")
     cls = np.select([(y - h.z_aobt).abs().lt(60), (y - h.z_eobt).abs().lt(60), (y - h.z_sched).abs().lt(60)],
                     ["AOBT copy", "EOBT copy", "sched copy"], "physical")
     c = (y - h.z_aobt).abs()

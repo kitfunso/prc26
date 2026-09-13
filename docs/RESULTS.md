@@ -58,3 +58,5 @@
 | ra_cb_wz (B from mix_cb_wx) | {"all": 250.16, "laneA": 204.07, "laneB": 1474.08} | {"all": 324.99, "laneA": 223.71, "laneB": 1900.6, "m1": 340.46, "m7": 311.97} | (2373, 1991, 4509) | 3848s |
 | blend:ra_cb_wz+ra_lgb_wz+nn3_wz w=[0.522, 0.156, 0.321] | {"all": 247.88, "laneA": 201.29, "laneB": 1473.38} | {"all": 322.78, "laneA": 220.43, "laneB": 1900.6, "m1": 338.84, "m7": 309.22} | - | -  vs blend_ra_cb_arr+ra_lgb_arr+nn3_arr: +2.17 [+1.39, +3.11] |
 | v26 = 0.5223 ra_cb_wz + 0.1564 ra_lgb_wz + 0.3213 nn3_wz, lane B overridden by laneb.py with the LIRF hull (combine.py --over) vs v25 (holdout, paired day-block bootstrap) | - | all 322.59 -> 315.17, laneA 223.65 -> 220.43, laneB 1874.62 -> 1816.93 | - | all +7.42 [+2.12, +14.51]; on all rows, lane A change alone +2.19 [+1.40, +3.14], hull alone +5.19 [+0.01, +12.01]; shipped as v26, board 282.4241 |
+| laneb (donor mix_cb_wx) | - | {"all": 1803.17, "laneA": NaN, "laneB": 1803.17, "m1": 2853.36, "m7": 1212.2} | (127, 238) | 27s |
+| laneb (donor mix_cb_wx) | - | {"all": 1741.7, "laneA": NaN, "laneB": 1741.7, "m1": 2818.65, "m7": 1115.28} | (127, 238) | 51s |

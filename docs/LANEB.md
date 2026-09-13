@@ -1,8 +1,8 @@
 # Lane B mechanism model
 
-`PYTHONPATH=/c/Users/skf_s/prc26 python laneb.py cv mix_cb_wx` then `python laneb.py fit 100 449`. `cv` writes its
+`PYTHONPATH=/c/Users/skf_s/prc26 python laneb.py cv mix_cb_wx` then `python laneb.py fit 127 238`. `cv` writes its
 tables to `docs/LANEB_RUN.md`; this file is the analysis. Sections 1 to 3 and the verdict describe v25; section 4 adds
-the hull that v26 ships.
+the hull that v26 ships; section 5 the classifier weights, tau columns and hull prior that v27 ships.
 
 **Result: FAIL** vs donor mix_cb_wx (holdout lane B RMSE 1900.6) on the strict pass mark (copy class no worse than
 donor's 2707.4), by 0.2%. New 1874.6, donor 1900.6, paired day-block bootstrap delta +26.0 [+5.2, +57.5] (lower
@@ -223,6 +223,135 @@ board change is not read row by row.
 
 **Non-LIRF rows over 4 h late in 2026.** The rank set has 280 (215 in January). v25 puts 101 of them above 3,600 s,
 against 21 of 415 labels in 2025 train. 100 of the 101 are EHAM, which has 148 such rows against 91 in all of 2025
-(v25 median 4,701 s, max 6,460; the donor puts 55 above 3,600 s), and 99 of those 100 fall on 2026-01-03 to 05. An
-early-January weather or disruption spell is the likely reading, not checked against METAR here. No interval bounds a
-composed label, so these rows stay as the model has them (session scratchpad `nonlirf_big.py`).
+(v25 median 4,701 s, max 6,460; the donor puts 55 above 3,600 s), and 99 of those 100 fall on 2026-01-03 to 05.
+METAR shows a snow spell: SN in 31, 28 and 15 reports on those three days, and lane A's median `z_aobt` there is 1,998,
+2,352 and 2,110 s against an EHAM 99th percentile of daily medians of 1,202 s. The one 2025 analogue is LTFM in the
+February 2025 snow (19, 22 and 23 February): lane A median about 2,100 s, lane B median label about 5,100 s (2.43 times
+the lane A median). Out of sample, laneb predicted about 2,300 s on those days (RMSE about 3,085); the full refit trains
+on them, and its EHAM predictions near 5,000 s match the analogue (section 5 finds that the analogue does not transfer;
+v27 predicts about 3,100 s there). No interval bounds a composed label, so these rows stay as the model has them
+(session scratchpad `nonlirf_big.py`, `eham_snow.py`, `eham_snow2.py`).
+
+## 5. Cost-weighted classifier, tau columns and a cell prior on the hull rows (v27)
+
+Three changes, all on lane B; lane A stays as v26 has it. The runs below are fold-honest (five folds over months 2 to
+12, the holdout fitted on all ten) and compared with v26's lane B by the paired day-block bootstrap, positive = better.
+
+**Cost-weighted classifier (`_cost_w`).** Calling a copy row physical, or a physical row a copy, costs about
+(`z_sched` - tau)^2 of SSE, while log loss charges every row the same. Each lane B row now weighs |`z_sched` - tau0|,
+clipped to [300, 14400] s and scaled to mean 1, with tau0 the airport's median physical label in the training rows;
+the early-stopping rows take the same weights. `w2` below squares that weight.
+
+**Tau columns.** The physical-taxi regressor gains lane A's 16 `ARR` and 20 `WZ` columns.
+
+Lane B RMSE (session scratchpad `laneb_feat_test.py`, logs `lbt.log`, `lbt2.log`, `lbt3.log`):
+
+| variant | OOF | vs v26 | holdout | vs v26 |
+|---|---|---|---|---|
+| v26 | 1477.8 | | 1816.9 | |
+| tau + ARR | 1485.1 | -7.2 [-14.3, -2.0] | 1813.8 | +3.1 [+0.1, +5.5] |
+| tau + WZ | 1472.2 | +5.7 [-3.5, +17.5] | 1813.1 | +3.9 [-0.1, +9.3] |
+| tau + ARR + WZ | 1472.0 | +5.8 [-3.9, +18.2] | 1811.6 | +5.4 [+2.6, +9.8] |
+| w1 | 1437.9 | +39.9 [+16.1, +70.1] | 1808.3 | +8.6 [-4.9, +26.5] |
+| w2 | 1421.5 | +56.3 [+23.3, +104.3] | 1815.0 | +2.0 [-19.2, +23.4] |
+| w1 + tau ARR + WZ (v27) | 1431.4 | +46.4 [+21.9, +77.0] | 1803.2 | +13.8 [+0.8, +31.8] |
+| w2 + tau ARR + WZ | 1414.4 | +63.4 [+29.2, +110.9] | 1809.5 | +7.4 [-13.2, +29.8] |
+
+Adding columns to the classifier instead (`ARR`, `WZ`, stand, aircraft type, same-day counts of late lane B rows)
+lost on the OOF months in every run, with or without the weights. w2 leads w1 on the OOF months and trails it on the
+holdout. v27 takes w1; that pick saw the holdout, so the holdout column overstates what the weighting is worth by an
+unknown amount. The OOF column does not depend on it.
+
+**Hull cell prior (`hull_prior()`, `_cells()`).** On the 127 hull rows of 2025 train (section 4), w1t's P(copy) does
+not sort copies from composed stamps: the copy share is 0.74 on the 38 rows with P(copy) above 0.9, 0.83 on the 29
+between 0.7 and 0.9, and 0.40 on the 10 between 0.5 and 0.7 (A0 and A1 cells below; session scratchpad
+`hull_air.py`). The mechanism of section 4 sorts them better. Every composed row takes k = kn and has kd = kn, so a
+row with kn != kd can only be a copy; the rest split by kn, and at kn = 1 by `z_sched` either side of 57,600 s, the
+shift rule's threshold:
+
+| cell | rule (kn, kd at tau = 1100) | train rows | copies |
+|---|---|---|---|
+| D | kn != kd | 36 | 36 |
+| A0 | kn = kd = 0 | 66 | 51 |
+| A1lo | kn = kd = 1, `z_sched` <= 57,600 | 13 | 11 |
+| A1hi | kn = kd = 1, `z_sched` > 57,600 | 12 | 3 |
+
+Each hull row then takes the expected label of its cell, P(copy) `z_sched` + (1 - P(copy)) (1100 + 86400 kn), with
+P(copy) = (copies + 1) / (rows + 2) over the training rows of its cell (the other OOF months in CV, all ten on the
+holdout, all of 2025 for the rank set), and `hull()` clips as before. Copies here include the near band.
+
+Against v26 on those 127 rows (SSE in millions of s^2, positive = better; session scratchpad `prior_hull2.py`):
+
+| variant | 12 months (127) | OOF (82) | holdout (45) |
+|---|---|---|---|
+| w1t, no prior | +2,132 | +2,145 | -13 |
+| one share per kn | +3,280 | +2,786 | +494 |
+| per kn, kn = 1 split at 57,600 | +3,705 | +2,478 | +1,228 |
+| cells D, A0, A1 | +3,893 | +3,574 | +319 |
+| cells D, A0, A1lo, A1hi (v27) | +4,952 | +3,794 | +1,158 |
+
+The v27 cells lead on the OOF months alone, so the choice among the four did not need the holdout; over all 12 months
+the RMSE on these rows improves by 2,081 s [+546, +3,938]. An airline term was checked and left out: sorted by the
+airline's own copy share on LIRF rows 1 to 4 h late, the copy share on A0 and A1 rows runs 0.60, 0.56, 0.55 and 0.81
+from the lowest band to the highest (20, 9, 11 and 43 rows).
+
+**Result** (`python laneb.py cv mix_cb_wx`, `docs/LANEB_RUN.md`). Holdout lane B 1741.7 against v26's 1816.9 and the
+donor's 1900.6 (+158.9 [+43.7, +347.7] vs the donor); LIRF 3331.1 (v26 3809.8); physical class 1112.4 (donor
+1153.0). The copy class is 2793.9 against the donor's 2707.4, so the strict pass mark of section 3 still fails, now
+by 3.2%.
+
+| variant | holdout lane B RMSE |
+|---|---|
+| full | 1741.7 |
+| no_prior | 1803.2 |
+| no_blend | 1742.4 |
+| no_shift | 1741.7 |
+| no_day | 1740.5 |
+| donor_only | 1900.6 |
+
+The prior is worth 61.5 points. The donor blend now changes little (0.7 points). Removing the shift rule changes
+nothing: every row it touches is a hull row, and the prior replaces those predictions whole. It stays in the code
+until `laneb.py` is next reworked.
+
+Full file, lane A unchanged (session scratchpad `gate_lb.py`): holdout 308.47 all against v26's 315.17, +6.70
+[+0.37, +14.41]; lane B over all 12 months 1486.9 against 1565.6, +78.7 [+17.4, +156.9]. Of the holdout's 1,438M of
+lane B SSE gain, 1,171M comes from the prior on 45 hull rows.
+
+**Rank 2026.** The 43 hull rows of the rank set fall 22 in A0, 13 in D, 4 in A1lo and 4 in A1hi, and each now equals
+its cell prediction. Against v26 they move by 7,599 s RMS; the largest moves (session scratchpad `rank_cmp.py`):
+
+| MVT_ID | cell | `z_sched` | v26 | v27 |
+|---|---|---|---|---|
+| 202681830 | A0 | 40,615 | 9,238 | 31,317 |
+| 213147307 | A0 | 33,057 | 47,410 | 25,538 |
+| 213145579 | A1hi | 111,654 | 106,525 | 94,401 |
+| 213154026 | A1hi | 60,656 | 67,737 | 79,830 |
+| 213142469 | A1lo | 47,705 | 44,605 | 55,664 |
+| 213142746 | A0 | 41,395 | 42,095 | 31,914 |
+
+Each is a two-outcome bet. Row 202681830 gains 4.6 s of board RMSE if it is a copy and loses about 4.3 s if it is
+composed at k = 0 with a 1,100 s taxi (1 s = 2 x 282.42 x 344,841 = 195M of SSE at v26's board score). Summed,
+(v27 - v26)^2 over the 43 rows is 2,483M, 12.75 s: what the rows are worth in expectation if every cell share is
+right, and what they cost if every label sits where v26 put it (session scratchpad `swing.py`).
+
+**EHAM snow rows, re-read.** Section 4 took LTFM's February 2025 snow as the analogue for EHAM's 3 to 5 January 2026
+and found v26's predictions near 5,000 s consistent with it. Three checks say it does not transfer:
+
+1. On LTFM's snow days lane A's median `z_aobt` is 2,098 to 2,105 s in every lateness band (`z_sched` 1 to 1.7 h,
+   1.7 to 2.8 h, 2.8 to 4.2 h, 4.2 to 6.9 h, over 6.9 h), while lane A's median label is about 3,200 s in the first
+   three. A measured pushback does not sit at one value across bands. Lane B's copy share there runs 0.98, 0.77,
+   0.17 and 0.00 by band, and its physical labels (median 4,769 to 6,235 s from the second band on) rise with
+   lateness. On EHAM's snow days lane A's median `z_aobt` moves with the band (2,806, 2,007, 1,548, 3,341 and
+   1,618 s), as measured times do (session scratchpad `snow_band.py`).
+2. Over 2025 train, on the 1,642 airport-days with at least 5 lane B physical rows and a lane A median `z_aobt` up to
+   2,000 s, the lane B physical median is 0.78 to 1.06 times lane A's median `z_aobt` in every band. The three days
+   above 2,000 s are all LTFM in February 2025 and give 0.38, 1.48 and 2.59 (session scratchpad `ab_ratio.py`).
+3. Fold-honest, on lane B rows over 1 h late (like for like: no donor blend on OOF months, blend on the holdout
+   months), w1t's SSE is 24,873M against v26's 26,958M, and 1,731M against 1,985M on the 6 most disrupted train
+   airport-days (lane A late median `z_aobt` over 2,000 s, 221 rows, copy share 0.68). w1t loses in the two bands
+   between 1,300 and 2,000 s, 1,892M against 1,781M (session scratchpad `ab_late.py`).
+
+v27 therefore keeps w1t's level on those rows: the 315 EHAM lane B rows of 3 to 5 January 2026 average 3,099 s against
+v26's 4,741 s (lane A's late median `z_aobt` on the three days: 2,108, 3,043 and 2,324 s). The risk stays: (v27 -
+v26)^2 over those rows sums to 987M, 5.07 s of board RMSE, gained if the labels sit at w1t's level and lost if they
+sit at v26's (session scratchpad `swing.py`). One board number cannot split this from the hull rows.

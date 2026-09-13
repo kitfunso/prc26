@@ -1,6 +1,6 @@
 """Lane B mechanism model: y is one of {schedule copy, day-shifted physical, physical} (near folded into physical,
-see docs/LANEB.md), not a single donor regression. Ambiguous copy rows blend toward the donor's cached prediction.
-`python laneb.py cv DONOR` / `python laneb.py fit IT_CLF IT_TAU [DONOR]`."""
+see docs/LANEB.md), not a single donor regression. Ambiguous copy rows blend toward the donor's cached prediction;
+LIRF rows over 4 h late take a per-cell copy-share prior instead. `python laneb.py cv DONOR` / `python laneb.py fit IT_CLF IT_TAU [DONOR]`."""
 from __future__ import annotations
 
 import json
@@ -13,7 +13,7 @@ import pandas as pd
 from sklearn.metrics import log_loss
 
 from data import CACHE, rmse
-from features import DAY, NUM, OCC, WX, build
+from features import ARR, DAY, NUM, OCC, WX, WZ, build
 from mix import B_CAT, B_NUM
 from train import FOLDS, HOLDOUT, LGB, RESULTS, boot_delta, report
 
@@ -22,7 +22,8 @@ BLEND = CACHE / "blend_ra_cb+ra_cb_s1+ra_cb_s2+ra_lgb+nn3_holdout.parquet"
 APT_SHIFT, Z_SHIFT, Y_SHIFT, SHIFT_ADD = "LIRF", 57600.0, 72000.0, 86400.0
 COPY_TOL, NEAR_Y_MIN, NEAR_LO, NEAR_HI, WIN = 60.0, 3000.0, -700.0, 3100.0, 7200.0
 DONOR_COPY_THRESH, DONOR_COPY_W = 0.12, 0.10
-HULL_Z, HULL_TAU, HULL_TZ = 14400.0, 3600.0, "Europe/Rome"
+W_FLOOR, W_CAP = 300.0, 14400.0
+HULL_Z, HULL_TAU, HULL_TZ, PRIOR_TAU = 14400.0, 3600.0, "Europe/Rome", 1100.0
 TAU_CAT = ["apt", "runway", "stand", "actype", "airline", "ades"]
 DAY_COLS = ["est_share", "a_tail_share", "a_za_p90", "w_est_share", "w_tail_share", "w_za_p90"]
 CLF_LGB = dict(objective="multiclass", learning_rate=0.05, num_leaves=63, min_child_samples=30, feature_fraction=0.8,
@@ -88,21 +89,30 @@ def tau_num(b: pd.DataFrame) -> list[str]:
     return [c for c in NUM if b[c].notna().any()]
 
 
+def _cost_w(d: pd.DataFrame, tau0: pd.Series) -> np.ndarray:
+    """A wrong copy/phys call costs about (z_sched - tau)^2 of SSE, so rows weigh |z_sched - tau0|, clipped, mean 1."""
+    t0 = d["apt"].astype(str).map(tau0).astype(float).fillna(float(tau0.median())).values
+    w = np.clip(np.abs(d["z_sched"].values - t0), W_FLOOR, W_CAP)
+    return w / w.mean()
+
+
 def fit_clf(tr, lab, keep, te, va, vlab, vkeep, cols, iters) -> tuple[np.ndarray, int]:
-    """Multiclass over whichever of {copy, near, phys} are present in tr, expanded back to a fixed 3-column P."""
+    """Multiclass over whichever of {copy, near, phys} are present in tr, expanded back to a fixed 3-column P. Rows are
+    cost-weighted (`_cost_w`, tau0 = the airport's median physical y in tr), see docs/LANEB.md section 5."""
     present = sorted(set(lab[keep].tolist()))
     remap = {v: i for i, v in enumerate(present)}
     y = np.vectorize(remap.get)(lab[keep])
+    tau0 = tr[keep & (lab == 2)].groupby(tr["apt"].astype(str))["y"].median()
     params = {**CLF_LGB, "num_class": len(present)}
     n = iters or params.pop("n_estimators")
     m = lgb.LGBMClassifier(**{**params, "n_estimators": n})
     if va is not None:
         yv = np.vectorize(remap.get)(vlab[vkeep])
-        m.fit(tr[cols][keep], y, eval_set=[(va[cols][vkeep], yv)], categorical_feature=B_CAT,
-              callbacks=[lgb.early_stopping(100, verbose=False)])
+        m.fit(tr[cols][keep], y, sample_weight=_cost_w(tr[keep], tau0), eval_set=[(va[cols][vkeep], yv)],
+              eval_sample_weight=[_cost_w(va[vkeep], tau0)], categorical_feature=B_CAT, callbacks=[lgb.early_stopping(100, verbose=False)])
         it = m.best_iteration_ or n
     else:
-        m.fit(tr[cols][keep], y, categorical_feature=B_CAT); it = n
+        m.fit(tr[cols][keep], y, sample_weight=_cost_w(tr[keep], tau0), categorical_feature=B_CAT); it = n
     raw, P = m.predict_proba(te[cols]), np.zeros((len(te), 3))
     for v, i in remap.items():
         P[:, v] = raw[:, i]
@@ -139,7 +149,7 @@ def predict(tr, te, va=None, iters=None, use_shift=True, use_day=True):
     if va is not None:
         vlab, vkeep, vphys = _labels(va)
     P, it_c = fit_clf(tr, lab, keep, te, va, vlab, vkeep, clf_cols, iters[0] if iters else None)
-    tcols = TAU_CAT + tau_num(tr) + DAY + OCC + WX
+    tcols = TAU_CAT + tau_num(tr) + DAY + OCC + WX + ARR + WZ
     tau, it_t = fit_tau(tr, phys, te, va, vphys, tcols, iters[1] if iters else None)
     rate, n_shift = shift_rate(tr)
     p_shift = np.where(use_shift & (te["apt"].values == APT_SHIFT) & (te["z_sched"].values > Z_SHIFT), rate, 0.0)
@@ -169,6 +179,28 @@ def hull(d: pd.DataFrame, p: np.ndarray) -> np.ndarray:
     return np.where((d["apt"].values == APT_SHIFT) & (z >= HULL_Z), np.clip(p, lo, hi), p)
 
 
+def _cells(d: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
+    """kn: whole days of delay after a PRIOR_TAU taxi; kd: local dates between the schedule and that off-block. kn != kd
+    only fits a copy (cell D); the rest split by kn = 0 (A0) and z_sched either side of Z_SHIFT (A1lo, A1hi)."""
+    z, t = d["z_sched"].values, d["t_off"].values
+    kn, kd = np.round((z - PRIOR_TAU) / SHIFT_ADD), _lday(t - PRIOR_TAU) - _lday(t - z)
+    return kn, np.where(kn != kd, "D", np.where(kn == 0, "A0", np.where(z > Z_SHIFT, "A1hi", "A1lo")))
+
+
+def hull_prior(tr: pd.DataFrame, te: pd.DataFrame, p: np.ndarray) -> np.ndarray:
+    """LIRF rows over 4h late: the classifier's P(copy) does not sort copies there, so p becomes P(copy) z + (1 - P(copy))
+    (PRIOR_TAU + 86400 kn), P(copy) the Laplace-smoothed copy share of tr's rows in the same cell (docs/LANEB.md section 5)."""
+    ht = (tr["apt"].values == APT_SHIFT) & (tr["z_sched"].values >= HULL_Z)
+    he = (te["apt"].values == APT_SHIFT) & (te["z_sched"].values >= HULL_Z)
+    c, nr, _, _ = classes(tr[ht])
+    _, cell_tr = _cells(tr[ht])
+    kn, cell = _cells(te[he])
+    pc = np.array([((c | nr)[cell_tr == k].sum() + 1) / ((cell_tr == k).sum() + 2) for k in cell])
+    out = np.array(p, dtype=float)
+    out[he] = pc * te["z_sched"].values[he] + (1 - pc) * (PRIOR_TAU + SHIFT_ADD * kn)
+    return out
+
+
 def overall(f: pd.DataFrame, ho: pd.DataFrame, ph: np.ndarray) -> tuple[float, float]:
     """Holdout RMSE over all 344,419 rows: donor blend as-is, vs. the same blend with lane B rows replaced."""
     bl = pd.read_parquet(BLEND)
@@ -191,25 +223,26 @@ def cv(donor: str) -> None:
         va = tr_all["month"].isin(months).values
         trn, van = tr_all[~va], tr_all[va]
         p, it, *_ = predict(trn, van, van)
-        oof[va] = p = hull(van, p); its.append(it)
+        oof[va] = p = hull(van, hull_prior(trn, van, p)); its.append(it)
         l1, n1 = clf_logloss(trn, van, True); l0, n0 = clf_logloss(trn, van, False)
         ll_day += l1 * n1; ll_noday += l0 * n0; n_ll += n1
         print(f"fold {i} {months}: rmse {rmse(van['y'].values, p):.1f} at {it} iters, {time.time() - t0:.0f}s", flush=True)
     print(f"day-feature multiclass logloss: with {ll_day / n_ll:.4f}, without {ll_noday / n_ll:.4f}")
     it = tuple(int(np.mean([x[j] for x in its]) * 1.1) for j in range(2))
-    ph, _, P, rate, n_shift = predict(tr_all, ho, iters=it); print(f"shift rule: {APT_SHIFT} z_sched>{Z_SHIFT:.0f}, n={n_shift}, rate={rate:.3f}")
+    raw, _, P, rate, n_shift = predict(tr_all, ho, iters=it); print(f"shift rule: {APT_SHIFT} z_sched>{Z_SHIFT:.0f}, n={n_shift}, rate={rate:.3f}")
     dh = pd.read_parquet(CACHE / f"{donor}_holdout.parquet")[["id", "p"]].rename(columns={"p": "donor"})
-    donor_p = ho[["id"]].merge(dh, on="id", how="left")["donor"].values; ph = hull(ho, blend_donor(ph, P[:, 0], donor_p))
+    donor_p = ho[["id"]].merge(dh, on="id", how="left")["donor"].values; bl = blend_donor(raw, P[:, 0], donor_p)
+    ph = hull(ho, hull_prior(tr_all, ho, bl))
     pd.DataFrame({"id": tr_all["id"].values, "oof": oof}).to_parquet(CACHE / "laneb_oof.parquet")
     pd.DataFrame({"id": ho["id"].values, "p": ph}).to_parquet(CACHE / "laneb_holdout.parquet")
     ho = ho.assign(p=ph); hb = ho.merge(dh, on="id")
     rmse_new, rmse_donor = rmse(hb["y"].values, hb["p"].values), rmse(hb["y"].values, hb["donor"].values)
     d = boot_delta(hb["y"].values, hb["donor"].values, hb["p"].values, hb["day"].values)
-    abl = {"full": rmse_new, "donor_only": rmse_donor}
-    for tag, kw in (("no_shift", dict(use_shift=False)), ("no_blend", {}), ("no_day", dict(use_day=False))):
+    abl = {"full": rmse_new, "donor_only": rmse_donor, "no_blend": rmse(ho["y"].values, hull(ho, hull_prior(tr_all, ho, raw))),
+           "no_prior": rmse(ho["y"].values, hull(ho, bl))}
+    for tag, kw in (("no_shift", dict(use_shift=False)), ("no_day", dict(use_day=False))):
         p, _, Pk, _, _ = predict(tr_all, ho, iters=it, **kw)
-        p = hull(ho, blend_donor(p, Pk[:, 0], donor_p) if tag != "no_blend" else p)
-        abl[tag] = rmse(ho["y"].values, p)
+        abl[tag] = rmse(ho["y"].values, hull(ho, hull_prior(tr_all, ho, blend_donor(p, Pk[:, 0], donor_p))))
     base_rmse, new_rmse = overall(f, ho, ph)
     by_apt = pd.DataFrame({"apt": hb["apt"].values, "y": hb["y"].values, "new": hb["p"].values, "donor": hb["donor"].values}) \
         .groupby("apt").apply(lambda g: pd.Series({"n": len(g), "rmse_new": rmse(g["y"], g["new"]), "rmse_donor": rmse(g["y"], g["donor"])}), include_groups=False)
@@ -238,6 +271,8 @@ def write_doc(donor, it, rate, n_shift, ll_d, ll_nd, rmse_new, rmse_donor, d, by
         f"({'day features help' if ll_d < ll_nd else 'day features do not help'}).\n\n",
         f"Donor blend: P(copy) > {DONOR_COPY_THRESH} rows take {DONOR_COPY_W:.2f}*ours + {1 - DONOR_COPY_W:.2f}*donor (tau misjudges the remainder there).\n\n",
         f"Hull: {APT_SHIFT} rows with z_sched >= {HULL_Z:.0f}s are projected onto the convex hull of their feasible labels (`hull()`).\n\n",
+        f"Hull prior: before `hull()` those rows take P(copy) z + (1 - P(copy)) ({PRIOR_TAU:.0f} + 86400 kn), P(copy) the Laplace-smoothed "
+        "copy share of their cell among the training rows (`hull_prior()`).\n\n",
         "## By airport (holdout lane B)\n\n", by_apt.round(1).to_markdown(), "\n\n",
         "## By mechanism class (holdout lane B)\n\n", by_cls.round(1).to_markdown(), "\n\n",
         "## Ablation (holdout lane B RMSE, one piece removed)\n\n",
@@ -255,7 +290,7 @@ def fit(it_clf: int, it_tau: int, donor: str = "mix_cb_wx") -> None:
     tr, rk = b[b["split"] == "train"], b[b["split"] == "rank"]
     p, _, P, _, _ = predict(tr, rk, iters=(it_clf, it_tau))
     dr = pd.read_parquet(f"data/{donor}_rank.parquet")[["MVT_ID_mvt", "TAXITIME_SEC_mvt"]].rename(columns={"MVT_ID_mvt": "id", "TAXITIME_SEC_mvt": "donor"})
-    donor_p = rk[["id"]].merge(dr, on="id", how="left")["donor"].values; p = hull(rk, blend_donor(p, P[:, 0], donor_p))
+    donor_p = rk[["id"]].merge(dr, on="id", how="left")["donor"].values; p = hull(rk, hull_prior(tr, rk, blend_donor(p, P[:, 0], donor_p)))
     pd.DataFrame({"MVT_ID_mvt": rk["id"].values, "TAXITIME_SEC_mvt": p}).to_parquet("data/laneb_rank.parquet")
     print("data/laneb_rank.parquet", len(p), float(np.mean(p)))
 

@@ -22,3 +22,10 @@ Lane B rows carry no AOBT/EOBT/LOBT/IOBT stamp; only the schedule stamp and the 
 cannot be predicted from that, and shifting a group mean toward them costs the other rows more than it saves.
 The holdout "all" figure is therefore dominated by a handful of rows; compare candidates on lane A and on the paired
 day-block bootstrap, which is what the ledger does.
+
+Midnight crossing does not explain them either (session scratchpad `shift_mid.py`, 2025 train). Of 5,903 rows under
+4 h late whose schedule falls on the local date before the off-block, one is a day-shift row (LIRF lane B, 23:59
+schedule, 03:13 takeoff). The two day-shift rows off LIRF sit on one date with no crossing: LFPG 2025-01-19 (y 84,240 s,
+29 min late, stamp 20:30 the evening before) and LSZH 2025-05-14 (y 87,341 s, `z_sched` 939 s: the schedule time on
+the previous date). The one row over 21,600 s off LIRF, LFPG 2025-01-23 (y 58,206 s), carries a 23:59 stamp from the
+evening before. The other twelve LIRF lane B day-shift rows are 4 h or more late (`docs/LANEB.md` sections 4 and 5).
