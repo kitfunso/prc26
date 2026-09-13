@@ -50,24 +50,27 @@ Holdout = January and July 2025, never used for model choice. CV = five folds ov
 by month pair. Every result line reports per lane (A = has a flight plan, B = no plan) and per month.
 Predictions are floored at 0. Board uploads are logged in `LEDGER.md` with the expected and actual score.
 
-## Reproduce the current build (v25)
+## Reproduce the current build (v26)
 
-v25 = 0.5824 * CatBoost residual lane-A model with arrival recorder-mode features (`ra_cb_arr`) + 0.1399 * the
-LightGBM version (`ra_lgb_arr`) + 0.2777 * the MLP version (`nn3_arr`). Lane A is the same residual-to-AOBT
-design as v24 (tail-gated tree cells, or an MLP fit on the residual directly), now with 16 more features from
-the arrival recorder-mode analysis (`ARR` in `features.py`; each `_arr` config passed a paired day-block
-bootstrap gate against its non-ARR parent, `docs/ARR_SHIP.md`). Lane B (no plan) takes `laneb.py`'s LIRF-only
-mechanism model as a row-level override (`combine.py --over`) instead of the donor mixture. Weights are
-non-negative least squares on the CV out-of-fold predictions (`blend.py`), never on the holdout. Holdout
-Jan+Jul 2025: 322.59 all, 223.65 lane A, 1874.62 lane B (`docs/RESULTS.md`); paired day-block bootstrap
-against the shipped v24 blend +4.40 [+2.18, +6.84] all, +3.00 [+2.38, +3.64] lane A, +25.98 [+5.24, +57.48]
-lane B (`docs/ARR_SHIP.md`). Uploaded 2026-09-13: board 288.6796, down from v24's 290.7995 (`LEDGER.md`).
+v26 = 0.5223 * CatBoost residual lane-A model with arrival recorder-mode and window-state features (`ra_cb_wz`)
++ 0.1564 * the LightGBM version (`ra_lgb_wz`) + 0.3213 * the MLP version (`nn3_wz`). Lane A is v25's design
+(residual to AOBT, tail-gated tree cells or an MLP on the residual, plus the 16 `ARR` arrival recorder-mode
+features, `docs/ARR_SHIP.md`) with 20 window-state columns (`WZ` in `features.py`): label-free statistics of the
+neighbouring departures' stamps within +-30 min, +-1 h and +-3 h at the airport and +-1 h within the airline
+(`docs/WINDOW_STATE.md`). Lane B (no plan) takes `laneb.py`'s LIRF-only mechanism model as a row-level override
+(`combine.py --over`). New in v26: LIRF lane B rows over 4 h late are clipped onto the interval of labels the two
+recorder mechanisms can produce (a schedule copy, or the real clock time written on a nearby date), and clipping
+onto an interval that holds the label cannot move a prediction away from it (`docs/LANEB.md` section 4). Weights
+are non-negative least squares on the CV out-of-fold predictions (`blend.py`), never on the holdout. Holdout
+Jan+Jul 2025: 315.17 all, 220.43 lane A, 1816.9 lane B; paired day-block bootstrap against v25 +7.42 [+2.12,
++14.51] all, lane A blend alone +2.19 [+1.40, +3.14], hull alone +5.19 [+0.01, +12.01] (`docs/WINDOW_STATE.md`).
+Uploaded 2026-09-13: board 282.4241, down from v25's 288.6796 (`LEDGER.md`).
 
 ```
 pip install -r requirements.txt            # Python 3.12, CUDA GPU for CatBoost
 # put training_*.parquet, ranking.parquet, submitting.parquet in data/
 python weather.py fetch 2026-09-05         # data/weather/2026-09-05/<ICAO>.csv
-python data.py && python features.py       # caches under data/cache/, incl. ARR (arrival recorder-mode features)
+python data.py && python features.py       # caches under data/cache/, incl. ARR (arrival recorder-mode) and WZ (window-state) features
 python mix.py cv mix_cb_wx                 # lane-B donor: CV + holdout line in docs/RESULTS.md, iteration counts at the end
 python mix.py fit mix_cb_wx 2309 3779      # -> data/mix_cb_wx_rank.parquet
 python lanea.py cv ra_cb mix_cb_wx         # residual lane A, lane B copied from the donor
@@ -79,18 +82,22 @@ python blend.py ra_cb ra_cb_s1 ra_cb_s2 ra_lgb nn3 --base=mix_cb_wx    # v24 ble
 python lanea.py cv ra_cb_arr mix_cb_wx     # same configs plus ARR (16 arrival recorder-mode features)
 python lanea.py cv ra_lgb_arr mix_cb_wx
 python nn.py cv nn3_arr mix_cb_wx
-python blend.py ra_cb_arr ra_lgb_arr nn3_arr --base=blend_ra_cb+ra_cb_s1+ra_cb_s2+ra_lgb+nn3
-python laneb.py fit 100 449                # LIRF-only lane B mechanism model -> data/laneb_rank.parquet
-python lanea.py fit ra_lgb_arr mix_cb_wx 254 249 414   # full 2025 refit at the CV iteration counts
-python nn.py fit nn3_arr mix_cb_wx
-python lanea.py fit ra_cb_arr mix_cb_wx 2356 2743 5048
-python combine.py data/merry-octopus_v25.parquet data/ra_cb_arr_rank.parquet:0.5824 data/ra_lgb_arr_rank.parquet:0.1399 data/nn3_arr_rank.parquet:0.2777 --over=data/laneb_rank.parquet
-python board.py check data/merry-octopus_v25.parquet
+python blend.py ra_cb_arr ra_lgb_arr nn3_arr --base=blend_ra_cb+ra_cb_s1+ra_cb_s2+ra_lgb+nn3    # v25 blend
+python lanea.py cv ra_cb_wz mix_cb_wx      # v25 configs plus WZ (20 window-state features)
+python lanea.py cv ra_lgb_wz mix_cb_wx
+python nn.py cv nn3_wz mix_cb_wx
+python blend.py ra_cb_wz ra_lgb_wz nn3_wz --base=blend_ra_cb_arr+ra_lgb_arr+nn3_arr
+python laneb.py fit 100 449                # LIRF-only lane B mechanism model with the hull -> data/laneb_rank.parquet
+python lanea.py fit ra_lgb_wz mix_cb_wx 229 286 494    # full 2025 refit at the CV iteration counts
+python nn.py fit nn3_wz mix_cb_wx
+python lanea.py fit ra_cb_wz mix_cb_wx 2373 1991 4509
+python combine.py data/merry-octopus_v26.parquet data/ra_cb_wz_rank.parquet:0.5223 data/ra_lgb_wz_rank.parquet:0.1564 data/nn3_wz_rank.parquet:0.3213 --over=data/laneb_rank.parquet
+python board.py check data/merry-octopus_v26.parquet
 ```
 
 `laneb.py` is a LIRF-only mechanism model for lane B (schedule copy vs. physical, day-shifted; `docs/LANEB.md`).
 Its own strict pass mark (copy class no worse than the donor) narrowly fails, but its holdout RMSE is better
-overall with a bootstrap CI clear of zero, so v25 uses its predictions as a row-level override on lane B
+overall with a bootstrap CI clear of zero, so v25 and v26 use its predictions as a row-level override on lane B
 (`combine.py --over`) rather than through the blend weights.
 
 CatBoost on GPU is not bit-reproducible run to run; expect about 1 s of holdout noise. `tune.py` runs Optuna over

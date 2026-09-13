@@ -1,6 +1,8 @@
 # Lane B mechanism model
 
-`PYTHONPATH=/c/Users/skf_s/prc26 python laneb.py cv mix_cb_wx` then `python laneb.py fit 100 449`.
+`PYTHONPATH=/c/Users/skf_s/prc26 python laneb.py cv mix_cb_wx` then `python laneb.py fit 100 449`. `cv` writes its
+tables to `docs/LANEB_RUN.md`; this file is the analysis. Sections 1 to 3 and the verdict describe v25; section 4 adds
+the hull that v26 ships.
 
 **Result: FAIL** vs donor mix_cb_wx (holdout lane B RMSE 1900.6) on the strict pass mark (copy class no worse than
 donor's 2707.4), by 0.2%. New 1874.6, donor 1900.6, paired day-block bootstrap delta +26.0 [+5.2, +57.5] (lower
@@ -156,3 +158,71 @@ found after a genuine grid search that shows the two pass criteria trade off aga
 of fixes; closing the remaining 0.2% would need a fix for the classifier's false negatives on true copy rows
 (P(copy) <= 0.12 on an actual copy row), not more blend weight. Shipped as the best available variant per
 instruction.
+
+## 4. Hull on LIRF rows over 4 h late (v26)
+
+A LIRF lane B row whose takeoff is 4 h or more after its schedule (`z_sched >= 14400`) carries one of two labels,
+read on all 127 such rows in 2025 train:
+
+- a schedule copy: y within 60 s of `z_sched`, or in the near band [`z_sched` - 3100, `z_sched` + 700];
+- a composed stamp: the real off-block clock time written on some date, so y = tau + 86400 k with tau an
+  ordinary taxi.
+
+Which day count the composed rows use: kn = round((`z_sched` - tau) / 86400) is the count nearest the schedule,
+kd = local date(`t_off` - tau) - local date(`t_off` - `z_sched`) in Europe/Rome is the calendar count. Counts at
+tau = 1100 (session scratchpad `laneb_hull.py`):
+
+| kn | kd | composed, y <= 72000 | composed, y > 72000 | copy, y <= 72000 | copy, y > 72000 |
+|---|---|---|---|---|---|
+| 0 | 0 | 15 | 0 | 51 | 0 |
+| 0 | 1 | 0 | 0 | 33 | 0 |
+| 1 | 0 | 0 | 0 | 2 | 0 |
+| 1 | 1 | 0 | 11 | 14 | 0 |
+| 2 | 1 | 0 | 0 | 0 | 1 |
+
+Every composed row takes k = kn (15 at k = 0, 11 at k = 1), and kd agrees with kn on all 26 of them.
+
+Off LIRF the same filter finds 415 train rows, all composed at k = 0: y runs from -5 to 8,937 s (median 1,026), and
+21 are above 3,600 s, 17 of them LTFM. There is no copy mode to bound there, and a cap at 3,600 s would cut 21 real
+labels, so the hull is LIRF only.
+
+**Hull.** On those LIRF rows p is clipped to [lo, hi] (`hull()`), with lo = min(`z_sched` - 3100, 86400 k_min) and
+hi = max(`z_sched` + 700, 3600 + 86400 k_max), k running over kn and kd at tau in {0, 3600}. Every label the two
+mechanisms can produce (copy, near band, composed with tau in [0, 3600] at those day counts) lies inside, and
+clipping onto an interval that holds the label never moves a prediction away from it. That rests on the support:
+0 of the 127 train rows fall outside their own interval. kd never changes a composed row's k here; it stays in to
+keep the interval wide.
+
+**Results.**
+
+| set | rows moved | effect |
+|---|---|---|
+| OOF, months 2-12, no donor blend | 6 of 17,097, all closer to the label | lane B SSE 37,929M to 37,339M |
+| holdout Jan+Jul 2025 | 5 (3 composed, 2 copy), all closer | lane B 1874.6 to 1816.9; all rows with v25's lane A 322.59 to 317.40, +5.19 [+0.01, +12.01] vs v25 |
+
+The `laneb.py cv` rerun with the hull reproduces the holdout figure (1816.93, `docs/LANEB_RUN.md`). With the hull in
+place the donor blend costs 33.0 points of lane B RMSE (`no_blend` 1783.9 vs 1816.9), down from 80.6. It stays:
+it was chosen for the copy class, and dropping it on this ablation would be a choice made on the holdout.
+
+**Rank 2026.** 43 LIRF lane B rows have `z_sched >= 14400`. `python laneb.py fit 100 449` moves 6 of them and leaves
+every other lane B row as v25 had it (the new `data/laneb_rank.parquet` equals hull(v25), max difference 0.000000).
+
+| MVT_ID | z_sched | v25 | v26 |
+|---|---|---|---|
+| 202680695 | 39,365 | 40,396 | 40,065 |
+| 213142469 | 47,705 | 22,435 | 44,605 |
+| 213145828 | 36,062 | 50,140 | 36,762 |
+| 213142746 | 41,395 | 60,341 | 42,095 |
+| 213152353 | 87,484 | 67,814 | 84,384 |
+| 213154831 | 39,060 | 40,222 | 39,760 |
+
+Board arithmetic for these six rows alone (N = 344,841, from v25's 288.68): all six copies gives 280.71, all six
+composed at k = kn gives 257.93, and all six composed at k = 0 gives 293.16. The last case puts the two kn = 1 rows
+outside the support, which no train row does (0 of 11). v26 ships the hull together with the lane A change, and the
+board change is not read row by row.
+
+**Non-LIRF rows over 4 h late in 2026.** The rank set has 280 (215 in January). v25 puts 101 of them above 3,600 s,
+against 21 of 415 labels in 2025 train. 100 of the 101 are EHAM, which has 148 such rows against 91 in all of 2025
+(v25 median 4,701 s, max 6,460; the donor puts 55 above 3,600 s), and 99 of those 100 fall on 2026-01-03 to 05. An
+early-January weather or disruption spell is the likely reading, not checked against METAR here. No interval bounds a
+composed label, so these rows stay as the model has them (session scratchpad `nonlirf_big.py`).

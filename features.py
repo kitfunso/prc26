@@ -20,6 +20,12 @@ DAY = ["n_day", "nB_day", "b_share", "day_dae_med", "day_zs_med", "day_za_med", 
 OCC = ["occ", "t_occ"]
 ARR = ["ad_arr_a1", "ad_arr_sc", "ad_arr_tail", "ad_n_arr", "w_arr_a1", "w_arr_sc", "w_arr_tail", "w_n_arr",
        "pa_a1", "pa_sc", "pa_taxi_in", "pa_gap", "pa_missing", "al_arr_a1", "al_arr_sc", "al_n_arr"]
+WS_CLIP, WS_TAIL = 1800.0, 600.0  # gap clip; lanea's |c| tail threshold, reused for the gap shares
+WS_SCALES = {"wz": (("split", "apt", "day"), 3600.0), "wa": (("split", "apt", "day", "airline"), 3600.0),
+             "wz30": (("split", "apt", "day"), 1800.0), "wz3h": (("split", "apt", "day"), 10800.0)}
+WZ = ["wz_n", "wz_dz", "wz_dz_sd", "wz_hi", "wz_lo", "wz_dae", "wz_dae_sd", "wz_dae0",
+      "wa_n", "wa_dz", "wa_dae", "wa_dae_sd", "wz30_dz", "wz30_dae", "wz30_dae_sd",
+      "wz3h_dz", "wz3h_dae", "wz3h_dae_sd", "wz_dal", "wz_dal_sd"]
 
 
 def anchor(df: pd.DataFrame) -> np.ndarray:
@@ -185,6 +191,41 @@ def arrmode(f: pd.DataFrame, raw: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def window_state(f: pd.DataFrame, keys: tuple[str, ...], win: float, pre: str) -> pd.DataFrame:
+    """Leave-one-out +-win stats within `keys` over neighbours with the stamps; z_aobt, d_ae, d_al only, never y."""
+    za, dae, dal = f["z_aobt"].values, f["d_ae"].values, f["d_al"].values
+    ok = np.isfinite(za) & np.isfinite(dae)
+    okl = ok & np.isfinite(dal)
+    norm = f["z_aobt"].groupby([f["apt"], f["runway"], f["hour"]], observed=True).transform("median").values
+    dz = np.where(ok, np.clip(za - norm, -WS_CLIP, WS_CLIP), 0.0)
+    de = np.where(ok, np.clip(dae, -WS_CLIP, WS_CLIP), 0.0)
+    dl = np.where(okl, np.clip(dal, -WS_CLIP, WS_CLIP), 0.0)
+    q = {"n": ok, "dz": dz, "dz2": dz ** 2, "hi": ok & (dz > WS_TAIL), "lo": ok & (dz < -WS_TAIL),
+         "de": de, "de2": de ** 2, "de0": ok & (np.abs(de) < 60), "nl": okl, "dl": dl, "dl2": dl ** 2}
+    q = {k: np.asarray(v, dtype=float) for k, v in q.items()}
+    s = {k: np.zeros(len(f)) for k in q}
+    t = f["t_off"].values
+    for ix in f.groupby(list(keys), observed=True).indices.values():
+        o = ix[np.argsort(t[ix], kind="stable")]
+        ts = t[o]
+        lo, hi = np.searchsorted(ts, ts - win, "left"), np.searchsorted(ts, ts + win, "right")
+        for k, v in q.items():
+            cum = np.concatenate([[0.0], np.cumsum(v[o])])
+            s[k][o] = cum[hi] - cum[lo] - v[o]
+    n, nl = s["n"], s["nl"]
+    with np.errstate(invalid="ignore", divide="ignore"):
+        m, e, l = s["dz"] / n, s["de"] / n, s["dl"] / nl
+        d = {"n": n, "dz": m, "dz_sd": np.sqrt(np.maximum(s["dz2"] / n - m ** 2, 0)), "hi": s["hi"] / n,
+             "lo": s["lo"] / n, "dae": e, "dae_sd": np.sqrt(np.maximum(s["de2"] / n - e ** 2, 0)),
+             "dae0": s["de0"] / n, "dal": l, "dal_sd": np.sqrt(np.maximum(s["dl2"] / nl - l ** 2, 0))}
+    return pd.DataFrame({f"{pre}_{k}": v for k, v in d.items()}, index=f.index)
+
+
+def winstate(f: pd.DataFrame) -> pd.DataFrame:
+    """Recorder state around each departure (docs/WINDOW_STATE.md): neighbours' AOBT gaps stand in for their unseen c."""
+    return pd.concat([window_state(f, k, w, p) for p, (k, w) in WS_SCALES.items()], axis=1)[WZ]
+
+
 def build(refresh: bool = False) -> pd.DataFrame:
     out = CACHE / "feat.parquet"
     if out.exists() and not refresh:
@@ -220,6 +261,7 @@ def build(refresh: bool = False) -> pd.DataFrame:
     for c in CAT:
         f[c] = f[c].astype(str).fillna("NA").astype("category")
     f = f.reset_index(drop=True)
+    f = pd.concat([f, winstate(f)], axis=1)  # after the CAT cast: a missing runway is then its own level, not a dropped key
     tmp = out.with_suffix(".tmp.parquet")  # another process may be reading feat.parquet: write, then atomic rename
     f.to_parquet(tmp)
     tmp.replace(out)

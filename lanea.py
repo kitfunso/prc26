@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 from data import CACHE, rmse
-from features import ARR, CAT, DAY, NUM, OCC, WX, build
+from features import ARR, CAT, DAY, NUM, OCC, WX, WZ, build
 from mix import CLF_CB, CLF_LGB, fit_clf
 from train import BASE, FOLDS, HOLDOUT, LGB, RESULTS, fit_predict, report
 
@@ -27,6 +27,8 @@ CONFIGS: dict[str, dict] = {
     "ra_cb_s1_arr": dict(clf=dict(family="cb", params={**CLF_CB, "loss_function": "Logloss", "random_seed": 1}), reg=dict(params={**REG, "random_seed": 1}, cat=CAT, num=NUM + DAY + OCC + WX + ARR), cat=CAT, num=NUM + DAY + OCC + WX + ARR),
     "ra_cb_s2_arr": dict(clf=dict(family="cb", params={**CLF_CB, "loss_function": "Logloss", "random_seed": 2}), reg=dict(params={**REG, "random_seed": 2}, cat=CAT, num=NUM + DAY + OCC + WX + ARR), cat=CAT, num=NUM + DAY + OCC + WX + ARR),
     "ra_lgb_arr": dict(clf=dict(family="lgb", params=CLF_LGB_BIN), reg=dict(family="lgb", params={**LGB, "n_jobs": 12}, cat=CAT, num=NUM + DAY + OCC + WX + ARR), cat=CAT, num=NUM + DAY + OCC + WX + ARR),
+    "ra_cb_wz": dict(clf=dict(family="cb", params={**CLF_CB, "loss_function": "Logloss"}), reg=dict(params=REG, cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ), cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ),
+    "ra_lgb_wz": dict(clf=dict(family="lgb", params=CLF_LGB_BIN), reg=dict(family="lgb", params={**LGB, "n_jobs": 12}, cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ), cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ),
 }
 
 

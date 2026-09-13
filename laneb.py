@@ -17,11 +17,12 @@ from features import DAY, NUM, OCC, WX, build
 from mix import B_CAT, B_NUM
 from train import FOLDS, HOLDOUT, LGB, RESULTS, boot_delta, report
 
-DOC = "docs/LANEB.md"
+DOC = "docs/LANEB_RUN.md"
 BLEND = CACHE / "blend_ra_cb+ra_cb_s1+ra_cb_s2+ra_lgb+nn3_holdout.parquet"
 APT_SHIFT, Z_SHIFT, Y_SHIFT, SHIFT_ADD = "LIRF", 57600.0, 72000.0, 86400.0
 COPY_TOL, NEAR_Y_MIN, NEAR_LO, NEAR_HI, WIN = 60.0, 3000.0, -700.0, 3100.0, 7200.0
 DONOR_COPY_THRESH, DONOR_COPY_W = 0.12, 0.10
+HULL_Z, HULL_TAU, HULL_TZ = 14400.0, 3600.0, "Europe/Rome"
 TAU_CAT = ["apt", "runway", "stand", "actype", "airline", "ades"]
 DAY_COLS = ["est_share", "a_tail_share", "a_za_p90", "w_est_share", "w_tail_share", "w_za_p90"]
 CLF_LGB = dict(objective="multiclass", learning_rate=0.05, num_leaves=63, min_child_samples=30, feature_fraction=0.8,
@@ -155,6 +156,19 @@ def blend_donor(p_new: np.ndarray, p_copy: np.ndarray, donor_p: np.ndarray) -> n
     return np.maximum(np.where(p_copy > DONOR_COPY_THRESH, mixed, p_new), 0)
 
 
+def _lday(t: np.ndarray) -> np.ndarray:
+    return pd.to_datetime(t, unit="s", utc=True).tz_convert(HULL_TZ).tz_localize(None).values.astype("datetime64[D]").astype(np.int64)
+
+
+def hull(d: pd.DataFrame, p: np.ndarray) -> np.ndarray:
+    """LIRF rows over 4h late: y is a schedule copy (z or the near band) or the off-block clock time pinned to date k, the
+    date nearest the schedule or the local date, so p goes onto the convex hull of those outcomes (docs/LANEB.md)."""
+    z, t = d["z_sched"].values, d["t_off"].values
+    k = np.array([np.round((z - a) / SHIFT_ADD) for a in (0.0, HULL_TAU)] + [_lday(t - a) - _lday(t - z) for a in (0.0, HULL_TAU)])
+    lo, hi = np.minimum(z - NEAR_HI, SHIFT_ADD * k.min(0)), np.maximum(z - NEAR_LO, HULL_TAU + SHIFT_ADD * k.max(0))
+    return np.where((d["apt"].values == APT_SHIFT) & (z >= HULL_Z), np.clip(p, lo, hi), p)
+
+
 def overall(f: pd.DataFrame, ho: pd.DataFrame, ph: np.ndarray) -> tuple[float, float]:
     """Holdout RMSE over all 344,419 rows: donor blend as-is, vs. the same blend with lane B rows replaced."""
     bl = pd.read_parquet(BLEND)
@@ -177,7 +191,7 @@ def cv(donor: str) -> None:
         va = tr_all["month"].isin(months).values
         trn, van = tr_all[~va], tr_all[va]
         p, it, *_ = predict(trn, van, van)
-        oof[va] = p; its.append(it)
+        oof[va] = p = hull(van, p); its.append(it)
         l1, n1 = clf_logloss(trn, van, True); l0, n0 = clf_logloss(trn, van, False)
         ll_day += l1 * n1; ll_noday += l0 * n0; n_ll += n1
         print(f"fold {i} {months}: rmse {rmse(van['y'].values, p):.1f} at {it} iters, {time.time() - t0:.0f}s", flush=True)
@@ -185,7 +199,7 @@ def cv(donor: str) -> None:
     it = tuple(int(np.mean([x[j] for x in its]) * 1.1) for j in range(2))
     ph, _, P, rate, n_shift = predict(tr_all, ho, iters=it); print(f"shift rule: {APT_SHIFT} z_sched>{Z_SHIFT:.0f}, n={n_shift}, rate={rate:.3f}")
     dh = pd.read_parquet(CACHE / f"{donor}_holdout.parquet")[["id", "p"]].rename(columns={"p": "donor"})
-    donor_p = ho[["id"]].merge(dh, on="id", how="left")["donor"].values; ph = blend_donor(ph, P[:, 0], donor_p)
+    donor_p = ho[["id"]].merge(dh, on="id", how="left")["donor"].values; ph = hull(ho, blend_donor(ph, P[:, 0], donor_p))
     pd.DataFrame({"id": tr_all["id"].values, "oof": oof}).to_parquet(CACHE / "laneb_oof.parquet")
     pd.DataFrame({"id": ho["id"].values, "p": ph}).to_parquet(CACHE / "laneb_holdout.parquet")
     ho = ho.assign(p=ph); hb = ho.merge(dh, on="id")
@@ -194,7 +208,7 @@ def cv(donor: str) -> None:
     abl = {"full": rmse_new, "donor_only": rmse_donor}
     for tag, kw in (("no_shift", dict(use_shift=False)), ("no_blend", {}), ("no_day", dict(use_day=False))):
         p, _, Pk, _, _ = predict(tr_all, ho, iters=it, **kw)
-        p = blend_donor(p, Pk[:, 0], donor_p) if tag != "no_blend" else p
+        p = hull(ho, blend_donor(p, Pk[:, 0], donor_p) if tag != "no_blend" else p)
         abl[tag] = rmse(ho["y"].values, p)
     base_rmse, new_rmse = overall(f, ho, ph)
     by_apt = pd.DataFrame({"apt": hb["apt"].values, "y": hb["y"].values, "new": hb["p"].values, "donor": hb["donor"].values}) \
@@ -215,7 +229,7 @@ def write_doc(donor, it, rate, n_shift, ll_d, ll_nd, rmse_new, rmse_donor, d, by
     copy_new, copy_donor = by_cls.loc["copy", "rmse_new"], by_cls.loc["copy", "rmse_donor"]
     passed = rmse_new < 1900.6 and d[1] > 0 and copy_new <= copy_donor
     lines = [
-        "# Lane B mechanism model\n\n",
+        "# Lane B mechanism model: last `laneb.py cv` run (the analysis is docs/LANEB.md)\n\n",
         f"`PYTHONPATH=/c/Users/skf_s/prc26 python laneb.py cv {donor}` then `python laneb.py fit {it[0]} {it[1]}`.\n\n",
         f"Result: **{'PASS' if passed else 'FAIL'}** vs donor {donor} (1900.6). New {rmse_new:.1f}, donor {rmse_donor:.1f}, "
         f"bootstrap delta {d[0]:+.1f} [{d[1]:+.1f}, {d[2]:+.1f}]. Copy {copy_new:.1f} vs donor {copy_donor:.1f} ({'no worse' if copy_new <= copy_donor else 'worse'}).\n\n",
@@ -223,6 +237,7 @@ def write_doc(donor, it, rate, n_shift, ll_d, ll_nd, rmse_new, rmse_donor, d, by
         f"Day-feature multiclass log loss on CV folds: with {ll_d:.4f}, without {ll_nd:.4f} "
         f"({'day features help' if ll_d < ll_nd else 'day features do not help'}).\n\n",
         f"Donor blend: P(copy) > {DONOR_COPY_THRESH} rows take {DONOR_COPY_W:.2f}*ours + {1 - DONOR_COPY_W:.2f}*donor (tau misjudges the remainder there).\n\n",
+        f"Hull: {APT_SHIFT} rows with z_sched >= {HULL_Z:.0f}s are projected onto the convex hull of their feasible labels (`hull()`).\n\n",
         "## By airport (holdout lane B)\n\n", by_apt.round(1).to_markdown(), "\n\n",
         "## By mechanism class (holdout lane B)\n\n", by_cls.round(1).to_markdown(), "\n\n",
         "## Ablation (holdout lane B RMSE, one piece removed)\n\n",
@@ -240,7 +255,7 @@ def fit(it_clf: int, it_tau: int, donor: str = "mix_cb_wx") -> None:
     tr, rk = b[b["split"] == "train"], b[b["split"] == "rank"]
     p, _, P, _, _ = predict(tr, rk, iters=(it_clf, it_tau))
     dr = pd.read_parquet(f"data/{donor}_rank.parquet")[["MVT_ID_mvt", "TAXITIME_SEC_mvt"]].rename(columns={"MVT_ID_mvt": "id", "TAXITIME_SEC_mvt": "donor"})
-    donor_p = rk[["id"]].merge(dr, on="id", how="left")["donor"].values; p = blend_donor(p, P[:, 0], donor_p)
+    donor_p = rk[["id"]].merge(dr, on="id", how="left")["donor"].values; p = hull(rk, blend_donor(p, P[:, 0], donor_p))
     pd.DataFrame({"MVT_ID_mvt": rk["id"].values, "TAXITIME_SEC_mvt": p}).to_parquet("data/laneb_rank.parquet")
     print("data/laneb_rank.parquet", len(p), float(np.mean(p)))
 
