@@ -39,3 +39,16 @@
 | ra_cb_s2 (B from mix_cb_wx) | {"all": 255.33, "laneA": 210.44, "laneB": 1474.08} | {"all": 329.37, "laneA": 230.13, "laneB": 1900.6, "m1": 343.45, "m7": 317.57} | (2708, 2453, 4713) | 56205s |
 | blend:ra_cb+ra_cb_s1+ra_cb_s2+ra_lgb+nn3 w=[0.218, 0.247, 0.181, 0.074, 0.28] | {"all": 253.15, "laneA": 207.81, "laneB": 1473.38} | {"all": 326.99, "laneA": 226.65, "laneB": 1900.6, "m1": 341.59, "m7": 314.73} | - | -  vs blend_ra_cb+ra_cb_s1+ra_lgb+nn3: +0.09 [+0.04, +0.15] |
 | five-way blend 0.218 ra_cb + 0.247 ra_cb_s1 + 0.181 ra_cb_s2 + 0.074 ra_lgb + 0.28 nn3 vs v23 blend (holdout, paired day-block bootstrap) | laneA OOF 207.89 -> 207.81 | all 327.08 -> 326.99, laneA 226.79 -> 226.65 | - | all +0.09 [+0.04, +0.15], laneA +0.13 [+0.06, +0.20]; shipped as v24, board 290.7995 |
+| laneb (donor mix_cb_wx) | - | {"all": 1834.27, "laneA": NaN, "laneB": 1834.27, "m1": 2810.98, "m7": 1308.15} | (84, 658) | 134s |
+| laneb (donor mix_cb_wx) | - | {"all": 1834.27, "laneA": NaN, "laneB": 1834.27, "m1": 2810.98, "m7": 1308.15} | (84, 658) | 39s |
+| laneb (donor mix_cb_wx) | - | {"all": 1863.34, "laneA": NaN, "laneB": 1863.34, "m1": 2852.01, "m7": 1331.63} | (100, 449) | 33s |
+| laneb (donor mix_cb_wx) | - | {"all": 1886.64, "laneA": NaN, "laneB": 1886.64, "m1": 2863.09, "m7": 1367.26} | (100, 449) | 32s |
+| laneb (donor mix_cb_wx) | - | {"all": 1874.62, "laneA": NaN, "laneB": 1874.62, "m1": 2857.4, "m7": 1348.91} | (100, 449) | 34s |
+| laneb (donor mix_cb_wx) | - | {"all": 1881.75, "laneA": NaN, "laneB": 1881.75, "m1": 2860.78, "m7": 1359.79} | (100, 449) | 47s |
+| laneb (donor mix_cb_wx) | - | {"all": 1874.62, "laneA": NaN, "laneB": 1874.62, "m1": 2857.4, "m7": 1348.91} | (100, 449) | 43s |
+| ra_cb_arr (B from mix_cb_wx) | {"all": 252.68, "laneA": 207.18, "laneB": 1474.08} | {"all": 327.12, "laneA": 226.85, "laneB": 1900.6, "m1": 341.72, "m7": 314.87} | (2356, 2743, 5048) | 4066s |
+| ra_lgb_arr (B from mix_cb_wx) | {"all": 256.94, "laneA": 212.41, "laneB": 1474.08} | {"all": 330.41, "laneA": 231.64, "laneB": 1900.6, "m1": 344.23, "m7": 318.84} | (254, 249, 414) | 935s |
+| nn3_arr (B from mix_cb_wx) | {"all": 259.06, "laneA": 214.99, "laneB": 1474.08} | {"all": 332.77, "laneA": 235.05, "laneB": 1900.6, "m1": 346.14, "m7": 321.59} | epochs [25, 26, 29, 40, 30]+35 | 1246s |
+| blend:ra_cb_arr+ra_lgb_arr+nn3_arr w=[0.583, 0.14, 0.278] | {"all": 250.84, "laneA": 204.96, "laneB": 1473.38} | {"all": 324.95, "laneA": 223.65, "laneB": 1900.6, "m1": 340.22, "m7": 312.1} | - | -  vs blend_ra_cb+ra_cb_s1+ra_cb_s2+ra_lgb+nn3: +2.04 [+1.49, +2.63] |
+| blend:ra_cb_arr+ra_lgb_arr+nn3_arr+ra_cb+ra_cb_s1+ra_cb_s2+ra_lgb+nn3 w=[0.55, 0.125, 0.238, 0.0, 0.039, 0.0, 0.0, 0.049] | {"all": 250.82, "laneA": 204.94, "laneB": 1473.38} | {"all": 324.9, "laneA": 223.58, "laneB": 1900.6, "m1": 340.17, "m7": 312.05} | - | -  vs blend_ra_cb+ra_cb_s1+ra_cb_s2+ra_lgb+nn3: +2.09 [+1.57, +2.67] |
+| v25 = 0.5824 ra_cb_arr + 0.1399 ra_lgb_arr + 0.2777 nn3_arr, lane B overridden by laneb.py (combine.py --over) vs v24 blend (holdout, paired day-block bootstrap) | - | all 326.99 -> 322.59, laneA 226.65 -> 223.65, laneB 1900.6 -> 1874.62 | - | all +4.40 [+2.18, +6.84], laneA +3.00 [+2.38, +3.64], laneB +25.98 [+5.24, +57.48]; shipped as v25, board 288.6796 |

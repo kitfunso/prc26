@@ -12,7 +12,7 @@ import torch
 import torch.nn as nn
 
 from data import CACHE, rmse
-from features import CAT, DAY, NUM, OCC, WX, build
+from features import ARR, CAT, DAY, NUM, OCC, WX, build
 from lanea import _merge_b
 from train import FOLDS, HOLDOUT, RESULTS, report
 
@@ -23,6 +23,7 @@ CELL = dict(hidden=(1024, 1024, 1024), dropout=0.2555, lr=1.5e-3, weight_decay=1
 CONFIGS: dict[str, dict] = {
     "nn3": dict(cell=CELL, cat=CAT, num=NUM + DAY + OCC + WX),
     "nn3_s1": dict(cell={**CELL, "seed": 1}, cat=CAT, num=NUM + DAY + OCC + WX),
+    "nn3_arr": dict(cell=CELL, cat=CAT, num=NUM + DAY + OCC + WX + ARR),
 }
 
 

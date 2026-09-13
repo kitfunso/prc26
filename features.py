@@ -8,12 +8,18 @@ from data import CACHE, departures, load_raw, secs
 from weather import WX, join
 
 W = 900.0
+TOL = 60.0                # arrival copy tolerance, same as mix.label
+TAIL = 1800.0             # arrival taxi-in above this = tail-of-queue arrival
+WIN = 7200.0              # +-2h window around the departure's takeoff, for arrival shares
+STAND_LOOKBACK = 86400.0  # previous-arrival lookback cap on the same stand
 CAT = ["apt", "runway", "stand", "actype", "wake", "segment", "operator", "ftype", "frule", "ades", "airline"]
 NUM = ["hour", "wday", "mod", "has_plan", "notyp", "z_aobt", "z_eobt", "z_lobt", "z_iobt", "z_sched", "z_anchor",
        "d_ae", "d_al", "d_es", "d_as", "dur", "slip", "aobt_sec", "aobt_m5", "eobt_m5", "lobt_sec",
        "queue", "dep_before", "dep_after", "arr_anchor", "arr_off", "rq", "rwy_share", "push_anchor"]
 DAY = ["n_day", "nB_day", "b_share", "day_dae_med", "day_zs_med", "day_za_med", "h_nB"]
 OCC = ["occ", "t_occ"]
+ARR = ["ad_arr_a1", "ad_arr_sc", "ad_arr_tail", "ad_n_arr", "w_arr_a1", "w_arr_sc", "w_arr_tail", "w_n_arr",
+       "pa_a1", "pa_sc", "pa_taxi_in", "pa_gap", "pa_missing", "al_arr_a1", "al_arr_sc", "al_n_arr"]
 
 
 def anchor(df: pd.DataFrame) -> np.ndarray:
@@ -79,6 +85,106 @@ def daylevel(f: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def arr_recs(raw: pd.DataFrame) -> pd.DataFrame:
+    """Arrival movements with block time present, plus copy/tail flags (arr_a3 is diagnostic-only, kept for analysis/arrmode.py)."""
+    a = raw[raw["PHASE_mvt"] == "ARR"].dropna(subset=["BLOCK_TIME_UTC_mvt"]).rename(columns={"ADES_mvt": "apt"}).copy()
+    a["day"] = a["MVT_TIME_UTC_mvt"].dt.date.astype(str)
+    a["t_block"] = secs(a["BLOCK_TIME_UTC_mvt"], pd.Timestamp(0, tz="UTC"))
+    a["airline"] = a["FLIGHT_mvt"].astype(str).str[:3].where(a["FLIGHT_mvt"].notna(), "NA")
+    a["a1"] = (secs(a["BLOCK_TIME_UTC_mvt"], a["ARVT_1_flt"]).abs() < TOL).astype(int)
+    a["sc"] = (secs(a["BLOCK_TIME_UTC_mvt"], a["SCHED_TIME_UTC_mvt"]).abs() < TOL).astype(int)
+    a["a3"] = (secs(a["BLOCK_TIME_UTC_mvt"], a["ARVT_3_flt"]).abs() < TOL).astype(int)
+    a["tail"] = (a["TAXITIME_SEC_mvt"].astype(float) > TAIL).astype(int)
+    return a
+
+
+def _arr_day(a: pd.DataFrame) -> pd.DataFrame:
+    """Airport-day arrival shares, one row per (split, apt, day)."""
+    g = a.groupby(["split", "apt", "day"], observed=True)
+    return g.agg(ad_arr_a1=("a1", "mean"), ad_arr_sc=("sc", "mean"), ad_arr_tail=("tail", "mean"),
+                 ad_n_arr=("a1", "size")).reset_index()
+
+
+def _arr_airline_day(a: pd.DataFrame) -> pd.DataFrame:
+    """Airport-day-airline arrival shares, one row per (split, apt, day, airline)."""
+    g = a.groupby(["split", "apt", "day", "airline"], observed=True)
+    return g.agg(al_arr_a1=("a1", "mean"), al_arr_sc=("sc", "mean"), al_n_arr=("a1", "size")).reset_index()
+
+
+def _arr_window(f: pd.DataFrame, a: pd.DataFrame) -> pd.DataFrame:
+    """+-2h arrival shares around each departure's takeoff, same-apt arrivals only (traffic()'s searchsorted pattern)."""
+    n = len(f)
+    out = {k: np.full(n, np.nan) for k in ("w_arr_a1", "w_arr_sc", "w_arr_tail")}
+    cnt = np.zeros(n)
+    t = f["t_off"].values
+    for apt, ix in f.groupby("apt", observed=True).indices.items():
+        m = a["apt"].values == apt
+        if not m.any():
+            continue
+        order = np.argsort(a["t_block"].values[m])
+        tb = a["t_block"].values[m][order]
+        ca1 = np.concatenate([[0], np.cumsum(a["a1"].values[m][order])])
+        csc = np.concatenate([[0], np.cumsum(a["sc"].values[m][order])])
+        ctail = np.concatenate([[0], np.cumsum(a["tail"].values[m][order])])
+        lo = np.searchsorted(tb, t[ix] - WIN, "left")
+        hi = np.searchsorted(tb, t[ix] + WIN, "right")
+        c = hi - lo
+        cnt[ix] = c
+        with np.errstate(invalid="ignore", divide="ignore"):
+            out["w_arr_a1"][ix] = (ca1[hi] - ca1[lo]) / c
+            out["w_arr_sc"][ix] = (csc[hi] - csc[lo]) / c
+            out["w_arr_tail"][ix] = (ctail[hi] - ctail[lo]) / c
+    res = pd.DataFrame(out, index=f.index)
+    res["w_n_arr"] = cnt
+    return res
+
+
+def _arr_prev_stand(f: pd.DataFrame, a: pd.DataFrame) -> pd.DataFrame:
+    """Last arrival that blocked on the same stand before the departure's anchor (occupancy()'s dict-lookup pattern)."""
+    st = a.dropna(subset=["STAND_mvt"]).assign(stand=lambda d: d["STAND_mvt"].astype(str))
+    groups = {}
+    for key, g in st.groupby(["split", "apt", "stand"], observed=True):
+        order = np.argsort(g["t_block"].values)
+        groups[key] = (g["t_block"].values[order], g["a1"].values[order], g["sc"].values[order],
+                        g["TAXITIME_SEC_mvt"].values[order].astype(float))
+    n = len(f)
+    pa_a1, pa_sc = np.full(n, np.nan), np.full(n, np.nan)
+    pa_taxi, pa_gap, missing = np.full(n, np.nan), np.full(n, np.nan), np.ones(n)
+    anchor_t = f["t_off"].values - f["z_anchor"].values
+    for key, ix in f.groupby(["split", "apt", "stand"], observed=True).indices.items():
+        found = groups.get(key)
+        if found is None:
+            continue
+        tb, a1v, scv, taxiv = found
+        ix = np.asarray(ix)
+        pos = np.searchsorted(tb, anchor_t[ix], "right") - 1
+        ok = pos >= 0
+        p = np.clip(pos, 0, len(tb) - 1)
+        gap = np.where(ok, anchor_t[ix] - tb[p], np.nan)
+        within = ok & (gap <= STAND_LOOKBACK)
+        pa_a1[ix[within]] = a1v[p[within]]; pa_sc[ix[within]] = scv[p[within]]
+        pa_taxi[ix[within]] = taxiv[p[within]]; pa_gap[ix[within]] = gap[within]
+        missing[ix[within]] = 0
+    return pd.DataFrame({"pa_a1": pa_a1, "pa_sc": pa_sc, "pa_taxi_in": pa_taxi, "pa_gap": pa_gap,
+                          "pa_missing": missing}, index=f.index)
+
+
+def arrmode(f: pd.DataFrame, raw: pd.DataFrame) -> pd.DataFrame:
+    """16 arrival recorder-mode features (docs/ARRMODE.md): arrivals share the departure's airport-day recorder,
+    and their block times are never hidden, so their copy behaviour is a visible proxy for the departure stamp."""
+    a = arr_recs(raw)
+    day, al = _arr_day(a), _arr_airline_day(a)
+    keys = pd.DataFrame({"split": f["split"].values, "apt": f["apt"].astype(str).values, "day": f["day"].values})
+    dj = keys.merge(day, on=["split", "apt", "day"], how="left")
+    aj = keys.assign(airline=f["airline"].astype(str).values).merge(al, on=["split", "apt", "day", "airline"], how="left")
+    win, pa = _arr_window(f, a), _arr_prev_stand(f, a)
+    out = pd.concat([dj[["ad_arr_a1", "ad_arr_sc", "ad_arr_tail", "ad_n_arr"]].reset_index(drop=True),
+                      win.reset_index(drop=True), pa.reset_index(drop=True),
+                      aj[["al_arr_a1", "al_arr_sc", "al_n_arr"]].reset_index(drop=True)], axis=1)
+    out.index = f.index
+    return out
+
+
 def build(refresh: bool = False) -> pd.DataFrame:
     out = CACHE / "feat.parquet"
     if out.exists() and not refresh:
@@ -110,11 +216,13 @@ def build(refresh: bool = False) -> pd.DataFrame:
     blk = arr.dropna(subset=["STAND_mvt", "BLOCK_TIME_UTC_mvt"]).assign(stand=lambda d: d["STAND_mvt"].astype(str))
     blk["t"] = secs(blk["BLOCK_TIME_UTC_mvt"], pd.Timestamp(0, tz="UTC"))
     f["stand"] = f["stand"].astype(str)
-    f = pd.concat([f, traffic(f, arr), daylevel(f), occupancy(f, blk), join(f)], axis=1)
+    f = pd.concat([f, traffic(f, arr), daylevel(f), occupancy(f, blk), join(f), arrmode(f, raw)], axis=1)
     for c in CAT:
         f[c] = f[c].astype(str).fillna("NA").astype("category")
     f = f.reset_index(drop=True)
-    f.to_parquet(out)
+    tmp = out.with_suffix(".tmp.parquet")  # another process may be reading feat.parquet: write, then atomic rename
+    f.to_parquet(tmp)
+    tmp.replace(out)
     return f
 
 
