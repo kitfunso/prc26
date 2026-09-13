@@ -355,3 +355,87 @@ v27 therefore keeps w1t's level on those rows: the 315 EHAM lane B rows of 3 to 
 v26's 4,741 s (lane A's late median `z_aobt` on the three days: 2,108, 3,043 and 2,324 s). The risk stays: (v27 -
 v26)^2 over those rows sums to 987M, 5.07 s of board RMSE, gained if the labels sit at w1t's level and lost if they
 sit at v26's (session scratchpad `swing.py`). One board number cannot split this from the hull rows.
+
+## 6. Copy history by airline and flight number (candidate, not uploaded)
+
+After section 5, the LIRF rows 1 to 4 h late are the largest block of lane B error outside the shift and hull rows:
+over the 12 months of 2025, v27 leaves 7,771M of SSE on 1,247 rows, copy share 0.460 (session scratchpad
+`mech_hist.py`).
+
+**What decides a copy.** Leave-one-out target encoding on those 1,247 rows (session scratchpad `mech_sep.py`): the
+airline sorts copies from physical labels with AUC 0.846, the stand 0.668, the calendar day 0.626 and the month 0.587;
+v27's implied copy share reaches 0.875. LTFM's near class goes the other way: the day reaches 0.923 there. By airline
+at LIRF, over 2025 rows with the takeoff 30+ min after the schedule (session scratchpad log `lirf_regime.log`):
+
+| airline | lane B rows | lane B copy share | lane A copy share |
+|---|---|---|---|
+| ISR | 56 | 1.000 | 0.993 |
+| LAV | 22 | 1.000 | 1.000 |
+| TKJ | 20 | 1.000 | 1.000 |
+| TWB | 19 | 1.000 | 1.000 |
+| ETH | 21 | 1.000 | 0.221 |
+| MSC | 11 | 1.000 | 0.255 |
+| WMT | 173 | 0.480 | 0.131 |
+| RYR | 234 | 0.329 | 0.046 |
+| ITY | 75 | 0.040 | 0.033 |
+| BAW | 11 | 0.000 | 0.038 |
+| EWG | 14 | 0.000 | 0.006 |
+| KLM | 17 | 0.000 | 0.001 |
+
+Across airlines the two lanes' copy shares correlate at 0.754. A copy follows who stamps the off-block (most likely the
+ground handler), not the day's traffic. RYR is the one large airline whose lane B share moves with the calendar: 0.60,
+0.62 and 0.67 from January to March, 0.18 to 0.26 from April to October except June's 0.49, 0.33 in November and 0.73
+in December, on 5 to 70 rows a month, while its lane A share stays between 0.02 and 0.11. The classifier has no
+season column.
+
+**History columns (`copy_hist()`).** Each lane B row gets three columns from lane A rows with the takeoff 30+ min
+after the schedule: the copy share of its (airport, airline), shrunk toward the airport share with weight 20; the copy
+share of its (airport, flight number), shrunk toward the airline share with weight 5; and log(1 + lane A rows behind
+the flight share). A 2025 row sees only lane A months 3+ away from its own, nearer the gap the 2026 rows face; a rank
+row sees all of 2025.
+
+Before building them, a two-point check on the same 1,247 rows: p = P `z_sched` + (1 - P) t0, P a logistic stacked on
+v27's implied share and fitted leave-one-month-group-out (six groups, the holdout pair one of them), t0 the airport's
+median physical label. The two-point form has no tau regressor, so its SSE sits above v27's 7,771M; only the changes
+between rows compare (logs `mech_hist.log`, `mech_far.log`):
+
+| stacked on | other month groups: AUC | SSE | months 3+ away: AUC | SSE |
+|---|---|---|---|---|
+| v27 share | 0.865 | 7,997M | 0.865 | 7,997M |
+| + airline share | 0.886 | 7,541M | 0.883 | 7,602M |
+| + flight share and count | 0.920 | 6,382M | 0.907 | 6,765M |
+| + airline, flight, stand | 0.920 | 6,377M | 0.911 | 6,632M |
+
+Lane A history covers the flight numbers of 87.0% of those rows from the other month groups and 66.5% from months 3+
+away. On all lane B rows 30 min to 4 h late (16,289 rows, copy share 0.039) the same stacks run from 16,615M to
+15,294M (15,518M from months 3+ away). On the rank set's lane B rows 30 min to 4 h late, coverage from all of 2025
+runs from 0.454 (LIRF) and 0.477 (LTFM) to 0.917 (EDDF): flight numbers change between years, so the rank set gets
+less from the flight column than 2025 does.
+
+The hull rows do not gain. On the 127 of section 5 the flight share sorts copies within cells (AUC 0.745 on A0's 66
+rows, 0.864 on A1lo's 13), but a logistic on cell plus history raises the SSE of the prior form from 7,964M to 8,595M
+with the airline share and 8,566M with airline, flight and count (session scratchpad `hull_hist.py`). `hull_prior()`
+keeps its cell shares.
+
+**Result** (`python laneb.py cv mix_cb_wx`, `docs/LANEB_RUN.md`; flight history on 66.1% of the OOF months' lane B
+rows and 74.8% of the holdout's). Holdout lane B 1736.9 against v27's 1741.7; LIRF 3299.7 (v27 3331.1); physical class
+1099.8 (v27 1112.4); copy class 2834.9 (v27 2793.9). Ablation: no_hist 1742.5, no_day 1733.9, no_prior 1798.7,
+no_blend 1740.5. The day columns lose on the holdout in v27 and here while the fold log loss favours them (0.1211
+against 0.1212); they stay, since dropping them would be a pick made on the holdout.
+
+Full file, lane A unchanged (session scratchpad `gate_lb.py`, log `gate_hist.log`): holdout 308.05 against v27's
+308.47, +0.42 [-0.26, +1.21]; lane B over all 12 months 1473.4 against 1486.9, +13.6 [+3.7, +26.5].
+
+Where the 12-month gain lands (session scratchpad `hist_blk.py`, log `hist_blk.log`): lane B SSE falls from 49,681M
+to 48,779M, and LIRF rows 1 to 4 h late take 931M of the 902M (14,704M to 13,774M on 1,248 rows). There the copy
+class gains 677M and the physical class 401M, while the one day-shift row loses 141M. Every other airport and band
+moves by 7M or less, except LIRF under 30 min late (77 rows, 50M worse). The holdout months carry 102M of the LIRF gain
+and the OOF months 828M. Without the shift row, LIRF 1 to 4 h falls from 7,770M to 6,700M, close to the two-point
+stack's fall from months 3+ away (7,997M to 6,765M). The forms differ, so the match is rough, but the classifier
+already takes most of what a dedicated LIRF copy stack would, and that stack is not built.
+
+**Verdict.** The mechanism holds over the 12 months, but the full-file holdout gain does not clear zero, so this lane
+B is not uploaded alone. The columns stay in `laneb.py`, and the next candidate that carries them is gated against v27
+on the full file. That candidate is v28, which adds the lane A second stage of `docs/RECAL.md`: holdout +1.71
+[+0.75, +2.88] against v27. `python laneb.py fit 117 238` wrote its `data/laneb_rank.parquet` (5,290 rows, mean
+1675.9).

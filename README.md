@@ -50,23 +50,27 @@ Holdout = January and July 2025, never used for model choice. CV = five folds ov
 by month pair. Every result line reports per lane (A = has a flight plan, B = no plan) and per month.
 Predictions are floored at 0. Board uploads are logged in `LEDGER.md` with the expected and actual score.
 
-## Reproduce the current build (v27)
+## Reproduce the current build (v28)
 
-v27 = 0.5223 * CatBoost residual lane-A model with arrival recorder-mode and window-state features (`ra_cb_wz`)
+The lane A blend is 0.5223 * CatBoost residual lane-A model with arrival recorder-mode and window-state features (`ra_cb_wz`)
 + 0.1564 * the LightGBM version (`ra_lgb_wz`) + 0.3213 * the MLP version (`nn3_wz`). Lane A is v25's design
 (residual to AOBT, tail-gated tree cells or an MLP on the residual, plus the 16 `ARR` arrival recorder-mode
 features, `docs/ARR_SHIP.md`) with 20 window-state columns (`WZ` in `features.py`): label-free statistics of the
 neighbouring departures' stamps within +-30 min, +-1 h and +-3 h at the airport and +-1 h within the airline
-(`docs/WINDOW_STATE.md`). Lane B (no plan) takes `laneb.py`'s LIRF-only mechanism model as a row-level override
+(`docs/WINDOW_STATE.md`). New in v28, a LightGBM second stage on the blend's residual, from the blend, the airport
+and the blend's distance to each plan stamp, lets rows whose recorded off-block copies a stamp move toward it
+(`recal.py`, `docs/RECAL.md`). Lane B (no plan) takes `laneb.py`'s LIRF-only mechanism model as a row-level override
 (`combine.py --over`). LIRF lane B rows over 4 h late are clipped onto the interval of labels the two recorder
 mechanisms can produce (a schedule copy, or the real clock time written on a nearby date), and clipping onto an
-interval that holds the label cannot move a prediction away from it (v26, `docs/LANEB.md` section 4). New in v27,
+interval that holds the label cannot move a prediction away from it (v26, `docs/LANEB.md` section 4). From v27,
 all on lane B: the copy classifier weighs each row by what a wrong call costs in squared error, the physical-taxi
 regressor gains the `ARR` and `WZ` columns, and before the clip each late LIRF row takes the expected label of its
 cell, P(copy) times the schedule gap plus (1 - P(copy)) times the composed stamp, with P(copy) the cell's copy share
-in training (`docs/LANEB.md` section 5). Weights are non-negative least squares on the CV out-of-fold predictions
-(`blend.py`), never on the holdout. Holdout Jan+Jul 2025: 308.47 all, 220.43 lane A, 1741.7 lane B; paired
-day-block bootstrap against v26 +6.70 [+0.37, +14.41] all, lane B over all 12 months +78.7 [+17.4, +156.9].
+in training (`docs/LANEB.md` section 5). New in v28, the copy classifier also sees how often the row's airline and
+flight number copy the schedule in lane A (`docs/LANEB.md` section 6). Weights are non-negative least squares on the
+CV out-of-fold predictions (`blend.py`), never on the holdout. Holdout Jan+Jul 2025: 306.76 all, 218.60 lane A,
+1736.9 lane B; paired day-block bootstrap against v27 +1.71 [+0.75, +2.88] all, second stage alone +1.29 [+0.76,
++2.03].
 v26 on the board: 282.4241 (`LEDGER.md`).
 
 ```
@@ -91,17 +95,19 @@ python lanea.py cv ra_lgb_wz mix_cb_wx
 python nn.py cv nn3_wz mix_cb_wx
 python blend.py ra_cb_wz ra_lgb_wz nn3_wz --base=blend_ra_cb_arr+ra_lgb_arr+nn3_arr
 python laneb.py cv mix_cb_wx               # LIRF-only lane B mechanism model: CV + holdout, tables in docs/LANEB_RUN.md
-python laneb.py fit 127 238                # full 2025 refit at the CV iteration counts -> data/laneb_rank.parquet
+python laneb.py fit 117 238                # full 2025 refit at the CV iteration counts -> data/laneb_rank.parquet
 python lanea.py fit ra_lgb_wz mix_cb_wx 229 286 494    # full 2025 refit at the CV iteration counts
 python nn.py fit nn3_wz mix_cb_wx
 python lanea.py fit ra_cb_wz mix_cb_wx 2373 1991 4509
-python combine.py data/merry-octopus_v27.parquet data/ra_cb_wz_rank.parquet:0.5223 data/ra_lgb_wz_rank.parquet:0.1564 data/nn3_wz_rank.parquet:0.3213 --over=data/laneb_rank.parquet
-python board.py check data/merry-octopus_v27.parquet
+python recal.py cv                         # lane A second stage on the blend: holdout check, docs/RECAL.md
+python recal.py fit                        # -> data/recal_rank.parquet (its lane B rows are replaced by --over)
+python combine.py data/merry-octopus_v28.parquet data/recal_rank.parquet:1 --over=data/laneb_rank.parquet
+python board.py check data/merry-octopus_v28.parquet
 ```
 
 `laneb.py` is a LIRF-only mechanism model for lane B (schedule copy vs. physical, day-shifted; `docs/LANEB.md`).
-Its own strict pass mark (copy class no worse than the donor) fails, by 3.2% at v27, but its holdout RMSE is better
-overall with a bootstrap CI clear of zero, so v25 to v27 use its predictions as a row-level override on lane B
+Its own strict pass mark (copy class no worse than the donor) fails, by 4.7% at v28, but its holdout RMSE is better
+overall with a bootstrap CI clear of zero, so v25 to v28 use its predictions as a row-level override on lane B
 (`combine.py --over`) rather than through the blend weights.
 
 CatBoost on GPU is not bit-reproducible run to run; expect about 1 s of holdout noise. `tune.py` runs Optuna over

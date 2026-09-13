@@ -1,5 +1,6 @@
 """Lane B mechanism model: y is one of {schedule copy, day-shifted physical, physical} (near folded into physical,
-see docs/LANEB.md), not a single donor regression. Ambiguous copy rows blend toward the donor's cached prediction;
+see docs/LANEB.md), not a single donor regression. The classifier also sees how often the row's airline and flight
+number copy the schedule in lane A (`copy_hist()`). Ambiguous copy rows blend toward the donor's cached prediction;
 LIRF rows over 4 h late take a per-cell copy-share prior instead. `python laneb.py cv DONOR` / `python laneb.py fit IT_CLF IT_TAU [DONOR]`."""
 from __future__ import annotations
 
@@ -26,6 +27,7 @@ W_FLOOR, W_CAP = 300.0, 14400.0
 HULL_Z, HULL_TAU, HULL_TZ, PRIOR_TAU = 14400.0, 3600.0, "Europe/Rome", 1100.0
 TAU_CAT = ["apt", "runway", "stand", "actype", "airline", "ades"]
 DAY_COLS = ["est_share", "a_tail_share", "a_za_p90", "w_est_share", "w_tail_share", "w_za_p90"]
+HIST, HIST_Z, HIST_GAP, HIST_K = ["h_al", "h_flt", "h_nflt"], 1800.0, 3, (20.0, 5.0)
 CLF_LGB = dict(objective="multiclass", learning_rate=0.05, num_leaves=63, min_child_samples=30, feature_fraction=0.8,
                bagging_fraction=0.8, bagging_freq=1, lambda_l2=3.0, n_estimators=2000, verbose=-1, random_state=0, n_jobs=8)
 
@@ -76,7 +78,34 @@ def augment(f: pd.DataFrame) -> pd.DataFrame:
     day = a.assign(near=near_a, tail=tail_a).groupby(["apt", "day"], observed=True).agg(
         est_share=("near", "mean"), a_tail_share=("tail", "mean"), a_za_p90=("z_aobt", lambda s: s.quantile(.9))).reset_index()
     f = f.merge(day, on=["apt", "day"], how="left")
-    return pd.concat([f, _window(f, a, near_a, tail_a)], axis=1)
+    return pd.concat([f, _window(f, a, near_a, tail_a), copy_hist(f)], axis=1)
+
+
+def _hist_rates(a: pd.DataFrame, q: pd.DataFrame) -> np.ndarray:
+    """Copy share of a's rows by (airport, airline), shrunk toward the airport share, and by (airport, flight number),
+    shrunk toward the airline share; plus log(1 + rows behind the flight share)."""
+    p0 = q["apt_s"].map(a.groupby("apt_s")["copy"].mean()).fillna(a["copy"].mean()).values
+    s_al, s_flt = (a.groupby(k)["copy"].agg(["sum", "size"]) for k in ("k_al", "k_flt"))
+    r_al = (q["k_al"].map(s_al["sum"]).fillna(0).values + HIST_K[0] * p0) / (q["k_al"].map(s_al["size"]).fillna(0).values + HIST_K[0])
+    n_flt = q["k_flt"].map(s_flt["size"]).fillna(0).values
+    r_flt = (q["k_flt"].map(s_flt["sum"]).fillna(0).values + HIST_K[1] * r_al) / (n_flt + HIST_K[1])
+    return np.column_stack([r_al, r_flt, np.log1p(n_flt)])
+
+
+def copy_hist(f: pd.DataFrame) -> pd.DataFrame:
+    """Lane B rows: how often the same airline and the same flight number copy the schedule in lane A (takeoff HIST_Z+
+    after the schedule). Copy status follows the airline and the flight far more than the day (docs/LANEB.md section 6).
+    2025 rows see lane A months HIST_GAP+ away from their own; rank rows see all of 2025."""
+    r = pd.read_parquet(CACHE / "raw.parquet", columns=["MVT_ID_mvt", "FLIGHT_mvt", "PHASE_mvt"])
+    flt = r[r["PHASE_mvt"] == "DEP"].drop_duplicates("MVT_ID_mvt").set_index("MVT_ID_mvt")["FLIGHT_mvt"]
+    apt = f["apt"].astype(str)
+    f = f.assign(apt_s=apt, k_al=apt + "|" + f["airline"].astype(str), k_flt=apt + "|" + f["id"].map(flt).astype(str),
+                 copy=(np.abs(f["y"] - f["z_sched"]) < COPY_TOL).astype(float))
+    a = f[(f["split"] == "train") & (f["has_plan"] == 1) & (f["z_sched"] >= HIST_Z)]
+    b, out = f[f["has_plan"] == 0], pd.DataFrame(np.nan, index=f.index, columns=HIST)
+    for (split, m), q in b.groupby(["split", "month"], observed=True):
+        out.loc[q.index] = _hist_rates(a if split == "rank" else a[(a["month"] - m).abs() >= HIST_GAP], q)
+    return out
 
 
 def shift_rate(tr: pd.DataFrame) -> tuple[float, int]:
@@ -135,16 +164,16 @@ def clf_logloss(tr: pd.DataFrame, va: pd.DataFrame, use_day: bool) -> tuple[floa
     """Classifier-only fit (no tau) to isolate the day features' effect on multiclass log loss."""
     lab, keep, _ = _labels(tr)
     vlab, vkeep, _ = _labels(va)
-    cols = B_CAT + B_NUM + ["cross", "sched_hour"] + (DAY_COLS if use_day else [])
+    cols = B_CAT + B_NUM + ["cross", "sched_hour"] + HIST + (DAY_COLS if use_day else [])
     P, _ = fit_clf(tr, lab, keep, va, va, vlab, vkeep, cols, None)
     p = np.clip(P[vkeep], 1e-9, 1); p /= p.sum(1, keepdims=True)
     return log_loss(vlab[vkeep], p, labels=[0, 1, 2]), int(vkeep.sum())
 
 
-def predict(tr, te, va=None, iters=None, use_shift=True, use_day=True):
+def predict(tr, te, va=None, iters=None, use_shift=True, use_day=True, use_hist=True):
     """tr/te/va: lane-B rows only. yhat = P(copy)*z_sched + P(phys)*tau, shift rows get 86400+tau on top."""
     lab, keep, phys = _labels(tr)
-    clf_cols = B_CAT + B_NUM + ["cross", "sched_hour"] + (DAY_COLS if use_day else [])
+    clf_cols = B_CAT + B_NUM + ["cross", "sched_hour"] + (HIST if use_hist else []) + (DAY_COLS if use_day else [])
     vlab = vkeep = vphys = None
     if va is not None:
         vlab, vkeep, vphys = _labels(va)
@@ -217,6 +246,7 @@ def cv(donor: str) -> None:
     b = f[f["has_plan"] == 0]
     tr_all, ho = b[(b["split"] == "train") & ~b["month"].isin(HOLDOUT)], b[(b["split"] == "train") & b["month"].isin(HOLDOUT)]
     copy, near, phys, shift = classes(tr_all)
+    print(f"flight copy history on lane B rows: train {np.mean(tr_all['h_nflt'] > 0):.3f}, holdout {np.mean(ho['h_nflt'] > 0):.3f}")
     print(pd.DataFrame({"apt": tr_all["apt"].values, "copy": copy, "near": near, "phys": phys, "shift": shift}).groupby("apt").sum())
     oof, its, t0 = np.full(len(tr_all), np.nan), [], time.time(); ll_day = ll_noday = n_ll = 0
     for i, months in enumerate(FOLDS):
@@ -240,7 +270,7 @@ def cv(donor: str) -> None:
     d = boot_delta(hb["y"].values, hb["donor"].values, hb["p"].values, hb["day"].values)
     abl = {"full": rmse_new, "donor_only": rmse_donor, "no_blend": rmse(ho["y"].values, hull(ho, hull_prior(tr_all, ho, raw))),
            "no_prior": rmse(ho["y"].values, hull(ho, bl))}
-    for tag, kw in (("no_shift", dict(use_shift=False)), ("no_day", dict(use_day=False))):
+    for tag, kw in (("no_shift", dict(use_shift=False)), ("no_day", dict(use_day=False)), ("no_hist", dict(use_hist=False))):
         p, _, Pk, _, _ = predict(tr_all, ho, iters=it, **kw)
         abl[tag] = rmse(ho["y"].values, hull(ho, hull_prior(tr_all, ho, blend_donor(p, Pk[:, 0], donor_p))))
     base_rmse, new_rmse = overall(f, ho, ph)

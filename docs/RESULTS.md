@@ -60,3 +60,4 @@
 | v26 = 0.5223 ra_cb_wz + 0.1564 ra_lgb_wz + 0.3213 nn3_wz, lane B overridden by laneb.py with the LIRF hull (combine.py --over) vs v25 (holdout, paired day-block bootstrap) | - | all 322.59 -> 315.17, laneA 223.65 -> 220.43, laneB 1874.62 -> 1816.93 | - | all +7.42 [+2.12, +14.51]; on all rows, lane A change alone +2.19 [+1.40, +3.14], hull alone +5.19 [+0.01, +12.01]; shipped as v26, board 282.4241 |
 | laneb (donor mix_cb_wx) | - | {"all": 1803.17, "laneA": NaN, "laneB": 1803.17, "m1": 2853.36, "m7": 1212.2} | (127, 238) | 27s |
 | laneb (donor mix_cb_wx) | - | {"all": 1741.7, "laneA": NaN, "laneB": 1741.7, "m1": 2818.65, "m7": 1115.28} | (127, 238) | 51s |
+| laneb (donor mix_cb_wx) | - | {"all": 1736.89, "laneA": NaN, "laneB": 1736.89, "m1": 2814.48, "m7": 1108.86} | (117, 238) | 30s |
