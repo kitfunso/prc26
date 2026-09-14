@@ -3,7 +3,7 @@
 `PYTHONPATH=/c/Users/skf_s/prc26 python laneb.py cv mix_cb_wx` then `python laneb.py fit 117 238`. `cv` writes its
 tables to `docs/LANEB_RUN.md`; this file is the analysis. Sections 1 to 3 and the verdict describe v25; section 4 adds
 the hull that v26 ships; section 5 the classifier weights, tau columns and hull prior that v27 ships; section 6 the
-copy history in v28. Sections 7 to 9 record leads that did not help.
+copy history in v28. Sections 7 to 10 record leads that did not help.
 
 **Result: FAIL** vs donor mix_cb_wx (holdout lane B RMSE 1900.6) on the strict pass mark (copy class no worse than
 donor's 2707.4), by 0.2%. New 1874.6, donor 1900.6, paired day-block bootstrap delta +26.0 [+5.2, +57.5] (lower
@@ -523,3 +523,38 @@ takeoff), and takeoff minus the twin's AOBT on 8.0%. At LIRF 30+ min late 2.7% o
 0.368 against 0.493 without.
 
 None of the three goes into `laneb.py`.
+
+## 10. The inbound parked after the schedule (already in v28)
+
+LIRF lane B rows 30 min or more late, relinked to the last arrival that blocked on the same stand at least 20 min
+before takeoff (session scratchpad `pb_d.py` and `pb_s.py`, logs `pb_d.log` and `pb_s.log`; 1,399 rows, shift rows
+left out, an arrival found for 96.6%). Where that arrival blocked after the departure's schedule, the aircraft came in
+late and the departure copies its schedule far more often: 0.791 against 0.345 in the OOF months (426 and 554 rows)
+and 0.599 against 0.179 on the holdout (142 and 229 rows). The gap holds inside every large airline: RYR 0.500
+against 0.209, WMT 0.738 against 0.244, ITY 0.625 against 0.056. The arrival's own recorder mode adds nothing (in-block
+on its schedule against a physical in-block, within airline -0.071).
+
+It is not new information. `features.occupancy` already gives the copy classifier `occ` (the first arrival after the
+anchor parked before takeoff) and `t_occ`, and for lane B the anchor is the schedule, so `occ` is this column with a
+different cutoff. v28's implied copy share, (p - t0) / (z_sched - t0) with t0 = 1,027 s the median non-copy label,
+tracks it band by band:
+
+| late by | inbound | rows | copy share | v28 implied |
+|---|---|---|---|---|
+| 1-2 h | after the schedule | 196 | 0.704 | 0.661 |
+| 1-2 h | before | 538 | 0.243 | 0.297 |
+| 2-4 h | after the schedule | 286 | 0.738 | 0.738 |
+| 2-4 h | before | 193 | 0.358 | 0.430 |
+
+A logistic regression stacked on logit(implied share), leave-one-month-group-out over the six groups, moves AUC from
+0.878 to 0.888 in the OOF months and not at all on the holdout (0.859 both). The two-point SSE falls 173M in the OOF
+months and rises 148M on the holdout; the inbound's lateness in hours on top changes neither. The rows v28 misses most
+change sides between the two: in the OOF months it sits 96 s high on the before rows and 10 s high on the after rows,
+on the holdout 149 s and 354 s.
+
+Over 4 h late the column runs the wrong way: in cell A0 the copy-or-near share is 0.711 on 45 after rows against
+0.857 on 14 before rows, and cell D copies on all 36. Lane A shows nothing either: rows 30 min or more late whose last
+same-stand arrival (by `pa_gap`, anchored at AOBT) blocked after the schedule copy the schedule on 0.007 against 0.014,
+and v28's lane A residual is 10 s higher on them in both halves.
+
+Not used.
