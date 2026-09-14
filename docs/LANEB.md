@@ -1,8 +1,9 @@
 # Lane B mechanism model
 
-`PYTHONPATH=/c/Users/skf_s/prc26 python laneb.py cv mix_cb_wx` then `python laneb.py fit 127 238`. `cv` writes its
+`PYTHONPATH=/c/Users/skf_s/prc26 python laneb.py cv mix_cb_wx` then `python laneb.py fit 117 238`. `cv` writes its
 tables to `docs/LANEB_RUN.md`; this file is the analysis. Sections 1 to 3 and the verdict describe v25; section 4 adds
-the hull that v26 ships; section 5 the classifier weights, tau columns and hull prior that v27 ships.
+the hull that v26 ships; section 5 the classifier weights, tau columns and hull prior that v27 ships; section 6 the
+copy history in v28. Sections 7 to 9 record leads that did not help.
 
 **Result: FAIL** vs donor mix_cb_wx (holdout lane B RMSE 1900.6) on the strict pass mark (copy class no worse than
 donor's 2707.4), by 0.2%. New 1874.6, donor 1900.6, paired day-block bootstrap delta +26.0 [+5.2, +57.5] (lower
@@ -489,3 +490,36 @@ is under 30 min, 0.028 at 30 to 45 min). A band-mean correction fitted on the OO
 1736.9 to 1748.7, -11.8 [-25.0, -5.2]. The OOF pattern rests on the two LTFM days. A near row is a stamp on its own
 flight, not congestion that lane A shows, so the day columns stay out of the regressor and no `laneb.py cv` run was
 spent on it.
+
+## 9. Previous arrival, local delay and runway twins (not used)
+
+Three more label-free signals for the LIRF lane B rows 30 min or more late, each read against the copy share and
+against v28's lane B residual (the OOF months without the donor blend, and the holdout).
+
+**Previous arrival on the same stand** (session scratchpad `pa_d.py`, log `pa_d.log`; 1,399 rows, shift rows left
+out). Where that arrival's in-block lies within 60 s of its own schedule (`pa_sc`), the copy share is 0.636 in the OOF
+months against 0.508 where the in-block copies neither the schedule nor ARVT_1, and 0.387 against 0.331 on the
+holdout. Within an airline it mostly goes away: over the 12 months RYR reads 0.304 against 0.337 and WMT 0.312 against
+0.493, while AEZ reads 0.889 against 0.760 and WZZ 0.900 against 0.727 on 18 and 10 `pa_sc` rows. Weighted by the
+`pa_sc` rows of the eight largest airlines, the within-airline gap is +0.01 against +0.10 pooled. The column carries the
+airline mix: AEZ and WZZ, which copy often, have the highest shares of `pa_sc` rows (0.39 and 0.18, against 0.10 at
+RYR and 0.09 at WMT). The stand does the same: stand copy shares correlate 0.590 between
+the OOF months and the holdout over 28 stands, while within RYR and WMT they spread about as far as binomial noise on
+10 to 27 rows allows. One small pocket: rows with no arrival on their stand in the 24 h before the schedule
+(`pa_missing`) copy on 0.811 of 53 OOF rows and 0.923 of 13 holdout rows, and v28 sits 1,139 s and 690 s low on them.
+The classifier does not see that column, but removing both biases outright is worth about 75M of SSE (53 x 1,139^2 +
+13 x 690^2), so no run was spent on it.
+
+**Local lane A delay** (`dly_d.py`, `dly_d.log`). `w_late` is the share of LIRF lane A takeoffs within 2 h of the row
+whose takeoff came 30+ min after the schedule. It follows the season (July 0.703 with copy share 0.330, November 0.252
+with 0.653), and within an airline the copy share does not order with it (RYR 0.200, 0.636, 0.278 and 0.333 over the
+four bands from 0.1 up, on 5 to 183 rows). Its correlation with v28's residual is -0.021 in the OOF months and 0.030
+on the holdout.
+
+**Same-runway twins** (`twin_d.py`, `twin_d.log`). 373 of the 22,470 train lane B rows (1.7%, against 0.9% of lane
+A) have another departure off the same runway within 30 s. The labels do not follow each other: the twin's label is
+within 60 s of the row's own on 24.1%, duplicate records among them (one EDDM flight number four times at one
+takeoff), and takeoff minus the twin's AOBT on 8.0%. At LIRF 30+ min late 2.7% of rows have a twin, with copy share
+0.368 against 0.493 without.
+
+None of the three goes into `laneb.py`.
