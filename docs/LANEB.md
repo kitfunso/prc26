@@ -356,7 +356,7 @@ v26's 4,741 s (lane A's late median `z_aobt` on the three days: 2,108, 3,043 and
 v26)^2 over those rows sums to 987M, 5.07 s of board RMSE, gained if the labels sit at w1t's level and lost if they
 sit at v26's (session scratchpad `swing.py`). One board number cannot split this from the hull rows.
 
-## 6. Copy history by airline and flight number (candidate, not uploaded)
+## 6. Copy history by airline and flight number (in v28)
 
 After section 5, the LIRF rows 1 to 4 h late are the largest block of lane B error outside the shift and hull rows:
 over the 12 months of 2025, v27 leaves 7,771M of SSE on 1,247 rows, copy share 0.460 (session scratchpad
@@ -387,6 +387,13 @@ ground handler), not the day's traffic. RYR is the one large airline whose lane 
 0.62 and 0.67 from January to March, 0.18 to 0.26 from April to October except June's 0.49, 0.33 in November and 0.73
 in December, on 5 to 70 rows a month, while its lane A share stays between 0.02 and 0.11. The classifier has no
 season column.
+
+A season column would not help (session scratchpad `season_d.py`, log `season_d.log`, not run through `laneb.py`).
+On all LIRF lane B rows 30 min to 4 h late the copy share is 0.761 and 0.820 in February and March and 0.638 and
+0.750 in November and December, but 0.408 in January (49 rows) and 0.263 in July (289 rows). Over the OOF months the
+IATA winter season reads 0.733 against summer's 0.460, so a season column fitted there would raise January's
+predictions, which v28 already puts 491 s too high on average (July 282 s too high). LIRF lane A copy shares do not
+move with the month: schedule 0.070 to 0.089, EOBT 0.108 to 0.138.
 
 **History columns (`copy_hist()`).** Each lane B row gets three columns from lane A rows with the takeoff 30+ min
 after the schedule: the copy share of its (airport, airline), shrunk toward the airport share with weight 20; the copy
@@ -439,3 +446,46 @@ B is not uploaded alone. The columns stay in `laneb.py`, and the next candidate 
 on the full file. That candidate is v28, which adds the lane A second stage of `docs/RECAL.md`: holdout +1.71
 [+0.75, +2.88] against v27. `python laneb.py fit 117 238` wrote its `data/laneb_rank.parquet` (5,290 rows, mean
 1675.9).
+
+## 7. The plan from the destination's arrival record (not used)
+
+A lane B departure carries no flight plan, but when it flies to one of the other nine airports, the arrival record
+there can carry the plan stamps (session scratchpad `dest_a.py`, log `dest_a.log`; join on flight number, origin and
+destination, arrival 0 to 12 h after takeoff). On lane A the join finds the right flight: the arrival record's AOBT_3
+equals the departure's own within 60 s on 99.8% of 182,429 rows. Of 4,644 lane B departures to one of the ten
+airports, 2,906 match an arrival and 39.2% of those carry AOBT_3: 912 train rows and 228 rank rows. On the train rows
+the label lies within 5 min of t_off - AOBT_3 on 63.2% (lane A 75.1%).
+
+It does not help (session scratchpad `dest_b.py`, log `dest_b.log`, against v28's lane B; the OOF months without the
+donor blend). The recovered stamp as the prediction, max(t_off - AOBT_3 + 60 s, 0) with the offset the OOF median,
+loses on lane B: OOF months 1380.2 to 1414.0, -33.8 [-51.0, -20.1]; holdout 1736.9 to 1784.9, -48.0 [-136.6, +0.7].
+A blend weight fitted on the OOF months comes out negative (-0.211) and is flat: OOF +1.1 [-1.5, +4.3], holdout -4.2
+[-12.9, +0.2]. The reason is the section 6 mechanism. Of the 37 OOF rows with the stamp that are more than 1 h late,
+22 are LIRF, and on 16 of those the label equals the schedule to within 6 s while t_off - AOBT_3 reads 724 to 1,260
+s. The departure recorder copied the schedule, the plan kept the real pushback, and the label follows the recorder.
+
+## 8. Near rows and the local lane A taxi level (not used)
+
+After v28, the near rows (`classes()`: off-block recorded between 700 s before and 3,100 s after the schedule, label
+over 3,000 s) still under-predict: by 4,459 s on average on the 34 holdout rows off LIRF 1 to 4 h late (session
+scratchpad `blk_v28.py`, log `blk_v28.log`). In the OOF months 162 of the 201 near rows off LIRF are LTFM, 108 of
+them on 2025-02-19 and 2025-02-23. The physical-taxi regressor, which predicts them since near is folded into
+physical, sees the neighbours' taxi excess only through `WZ`, clipped at 1,800 s. The unclipped local lane A level
+(`w_za_p90`, the p90 of lane A takeoff minus AOBT within 2 h at the airport) and the lane A near share (`w_est_share`)
+reach only the copy classifier. Would they help the regressor?
+
+Against v28's lane B residual off LIRF without the shift rows (session scratchpad `near_d.py`, log `near_d.log`;
+16,005 OOF rows, 4,975 holdout):
+
+| | OOF months | holdout |
+|---|---|---|
+| corr of y - p with `w_za_p90` | 0.133 | -0.005 |
+| corr with `w_est_share` | 0.002 | 0.064 |
+| corr with `w_tail_share` | -0.030 | 0.056 |
+| `w_za_p90` 45 to 60 min: rows, near share, mean y - p | 159, 0.296, +979 s | 118, 0.034, -33 s |
+
+In the OOF months the near rows sit beside a slow lane A; on the holdout they do not (near share 0.004 where the p90
+is under 30 min, 0.028 at 30 to 45 min). A band-mean correction fitted on the OOF months loses on the holdout: lane B
+1736.9 to 1748.7, -11.8 [-25.0, -5.2]. The OOF pattern rests on the two LTFM days. A near row is a stamp on its own
+flight, not congestion that lane A shows, so the day columns stay out of the regressor and no `laneb.py cv` run was
+spent on it.

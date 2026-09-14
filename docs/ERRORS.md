@@ -29,3 +29,11 @@ schedule, 03:13 takeoff). The two day-shift rows off LIRF sit on one date with n
 29 min late, stamp 20:30 the evening before) and LSZH 2025-05-14 (y 87,341 s, `z_sched` 939 s: the schedule time on
 the previous date). The one row over 21,600 s off LIRF, LFPG 2025-01-23 (y 58,206 s), carries a 23:59 stamp from the
 evening before. The other twelve LIRF lane B day-shift rows are 4 h or more late (`docs/LANEB.md` sections 4 and 5).
+
+Postponed-flight traces do not find them either (session scratchpad `tow_a.py`, `tow_b.py`, 2025 train). The two LFPG
+rows read as flights first pushed back the evening before and flown the next day: the same flight number has no
+departure on the day before, and their stands saw no other movement for 32.5 h and 40.6 h before takeoff. Both traces
+exist at test time, and neither selects anything: off LIRF, 913 lane B rows had their stand idle 20 h or more before
+takeoff, 2 of them over 6 h (the two LFPG rows), mean label 1,101 s; 1,519 rows had no flight the day before after 4
+or more of the 7 days before, none over 6 h. The recorded off-block is an arrival's in-block on the same stand (within
+1 min) on 2 of 33 lane B rows over 12 h, 10 of 901 lane B rows between 1 and 3 h, and 0.03% of lane A rows under 30 min.

@@ -71,7 +71,7 @@ flight number copy the schedule in lane A (`docs/LANEB.md` section 6). Weights a
 CV out-of-fold predictions (`blend.py`), never on the holdout. Holdout Jan+Jul 2025: 306.76 all, 218.60 lane A,
 1736.9 lane B; paired day-block bootstrap against v27 +1.71 [+0.75, +2.88] all, second stage alone +1.29 [+0.76,
 +2.03].
-v26 on the board: 282.4241 (`LEDGER.md`).
+v28 on the board: 271.783, rank 11 of 132 (`LEDGER.md`).
 
 ```
 pip install -r requirements.txt            # Python 3.12, CUDA GPU for CatBoost

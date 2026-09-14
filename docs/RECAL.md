@@ -35,6 +35,20 @@ and the log count (`laneb._hist_rates`, rows with the stamp 30+ min before takeo
 218.68 against 218.60, -0.08 [-0.52, +0.30]; 12 months +0.24 [+0.10, +0.43]. On rows with the stamp 30+ min before
 takeoff, lane A copies are rare: schedule 0.013, EOBT 0.020, LOBT 0.020, IOBT 0.020. Not added.
 
+**Linear leaves lose.** The same stage with linear leaves (`linear_tree=True`, `linear_lambda=1.0`), on the idea that a
+leaf can fit the distance to a copied stamp as a slope where a constant leaf only reaches its average: lane A holdout
+218.60 to 221.45, -2.85 [-8.34, +0.14]; 12 months -0.68 [-1.85, -0.06]. Holdout SSE on schedule-copy rows goes from
+2,312M to 2,670M (classes taken in the order AOBT, schedule, EOBT, LOBT, IOBT), and no other class moves by more than
+61M (session scratchpad `recal_lin.py`, log `recal_lin.log`). Not used.
+
+**Degenerate AOBT stamps.** At six airports a few `z_aobt` minutes hold mostly rows whose recorded off-block sits 10+
+min before the AOBT stamp (at least half of 30+ OOF rows in the airport and minute): 0 to 10 min at EDDF, EDDM, EGLL,
+LEBL and LEMD, -2 to 0 min at LTFM (session scratchpad `mech_e.py`, log `mech_e.log`). There the label lies within 5
+min of the EOBT on 42% of rows, the schedule on 41%, the LOBT on 38% and the IOBT on 49%. After the second stage these
+rows are 1.1% of lane A in the OOF months with 2.4% of its SSE, bias -4.2 s, and 4,022 holdout rows with 3.2% (518M),
+bias +7.5 s. The error there is spread, not a level: a perfect call on every such holdout row would take lane A from
+218.60 to 215.07. No change.
+
 **Full file** (session scratchpad `gate_a.py`): with v27's lane B, holdout 307.18 against v27's 308.47, +1.29 [+0.76,
 +2.03]; with the copy-history lane B of `docs/LANEB.md` section 6, 306.76, +1.71 [+0.75, +2.88]. The second is v28.
 
