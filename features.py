@@ -71,8 +71,8 @@ def occupancy(dep: pd.DataFrame, blk: pd.DataFrame) -> pd.DataFrame:
     for key, ix in dep.groupby(["apt", "stand"], observed=True).indices.items():
         s = parked.get(key)
         if s is not None and len(s):
-            pos = np.minimum(np.searchsorted(s, a[ix], "right"), len(s) - 1)
-            nxt[ix] = np.where(pos < len(s), s[pos], np.inf)
+            pos = np.searchsorted(s, a[ix], "right")
+            nxt[ix] = np.where(pos < len(s), s[np.minimum(pos, len(s) - 1)], np.inf)
     occ = nxt < t
     return pd.DataFrame({"occ": occ.astype(int), "t_occ": np.where(occ, t - nxt, np.nan)}, index=dep.index)
 

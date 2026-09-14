@@ -104,6 +104,31 @@ rows are easier (RMSE 160 against 218 on the rest) with a mean residual of +0.05
 (1.4%), filed destination (0.1%) and rule (0.07%) mismatches run harder (RMSE 234 to 305 against 203) with mean
 residuals between -5.7 and +4.1 s. No flag moves the conditional mean, so none is a feature. Not used.
 
+## Stand occupancy at the data end (2026-09-14)
+
+`occupancy()` clipped the searchsorted position to the stand's last arrival before testing for "no arrival after the
+anchor", so the test never fired: a departure with no later arrival on its stand got `occ` = 1 and a `t_occ` of at
+least `z_anchor`, from the stand's last arrival, which parked before the anchor (a median 3 h before it on the rank
+rows, 18 days on the train rows). A true `occ` has `t_occ` < `z_anchor`. Later 2025 months and the 2026 arrivals follow every 2025 month, so only 515 train
+rows carried it; the rank arrivals stop on 2026-07-31, so 1,749 rank rows did, 976 of them on 31 July (session
+scratchpad `occ_d.py`). The fix tests the unclipped position (`features.py:74`), and the rebuilt frame differs from the
+old one in `occ` and `t_occ` on exactly those 2,264 rows (`verify_occ.py`).
+
+The holdout cannot see it, so `occ_sim.py` rebuilds the holdout's `occ` with the old code from Jan and Jul 2025
+arrivals only, the rank span a year earlier. That gives 1,507 lane A rows a false `occ` (rank 1,677), 914 of them on
+31 July. `ra_lgb_wz` fitted on the old frame's other months (holdout RMSE 227.218 against the logged 227.22) moves
+them up by a median 52 s, the same as on the rank rows (53 s). On those rows the clean frame scores RMSE 253.6 against
+272.3 with the fault, +0.096 [+0.030, +0.201] on the full lane A holdout, about 0.1 s carried to the board; the other
+two components were not rerun. A file that differs from v28 on these rows alone would read their labels off the board,
+so the fix ships with the next candidate.
+
+The same edge costs the previous-arrival columns nothing. `_arr_prev_stand` groups by split and rank has no June 2026,
+so on the first mornings of January and July 2026 `pa_missing` runs at 0.56 and 0.44 against 0.03 and 0.02 on the
+other days (`edge_d.py`; 1 January 2025 shows the same 0.54 in the holdout). Clearing `pa_*` on the 807 holdout rows
+whose previous arrival parked in June 2025 moves them by a median -2 s, +0.005 [+0.000, +0.017]. Not fixed. The
+forward windows on the last evenings stay inside the 2025 month-to-month spread, except the +-2 h arrival count
+(`w_n_arr`) for the 211 departures after 21:00 UTC on 31 January 2026, 33% low; not tested.
+
 ## Files
 
 - `analysis/fe.py` — feature build (`build_fp`, `flight_ids`, `fit_apply`, `oof_apply`),
