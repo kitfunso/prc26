@@ -94,6 +94,16 @@ apiece), and `all` inherits g3's fold0 failure. Read this as a null result for a
 variants as specified, not as "close" or "promising": none clears the bar of beating base
 everywhere.
 
+## Plan against airport record (2026-09-14)
+
+Six raw columns no model reads say whether the flight plan (`_flt`) and the airport record (`_mvt`) agree: callsign
+against flight number, aircraft type, departure and destination airport, filed against actual destination, flight
+rule (session scratchpad `mm_d.py`, log `mm_d.log`, v28 predictions). Lane B rows carry no plan column at all, so
+there is nothing to read there. On lane A train rows the callsign differs from the flight number on 27%, and those
+rows are easier (RMSE 160 against 218 on the rest) with a mean residual of +0.05 s; the type (0.3%), destination
+(1.4%), filed destination (0.1%) and rule (0.07%) mismatches run harder (RMSE 234 to 305 against 203) with mean
+residuals between -5.7 and +4.1 s. No flag moves the conditional mean, so none is a feature. Not used.
+
 ## Files
 
 - `analysis/fe.py` — feature build (`build_fp`, `flight_ids`, `fit_apply`, `oof_apply`),

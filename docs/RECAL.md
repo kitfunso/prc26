@@ -49,6 +49,19 @@ rows are 1.1% of lane A in the OOF months with 2.4% of its SSE, bias -4.2 s, and
 bias +7.5 s. The error there is spread, not a level: a perfect call on every such holdout row would take lane A from
 218.60 to 215.07. No change.
 
+**Regime context adds nothing** (session scratchpad `rc2.py`, log `rc2.log`). The same stage given where and when a
+row sits (airline, stand, runway and hour, the airport-day and +-2 h stamp signatures of `docs/LANEA_CLF.md` section
+4, the 20 window-state and 7 day-level columns; 48 columns): lane A holdout 218.60 to 219.53, -0.94 [-1.42, -0.47];
+12 months -1.19 [-1.44, -0.81], worse in 11 of 12 months. With the occupancy, weather, arrival and plan-gap columns
+as well (87 columns): 218.86, -0.26 [-0.78, +0.22]; 12 months -0.74 [-1.00, -0.36]. Stand and airline take 38 to 40%
+of the split gain in both, and the loss sits on rows that copy no stamp (123M of the first variant's 139M). The first
+stage already fits these columns, so a stage fitted to its out-of-fold residual finds month-specific noise in them.
+The LIRF rows 30+ min after the schedule (59,604 train rows, holdout SSE 2,978M) show the same thing from the other
+side (scratchpad `lirf_a.py`): the stage's mean sits within 30 s of the label mean in every slice by inbound block
+against the schedule, EOBT and AOBT against the schedule, `occ` and the previous same-stand arrival's mode, and the
+schedule-copy share moves with that arrival's mode (0.17 against 0.04) and the airline (ITY 0.013, THY 0.20), both
+already first-stage columns. Not used.
+
 **Full file** (session scratchpad `gate_a.py`): with v27's lane B, holdout 307.18 against v27's 308.47, +1.29 [+0.76,
 +2.03]; with the copy-history lane B of `docs/LANEB.md` section 6, 306.76, +1.71 [+0.75, +2.88]. The second is v28.
 
