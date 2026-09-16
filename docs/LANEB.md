@@ -584,3 +584,24 @@ the 2026 rows where the holdout promised 138M. Reverted; the code is commit `88a
 rank lane B rows moved 157 s on average (v28 to v29), and the January rank set sits in different cells from the
 holdout's (EHAM Jan median `z_sched` 144 min against 84 in training, LSZH 98 against 21, session scratchpad `tz_d.py`),
 so a column fitted to 2025's lane B level can move the wrong way there.
+
+## 12. Where the board seconds sit: day shifts and the hull rows (after v30)
+
+**Day shifts outside the hull.** Session scratchpad `shiftx.py`, log `shiftx.log`. 2025 has 34 rows with y over
+43,200 s in either lane: 31 LIRF (30 lane B, 1 lane A), 2 LFPG, 1 LSZH. Every LIRF one is a hull row (schedule 4 h or
+more late): a schedule copy with `z_sched` above 43,200, or a composed stamp at k = 1. The three others are ordinary
+flights (schedule gap 939 to 2,043 s) whose recorded off-block sits 16 to 24 h before takeoff; two are EJU at LFPG
+in January 2025. Of the 595 non-LIRF 2025 rows more than 12 h late by schedule, 0 shifted, so the 128 such rank rows
+(EDDF 47, EHAM 42, LFPG 19, EDDM 8, LEBL 5, LEMD 4, EGLL 3) get no hedge. Nothing predicts the three ordinary-flight
+shifts: 41,939 train rows take off between local midnight and 03:00 and 3 of them shifted, all LIRF hull rows.
+Arrivals are not a sensor either (scratchpad `arrshift.py`, log `arrshift.log`): 5 train arrivals have a block time
+more than 12 h from landing, none on the 30 airport-days that hold the departure shifts. A shift the model calls
+physical costs 86,400^2 = 7.5B of SSE, 37 s of board RMSE at v28's score, and every team pays it alike.
+
+**Hull rows.** Scratchpad `hullvar.py`, log `hullvar.log`. Reading v28's prediction on each of the 43 LIRF hull rows
+of 2026 as the expected value of a two-outcome label (copy at `z_sched`, composed at 1,100 + 86,400 kn) gives an
+implied copy share per row (0.765, 0.8, 0.286 or 0.974, the section 5 cells) and an expected residual SSE of
+P (1 - P) gap^2 per row: 4.01B over the 43 rows, 2.59B on the 32 rows at kn = 0 and 1.42B on the 11 at kn = 1.
+Knowing every label would move v28 from 271.78 to 249.5; the leader sits at 245.02. Lane A's whole label-free
+ceiling is about 8 s (`docs/STATE_ORACLE.md`), so most of the gap to the leader is these 43 rows, and no 2025 check
+can gate a bet on them.

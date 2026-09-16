@@ -101,6 +101,41 @@ Against the spread of the twelve 2025 monthly means (lane A, scratchpad `month_r
 The shipped model already uses row-level `d_ae`, `d_al` and `day_dae_med`, which carry the
 same shift. This is the risk to check first if the board gain falls short of the holdout gain.
 
+After v29 and v30 (session scratchpad `shift.py`, log `shift2.log`): a LightGBM told to separate
+the holdout month's lane A rows from the same rank month's, validated on a fifth of the days held
+out from both years, reaches AUC 0.73 for January and 0.92 for July, on the airport-day columns
+(`n_day`, `day_dae_med`, `day_za_med`, `day_zs_med`, the `ad_arr_*` arrival shares). A random row
+split gives AUC 1.00 because those columns name the day. Row-level identity coverage is not the
+shift: 99.0 to 99.7% of rank rows use a stand, operator, destination and airline seen in the
+holdout month. The two v29 columns that lost on the board rested on lane A copy history by flight
+number (rank LIRF coverage 0.454 against 0.973, `docs/LANEB.md` section 6) and on lane B cell
+levels, neither of which a 2025-only check can see; a column built from identity history needs its
+rank coverage checked before it ships.
+
+## Neighbours' predicted residual (after v30, not shipped yet)
+
+Two more window families on `ra_lgb_wz`, same harness as the feature test above (session scratchpad `nw.py`, log
+`nw.log`; `predict` per fold, refit at mean iterations x 1.1, `boot_delta` on the lane A holdout):
+
+- `wr`, 6 columns: the `wz` statistics keyed by runway as well as airport and day.
+- `pw`, 5 columns: leave-one-out count, mean and share above 600 s of the neighbours' predicted residual, the
+  `ra_lgb_wz` prediction minus `z_aobt` clipped at +-1,800 s (OOF for train months, the refit for the holdout), over
+  +-1 h on the airport-day, plus the +-1 h runway mean and the +-30 min mean. Rank rows get it from the rank
+  predictions, so rank coverage equals holdout coverage by construction.
+
+| variant | folds (2,3)/(4,5)/(6,8)/(9,10)/(11,12) | holdout lane A | vs base |
+|---|---|---|---|
+| base | 209.97 / 195.68 / 221.24 / 213.33 / 201.47 | 227.311 | - |
+| `wr` | 210.29 / 195.50 / 220.72 / 212.49 / 201.13 | 227.113 | +0.198 [-0.186, +0.618], 4 of 5 folds |
+| `pw` | 209.46 / 195.02 / 220.73 / 212.18 / 201.35 | 225.938 | **+1.373 [+0.706, +2.043], 5 of 5** |
+| both | 209.72 / 195.02 / 220.76 / 212.57 / 201.31 | 226.038 | +1.273 [+0.618, +1.944], 5 of 5 |
+
+The runway key adds nothing. The neighbours' predictions do: a second pass in which each row sees the hour's
+predicted tail share and level, which is the state the oracle prices. The second stage cannot take it instead
+(scratchpad `recalpw.py`, log `recalpw.log`): `recal.py`'s columns plus the same windows built from the v28 blend
+give holdout lane A 218.878 against 218.597, -0.281 [-0.653, +0.052], 3 of 5 folds. The gain needs the base models
+to see the columns, which means a second round of `ra_cb_wz`, `ra_lgb_wz` and `nn3_wz` with `pw` from the v28 blend.
+
 ## v26 ship
 
 `python lanea.py cv ra_cb_wz mix_cb_wx` (GPU): folds 204.66 / 191.67 / 216.59 / 207.78 / 197.82,
