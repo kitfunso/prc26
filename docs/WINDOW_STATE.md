@@ -112,6 +112,14 @@ number (rank LIRF coverage 0.454 against 0.973, `docs/LANEB.md` section 6) and o
 levels, neither of which a 2025-only check can see; a column built from identity history needs its
 rank coverage checked before it ships.
 
+Importance weighting toward the target months does not help (session scratchpad `iw.py`, log `iw.log`). An
+adversarial LightGBM on airport plus the numeric columns, cross-fitted over five day groups, separates the holdout
+months from months 2 to 12 at AUC 0.772; the odds ratio, clipped to [0.2, 5] and scaled to mean 1, puts 86% of the
+training rows at 0.41 and 4% at 10.2 (February 1.66, June 1.40, August 1.73 on average). `ra_lgb_wz` refitted with
+those weights on the classifier and both regressors, at the base iterations (235, 250, 512): holdout lane A 235.109
+against 227.311, -7.80 [-8.61, -6.97], January 210.4 against 203.9 and July 253.5 against 244.8. The model lives on
+volume; a weighting that matches the day-level mix costs more than the shift it corrects.
+
 ## Neighbours' predicted residual (after v30, not shipped yet)
 
 Two more window families on `ra_lgb_wz`, same harness as the feature test above (session scratchpad `nw.py`, log
