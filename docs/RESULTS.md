@@ -61,3 +61,4 @@
 | laneb (donor mix_cb_wx) | - | {"all": 1803.17, "laneA": NaN, "laneB": 1803.17, "m1": 2853.36, "m7": 1212.2} | (127, 238) | 27s |
 | laneb (donor mix_cb_wx) | - | {"all": 1741.7, "laneA": NaN, "laneB": 1741.7, "m1": 2818.65, "m7": 1115.28} | (127, 238) | 51s |
 | laneb (donor mix_cb_wx) | - | {"all": 1736.89, "laneA": NaN, "laneB": 1736.89, "m1": 2814.48, "m7": 1108.86} | (117, 238) | 30s |
+| laneb (donor mix_cb_wx) | - | {"all": 1729.49, "laneA": NaN, "laneB": 1729.49, "m1": 2816.96, "m7": 1090.66} | (107, 257) | 49s |

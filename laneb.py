@@ -1,7 +1,9 @@
 """Lane B mechanism model: y is one of {schedule copy, day-shifted physical, physical} (near folded into physical,
 see docs/LANEB.md), not a single donor regression. The classifier also sees how often the row's airline and flight
-number copy the schedule in lane A (`copy_hist()`). Ambiguous copy rows blend toward the donor's cached prediction;
-LIRF rows over 4 h late take a per-cell copy-share prior instead. `python laneb.py cv DONOR` / `python laneb.py fit IT_CLF IT_TAU [DONOR]`."""
+number copy the schedule in lane A (`copy_hist()`). The tau model and classifier also see a lane A physical-taxi
+prediction (`tau_a()`, run `python laneb.py taua` first). Ambiguous copy rows blend toward the donor's cached
+prediction; LIRF rows over 4 h late take a per-cell copy-share prior instead. `python laneb.py cv DONOR` / `python
+laneb.py fit IT_CLF IT_TAU [DONOR]`."""
 from __future__ import annotations
 
 import json
@@ -15,7 +17,7 @@ from sklearn.metrics import log_loss
 
 from data import CACHE, rmse
 from features import ARR, DAY, NUM, OCC, WX, WZ, build
-from mix import B_CAT, B_NUM
+from mix import B_CAT, B_NUM, label
 from train import FOLDS, HOLDOUT, LGB, RESULTS, boot_delta, report
 
 DOC = "docs/LANEB_RUN.md"
@@ -30,6 +32,11 @@ DAY_COLS = ["est_share", "a_tail_share", "a_za_p90", "w_est_share", "w_tail_shar
 HIST, HIST_Z, HIST_GAP, HIST_K = ["h_al", "h_flt", "h_nflt"], 1800.0, 3, (20.0, 5.0)
 CLF_LGB = dict(objective="multiclass", learning_rate=0.05, num_leaves=63, min_child_samples=30, feature_fraction=0.8,
                bagging_fraction=0.8, bagging_freq=1, lambda_l2=3.0, n_estimators=2000, verbose=-1, random_state=0, n_jobs=8)
+TAU_A, TAU_CLF = ["tau_a"], ["tau_a", "tau_d"]
+T_CAT = ["apt", "runway", "stand", "actype", "airline"]
+T_NUM = (["hour", "wday", "mod", "notyp", "z_sched", "dep_after", "arr_off", "rq", "rwy_share"] + DAY + OCC + WX
+         + [c for c in ARR if not c.startswith("pa_")] + WZ)
+T_LGB = {**LGB, "learning_rate": 0.1, "n_estimators": 3000, "n_jobs": 16}
 
 
 def classes(d: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -78,6 +85,9 @@ def augment(f: pd.DataFrame) -> pd.DataFrame:
     day = a.assign(near=near_a, tail=tail_a).groupby(["apt", "day"], observed=True).agg(
         est_share=("near", "mean"), a_tail_share=("tail", "mean"), a_za_p90=("z_aobt", lambda s: s.quantile(.9))).reset_index()
     f = f.merge(day, on=["apt", "day"], how="left")
+    ta = f["id"].map(pd.read_parquet(CACHE / "laneb_tau_a.parquet").set_index("id")["tau_a"])
+    assert ta[f["has_plan"] == 0].notna().all(), "lane B row missing from laneb_tau_a.parquet"
+    f = f.assign(tau_a=ta, tau_d=f["z_sched"] - ta)
     return pd.concat([f, _window(f, a, near_a, tail_a), copy_hist(f)], axis=1)
 
 
@@ -106,6 +116,28 @@ def copy_hist(f: pd.DataFrame) -> pd.DataFrame:
     for (split, m), q in b.groupby(["split", "month"], observed=True):
         out.loc[q.index] = _hist_rates(a if split == "rank" else a[(a["month"] - m).abs() >= HIST_GAP], q)
     return out
+
+
+def tau_a() -> None:
+    """L-B1: a lane A physical-taxi model (mix.label 0 or 3, lane-B-visible columns only) scored on lane B rows. 2025 rows
+    get a model that never saw their month group or the holdout months, rank rows one on all of 2025 (docs/LANEB.md)."""
+    t0, f = time.time(), build()
+    a = f[(f["split"] == "train") & (f["has_plan"] == 1)]
+    keep = np.isin(label(a), (0, 3)) & (a["y"].values > 0) & (a["y"].values < 7200)
+    a, b = a.loc[keep, T_CAT + T_NUM + ["y", "month", "day"]], f[f["has_plan"] == 0]
+    del f
+    out, btr = np.full(len(b), np.nan), (b["split"] == "train").values
+    for g in FOLDS + (HOLDOUT, None):
+        trn = a if g is None else a[~a["month"].isin(g) & ~a["month"].isin(HOLDOUT)]
+        es = pd.factorize(trn["day"])[0] % 10 == 0
+        m = lgb.LGBMRegressor(**T_LGB)
+        m.fit(trn[T_CAT + T_NUM][~es], trn["y"][~es], eval_set=[(trn[T_CAT + T_NUM][es], trn["y"][es])], categorical_feature=T_CAT,
+              callbacks=[lgb.early_stopping(100, verbose=False)])
+        tgt = ~btr if g is None else btr & b["month"].isin(g).values
+        out[tgt] = m.predict(b.loc[tgt, T_CAT + T_NUM])
+        print(f"tau_a model for {'rank' if g is None else g}: {m.best_iteration_} iters, {tgt.sum()} lane B rows, {time.time() - t0:.0f}s", flush=True)
+    assert not np.isnan(out).any()
+    pd.DataFrame({"id": b["id"].values, "tau_a": out}).to_parquet(CACHE / "laneb_tau_a.parquet")
 
 
 def shift_rate(tr: pd.DataFrame) -> tuple[float, int]:
@@ -173,12 +205,12 @@ def clf_logloss(tr: pd.DataFrame, va: pd.DataFrame, use_day: bool) -> tuple[floa
 def predict(tr, te, va=None, iters=None, use_shift=True, use_day=True, use_hist=True):
     """tr/te/va: lane-B rows only. yhat = P(copy)*z_sched + P(phys)*tau, shift rows get 86400+tau on top."""
     lab, keep, phys = _labels(tr)
-    clf_cols = B_CAT + B_NUM + ["cross", "sched_hour"] + (HIST if use_hist else []) + (DAY_COLS if use_day else [])
+    clf_cols = B_CAT + B_NUM + ["cross", "sched_hour"] + (HIST if use_hist else []) + (DAY_COLS if use_day else []) + TAU_CLF
     vlab = vkeep = vphys = None
     if va is not None:
         vlab, vkeep, vphys = _labels(va)
     P, it_c = fit_clf(tr, lab, keep, te, va, vlab, vkeep, clf_cols, iters[0] if iters else None)
-    tcols = TAU_CAT + tau_num(tr) + DAY + OCC + WX + ARR + WZ
+    tcols = TAU_CAT + tau_num(tr) + DAY + OCC + WX + ARR + WZ + TAU_A
     tau, it_t = fit_tau(tr, phys, te, va, vphys, tcols, iters[1] if iters else None)
     rate, n_shift = shift_rate(tr)
     p_shift = np.where(use_shift & (te["apt"].values == APT_SHIFT) & (te["z_sched"].values > Z_SHIFT), rate, 0.0)
@@ -326,4 +358,5 @@ def fit(it_clf: int, it_tau: int, donor: str = "mix_cb_wx") -> None:
 
 
 if __name__ == "__main__":
-    {"cv": lambda: cv(sys.argv[2]), "fit": lambda: fit(int(sys.argv[2]), int(sys.argv[3]), sys.argv[4] if len(sys.argv) > 4 else "mix_cb_wx")}[sys.argv[1]]()
+    {"cv": lambda: cv(sys.argv[2]), "fit": lambda: fit(int(sys.argv[2]), int(sys.argv[3]), sys.argv[4] if len(sys.argv) > 4 else "mix_cb_wx"),
+     "taua": tau_a}[sys.argv[1]]()

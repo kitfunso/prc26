@@ -1,6 +1,6 @@
-"""Lane A second stage: LightGBM on what the lane A blend leaves (y - p), from the blend, the airport and the distance
-from the blend to each plan stamp, so rows whose recorded off-block was copied from a stamp can move toward it
-(docs/RECAL.md). `python recal.py cv` / `python recal.py fit`."""
+"""Lane A second stage: LightGBM on what the lane A blend leaves (y - p), from the blend, the airport, the distance
+from the blend to each plan stamp, and the schedule-copy head P (copyhead.py), so rows whose recorded off-block was
+copied from a stamp can move toward it (docs/RECAL.md). `python recal.py cv` / `python recal.py fit`."""
 from __future__ import annotations
 
 import sys
@@ -14,7 +14,7 @@ from train import FOLDS, HOLDOUT, boot_delta
 
 W = {"ra_cb_wz": 0.5223, "ra_lgb_wz": 0.1564, "nn3_wz": 0.3213}
 Z = ["z_aobt", "z_sched", "z_eobt", "z_lobt", "z_iobt"]
-COLS = ["p", "apt", *[f"d_{z}" for z in Z]]
+COLS = ["p", "apt", *[f"d_{z}" for z in Z], "P"]
 GROUPS = (HOLDOUT, *FOLDS)
 PARAMS = dict(n_estimators=300, learning_rate=0.05, num_leaves=63, min_child_samples=200, subsample=0.8, subsample_freq=1,
               colsample_bytree=0.8, verbose=-1, n_jobs=8)
@@ -31,6 +31,8 @@ def load() -> pd.DataFrame:
         f.loc[~rk, "p"] += w * f.loc[~rk, "id"].map(tr.set_index("id")["p"]).values
         f.loc[rk, "p"] += w * f.loc[rk, "id"].map(r).values
     assert f["p"].notna().all(), "lane A row missing from a blend input"
+    f["P"] = f["id"].map(pd.read_parquet(CACHE / "copyhead.parquet").set_index("id")["P"]).values
+    assert f["P"].notna().all(), "lane A row missing from copyhead.parquet"
     f["p"] = np.maximum(f["p"], 0)
     f["apt"] = f["apt"].astype(str).astype("category")
     for z in Z:
