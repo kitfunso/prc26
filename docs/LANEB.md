@@ -579,7 +579,8 @@ which the tau regressor absorbs as a column.
 The third is v29's lane B (iters (107, 257); lane B over the OOF months +5.6 [+0.2, +13.5]). Holdout SSE gain by
 airport: LIRF +79M, EGLL +26M, LSZH +19M, EHAM +13M; the top row alone 63M, which is why the interval touches zero.
 With the lane A change of `docs/RECAL.md` the full file reads +0.873 [+0.104, +1.708] against v28, and the board
-went from 271.783 to 272.2175. Whether this change or the lane A one lost on the 2026 rows is not measured. The
+went from 271.783 to 272.2175. v30 (v29's lane A with v28's lane B) scored 271.9284, so this change cost 54M SSE on
+the 2026 rows where the holdout promised 138M. Reverted; the code is commit `88afb7e`. The
 rank lane B rows moved 157 s on average (v28 to v29), and the January rank set sits in different cells from the
 holdout's (EHAM Jan median `z_sched` 144 min against 84 in training, LSZH 98 against 21, session scratchpad `tz_d.py`),
 so a column fitted to 2025's lane B level can move the wrong way there.

@@ -76,8 +76,9 @@ v28 on the board: 271.783, rank 11 of 132 (`LEDGER.md`).
 v29 added a schedule-copy head to the second stage (`copyhead.py`: P(the recorded off-block copies the schedule) from
 the flight's lane A copy history, the stamps and identity columns, as a `recal.py` column) and a lane A physical-taxi
 prediction to the lane B tau regressor and copy classifier (`python laneb.py taua`). Holdout 305.89, +0.87 [+0.10,
-+1.71] against v28; board 272.2175, 0.43 s worse. v28 stays the file of record. The code at head is v29's: the block
-below reproduces v29 with the two extra commands, and the v28 code is commit `dd3057f`.
++1.71] against v28; board 272.2175, 0.43 s worse. v30 (v29's lane A with v28's lane B) scored 271.9284, so both
+changes lost on the 2026 rows: the copy head 27M SSE, the lane B column 54M. v28 stays the file of record and the
+code at head is v28's again; the v29 code is commit `88afb7e`.
 
 ```
 pip install -r requirements.txt            # Python 3.12, CUDA GPU for CatBoost
@@ -100,10 +101,8 @@ python lanea.py cv ra_cb_wz mix_cb_wx      # v25 configs plus WZ (20 window-stat
 python lanea.py cv ra_lgb_wz mix_cb_wx
 python nn.py cv nn3_wz mix_cb_wx
 python blend.py ra_cb_wz ra_lgb_wz nn3_wz --base=blend_ra_cb_arr+ra_lgb_arr+nn3_arr
-python laneb.py taua                       # v29: lane A physical-taxi prediction for lane B rows -> data/cache/laneb_tau_a.parquet
 python laneb.py cv mix_cb_wx               # LIRF-only lane B mechanism model: CV + holdout, tables in docs/LANEB_RUN.md
-python laneb.py fit 107 257                # full 2025 refit at the CV iteration counts -> data/laneb_rank.parquet (v28: 117 238)
-python copyhead.py                         # v29: schedule-copy head P for lane A rows -> data/cache/copyhead.parquet
+python laneb.py fit 117 238                # full 2025 refit at the CV iteration counts -> data/laneb_rank.parquet
 python lanea.py fit ra_lgb_wz mix_cb_wx 229 286 494    # full 2025 refit at the CV iteration counts
 python nn.py fit nn3_wz mix_cb_wx
 python lanea.py fit ra_cb_wz mix_cb_wx 2373 1991 4509

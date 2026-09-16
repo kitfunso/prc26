@@ -75,8 +75,9 @@ rows; as a direct correction v28 + w P (z_sched - v28) with w fitted on the OOF 
 +0.204], because the stage already moves these rows; as a stage column, lane A holdout 218.60 to 218.28, +0.314
 [+0.060, +0.558], 12 months +0.374 [+0.261, +0.476], full file +0.220 [+0.038, +0.423]. The third shipped in v29 with
 the lane B change of `docs/LANEB.md` section 11 (together +0.873 [+0.104, +1.708]) and the board went from 271.783
-to 272.2175. Rank LIRF flight-number coverage is 0.454 against 0.973 on the holdout (`docs/LANEB.md` section 6), so
-the head meets rows it has no history for; which of the two v29 changes lost is not measured.
+to 272.2175. v30, the same lane A with v28's lane B, scored 271.9284: the head alone costs 27M SSE on the 2026 rows
+where the holdout promised 46.5M. Rank LIRF flight-number coverage is 0.454 against 0.973 on the holdout
+(`docs/LANEB.md` section 6), so the head meets rows it has no history for. Reverted; the code is commit `88afb7e`.
 
 **Caveat.** The stage learns on OOF predictions from models fitted on 8 months and is checked on holdout predictions
 from models fitted on 10. The rank predictions come from models fitted on all 12, so there the stage meets a slightly
