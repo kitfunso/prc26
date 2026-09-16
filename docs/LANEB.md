@@ -558,3 +558,28 @@ same-stand arrival (by `pa_gap`, anchored at AOBT) blocked after the schedule co
 and v28's lane A residual is 10 s higher on them in both halves.
 
 Not used.
+
+## 11. A lane A physical-taxi prediction as a lane B column (in v29, lost on the board)
+
+Lane B's physical-taxi regressor learns from 12,000 lane B rows. Lane A holds 1.8 million physical rows (`mix.label`
+0 or 3, 0 < y < 7,200 s) with the same lane-B-visible columns: airport, runway, stand, type, airline, hour, weekday,
+`z_sched`, the day, occupancy, weather, the non-`pa_` arrival columns and `WZ`. `tau_a()` fits LightGBM (`LGB` at
+learning rate 0.1, early stopping on a tenth of the days) on those rows and scores the lane B rows, out of fold by
+month group with the holdout months excluded for 2025 rows and on all of 2025 for the rank rows (session scratchpad
+`lbx.py`, log `lbx.log`). On the 5,075 holdout lane B physical rows tau_a scores 968.5 against v28's 1,099.8; it runs
+90 to 280 s high at every airport but LIRF and LTFM (the lane B label is shorter than lane A's for the same cell),
+which the tau regressor absorbs as a column.
+
+| variant | OOF folds | holdout lane B | full file vs v28 |
+|---|---|---|---|
+| baseline (fixed occupancy frame) | 1381.5 | 1737.3 | -0.04 [-0.41, +0.69] |
+| tau_a in the tau regressor | 1375.2 | 1732.7 | +0.37 [-0.08, +0.99] |
+| tau_a in tau, tau_a and z_sched - tau_a in the classifier | 1374.7 | 1729.5 | +0.65 [-0.03, +1.46] |
+
+The third is v29's lane B (iters (107, 257); lane B over the OOF months +5.6 [+0.2, +13.5]). Holdout SSE gain by
+airport: LIRF +79M, EGLL +26M, LSZH +19M, EHAM +13M; the top row alone 63M, which is why the interval touches zero.
+With the lane A change of `docs/RECAL.md` the full file reads +0.873 [+0.104, +1.708] against v28, and the board
+went from 271.783 to 272.2175. Whether this change or the lane A one lost on the 2026 rows is not measured. The
+rank lane B rows moved 157 s on average (v28 to v29), and the January rank set sits in different cells from the
+holdout's (EHAM Jan median `z_sched` 144 min against 84 in training, LSZH 98 against 21, session scratchpad `tz_d.py`),
+so a column fitted to 2025's lane B level can move the wrong way there.

@@ -65,6 +65,19 @@ already first-stage columns. Not used.
 **Full file** (session scratchpad `gate_a.py`): with v27's lane B, holdout 307.18 against v27's 308.47, +1.29 [+0.76,
 +2.03]; with the copy-history lane B of `docs/LANEB.md` section 6, 306.76, +1.71 [+0.75, +2.88]. The second is v28.
 
+**Schedule-copy head (v29, lost on the board).** The 1,302 LIRF schedule-copy rows hold 1,295M of the second stage's
+holdout SSE (session scratchpad `lae_d.py`, `lae2_d.py`); a perfect call there takes LIRF lane A from 368.4 to 293.6.
+Copy history is predictive of them: `laneb._hist_rates` scored on lane A rows (`copyhead.hist_a`) gives corr(h_flt,
+copy) 0.546 on the delayed LIRF rows, and a binary LightGBM on the history, the stamps and identity columns
+(`copyhead.py`) reaches AUC 0.959 to 0.966 by month group. Three ways to use it (`lah.py`, `lsh.py`, `rcp.py` in the
+session scratchpad): as first-stage `ra_lgb_wz` columns, +0.18 [-0.09, +0.51] lane A, diluted by losses on physical
+rows; as a direct correction v28 + w P (z_sched - v28) with w fitted on the OOF months (0.232), +0.035 [-0.188,
++0.204], because the stage already moves these rows; as a stage column, lane A holdout 218.60 to 218.28, +0.314
+[+0.060, +0.558], 12 months +0.374 [+0.261, +0.476], full file +0.220 [+0.038, +0.423]. The third shipped in v29 with
+the lane B change of `docs/LANEB.md` section 11 (together +0.873 [+0.104, +1.708]) and the board went from 271.783
+to 272.2175. Rank LIRF flight-number coverage is 0.454 against 0.973 on the holdout (`docs/LANEB.md` section 6), so
+the head meets rows it has no history for; which of the two v29 changes lost is not measured.
+
 **Caveat.** The stage learns on OOF predictions from models fitted on 8 months and is checked on holdout predictions
 from models fitted on 10. The rank predictions come from models fitted on all 12, so there the stage meets a slightly
 stronger blend than anywhere it was checked. It moves lane A further there: 42.9 s rms (mean +4.45 s) on the rank set
