@@ -50,7 +50,7 @@ Holdout = January and July 2025, never used for model choice. CV = five folds ov
 by month pair. Every result line reports per lane (A = has a flight plan, B = no plan) and per month.
 Predictions are floored at 0. Board uploads are logged in `LEDGER.md` with the expected and actual score.
 
-## Reproduce the current build (v28)
+## Reproduce the current build (v28 base; v32 is the file of record)
 
 The lane A blend is 0.5223 * CatBoost residual lane-A model with arrival recorder-mode and window-state features (`ra_cb_wz`)
 + 0.1564 * the LightGBM version (`ra_lgb_wz`) + 0.3213 * the MLP version (`nn3_wz`). Lane A is v25's design
@@ -93,6 +93,27 @@ python lanea.py fit ra_lgb_pw mix_cb_wx 237 293 470
 python recal.py cv && python recal.py fit
 python combine.py data/merry-octopus_v31.parquet data/recal_rank.parquet:1 --over=data/laneb_rank.parquet
 python board.py check data/merry-octopus_v31.parquet
+```
+
+v32 (2026-09-17, the file of record, board 271.5521) is v31 with one change: the MLP lane A member
+also sees the five `PW` neighbour-predicted-residual windows in place of the plain residual
+(`nn3_pw` in `nn.py`, `docs/WINDOW_STATE.md`), trained on CPU (`NN_DEV=cpu`, venv `.venv-cpu`,
+CPU-only torch 2.14.0) because the GPU driver was wedged by another job. NNLS on OOF reweights the
+blend to 0.490727 `ra_cb_wz` + 0.175394 `ra_lgb_pw` + 0.333879 `nn3_pw`; the second stage is refit
+on it; lane B rows are v28's. Holdout 305.77 all, 217.18 lane A, +0.754 [+0.392, +1.314] against
+v31 (paired day-block bootstrap); `nn3_pw` alone vs `nn3_wz` +6.900 [+2.555, +13.026] lane A
+holdout. Board 271.5521, rank 20 of 152: NEW BEST by 0.128 s, but only 24.0M of the 159M SSE the
+holdout promised carried, 0.15 against v31's 0.4, so each `pw` member carries less of its holdout
+gain to the board. The extra commands, after the v31 chain (the CPU venv is only needed while the
+GPU driver is wedged; `python nn.py cv nn3_pw mix_cb_wx` is the normal form):
+
+```
+NN_DEV=cpu CUDA_VISIBLE_DEVICES="" .venv-cpu/Scripts/python.exe nn.py cv nn3_pw mix_cb_wx
+python blend.py ra_cb_wz ra_lgb_pw nn3_pw --base=blend_ra_cb_wz+ra_lgb_pw+nn3_wz
+NN_DEV=cpu CUDA_VISIBLE_DEVICES="" .venv-cpu/Scripts/python.exe nn.py fit nn3_pw mix_cb_wx
+python recal.py cv && python recal.py fit
+python combine.py data/merry-octopus_v32.parquet data/recal_rank.parquet:1 --over=data/laneb_rank.parquet
+python board.py check data/merry-octopus_v32.parquet
 ```
 
 ```

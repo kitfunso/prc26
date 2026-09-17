@@ -158,7 +158,33 @@ iterations for an hour. v31 therefore swaps only the LightGBM member. NNLS on OO
 `ra_lgb_pw` + 0.311142 `nn3_wz` (the LightGBM weight rises from 0.1564 because it now carries something the other
 two do not); second stage lane A holdout 218.26 against 218.60; full file 306.52 against 306.76, +0.240 [+0.108,
 +0.402]. Board 271.68 against 271.783: 0.10 s better, about 19M of board SSE against 51M promised by the holdout,
-so the columns carry at roughly 0.4 of the holdout gain. The CatBoost and MLP members with `pw` are the open item.
+so the columns carry at roughly 0.4 of the holdout gain. The CatBoost member with `pw` is the open item; the MLP
+member shipped as v32 below.
+
+### v32: the MLP member with `pw`
+
+`nn3_pw` is `nn3_wz` with the five `PW` columns joined in (`features.with_pw`, same set as `ra_lgb_pw`). The GPU
+driver was wedged by another job, so the run went through CPU (`NN_DEV=cpu`, venv `.venv-cpu`, CPU-only torch
+2.14.0); CV took 10879 s at epochs [39, 22, 21, 22, 20], plus 28 epochs for the holdout fit. `nn3_pw` CV all 253.8,
+lane A 208.56; holdout all 327.13, lane A 226.86, January 342.48, July 314.22, against `nn3_wz`'s holdout lane A
+233.77: +6.900 [+2.555, +13.026] (paired day-block bootstrap).
+
+NNLS on OOF (`python blend.py ra_cb_wz ra_lgb_pw nn3_pw --base=blend_ra_cb_wz+ra_lgb_pw+nn3_wz`) reweights the
+blend to 0.490727 `ra_cb_wz` + 0.175394 `ra_lgb_pw` + 0.333879 `nn3_pw`. Blend holdout all 321.61, lane A 218.69,
++0.91 [+0.52, +1.46] against the v31 blend. Second stage (`python recal.py cv`): lane A holdout 218.69 to 217.18,
++1.51 [+0.94, +2.15]; over 12 months +1.01 [+0.61, +1.36].
+
+Full-file holdout gate against v31 (`recal_holdout` vs `data/cache/v31_backup/recal_holdout`): +0.754 [+0.392,
++1.314], PASS. v32 holdout all 305.77 (v31 306.52), lane A 217.18 (v31 218.26), lane B 1736.9 unchanged (still
+v28's rows via `combine.py --over`); SSE drop 159M.
+
+Uploaded 2026-09-17 as `merry-octopus_v32.parquet` (sha256 prefix 77c4178c024c8474, 344,841 rows): board 271.5521
+against v31's 271.68, NEW BEST by 0.128 s, board SSE drop 24.0M against the 159M the holdout promised, a carry of
+0.15. Rank 20 of 152, leader vigorous-whistle 241.75, 10th strong-turtle 261.7928, 15th upbeat-goblin 266.4508.
+
+`ra_cb_pw`, the CatBoost member with `pw`, is the remaining round and still waits on the GPU. The carry ratio
+falling from 0.4 at v31 to 0.15 at v32 says the `pw` gain sits mostly in holdout-specific tail rows rather than
+rows the rank set shares.
 
 ## v26 ship
 

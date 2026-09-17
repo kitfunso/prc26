@@ -3,6 +3,7 @@ Lane B rows come from a donor. `python nn.py cv NAME DONOR` / `python nn.py fit 
 from __future__ import annotations
 
 import json
+import os
 import sys
 import time
 
@@ -16,7 +17,8 @@ from features import ARR, CAT, DAY, NUM, OCC, PW, WX, WZ, build, with_pw
 from lanea import _merge_b
 from train import FOLDS, HOLDOUT, RESULTS, report
 
-DEV = "cuda" if torch.cuda.is_available() else "cpu"
+# NN_DEV=cpu skips the driver call, which hangs while another job holds a wedged GPU.
+DEV = "cpu" if os.environ.get("NN_DEV") == "cpu" else ("cuda" if torch.cuda.is_available() else "cpu")
 VAL_FRAC = 0.10
 CELL = dict(hidden=(1024, 1024, 1024), dropout=0.2555, lr=1.5e-3, weight_decay=1.65e-4, batch=1024, max_epochs=150, t_max=60,
             patience=5, emb_cap=16, huber=0.405, seed=0)
