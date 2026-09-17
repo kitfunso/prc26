@@ -26,6 +26,9 @@ WS_SCALES = {"wz": (("split", "apt", "day"), 3600.0), "wa": (("split", "apt", "d
 WZ = ["wz_n", "wz_dz", "wz_dz_sd", "wz_hi", "wz_lo", "wz_dae", "wz_dae_sd", "wz_dae0",
       "wa_n", "wa_dz", "wa_dae", "wa_dae_sd", "wz30_dz", "wz30_dae", "wz30_dae_sd",
       "wz3h_dz", "wz3h_dae", "wz3h_dae_sd", "wz_dal", "wz_dal_sd"]
+PW = ["pw_n", "pw_m", "pw_hi", "pr_m", "pw30_m"]
+# duplicated from recal.W: importing recal here would cycle (recal -> train -> features)
+PW_BLEND = {"ra_cb_wz": 0.5223, "ra_lgb_wz": 0.1564, "nn3_wz": 0.3213}
 
 
 def anchor(df: pd.DataFrame) -> np.ndarray:
@@ -224,6 +227,53 @@ def window_state(f: pd.DataFrame, keys: tuple[str, ...], win: float, pre: str) -
 def winstate(f: pd.DataFrame) -> pd.DataFrame:
     """Recorder state around each departure (docs/WINDOW_STATE.md): neighbours' AOBT gaps stand in for their unseen c."""
     return pd.concat([window_state(f, k, w, p) for p, (k, w) in WS_SCALES.items()], axis=1)[WZ]
+
+
+def loo_mean(f: pd.DataFrame, keys: tuple[str, ...], win: float, v: np.ndarray, ok: np.ndarray, pre: str) -> pd.DataFrame:
+    """Leave-one-out count, mean and share above 600 of v over neighbours with ok in the same keys within +-win."""
+    t = f["t_off"].values
+    q = {"n": ok.astype(float), "s": np.where(ok, v, 0.0), "hi": (ok & (v > 600)).astype(float)}
+    s = {k: np.zeros(len(f)) for k in q}
+    for ix in f.groupby(list(keys), observed=True).indices.values():
+        o = ix[np.argsort(t[ix], kind="stable")]; ts = t[o]
+        lo, hi = np.searchsorted(ts, ts - win, "left"), np.searchsorted(ts, ts + win, "right")
+        for k, x in q.items():
+            cum = np.concatenate([[0.0], np.cumsum(x[o])]); s[k][o] = cum[hi] - cum[lo] - x[o]
+    with np.errstate(invalid="ignore", divide="ignore"):
+        return pd.DataFrame({f"{pre}_n": s["n"], f"{pre}_m": s["s"] / s["n"], f"{pre}_hi": s["hi"] / s["n"]}, index=f.index)
+
+
+def pw_cols() -> pd.DataFrame:
+    """Windows of the neighbours' predicted residual (v28 blend minus z_aobt), for every train and rank row
+    (docs/WINDOW_STATE.md): id plus the 5 PW columns, cached since the blend inputs never change underneath it."""
+    out = CACHE / "pw.parquet"
+    if out.exists():
+        return pd.read_parquet(out)
+    f = build()
+    rk = (f["split"] == "rank").values
+    p = np.zeros(len(f))
+    for n, w in PW_BLEND.items():
+        tr = pd.concat([pd.read_parquet(CACHE / f"{n}_oof.parquet").rename(columns={"oof": "p"}),
+                        pd.read_parquet(CACHE / f"{n}_holdout.parquet")]).set_index("id")["p"]
+        rr = pd.read_parquet(f"data/{n}_rank.parquet").set_index("MVT_ID_mvt")["TAXITIME_SEC_mvt"]
+        p[~rk] += w * f.loc[~rk, "id"].map(tr).values
+        p[rk] += w * f.loc[rk, "id"].map(rr).values
+    p = np.maximum(p, 0)
+    c = p - f["z_aobt"].values
+    ok = (f["has_plan"].values == 1) & np.isfinite(c)
+    c = np.where(ok, np.clip(c, -1800, 1800), 0.0)
+    res = pd.concat([loo_mean(f, ("split", "apt", "day"), 3600.0, c, ok, "pw"),
+                      loo_mean(f, ("split", "apt", "day", "runway"), 3600.0, c, ok, "pr")[["pr_m"]],
+                      loo_mean(f, ("split", "apt", "day"), 1800.0, c, ok, "pw30")[["pw30_m"]]], axis=1)
+    out_df = pd.concat([f[["id"]], res], axis=1)
+    tmp = out.with_suffix(".tmp.parquet")
+    out_df.to_parquet(tmp); tmp.replace(out)
+    return out_df
+
+
+def with_pw(f: pd.DataFrame) -> pd.DataFrame:
+    """Join the 5 PW columns onto f by id (docs/WINDOW_STATE.md, the neighbours' predicted residual)."""
+    return f.merge(pw_cols(), on="id", how="left")
 
 
 def build(refresh: bool = False) -> pd.DataFrame:

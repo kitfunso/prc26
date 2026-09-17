@@ -12,7 +12,7 @@ import torch
 import torch.nn as nn
 
 from data import CACHE, rmse
-from features import ARR, CAT, DAY, NUM, OCC, WX, WZ, build
+from features import ARR, CAT, DAY, NUM, OCC, PW, WX, WZ, build, with_pw
 from lanea import _merge_b
 from train import FOLDS, HOLDOUT, RESULTS, report
 
@@ -25,6 +25,7 @@ CONFIGS: dict[str, dict] = {
     "nn3_s1": dict(cell={**CELL, "seed": 1}, cat=CAT, num=NUM + DAY + OCC + WX),
     "nn3_arr": dict(cell=CELL, cat=CAT, num=NUM + DAY + OCC + WX + ARR),
     "nn3_wz": dict(cell=CELL, cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ),
+    "nn3_pw": dict(cell=CELL, cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ + PW),
 }
 
 
@@ -116,6 +117,8 @@ def predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame) -> tuple[np.ndarray, 
 
 def cv(name: str, donor: str) -> None:
     cfg, f = CONFIGS[name], build()
+    if set(PW) & set(cfg["num"]):
+        f = with_pw(f)
     f = f[f["split"] == "train"]
     tr, ho = f[~f["month"].isin(HOLDOUT)], f[f["month"].isin(HOLDOUT)]
     ta, ha = tr[tr["has_plan"] == 1], ho[ho["has_plan"] == 1]
@@ -137,6 +140,8 @@ def cv(name: str, donor: str) -> None:
 
 def fit(name: str, donor: str) -> None:
     cfg, f = CONFIGS[name], build()
+    if set(PW) & set(cfg["num"]):
+        f = with_pw(f)
     tr, rk = f[(f["split"] == "train") & (f["has_plan"] == 1)], f[f["split"] == "rank"]
     ra = rk[rk["has_plan"] == 1]
     p = np.maximum(predict(cfg, tr, ra)[0], 0)

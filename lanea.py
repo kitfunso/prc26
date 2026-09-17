@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 from data import CACHE, rmse
-from features import ARR, CAT, DAY, NUM, OCC, WX, WZ, build
+from features import ARR, CAT, DAY, NUM, OCC, PW, WX, WZ, build, with_pw
 from mix import CLF_CB, CLF_LGB, fit_clf
 from train import BASE, FOLDS, HOLDOUT, LGB, RESULTS, fit_predict, report
 
@@ -29,6 +29,8 @@ CONFIGS: dict[str, dict] = {
     "ra_lgb_arr": dict(clf=dict(family="lgb", params=CLF_LGB_BIN), reg=dict(family="lgb", params={**LGB, "n_jobs": 12}, cat=CAT, num=NUM + DAY + OCC + WX + ARR), cat=CAT, num=NUM + DAY + OCC + WX + ARR),
     "ra_cb_wz": dict(clf=dict(family="cb", params={**CLF_CB, "loss_function": "Logloss"}), reg=dict(params=REG, cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ), cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ),
     "ra_lgb_wz": dict(clf=dict(family="lgb", params=CLF_LGB_BIN), reg=dict(family="lgb", params={**LGB, "n_jobs": 12}, cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ), cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ),
+    "ra_cb_pw": dict(clf=dict(family="cb", params={**CLF_CB, "loss_function": "Logloss"}), reg=dict(params=REG, cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ + PW), cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ + PW),
+    "ra_lgb_pw": dict(clf=dict(family="lgb", params=CLF_LGB_BIN), reg=dict(family="lgb", params={**LGB, "n_jobs": 12}, cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ + PW), cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ + PW),
 }
 
 
@@ -54,6 +56,8 @@ def _merge_b(a: pd.DataFrame, donor: pd.DataFrame, rows: pd.DataFrame, col: str)
 
 def cv(name: str, donor: str) -> None:
     cfg, f = CONFIGS[name], build()
+    if set(PW) & set(cfg["num"]):
+        f = with_pw(f)
     f = f[f["split"] == "train"]
     tr, ho = f[~f["month"].isin(HOLDOUT)], f[f["month"].isin(HOLDOUT)]
     ta, ha = tr[tr["has_plan"] == 1], ho[ho["has_plan"] == 1]
@@ -76,6 +80,8 @@ def cv(name: str, donor: str) -> None:
 
 def fit(name: str, donor: str, iters: tuple[int, ...]) -> None:
     cfg, f = CONFIGS[name], build()
+    if set(PW) & set(cfg["num"]):
+        f = with_pw(f)
     tr, rk = f[(f["split"] == "train") & (f["has_plan"] == 1)], f[f["split"] == "rank"]
     ra = rk[rk["has_plan"] == 1]
     p = np.maximum(predict(cfg, tr, ra, iters=iters)[0], 0)

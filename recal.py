@@ -12,7 +12,7 @@ import pandas as pd
 from data import CACHE, rmse
 from train import FOLDS, HOLDOUT, boot_delta
 
-W = {"ra_cb_wz": 0.5223, "ra_lgb_wz": 0.1564, "nn3_wz": 0.3213}
+W = {"ra_cb_wz": 0.501509, "ra_lgb_pw": 0.187349, "nn3_wz": 0.311142}
 Z = ["z_aobt", "z_sched", "z_eobt", "z_lobt", "z_iobt"]
 COLS = ["p", "apt", *[f"d_{z}" for z in Z]]
 GROUPS = (HOLDOUT, *FOLDS)

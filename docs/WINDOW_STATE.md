@@ -144,6 +144,22 @@ predicted tail share and level, which is the state the oracle prices. The second
 give holdout lane A 218.878 against 218.597, -0.281 [-0.653, +0.052], 3 of 5 folds. The gain needs the base models
 to see the columns, which means a second round of `ra_cb_wz`, `ra_lgb_wz` and `nn3_wz` with `pw` from the v28 blend.
 
+### v31: the LightGBM member with `pw`
+
+`features.pw_cols()` builds the five columns for every train and rank row from the v28 blend (`PW_BLEND`; OOF for
+the fit months, the holdout refit for January and July, the rank files for 2026) and caches them in
+`data/cache/pw.parquet`; `with_pw` joins them by id in `lanea.py` and `nn.py` for any config whose columns name
+`PW`. The set differs from the table above in one column: the 3 h mean gave way to the runway mean. `ra_lgb_pw`
+(`python lanea.py cv ra_lgb_pw mix_cb_wx`): folds 210.44 / 194.68 / 220.14 / 212.38 / 201.22, holdout lane A
+225.75 at (237, 293, 470), +1.474 [+0.781, +2.163] against `ra_lgb_wz`, 4 of 5 folds.
+
+The CatBoost and MLP rounds could not run: the GPU was held by another job and the CatBoost fit sat at zero
+iterations for an hour. v31 therefore swaps only the LightGBM member. NNLS on OOF: 0.501509 `ra_cb_wz` + 0.187349
+`ra_lgb_pw` + 0.311142 `nn3_wz` (the LightGBM weight rises from 0.1564 because it now carries something the other
+two do not); second stage lane A holdout 218.26 against 218.60; full file 306.52 against 306.76, +0.240 [+0.108,
++0.402]. Board 271.68 against 271.783: 0.10 s better, about 19M of board SSE against 51M promised by the holdout,
+so the columns carry at roughly 0.4 of the holdout gain. The CatBoost and MLP members with `pw` are the open item.
+
 ## v26 ship
 
 `python lanea.py cv ra_cb_wz mix_cb_wx` (GPU): folds 204.66 / 191.67 / 216.59 / 207.78 / 197.82,

@@ -62,3 +62,5 @@
 | laneb (donor mix_cb_wx) | - | {"all": 1741.7, "laneA": NaN, "laneB": 1741.7, "m1": 2818.65, "m7": 1115.28} | (127, 238) | 51s |
 | laneb (donor mix_cb_wx) | - | {"all": 1736.89, "laneA": NaN, "laneB": 1736.89, "m1": 2814.48, "m7": 1108.86} | (117, 238) | 30s |
 | laneb (donor mix_cb_wx) | - | {"all": 1729.49, "laneA": NaN, "laneB": 1729.49, "m1": 2816.96, "m7": 1090.66} | (107, 257) | 49s |
+| ra_lgb_pw (B from mix_cb_wx) | {"all": 253.44, "laneA": 208.12, "laneB": 1474.08} | {"all": 326.37, "laneA": 225.75, "laneB": 1900.6, "m1": 342.38, "m7": 312.87} | (237, 293, 470) | 641s |
+| blend:ra_cb_wz+ra_lgb_pw+nn3_wz w=[0.502, 0.187, 0.311] | {"all": 247.79, "laneA": 201.18, "laneB": 1473.38} | {"all": 322.52, "laneA": 220.05, "laneB": 1900.6, "m1": 338.75, "m7": 308.81} | - | -  vs blend_ra_cb_wz+ra_lgb_wz+nn3_wz: +0.26 [+0.17, +0.38] |

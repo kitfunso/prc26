@@ -80,6 +80,21 @@ prediction to the lane B tau regressor and copy classifier (`python laneb.py tau
 changes lost on the 2026 rows: the copy head 27M SSE, the lane B column 54M. v28 stays the file of record and the
 code at head is v28's again; the v29 code is commit `88afb7e`.
 
+v31 (2026-09-17, the file of record, board 271.68) is v28 with one change: the LightGBM lane A member also sees
+five windows of the neighbours' predicted residual, the v28 blend minus the AOBT gap, leave-one-out over the
+airport-day (`features.pw_cols`, `docs/WINDOW_STATE.md`). NNLS on OOF reweights the blend to 0.501509 `ra_cb_wz`
++ 0.187349 `ra_lgb_pw` + 0.311142 `nn3_wz`; the second stage is refit on it; lane B rows are v28's. Holdout 306.52
+all, 218.26 lane A, +0.240 [+0.108, +0.402] against v28. The extra commands, after the v28 chain:
+
+```
+python lanea.py cv ra_lgb_pw mix_cb_wx     # builds data/cache/pw.parquet from the v28 caches on first use
+python blend.py ra_cb_wz ra_lgb_pw nn3_wz --base=blend_ra_cb_wz+ra_lgb_wz+nn3_wz
+python lanea.py fit ra_lgb_pw mix_cb_wx 237 293 470
+python recal.py cv && python recal.py fit
+python combine.py data/merry-octopus_v31.parquet data/recal_rank.parquet:1 --over=data/laneb_rank.parquet
+python board.py check data/merry-octopus_v31.parquet
+```
+
 ```
 pip install -r requirements.txt            # Python 3.12, CUDA GPU for CatBoost
 # put training_*.parquet, ranking.parquet, submitting.parquet in data/
