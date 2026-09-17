@@ -217,3 +217,11 @@ Uploaded 2026-09-13 as `merry-octopus_v26.parquet` (sha256 prefix fe320454aa7839
 288.6796, 6.26 s against 7.42 on the holdout. Lane A alone projected 286.23 at v25's 1:1 SSE carry, and the board
 went further. The hull ships in the same file, so the split between lane A and the six clipped rows is not read
 (reading rank rows off board differences is a probe, and probes are Keith's call).
+
+## v33: the CatBoost member with the PW windows loses on the board (2026-09-17)
+
+`ra_cb_pw` lane A holdout 222.18 vs `ra_cb_wz` 223.71 (CV 203.91 vs 204.07). Blend 0.504075 `ra_cb_pw` + 0.160367
+`ra_lgb_pw` + 0.335558 `nn3_pw`: +0.39 [+0.18, +0.64] vs the v32 blend; second stage 218.10 to 216.60; full file
++0.402 [+0.109, +0.748] vs v32. Board 271.84 vs v32's 271.5521, 0.29 s worse. Carry by member: LightGBM 0.4, MLP 0.15,
+CatBoost negative. The family nets +0.23 s and is closed; v32 (`ra_cb_wz` + `ra_lgb_pw` + `nn3_pw`) stays the file of record.
+A full-file gate whose lower bound sits near +0.1 has now lost twice (v29, v33), so such a gate does not justify a slot.

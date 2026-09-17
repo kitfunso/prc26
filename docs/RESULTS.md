@@ -66,3 +66,5 @@
 | blend:ra_cb_wz+ra_lgb_pw+nn3_wz w=[0.502, 0.187, 0.311] | {"all": 247.79, "laneA": 201.18, "laneB": 1473.38} | {"all": 322.52, "laneA": 220.05, "laneB": 1900.6, "m1": 338.75, "m7": 308.81} | - | -  vs blend_ra_cb_wz+ra_lgb_wz+nn3_wz: +0.26 [+0.17, +0.38] |
 | nn3_pw (B from mix_cb_wx) | {"all": 253.8, "laneA": 208.56, "laneB": 1474.08} | {"all": 327.13, "laneA": 226.86, "laneB": 1900.6, "m1": 342.48, "m7": 314.22} | epochs [39, 22, 21, 22, 20]+28 | 10879s |
 | blend:ra_cb_wz+ra_lgb_pw+nn3_pw w=[0.491, 0.175, 0.334] | {"all": 247.72, "laneA": 201.1, "laneB": 1473.38} | {"all": 321.61, "laneA": 218.69, "laneB": 1900.6, "m1": 338.36, "m7": 307.44} | - | -  vs blend_ra_cb_wz+ra_lgb_pw+nn3_wz: +0.91 [+0.52, +1.46] |
+| ra_cb_pw (B from mix_cb_wx) | {"all": 250.03, "laneA": 203.91, "laneB": 1474.08} | {"all": 323.95, "laneA": 222.18, "laneB": 1900.6, "m1": 339.99, "m7": 310.42} | (2217, 2465, 5238) | 3212s |
+| blend:ra_cb_pw+ra_lgb_pw+nn3_pw w=[0.504, 0.16, 0.336] | {"all": 247.7, "laneA": 201.07, "laneB": 1473.38} | {"all": 321.22, "laneA": 218.1, "laneB": 1900.6, "m1": 338.16, "m7": 306.88} | - | -  vs blend_ra_cb_wz+ra_lgb_pw+nn3_pw: +0.39 [+0.18, +0.64] |
