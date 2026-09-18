@@ -121,6 +121,8 @@ pip install -r requirements.txt            # Python 3.12, CUDA GPU for CatBoost
 # put training_*.parquet, ranking.parquet, submitting.parquet in data/
 python weather.py fetch 2026-09-05         # data/weather/2026-09-05/<ICAO>.csv
 python data.py && python features.py       # caches under data/cache/, incl. ARR (arrival recorder-mode) and WZ (window-state) features
+python regime.py                           # disruption-day map -> docs/REGIME.md + data/cache/regime.parquet; blend.py and recal.py slice every result by it
+python -m pytest tests/ -q                 # 11 tests: label timing, feature leakage, reproducibility
 python mix.py cv mix_cb_wx                 # lane-B donor: CV + holdout line in docs/RESULTS.md, iteration counts at the end
 python mix.py fit mix_cb_wx 2309 3779      # -> data/mix_cb_wx_rank.parquet
 python lanea.py cv ra_cb mix_cb_wx         # residual lane A, lane B copied from the donor
@@ -155,3 +157,7 @@ overall with a bootstrap CI clear of zero, so v25 to v28 use its predictions as 
 
 CatBoost on GPU is not bit-reproducible run to run; expect about 1 s of holdout noise. `tune.py` runs Optuna over
 the mixture regressor on CV folds only (`python tune.py N_TRIALS 2-3,6-8`, study in `data/optuna.db`).
+`window.py` prices a rolling training window against everything-before on a later month pair
+(`python window.py ra_lgb_wz 11,12 26 99`); it found expanding wins, `docs/EXPERIMENT-PROTOCOL.md` R4.
+Every declared experiment, its null bar and its verdict live in `docs/EXPERIMENT-PROTOCOL.md`; coverage against
+the 44-step time-series roadmap is `docs/ROADMAP-COVERAGE.md`.
