@@ -17,6 +17,10 @@ LOOKBACK = 3 * 3600.0
 CODES = ("TS", "SN", "FZ", "RA", "SH", "FG", "BR")
 OBS = ("w_sknt", "w_gust", "w_vsby", "w_tmpf", "w_ceil") + tuple(f"w_{c.lower()}" for c in CODES)
 WX = list(OBS) + ["w_ts3h", "w_age"]  # p01i is 0.00 on every European row, so no rain sums
+SNOW = ["w_sn6h", "w_sn24h", "w_fz6h", "w_cold12h", "w_cold24h", "w_lovis6h"]
+HIST = {"w_ts3h": ("w_ts", LOOKBACK), "w_sn6h": ("w_sn", 6 * 3600.0), "w_sn24h": ("w_sn", 86400.0),
+        "w_fz6h": ("w_fz", 6 * 3600.0), "w_cold12h": ("w_cold", 12 * 3600.0), "w_cold24h": ("w_cold", 86400.0),
+        "w_lovis6h": ("w_lovis", 6 * 3600.0)}
 
 
 def _num(s: pd.Series) -> pd.Series:
@@ -34,14 +38,17 @@ def load_metar() -> pd.DataFrame:
         out["w_ceil"] = np.nanmin(np.vstack(layers), axis=0)
     for c in CODES:
         out[f"w_{c.lower()}"] = df["wxcodes"].str.contains(c).astype(np.int8)
+    out["w_cold"] = (out["w_tmpf"] <= 32).astype(np.int8)
+    out["w_lovis"] = (out["w_vsby"] <= 1.0).astype(np.int8)
     return out.sort_values(["apt", "t"]).reset_index(drop=True)
 
 
 def join(f: pd.DataFrame, metar: pd.DataFrame | None = None) -> pd.DataFrame:
-    """Latest observation at or before the anchor (estimated off-block), plus 3 h look-back thunderstorm and rain sums."""
+    """Latest observation at or before the anchor (estimated off-block), plus look-back counts. Snow, freezing and
+    low-visibility history is what drives a de-icing queue; the instant code alone cannot see a morning of it."""
     metar = load_metar() if metar is None else metar
     at = f["t_off"].values - f["z_anchor"].values
-    cols = {c: np.full(len(f), np.nan) for c in WX}
+    cols = {c: np.full(len(f), np.nan) for c in WX + SNOW}
     for apt, ix in f.groupby("apt", observed=True).indices.items():
         m = metar[metar["apt"] == apt]
         if m.empty:
@@ -52,9 +59,10 @@ def join(f: pd.DataFrame, metar: pd.DataFrame | None = None) -> pd.DataFrame:
         for c in OBS:
             cols[c][ix] = np.where(ok, m[c].values[p], np.nan)
         cols["w_age"][ix] = np.where(ok, at[ix] - t[p], np.nan)
-        lo, hi = np.searchsorted(t, at[ix] - LOOKBACK, "left"), np.searchsorted(t, at[ix], "right")
-        cum = np.concatenate([[0.0], np.cumsum(m["w_ts"].values)])
-        cols["w_ts3h"][ix] = cum[hi] - cum[lo]
+        hi = np.searchsorted(t, at[ix], "right")
+        for name, (src, win) in HIST.items():
+            cum = np.concatenate([[0.0], np.cumsum(m[src].values)])
+            cols[name][ix] = cum[hi] - cum[np.searchsorted(t, at[ix] - win, "left")]
     return pd.DataFrame(cols, index=f.index)
 
 

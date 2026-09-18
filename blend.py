@@ -10,6 +10,7 @@ from scipy.optimize import nnls
 
 from data import CACHE, rmse
 from features import build
+from regime import slice_delta
 from train import HOLDOUT, RESULTS, boot_delta, report
 
 
@@ -37,6 +38,7 @@ def main(names: list[str], base: str | None) -> None:
         b = ho.merge(pd.read_parquet(CACHE / f"{base}_holdout.parquet").rename(columns={"p": "base"})[["id", "base"]], on="id")
         d = boot_delta(b["y"].values, b["base"].values, p_ho, b["day"].values)
         line = line.rstrip("|\n") + f" vs {base}: {d[0]:+.2f} [{d[1]:+.2f}, {d[2]:+.2f}] |\n"
+        print("  regime:", slice_delta(b["y"].values, b["base"].values, p_ho, b["day"].values, b["id"].values))
     RESULTS.open("a", encoding="utf-8").write(line)
     print(line)
 

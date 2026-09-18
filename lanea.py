@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 from data import CACHE, rmse
-from features import ARR, CAT, DAY, NUM, OCC, PW, WX, WZ, build, with_pw
+from features import ARR, CAT, DAY, NUM, OCC, PW, SNOW, WX, WZ, build, with_pw
 from mix import CLF_CB, CLF_LGB, fit_clf
 from train import BASE, FOLDS, HOLDOUT, LGB, RESULTS, fit_predict, report
 
@@ -31,6 +31,9 @@ CONFIGS: dict[str, dict] = {
     "ra_lgb_wz": dict(clf=dict(family="lgb", params=CLF_LGB_BIN), reg=dict(family="lgb", params={**LGB, "n_jobs": 12}, cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ), cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ),
     "ra_cb_pw": dict(clf=dict(family="cb", params={**CLF_CB, "loss_function": "Logloss"}), reg=dict(params=REG, cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ + PW), cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ + PW),
     "ra_lgb_pw": dict(clf=dict(family="lgb", params=CLF_LGB_BIN), reg=dict(family="lgb", params={**LGB, "n_jobs": 12}, cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ + PW), cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ + PW),
+    "ra_lgb_sn": dict(clf=dict(family="lgb", params=CLF_LGB_BIN), reg=dict(family="lgb", params={**LGB, "n_jobs": 12}, cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ + PW + SNOW), cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ + PW + SNOW),
+    "ra_ridge": dict(clf=dict(family="lgb", params=CLF_LGB_BIN), reg=dict(family="ridge", params=dict(alpha=10.0, solver="lsqr", random_state=0), cat=CAT, num=NUM + DAY + OCC + WX), cat=CAT, num=NUM + DAY + OCC + WX),
+    "ra_cb_sn": dict(clf=dict(family="cb", params={**CLF_CB, "loss_function": "Logloss"}), reg=dict(params=REG, cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ + SNOW), cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ + SNOW),
 }
 
 

@@ -11,6 +11,11 @@ import pandas as pd
 import lightgbm as lgb
 import xgboost as xgb
 from catboost import CatBoostRegressor, Pool
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import Ridge
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from data import CACHE, rmse
 from features import CAT, DAY, NUM, build
@@ -62,6 +67,14 @@ def fit_predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame 
         m = xgb.XGBRegressor(**{**params, "n_estimators": n}, early_stopping_rounds=200 if va is not None else None)
         m.fit(tr[cols], tr["y"], sample_weight=w, eval_set=[(va[cols], va["y"])] if va is not None else None, verbose=False)
         return m.predict(te[cols]), (m.best_iteration or n) if va is not None else n
+    if fam == "ridge":
+        pre = ColumnTransformer(
+            [("n", Pipeline([("i", SimpleImputer(strategy="median")), ("s", StandardScaler())]), cfg["num"]),
+             ("c", OneHotEncoder(handle_unknown="infrequent_if_exist", min_frequency=params.pop("min_frequency", 500)), cfg["cat"])],
+            sparse_threshold=1.0)
+        m = Pipeline([("p", pre), ("r", Ridge(**params))])
+        m.fit(tr[cols].assign(**{c: tr[c].astype(str) for c in cfg["cat"]}), tr["y"], r__sample_weight=w)
+        return m.predict(te[cols].assign(**{c: te[c].astype(str) for c in cfg["cat"]})), 1
     if iters:
         params.update(iterations=iters, od_type=None, od_wait=None)
         params = {k: v for k, v in params.items() if v is not None}

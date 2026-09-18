@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from data import CACHE, departures, load_raw, secs
-from weather import WX, join
+from weather import SNOW, WX, join
 
 W = 900.0
 TOL = 60.0                # arrival copy tolerance, same as mix.label

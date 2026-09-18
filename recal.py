@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 
 from data import CACHE, rmse
+from regime import slice_delta
 from train import FOLDS, HOLDOUT, boot_delta
 
 W = {"ra_cb_wz": 0.490727, "ra_lgb_pw": 0.175394, "nn3_pw": 0.333879}
@@ -53,6 +54,7 @@ def cv() -> None:
     d, a = boot_delta(y[ho], p[ho], q[ho], day[ho]), boot_delta(y, p, q, day)
     print(f"lane A holdout: blend {rmse(y[ho], p[ho]):.2f}, recal {rmse(y[ho], q[ho]):.2f}, delta {d[0]:+.2f} [{d[1]:+.2f}, {d[2]:+.2f}]"
           f" | 12 months {a[0]:+.2f} [{a[1]:+.2f}, {a[2]:+.2f}]")
+    print(f"  regime: {slice_delta(y[ho], p[ho], q[ho], day[ho], t['id'].values[ho])}")
 
 
 def fit() -> None:
