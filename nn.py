@@ -55,8 +55,9 @@ class Net(nn.Module):
         super().__init__()
         self.emb = nn.ModuleList([nn.Embedding(enc.card[k], int(min(cell["emb_cap"], max(4, round(enc.card[k] ** 0.5))))) for k in enc.cats])
         d, layers = sum(e.embedding_dim for e in self.emb) + n_num, []
+        act = getattr(nn, cell.get("act", "SiLU"))
         for h in cell["hidden"]:
-            layers += [nn.Linear(d, h), nn.BatchNorm1d(h), nn.SiLU(), nn.Dropout(cell["dropout"])]
+            layers += [nn.Linear(d, h)] + ([nn.BatchNorm1d(h)] if cell.get("bn", True) else []) + [act(), nn.Dropout(cell["dropout"])]
             d = h
         self.mlp, self.head = nn.Sequential(*layers), nn.Linear(d, 1)
 

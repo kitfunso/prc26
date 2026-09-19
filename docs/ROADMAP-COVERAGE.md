@@ -75,7 +75,7 @@ mostly fall away for that reason, and saying so is not the same as skipping them
 
 | Step | Verdict | Evidence |
 |---|---|---|
-| 32 systematic hyperparameters | PARTIAL | `tune.py` runs an Optuna study `ra_reg` in `data/optuna.db` over 8 parameters, trial 0 pinned to the baseline. It covers the CatBoost regressor only: the LightGBM configs, the tail classifier, the NN and the blend were never searched. |
+| 32 systematic hyperparameters | **NOT DONE** (regraded 2026-09-18, was PARTIAL on a wrong reading of the code) | `tune.py` *describes* a study `ra_reg`, but `data/optuna.db` has never held one. The database contains a single study, `mix_reg`: 3 completed trials and 1 left RUNNING on 2026-09-12, on the mixture regressor, not the live lane A path. Trial 0, the pinned hand-set baseline, won it (283.31 vs 295.04 and 286.25). So no live model has ever been searched; all of them run on round-number defaults (`train.py:25-28`, `mix.py:19-22`). Lane R6 opens the real search. The earlier PARTIAL grade read the source and not the database, which is the mistake this audit exists to catch. |
 | 33 feature ablation | PARTIAL | each config adds one feature group, so the ladder exists in `docs/RESULTS.md`, but never written up as a declared A/B/C/D/E table with per-group deltas |
 
 ## Phase 8: evaluation (steps 34-38)

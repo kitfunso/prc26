@@ -101,6 +101,111 @@ the board, which is what 3 expected false passes looks like.
 | R4 | 2026-09-17 | rolling vs expanding training window, `window.py`. Keith asked for 26-week increments; training is 52.0 weeks (2025-01-01..2025-12-31), so the increments give exactly two lengths, 26 and 52, and 52 is the current setup. Causal design: evaluate on a month pair, train only on rows before it. Two slices, (9,10) and (11,12), each with the 26-week window against everything-before. Slice (6,8) is impossible: only 21 weeks precede June. Month 7 is holdout and is never used as an evaluation slice here | 26 weeks beats everything-before on BOTH slices with a CI excluding zero. One slice out of two is a diagnostic, not a pass | **NULL, and the reverse is true** | `ra_lgb_wz`. Test Nov+Dec: 26w 210.25 (n=1,093,306) vs all-before 199.66 (n=1,737,573), **-10.59 [-14.39, -7.40]**. Test Sep+Oct: 26w 213.59 (n=1,067,069) vs all-before 212.25 (n=1,372,327), **-1.34 [-2.15, -0.57]**. Both slices lose, both CIs exclude zero. Matched-n controls (the same row count drawn at random from all history) split each loss into a sample-size part and a recency part. Nov+Dec: rand-n 202.08, so -2.42 is sample size and **-8.17 is recency**. Sep+Oct: rand-n 214.47, so -2.22 is sample size and recency is **+0.88, the other sign**. The sample-size cost is consistent (-2.42, -2.22); the recency effect is **not** and one slice cannot carry it. Mechanism consistent with both: the 26 weeks before November is May-October, no winter at all against a winter test set, while the 26 weeks before September is March-August, adjacent seasons to an early-autumn test set. Season coverage, not age, is what the window destroys. **Not measured here:** exponential recency weighting (Stage 4.1 rung 3). The same mechanism predicts it hurts our actual task, because the ranking months are January and July and recency weighting would downweight January and July 2025, the two best-matched months we own. That is a prediction from mechanism, not a result, and it is cheap to run via the `cfg["weight"]` hook at `train.py:52` if it is ever worth settling |
 | R5 | 2026-09-17 | automated tests: `test_label_timing.py`, `test_feature_leakage.py`, `test_reproducibility.py` (roadmap step 20) | n/a, an audit not an experiment. A failing test is a finding and stops the lane | **DONE, 11 pass** | `python -m pytest tests/ -q`, 48 s. Label reconstructs (takeoff minus recorded off-block) to 0.0 s max error over all 2,085,047 train rows; the 369 negative-y rows are pinned exactly; `y` is null on all 344,841 rank rows. Worst feature-to-label correlation is `z_eobt` at 0.556. `z_aobt` is built only from `AOBT_3_flt`, never from `BLOCK_TIME_UTC_mvt`, and stays 98.5% populated on rank rows where the recorded off-block is 100% null, so it is a reconstruction and not a leak. Forward-looking features are **not** treated as failures: `PLAN.md:25-26` allows them by the challenge rules. One real finding on the first run: `ra_ridge` (R3, written the same hour) had no seed, caught by `test_every_model_config_has_a_fixed_seed` and fixed |
 
+| R6 | 2026-09-18 | **Hyperparameter search, declared before the first trial.** Finding that opened it: `data/optuna.db` holds exactly one study, `mix_reg`, 3 completed trials and 1 left RUNNING, all 2026-09-12, all on the *mixture* regressor, which is not the live lane A path. The `ra_reg` study `tune.py` creates has never existed. Trial 0, the pinned hand-set baseline, **won** it: 283.31 against 295.04 and 286.25. So every live model runs on round-number defaults (`train.py:25-28`, `mix.py:19-22`) and roadmap step 32 is NOT DONE, not PARTIAL. **Design:** Optuna TPE, seed 0, k = 40 trials, over the 7 LightGBM regressor params of `ra_lgb_pw` (lr, num_leaves, min_child_samples, feature_fraction, bagging_fraction, l2, l1); the classifier stays shipped and is precomputed once per fold. Tune on folds (2,3) and (4,5); **judge on (6,8), (9,10), (11,12), which the search never sees**, so the winner is re-scored without its own selection bias. That disjoint split is roadmap step 24 (nested validation) for this lane; the Jan+Jul holdout is not touched at all. LightGBM first because it is about 2 min a trial against CatBoost's about 10, so 40 trials price the whole question in about 1.5 h. Known bias, equal on both arms: early stopping sees the scored fold, exactly as `lanea.cv` does, so both numbers are optimistic by the same amount and only their difference is read | **Tuned beats shipped on the three judge folds.** A win on the tune folds alone is the search fitting fold noise, which is what k = 40 buys at alpha = 0.05. If it passes, the member then has to earn a non-zero NNLS weight and the reblend has to beat v32 with a CI excluding zero; the slot gate stays section 3's 1.5 s all-rows. If the judge-fold gain is under about 1 s, tuning is priced as dead for this task and CatBoost is not searched | **PASS, +2.188 s on the judge folds** | `python tune.py 40 ra_lgb_pw 2-3,4-5 6-8,9-10,11-12`, log `data/r6.log`, study `ra_lgb_pw_reg_23_45`. Tune folds: shipped (trial 0) 202.558, best 200.306 at trial 22 of 40, gain +2.252. **Judge folds (6,8), (9,10), (11,12), never seen by the search: shipped 211.250, tuned 209.062, gain +2.188.** The judge gain is 97% of the tune gain, so selection inflation on this search is about 0.06 s and effectively nil. Winning region: `lr` 0.0255 against the shipped 0.05, `num_leaves` 88 against 255, `feature_fraction` 0.524 against 0.8. Trials 18 to 22 all land 200.3 to 200.8 in that same region, so it is a basin and not a lucky draw. `l2` (1.4 to 29.9), `l1` (0.7 to 2.9) and `ff` (0.50 to 0.92) vary freely among the winners, so the gain is carried by the learning-rate and leaf-count pair, not by regularisation. Not isolated: lr and leaves were never varied one at a time. **Priced, not shipped:** this is a member holding 0.175 of the blend, and `LEDGER.md:18-22` shows the last four lane A gates carrying 0.4, 0.15, negative, negative of their holdout promise. Superseded as a search by R7, which opens all 17 LightGBM parameters; kept as the control that says a narrow search does transfer |
+| R6 space | 2026-09-18 | **The exact search space, recorded so it cannot be widened after seeing a result.** `lr` 0.02-0.12 log, `num_leaves` 63-511 log, `min_child_samples` 10-200 log, `feature_fraction` 0.5-1.0, `bagging_fraction` 0.5-1.0, `lambda_l2` 0.3-30 log, `lambda_l1` 0.0-3.0 linear. The shipped values (0.05, 255, 50, 0.8, 0.8, 3.0, 0.0) sit inside every range and are enqueued as trial 0, so the search is always judged against the thing it must beat. **Amendment, made before any trial scored:** `lambda_l1` was declared log 1e-3 to 3; the shipped value is 0.0, which no log distribution can represent, so the smoke test failed at trial 0 and the range became linear from 0.0. Nothing had been measured when this changed. Second fix from the same smoke: the study is keyed `<CFG>_reg_<TUNEFOLDS>`, because an objective averaged over one fold set is not comparable with another, and the enqueue is gated on a COMPLETE trial so a crashed run cannot silently cost the baseline anchor | n/a, a record | DONE | reproduce: `python tune.py 40 ra_lgb_pw 2-3,4-5 6-8,9-10,11-12` |
+
+### R7: every hyperparameter of all three v32 members, 200 trials each
+
+Declared 2026-09-18, before the first trial, at Keith's instruction. R6 searched 7 LightGBM params on one member.
+R7 searches **every** tunable parameter on **all three** members of the shipped v32 blend. Same honesty design as R6:
+tune on folds (2,3) and (4,5), judge on (6,8), (9,10) and (11,12), which the search never sees. The Jan+Jul holdout is
+never touched. Studies are `<CFG>_full_<TUNEFOLDS>` in `data/optuna.db`, separate from R6's `<CFG>_reg_<TUNEFOLDS>`
+because the parameter distributions differ and Optuna cannot mix two distributions under one name.
+
+Trial 0 of every study is the shipped configuration, enqueued, so the search is always judged against the thing it must
+beat. Verified before launch: each space reconstructs its shipped values exactly (`lgb` 17 params, `cb` 13, `nn` 12).
+
+**Not searched, on purpose:** `n_estimators` / `iterations` / `max_epochs`. Early stopping already picks them per fold,
+so searching them would fight the callback that sets them. `rsm` (CatBoost column sampling) is excluded because
+CatBoost ignores it under `task_type="GPU"`. `max_depth` is excluded from LightGBM because growth is leaf-wise and
+`num_leaves` is the binding constraint.
+
+**`ra_lgb_pw`, LightGBM** (shipped values from `train.py:27-28` plus the library defaults the config never set)
+
+| parameter | shipped | range | scale |
+|---|---|---|---|
+| `learning_rate` | 0.05 | 0.01 to 0.15 | log |
+| `num_leaves` | 255 | 31 to 1023 | log |
+| `min_child_samples` | 50 | 5 to 300 | log |
+| `min_child_weight` | 0.001 | 1e-5 to 10 | log |
+| `feature_fraction` | 0.8 | 0.4 to 1.0 | linear |
+| `bagging_fraction` | 0.8 | 0.4 to 1.0 | linear |
+| `bagging_freq` | 1 | 0 to 7 | integer, 0 disables |
+| `lambda_l1` | 0.0 | 0.0 to 10.0 | linear, must hold 0 |
+| `lambda_l2` | 3.0 | 0.0 to 50.0 | linear, must hold 0 |
+| `min_split_gain` | 0.0 | 0.0 to 1.0 | linear |
+| `max_bin` | 255 | 63 to 511 | log |
+| `path_smooth` | 0.0 | 0.0 to 100.0 | linear |
+| `extra_trees` | False | False, True | categorical |
+| `cat_smooth` | 10.0 | 1 to 200 | log |
+| `cat_l2` | 10.0 | 1 to 200 | log |
+| `max_cat_threshold` | 32 | 8 to 128 | log |
+| `min_data_per_group` | 100 | 10 to 500 | log |
+
+The four `cat_*` parameters are live because `train.py:63` passes `categorical_feature=cfg["cat"]`, so LightGBM does its
+own categorical handling on 11 columns and has never had those knobs touched.
+
+**`ra_cb_wz`, CatBoost** (shipped from `train.py:25-26` `BASE` and `lanea.py:18` `REG`)
+
+| parameter | shipped | range | scale |
+|---|---|---|---|
+| `depth` | 8 | 4 to 10 | integer |
+| `learning_rate` | 0.1 | 0.01 to 0.2 | log |
+| `l2_leaf_reg` | 3.0 | 0.5 to 30 | log |
+| `random_strength` | 1.0 | 0.0 to 10.0 | linear |
+| `border_count` | 254 | 32 to 254 | integer |
+| `max_ctr_complexity` | 4 | 1 to 4 | integer |
+| `one_hot_max_size` | 2 | 2 to 255 | log |
+| `model_size_reg` | 0.5 | 0.0 to 2.0 | linear |
+| `leaf_estimation_iterations` | 1 | 1 to 10 | integer |
+| `leaf_estimation_method` | Newton | Newton, Gradient | categorical |
+| `grow_policy` | SymmetricTree | SymmetricTree, Depthwise, Lossguide | categorical |
+| `bootstrap_type` | Bayesian | Bayesian, Bernoulli, No | categorical |
+| `bagging_temperature` | 1.0 | 0.0 to 5.0 | only under Bayesian |
+| `subsample` | n/a | 0.3 to 1.0 | only under Bernoulli |
+| `min_data_in_leaf` | n/a | 1 to 200 log | only under Depthwise or Lossguide |
+| `max_leaves` | n/a | 16 to 128 log | only under Lossguide |
+
+`grow_policy` is the one that could matter most and has never been moved: the shipped model only ever grew symmetric
+(oblivious) trees, which is CatBoost's speed default, not its accuracy default.
+
+**`nn3_pw`, MLP** (shipped from `nn.py:23-24` `CELL`)
+
+| parameter | shipped | range | scale |
+|---|---|---|---|
+| depth, `hidden` layers | 3 | 1 to 5 | integer |
+| width per layer | 1024 | 128 to 2048 | log |
+| `dropout` | 0.2555 | 0.0 to 0.6 | linear |
+| `lr` | 0.0015 | 1e-4 to 1e-2 | log |
+| `weight_decay` | 0.000165 | 1e-7 to 1e-2 | log |
+| `batch` | 1024 | 256, 512, 1024, 2048, 4096 | categorical |
+| `t_max`, cosine period | 60 | 10 to 150 | log |
+| `emb_cap` | 16 | 4 to 64 | log |
+| `huber` delta | 0.405 | 0.05 to 3.0 | log |
+| `patience` | 5 | 3 to 15 | integer |
+| activation | SiLU | SiLU, ReLU, GELU | categorical |
+| batchnorm | on | on, off | categorical |
+
+Activation and batchnorm needed a two-line change in `nn.py:57-60` to become reachable; both default to the shipped
+behaviour when the key is absent, so every earlier result stands.
+
+**Pruning.** `MedianPruner(n_startup_trials=15)`. A trial reports after its first tune fold and is killed if it is worse
+than the median at that point. The first 15 trials never prune, so trial 0 (the shipped baseline) always runs to
+completion. This is what makes 200 CatBoost trials affordable; it does not narrow the space.
+
+**Measured cost per trial** on 2 tune folds, from the recorded run times in `docs/RESULTS.md`: LightGBM 3.6 min
+(confirmed against R6's live log), CatBoost about 16 min on GPU, the MLP about 60 min on CPU and unmeasured on GPU.
+
+**Null bar, same as R6 and stated before the first trial:** the tuned configuration must beat the shipped one on the
+three judge folds it never saw. A win on the tune folds alone is the search fitting fold noise, which is exactly what
+200 trials over 17 dimensions buys. Passing that, the member must still earn a non-zero NNLS weight and the reblend must
+beat v32 with a confidence interval excluding zero, and the slot gate stays section 3's 1.5 s.
+
+**Standing caution that rides this lane.** `LEDGER.md:18-22`: the last four gated lane A changes carried 0.4, then 0.15,
+then negative, then negative of their holdout promise. Two of them passed with a CI excluding zero and still lost board
+seconds. A judge-fold win here is necessary, not sufficient, and nothing from R7 goes to a scorer slot on the strength of
+the judge folds alone.
+
 ## 5. NOT-DONE table
 
 | declared item | status | why / slot |
