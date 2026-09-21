@@ -103,6 +103,7 @@ the board, which is what 3 expected false passes looks like.
 
 | R6 | 2026-09-18 | **Hyperparameter search, declared before the first trial.** Finding that opened it: `data/optuna.db` holds exactly one study, `mix_reg`, 3 completed trials and 1 left RUNNING, all 2026-09-12, all on the *mixture* regressor, which is not the live lane A path. The `ra_reg` study `tune.py` creates has never existed. Trial 0, the pinned hand-set baseline, **won** it: 283.31 against 295.04 and 286.25. So every live model runs on round-number defaults (`train.py:25-28`, `mix.py:19-22`) and roadmap step 32 is NOT DONE, not PARTIAL. **Design:** Optuna TPE, seed 0, k = 40 trials, over the 7 LightGBM regressor params of `ra_lgb_pw` (lr, num_leaves, min_child_samples, feature_fraction, bagging_fraction, l2, l1); the classifier stays shipped and is precomputed once per fold. Tune on folds (2,3) and (4,5); **judge on (6,8), (9,10), (11,12), which the search never sees**, so the winner is re-scored without its own selection bias. That disjoint split is roadmap step 24 (nested validation) for this lane; the Jan+Jul holdout is not touched at all. LightGBM first because it is about 2 min a trial against CatBoost's about 10, so 40 trials price the whole question in about 1.5 h. Known bias, equal on both arms: early stopping sees the scored fold, exactly as `lanea.cv` does, so both numbers are optimistic by the same amount and only their difference is read | **Tuned beats shipped on the three judge folds.** A win on the tune folds alone is the search fitting fold noise, which is what k = 40 buys at alpha = 0.05. If it passes, the member then has to earn a non-zero NNLS weight and the reblend has to beat v32 with a CI excluding zero; the slot gate stays section 3's 1.5 s all-rows. If the judge-fold gain is under about 1 s, tuning is priced as dead for this task and CatBoost is not searched | **PASS, +2.188 s on the judge folds** | `python tune.py 40 ra_lgb_pw 2-3,4-5 6-8,9-10,11-12`, log `data/r6.log`, study `ra_lgb_pw_reg_23_45`. Tune folds: shipped (trial 0) 202.558, best 200.306 at trial 22 of 40, gain +2.252. **Judge folds (6,8), (9,10), (11,12), never seen by the search: shipped 211.250, tuned 209.062, gain +2.188.** The judge gain is 97% of the tune gain, so selection inflation on this search is about 0.06 s and effectively nil. Winning region: `lr` 0.0255 against the shipped 0.05, `num_leaves` 88 against 255, `feature_fraction` 0.524 against 0.8. Trials 18 to 22 all land 200.3 to 200.8 in that same region, so it is a basin and not a lucky draw. `l2` (1.4 to 29.9), `l1` (0.7 to 2.9) and `ff` (0.50 to 0.92) vary freely among the winners, so the gain is carried by the learning-rate and leaf-count pair, not by regularisation. Not isolated: lr and leaves were never varied one at a time. **Priced, not shipped:** this is a member holding 0.175 of the blend, and `LEDGER.md:18-22` shows the last four lane A gates carrying 0.4, 0.15, negative, negative of their holdout promise. Superseded as a search by R7, which opens all 17 LightGBM parameters; kept as the control that says a narrow search does transfer |
 | R6 space | 2026-09-18 | **The exact search space, recorded so it cannot be widened after seeing a result.** `lr` 0.02-0.12 log, `num_leaves` 63-511 log, `min_child_samples` 10-200 log, `feature_fraction` 0.5-1.0, `bagging_fraction` 0.5-1.0, `lambda_l2` 0.3-30 log, `lambda_l1` 0.0-3.0 linear. The shipped values (0.05, 255, 50, 0.8, 0.8, 3.0, 0.0) sit inside every range and are enqueued as trial 0, so the search is always judged against the thing it must beat. **Amendment, made before any trial scored:** `lambda_l1` was declared log 1e-3 to 3; the shipped value is 0.0, which no log distribution can represent, so the smoke test failed at trial 0 and the range became linear from 0.0. Nothing had been measured when this changed. Second fix from the same smoke: the study is keyed `<CFG>_reg_<TUNEFOLDS>`, because an objective averaged over one fold set is not comparable with another, and the enqueue is gated on a COMPLETE trial so a crashed run cannot silently cost the baseline anchor | n/a, a record | DONE | reproduce: `python tune.py 40 ra_lgb_pw 2-3,4-5 6-8,9-10,11-12` |
+| R7 | 2026-09-18 | every tunable parameter of all three v32 members, 200 trials each, same tune/judge fold split as R6. Full spaces and rationale in the R7 section below | tuned beats shipped on the three judge folds the search never saw | **PASS on both tree members, MLP running** | `ra_lgb_pw` +4.235 (211.250 to 207.015), `ra_cb_wz` +1.142 (207.375 to 206.233), 0 failed trials of 400. Counts, transfer ratios and the R6 comparison in the R7 results table below. Priced, not shipped: no scorer slot without a non-zero NNLS weight, a reblend beating v32 with a CI excluding zero, and section 3's 1.5 s gate |
 
 ### R7: every hyperparameter of all three v32 members, 200 trials each
 
@@ -205,6 +206,31 @@ beat v32 with a confidence interval excluding zero, and the slot gate stays sect
 then negative, then negative of their holdout promise. Two of them passed with a CI excluding zero and still lost board
 seconds. A judge-fold win here is necessary, not sufficient, and nothing from R7 goes to a scorer slot on the strength of
 the judge folds alone.
+
+**R7 results, both tree searches complete (2026-09-21).** Logs `data/r7_lgb.log` and `data/r7_cb.log`; regenerate the
+trial counts with `grep -c "Trial [0-9]* \(finished\|pruned\)" data/r7_*.log`.
+
+| member | trials | COMPLETE / PRUNED / FAIL | tune folds: shipped to best (trial) | judge folds: shipped to tuned | judge gain |
+|---|---|---|---|---|---|
+| `ra_lgb_pw` | 200 | 128 / 72 / 0 | 202.558 to 198.956 (t183) | 211.250 to 207.015 | **+4.235** |
+| `ra_cb_wz` | 200 | 113 / 87 / 0 | 198.123 to 196.709 (t194) | 207.375 to 206.233 | **+1.142** |
+| `nn3_pw` | running, launched 2026-09-21 | | | | |
+
+Both pass the declared null bar. Three readings:
+
+1. **No selection inflation on LightGBM.** The judge gain (+4.235) is larger than the tune gain (+3.602), so the winning
+   region is not fitted fold noise. R6's narrow 7-parameter search transferred at 97%; this 17-parameter one transfers at
+   118%. CatBoost transfers at 81% (+1.142 judged against +1.414 tuned), still positive.
+2. **The wide search beats the narrow one on the same folds.** R6 and R7 share the judge folds and the same shipped
+   baseline of 211.250, so they compare directly: R6 (40 trials, 7 params) reached 209.062, R7 (200 trials, 17 params)
+   reached 207.015. The extra 10 parameters and 160 trials bought a further 2.047 s.
+3. **`grow_policy` did not move.** The protocol flagged it as the CatBoost knob most likely to matter, and the winner
+   kept `SymmetricTree`. The CatBoost gain comes from `depth` 8 to 10, `learning_rate` 0.1 to 0.0417 and `l2_leaf_reg`
+   3.0 to 21.6, the same lower-rate, higher-capacity, more-regularised direction LightGBM took.
+
+CatBoost bought a quarter of what LightGBM bought from the same trial budget, which prices further CatBoost tuning as
+close to dead. Nothing here is a scorer slot: the standing caution above still applies, and each member must still earn
+a non-zero NNLS weight and a reblend that beats v32 with a CI excluding zero.
 
 ## 5. NOT-DONE table
 
