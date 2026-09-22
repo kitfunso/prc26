@@ -57,7 +57,7 @@ mostly fall away for that reason, and saying so is not the same as skipping them
 | 21 chronological split | PARTIAL | HOLDOUT = months (1, 7), FOLDS = 5 month-pairs (`train.py`, used at `lanea.py:64-70`). Held out by month, not by a moving origin. |
 | 22 walk-forward validation | DONE, NULL | closed 2026-09-17 by R4 (`window.py`). Two forward slices, training rows strictly before the test months. 26 weeks loses on both: test Nov+Dec -10.59 s [-14.39, -7.40] (1.09M rows vs 1.74M), test Sep+Oct -1.34 s [-2.15, -0.57] (1.07M vs 1.37M). Expanding wins; the production folds stay month-pair. |
 | 23 purging and gap | N/A | labels do not overlap forward; nothing to purge |
-| 24 nested validation | NOT DONE | `tune.py` tunes on the same folds used to pick features and configs. `PLAN.md:28` keeps the holdout clean, which is the honest half of the answer, not the whole one. |
+| 24 nested validation | PARTIAL (regraded 2026-09-22, was NOT DONE) | R6 and R7 (`docs/EXPERIMENT-PROTOCOL.md` section 4) tune on folds (2,3) and (4,5) and judge on (6,8), (9,10) and (11,12), which the search never sees, and no search touches the Jan+Jul holdout. Still not fully nested: feature groups and configs were picked on all five folds, and the NNLS weights are fitted on OOF that includes the tuned months. |
 | 25 transforms fitted inside folds | DONE | `lanea.py:43-51`, every fit happens per fold |
 
 ## Phase 6: models (steps 26-31)
@@ -75,7 +75,7 @@ mostly fall away for that reason, and saying so is not the same as skipping them
 
 | Step | Verdict | Evidence |
 |---|---|---|
-| 32 systematic hyperparameters | **NOT DONE** (regraded 2026-09-18, was PARTIAL on a wrong reading of the code) | `tune.py` *describes* a study `ra_reg`, but `data/optuna.db` has never held one. The database contains a single study, `mix_reg`: 3 completed trials and 1 left RUNNING on 2026-09-12, on the mixture regressor, not the live lane A path. Trial 0, the pinned hand-set baseline, won it (283.31 vs 295.04 and 286.25). So no live model has ever been searched; all of them run on round-number defaults (`train.py:25-28`, `mix.py:19-22`). Lane R6 opens the real search. The earlier PARTIAL grade read the source and not the database, which is the mistake this audit exists to catch. |
+| 32 systematic hyperparameters | **PARTIAL** (regraded 2026-09-22, was NOT DONE from 2026-09-18) | R6 (40 trials, 7 LightGBM parameters) and R7 (200 trials each over every tunable parameter of `ra_lgb_pw`, `ra_cb_wz` and `nn3_pw`), tuned on folds (2,3) and (4,5) and judged on three folds the search never saw: judge gains +4.235, +1.142 and +3.481 s (`docs/EXPERIMENT-PROTOCOL.md` section 4). Not searched: the `recal.py` second stage, whose parameters are hand-set at `recal.py:20-21`. No zero-search champion has run. Before R6, `data/optuna.db` held only the 2026-09-12 `mix_reg` study on the mixture regressor, which the hand-set baseline won. |
 | 33 feature ablation | PARTIAL | each config adds one feature group, so the ladder exists in `docs/RESULTS.md`, but never written up as a declared A/B/C/D/E table with per-group deltas |
 
 ## Phase 8: evaluation (steps 34-38)

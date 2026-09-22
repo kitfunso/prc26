@@ -1,4 +1,4 @@
-# EXPERIMENT PROTOCOL - prc26 (v1, 2026-09-17)
+# EXPERIMENT PROTOCOL - prc26 (v2, 2026-09-22)
 
 > Instantiated from the quant-ml-protocol skill. This file governs every run and every scorer slot.
 > Amendments are appended with a version bump and a date, never edited in place. An experiment not
@@ -237,20 +237,68 @@ a non-zero NNLS weight and a reblend that beats v32 with a CI excluding zero.
 
 **R7 re-fits on the full CV, judged on the real holdout.** The judge folds score lane A residuals inside `tune.py`;
 these rows are the member's own `lanea.py cv` output, which is what the blend consumes. Regenerate with
-`grep -E "^\| (ra_lgb_pw|ra_lgb_pw_t7) " docs/RESULTS.md`.
+`grep -E "^\| (ra_lgb_pw|ra_lgb_pw_t7|nn3_pw|nn3_pw_t7) " docs/RESULTS.md`.
 
 | member | CV all | CV laneA | holdout all | holdout laneA | holdout laneA delta |
 |---|---|---|---|---|---|
 | `ra_lgb_pw` | 253.44 | 208.12 | 326.37 | 225.75 | baseline |
 | `ra_lgb_pw_t7` | 250.20 | 204.12 | 323.67 | 221.75 | **-4.00** |
-| `ra_cb_wz_t7` | running | | | | |
-| `nn3_pw_t7` | queued behind the CatBoost re-fit | | | | |
+| `nn3_pw` | 253.80 | 208.56 | 327.13 | 226.86 | baseline |
+| `nn3_pw_t7` | 251.35 | 205.55 | 325.92 | 225.08 | **-1.78** |
+| `ra_cb_wz_t7` | stopped, see below | | | | |
 
 The LightGBM holdout lane A gain (4.00) lands within 0.24 of the judge-fold gain (4.235), on rows neither the search nor
 the judge folds touched. That is the strongest transfer evidence in the campaign so far. Two cautions: the tuned member
 alone (323.67) is still worse than the v32 blend (321.61), so the gain only matters if it survives the reblend; and the
 low learning rate pushed the body regressor from 293 to 6938 iterations, a 12x fit-time cost that the `fit` step pays
 again.
+
+The tuned MLP won all five CV folds, and gained more on the three judge folds the search never saw (lane A 211.639 to
+208.181, +3.458) than on the two it was searched on (+2.233); per-fold RMSE of each member's OOF, session scratchpad
+`fold_rmse.py`. The CPU re-fit's judge mean, 208.181, is below the GPU search's 208.572, which closes the device flag
+in section 7. On the holdout it kept 1.78 s of lane A, about half its judge gain, and the member interval crosses zero:
++1.786 [-3.500, +4.666] lane A, `python gate.py nn3_pw_t7_holdout.parquet nn3_pw_holdout.parquet`.
+
+**Tuned CatBoost stopped.** The GPU re-fit of `ra_cb_wz_t7` ran at about 219 s per iteration while fifty's training
+chain held the card, and its own estimate was 18.6 days. It was stopped. It re-runs when the card is free, as a v35
+candidate; v34 keeps the shipped `ra_cb_wz`.
+
+**v34, declared before the tuned MLP's CV landed (2026-09-22).** Members: shipped `ra_cb_wz`, tuned `ra_lgb_pw_t7`,
+tuned `nn3_pw_t7`.
+
+- **Weights.** NNLS on all non-holdout OOF rows, `blend.py`'s rule, unchanged since v21. The two tuned members were
+  searched on folds (2,3) and (4,5), so their OOF on those months could be optimistic and pull weight toward them.
+  Checked on the interim set (tuned LightGBM only): fitting on the judge months alone moves the tuned LightGBM weight
+  from 0.311 to 0.345, up, not down, and the untuned v32 set moves the same way, 0.175 to 0.194. The tune months do
+  not inflate the tuned weight, so the all-months rule stays and the judge-month weights ride the report as a
+  diagnostic. The same check runs on the final set.
+- **Slot rule.** Upload if the file-level holdout gain over v32 (all rows, paired day-block bootstrap, `gate.py`) has
+  an interval excluding zero and the lane A hot slice is not negative beyond its interval. Keith asked for the upload
+  ("Submit them and check live result", 2026-09-22), so a gain under section 3's 1.5 s floor is uploaded on that
+  instruction and recorded in `LEDGER.md` as a below-floor upload, a section 8 breach. Anything else holds the slot.
+
+**v34 result (2026-09-22): held, not uploaded.** NNLS on all non-holdout OOF gave 0.345484 `ra_cb_wz` + 0.265653
+`ra_lgb_pw_t7` + 0.388863 `nn3_pw_t7`, every weight non-zero. The judge months alone gave 0.30697 / 0.279992 /
+0.413038: both tuned weights rise when the search months leave, so the all-months rule stands. Blend vs the v32 blend
++0.55 [-0.25, +1.07] (`blend.py`); second stage lane A 217.87 to 216.42, +1.45 [+0.85, +2.08]. File-level gate,
+`python gate.py recal_holdout_v34.parquet recal_holdout_v32.parquet`: holdout all 305.24 vs 305.77, **+0.526 [-0.123,
++1.043]**, lane A +0.754 [-0.181, +1.396], SSE +110.8M; hot lane A -0.52 [-3.56, +3.20], calm +0.80 [-0.15, +1.45].
+The all-rows interval includes zero, so the slot rule holds the slot: no file built, no slot spent. The 1.5 s floor
+needed lane A at 215.03; v34 reached 216.42. `recal.py` W and the recal caches are back on v32 (v34 copies
+`data/cache/recal_*_v34.parquet`); `data/recal_rank.parquet` was never refit.
+
+**v35, declared 2026-09-22 before any v35 run.** The independent review of v34 found that the MLP never sees three of
+the five PW columns. `loo_mean` (`features.py:232-243`) divides a float remainder by n = 0, which gives +inf or -inf on
+176 `pw_m`, 1,119 `pr_m` and 771 `pw30_m` rows of `pw.parquet`. With both signs in one column, `Enc` (`nn.py:47`) takes
+a NaN mean and `nan_to_num` (`nn.py:55`) zeroes that column on every row. Checked 2026-09-22: the mean is NaN for all
+three columns in all 7 MLP fit sets (the five folds, the holdout fit and the full fit). So every PW gain the MLP has
+shown came from `pw_n` and `pw_hi` alone. v34 against v32 is still a fair comparison, because both MLP arms carry the
+same defect.
+
+- **Fix at the root.** `loo_mean` returns NaN where n is 0, `pw.parquet` is rebuilt, and every PW member re-fits,
+  because the trees saw the same infinities. Nothing changes while v34's members are in flight.
+- **Joins the lane.** The tuned CatBoost `ra_cb_wz_t7`, once fifty frees the GPU.
+- **Gate.** Section 3 against the file of record, by `gate.py`, with NNLS weights by `blend.py`'s rule.
 
 ## 5. NOT-DONE table
 
@@ -262,12 +310,12 @@ again.
 | 4.1.4 lag structure of outside data | R1a | METAR was joined as-of only; the 6 look-back columns are R1a. Still no de-icing pad data and no ATFM regulation feed |
 | 4.1.5 feature selection with error control (knockoffs) | NOT RUN | ablation is per-group pass/fail (`docs/FE.md`), no FDR control |
 | 4.1.6 monotone constraints / partial pooling | NOT RUN | pooling across airports is the R1 lane's main lever |
-| 4.1.7 Optuna + zero-search champion | PART | `tune.py` on CV folds only. No zero-search champion |
+| 4.1.7 Optuna + zero-search champion | PART | R6 and R7: Optuna TPE on all three v32 members, tuned on folds (2,3) and (4,5), judged on three folds the search never saw. No zero-search champion (a prior-fitted model such as TabPFN) has run; no slot yet |
 | 4.1.8 ensembles across families | DONE | NNLS on OOF + LightGBM second stage (`blend.py`, `recal.py`) |
 | 4.1.9 late-lane data in every window config | **DONE, NULL** | R2. Pulled and tested; no window config run because the day-level correlation with our residual is zero (see R2) |
 | 4.1.10 execution lag + real costs | **N/A** | no execution |
 | walk-forward folds | R4 | folds are month-pair, not forward. R4 runs two genuinely forward slices. It prices the window question only; it does not convert the 5 production folds to walk-forward |
-| process null (re-run the recipe on shuffled labels) | NOT RUN | would price what 61 holdout looks find in noise |
+| process null (re-run the recipe on shuffled labels) | NOT RUN | would price what 71 holdout looks find in noise |
 
 ## 6. Accrual list
 
@@ -281,13 +329,18 @@ again.
 | flag | source | first declared | rides until |
 |---|---|---|---|
 | holdout gains under 1.5 s do not carry | this file, section 0 | 2026-09-17 | the floor is re-measured with more uploads |
-| the Jan+Jul 2025 holdout has been read 61 times | `docs/RESULTS.md` | 2026-09-17 | end of campaign; there is no untouched test but the board |
+| the Jan+Jul 2025 holdout has been read 71 times (one line per read in `docs/RESULTS.md`, recounted 2026-09-22) | `docs/RESULTS.md` | 2026-09-17 | end of campaign; there is no untouched test but the board |
 | 16 ranking airport-days sit above any training day | `docs/REGIME.md` | 2026-09-17 | end of campaign |
 | **the holdout cannot measure a disruption change.** `w_sn24h >= 15`: holdout **0.00%** of lane A rows (max 13), ranking **2.18%** (max 47). Section 3's hot-slice test rides r, not weather, and its holdout rows are mild versions of the ranking's. A hot-day change is unfalsifiable on our gate | R1a, computed 2026-09-17 | 2026-09-17 | end of campaign |
 | **hot-row error looks irreducible with this data.** Three independent attacks nulled (R1 bias, R1a weather history, R1c architecture); band y_sd rises 385 -> 1,169 s. Treat the 27.3% of ranking lane A SSE on hot rows as a floor, not headroom, until new causal data arrives | R1, R1a, R1c | 2026-09-17 | a new outside input lands |
 | adversarial AUC 0.7347 train vs rank, led by stand / ades / airline | `docs/AUDIT.md` | 2026-09-12 | end of campaign |
 | PRU published means cannot be read as a bias check at LTFM: 1,089 Jan-2026 flights marked invalid | session scratchpad, 2026-09-17 | 2026-09-17 | July 2026 publication |
 | `w_n_arr` is 33% low for 211 departures after 21:00 UTC on 2026-01-31 | `docs/FE.md` | 2026-09-14 | untested, small |
+| **the MLP zeroes `pw_m`, `pr_m` and `pw30_m` on every row**: `loo_mean` returns +inf and -inf at n = 0, so the encoder mean is NaN (section 4, v35) | v34 review, checked 2026-09-22 | 2026-09-22 | the v35 re-fit |
+| **tree OOF is early-stopped on the fold it scores** (`lanea.py:75`), while the MLP holds out its own last 10% of days, so NNLS on OOF leans toward the trees. The holdout arm is clean: it fits at the CV mean iterations x 1.1 | v34 review, checked in code 2026-09-22 | 2026-09-22 | an inner validation split in `lanea.cv` |
+| **the MLP search ran on GPU, its re-fits on CPU.** The reviewer put the device-fair judge gain at about 3.07 s, not 3.481 | v34 review | 2026-09-22 | **closed 2026-09-22**: the CPU re-fit's judge-fold mean is 208.181, below the GPU's 208.572 (section 4) |
+| **a high holdout-to-OOF gain ratio has preceded a poor carry**: v31 at 2.4x carried 0.43, v32 at 5.9x carried 0.17, v33 at 9.6x carried -0.72. Three points | v34 review, not re-derived | 2026-09-22 | each upload adds a point |
+| **no ledger point sits near the 1.5 s floor**: no holdout promise falls between 0.873 and 1.66 s, and `LEDGER.md:5` asks for about 3 s | v34 review | 2026-09-22 | the floor is re-measured with more uploads |
 
 ## 8. Scorer-slot contract
 
@@ -311,3 +364,6 @@ python -c "import numpy as np;P=[('v22',11.54,310.891,292.887),('v23',1.66,292.8
 ## Amendment log
 
 - v1 2026-09-17: instantiated after v33, from the measured holdout-to-board carry.
+- v2 2026-09-22: section 0 says the verdict statistic rides airport-days. It does not. `boot_delta` (`train.py:45`)
+  resamples calendar days, and the Jan+Jul 2025 holdout has 62 of them (checked 2026-09-22). The 620 figure counts the
+  ranking file's airport-days and stays right for the feature cap. Found by the v34 review.
