@@ -22,12 +22,17 @@ DEV = "cpu" if os.environ.get("NN_DEV") == "cpu" else ("cuda" if torch.cuda.is_a
 VAL_FRAC = 0.10
 CELL = dict(hidden=(1024, 1024, 1024), dropout=0.2555, lr=1.5e-3, weight_decay=1.65e-4, batch=1024, max_epochs=150, t_max=60,
             patience=5, emb_cap=16, huber=0.405, seed=0)
+# R7 winner, read back from study nn3_pw_full_23_45 in data/optuna.db; judge-fold evidence in docs/EXPERIMENT-PROTOCOL.md
+CELL_T7 = {**CELL, "hidden": (509, 509, 509), "dropout": 0.29480167045566424, "lr": 0.00450253157033885,
+           "weight_decay": 2.970043746082671e-06, "t_max": 95, "patience": 15, "emb_cap": 5,
+           "huber": 0.45174041271928167, "act": "GELU", "bn": True}
 CONFIGS: dict[str, dict] = {
     "nn3": dict(cell=CELL, cat=CAT, num=NUM + DAY + OCC + WX),
     "nn3_s1": dict(cell={**CELL, "seed": 1}, cat=CAT, num=NUM + DAY + OCC + WX),
     "nn3_arr": dict(cell=CELL, cat=CAT, num=NUM + DAY + OCC + WX + ARR),
     "nn3_wz": dict(cell=CELL, cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ),
     "nn3_pw": dict(cell=CELL, cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ + PW),
+    "nn3_pw_t7": dict(cell=CELL_T7, cat=CAT, num=NUM + DAY + OCC + WX + ARR + WZ + PW),
 }
 
 

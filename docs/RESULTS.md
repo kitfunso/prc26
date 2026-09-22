@@ -72,3 +72,4 @@
 | ra_ridge (B from mix_cb_wx) | {"all": 281.91, "laneA": 242.29, "laneB": 1474.08} | {"all": 360.75, "laneA": 273.79, "laneB": 1900.6, "m1": 366.48, "m7": 356.07} | (219, 1, 1) | 306s |
 | blend:ra_cb_wz+ra_lgb_pw+nn3_pw w=[0.491, 0.175, 0.334] | {"all": 247.72, "laneA": 201.1, "laneB": 1473.38} | {"all": 321.61, "laneA": 218.69, "laneB": 1900.6, "m1": 338.36, "m7": 307.44} | - | - |
 | blend:ra_cb_wz+ra_lgb_pw+nn3_pw+ra_ridge w=[0.491, 0.175, 0.334, 0.0] | {"all": 247.72, "laneA": 201.1, "laneB": 1473.38} | {"all": 321.61, "laneA": 218.69, "laneB": 1900.6, "m1": 338.36, "m7": 307.44} | - | -  vs blend_ra_cb_wz+ra_lgb_pw+nn3_pw: +0.00 [-0.00, +0.00] |
+| ra_lgb_pw_t7 (B from mix_cb_wx) | {"all": 250.2, "laneA": 204.12, "laneB": 1474.08} | {"all": 323.67, "laneA": 221.75, "laneB": 1900.6, "m1": 339.91, "m7": 309.95} | (237, 6938, 8665) | 7597s |
