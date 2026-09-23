@@ -1,0 +1,19 @@
+targets: 1805 physical-class dev departures with y > 1 h
+           flight_hit  flight_null  flight_id_hit  flight_id_null  stand_hit  stand_null  prefix_hit  prefix_null    n
+lane apt                                                                                                              
+A    EDDF           0            0              0               0          1           6          10            9   47
+     EDDM           0            0              0               0          1           2           9           11   36
+     EGLL           0            0              0               0         27          47         394          384  446
+     EHAM           0            0              0               0          0           2           5            7   27
+     LEBL           0            0              0               0          0           1           0            1    1
+     LFPG           3            0              0               0          1           5         101           94  217
+     LIRF           1            0              0               0          5           1          16           24  172
+     LSZH           0            0              0               0          1           0           6            6   12
+     LTFM           0            0              0               0          4          19         372          371  531
+B    EDDF           0            0              0               0          0           0           0            0    2
+     EDDM           1            0              0               0          1           1           5            4    9
+     EGLL           0            0              0               0          1           0          14           13   20
+     LFPG           0            0              0               0          0           3          17           17   35
+     LIRF           0            0              0               0          3           3           8            7   43
+     LSZH           0            0              0               0          0           0           0            0    1
+     LTFM           0            0              0               0          3           8         134          141  206

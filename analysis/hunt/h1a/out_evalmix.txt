@@ -1,0 +1,20 @@
+lane B judgeable (zs < 4 h, y <= 12 h): n=945 SSE v34 4.714B mix 5.914B stack 4.750B comb 5.027B v34-as-mixture 4.859B
+lane B all zs > 30 min: n=1028 SSE v34 18.459B mix 26.160B stack 17.949B comb 19.894B v34-as-mixture 18.831B
+  zs (0.5, 1.0]: n=28 AUC pc 0.840 v34-implied 0.417 | SSE saved: mix -242.0M stack 3.4M
+  zs (1.0, 2.0]: n=554 AUC pc 0.887 v34-implied 0.896 | SSE saved: mix -215.9M stack 29.5M
+  zs (2.0, 4.0]: n=363 AUC pc 0.849 v34-implied 0.893 | SSE saved: mix -742.6M stack -69.2M
+  fold (2, 3): n=96 saved mix -3.0M stack 37.1M (a=-0.050 b=0.216)
+  fold (4, 5): n=141 saved mix -342.8M stack -7.9M (a=-0.056 b=0.360)
+  fold (6, 8): n=337 saved mix -423.3M stack 39.2M (a=-0.089 b=0.345)
+  fold (9, 10): n=253 saved mix -273.0M stack -123.6M (a=-0.097 b=0.585)
+  fold (11, 12): n=118 saved mix -158.5M stack 18.8M (a=-0.061 b=0.315)
+lane A judgeable (zs < 4 h, y <= 12 h): n=47857 SSE v34 10.461B mix 18.769B stack 10.395B comb 17.548B v34-as-mixture 12.194B
+lane A all zs > 30 min: n=48128 SSE v34 10.503B mix 19.002B stack 10.475B comb 17.738B v34-as-mixture 12.248B
+  zs (0.5, 1.0]: n=35992 AUC pc 0.834 v34-implied 0.778 | SSE saved: mix -4490.0M stack 37.3M
+  zs (1.0, 2.0]: n=10130 AUC pc 0.886 v34-implied 0.844 | SSE saved: mix -2512.5M stack 69.1M
+  zs (2.0, 4.0]: n=1735 AUC pc 0.881 v34-implied 0.998 | SSE saved: mix -1305.7M stack -40.5M
+  fold (2, 3): n=5939 saved mix -1021.7M stack 4.1M (a=-0.009 b=0.336)
+  fold (4, 5): n=9736 saved mix -1451.3M stack 20.2M (a=-0.007 b=0.302)
+  fold (6, 8): n=13968 saved mix -2703.7M stack 1.5M (a=-0.013 b=0.369)
+  fold (9, 10): n=11866 saved mix -2331.6M stack 34.9M (a=-0.005 b=0.261)
+  fold (11, 12): n=6348 saved mix -800.0M stack 5.1M (a=-0.008 b=0.336)

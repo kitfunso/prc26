@@ -1,0 +1,9 @@
+read #2 B1: holdout rows 344419
+  B1 copy bet: touched 7 rows, classes {'copy': 7}, SSE saved vs v34 +237.3M, boot_delta RMSE +1.1306 s [+0.0784, +2.4846]
+    id 182641237 LIRF MABJA zs 20222 y 20225 v34 15007 candidate 19603
+    id 182637273 LIRF WZZZZ401 zs 41763 y 41766 v34 40257 candidate 40449
+    id 182638171 LIRF MABGV zs 39838 y 39837 v34 29273 candidate 38586
+    id 192620839 LIRF RYRR901Y zs 14885 y 14890 v34 11125 candidate 14438
+    id 192620868 LIRF BELEL5LC zs 16554 y 16549 v34 15982 candidate 16053
+    id 192617995 LIRF HATT3632 zs 35283 y 35287 v34 25960 candidate 34178
+    id 192627014 LIRF WMTMT6AN zs 14939 y 14939 v34 14426 candidate 14490

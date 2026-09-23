@@ -346,6 +346,12 @@ labels over 12 h hold 35.0%.
 - **Kill.** If no candidate passes and no bet case is written, we stop chasing top 3 and play for rank: v35, then the
   CatBoost `ra_cb_wz_t7` once the GPU is free.
 - **Cost.** Three agent runs. No scorer slot unless a candidate passes. The CPU is shared with the v35 re-fits.
+- **Outcome, 2026-09-23.** No candidate passes. H1b (`analysis/hunt/h1b/REPORT.md`) and H1c
+  (`analysis/hunt/h1c/REPORT.md`) found nothing new and spent no holdout reads. H1a (`analysis/hunt/h1a/REPORT.md`)
+  spent two: L1 backs v34's day-sized prediction on ITY340, and B1 (12 LIRF lane B rank rows, schedule gap 4 to 12 h,
+  garbled flight number) saved 237.3M on the holdout, +1.131 s [+0.078, +2.485], below the bar and unjudgeable. The
+  session took B1 as the one bet: v41 in `LEDGER.md`. A bet case exists, so the kill rule does not fire as worded, but
+  B1 is worth about 1 s against a 31.8 s gap: from here we play for rank, v35 and then `ra_cb_wz_t7`.
 
 ## 5. NOT-DONE table
 
@@ -376,7 +382,7 @@ labels over 12 h hold 35.0%.
 | flag | source | first declared | rides until |
 |---|---|---|---|
 | holdout gains under 1.5 s do not carry | this file, section 0 | 2026-09-17 | the floor is re-measured with more uploads; after v37 (n = 9) the mean is +0.04 with sd 0.407, still about zero on average; v34 carried +0.99 on a +0.526 promise, then the weights-only v36 and v37 lost 0.004 and 0.134 on +0.051 and +0.146 |
-| the Jan+Jul 2025 holdout has been read 71 times (one line per read in `docs/RESULTS.md`, recounted 2026-09-22) | `docs/RESULTS.md` | 2026-09-17 | end of campaign; there is no untouched test but the board |
+| the Jan+Jul 2025 holdout has been read 71 times (one line per read in `docs/RESULTS.md`, recounted 2026-09-22), plus H1a's 2 on 2026-09-23 (L1, B1) | `docs/RESULTS.md` | 2026-09-17 | end of campaign; there is no untouched test but the board |
 | 16 ranking airport-days sit above any training day | `docs/REGIME.md` | 2026-09-17 | end of campaign |
 | **the holdout cannot measure a disruption change.** `w_sn24h >= 15`: holdout **0.00%** of lane A rows (max 13), ranking **2.18%** (max 47). Section 3's hot-slice test rides r, not weather, and its holdout rows are mild versions of the ranking's. A hot-day change is unfalsifiable on our gate | R1a, computed 2026-09-17 | 2026-09-17 | end of campaign |
 | **hot-row error looks irreducible with this data.** Three independent attacks nulled (R1 bias, R1a weather history, R1c architecture); band y_sd rises 385 -> 1,169 s. Treat the 27.3% of ranking lane A SSE on hot rows as a floor, not headroom, until new causal data arrives | R1, R1a, R1c | 2026-09-17 | a new outside input lands |

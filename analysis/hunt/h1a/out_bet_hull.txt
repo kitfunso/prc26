@@ -1,0 +1,25 @@
+dev cell: 29 copies of 29 rows; q = 0.9677; mean physical taxi 1026 s
+touched rows: {'dev': 29, 'holdout': 7, 'rank': 12}
+dev SSE on the cell (in-sample q): v34 0.467B, bet 0.020B
+holdout: 7 rows, SSE saved if all copies +0.237B, if all physical -1.337B (mean cost per physical row -0.191B)
+rank: 12 rows, SSE saved if all copies +0.196B, if all physical -1.221B (mean cost per physical row -0.102B)
+           part   MVT_ID_mvt FLIGHT_mvt    fmt STAND_mvt ADES_mvt               sched       zs        p    p_bet
+1241    holdout  182637273.0   WZZZZ401   dbl2       909     LRCL 2025-01-03 12:00:00  41763.0  40257.0  40449.0
+1919    holdout  182638171.0      MABGV  other       233     EGSS 2025-01-05 06:00:00  39838.0  29273.0  38586.0
+4635    holdout  182641237.0      MABJA  other       227     LIME 2025-01-12 15:10:00  20222.0  15007.0  19603.0
+81222   holdout  192617995.0   HATT3632   dbl1       827     LIMC 2025-07-07 12:10:00  35283.0  25960.0  34178.0
+84067   holdout  192620839.0   RYRR901Y   dbl1       301     LFOB 2025-07-13 17:45:00  14885.0  11125.0  14438.0
+84108   holdout  192620868.0   BELEL5LC   dbl2       304     EBBR 2025-07-13 19:00:00  16554.0  15982.0  16053.0
+91050   holdout  192627014.0   WMTMT6AN   dbl2       310     LEIB 2025-07-27 19:30:00  14939.0  14426.0  14490.0
+162502     rank  202681830.0   RYRR8830   dbl1       318     LIBP 2026-01-05 00:30:00  40615.0  31317.0  39338.0
+164214     rank  202683690.0   TAYAY2SF   dbl2       108     LFPG 2026-01-09 21:45:00  15058.0  14691.0  14605.0
+164546     rank  202683962.0   WMTMT437   dbl2       310     EPWA 2026-01-10 18:35:00  33055.0  32214.0  32022.0
+168640     rank  202687662.0   AEZZ2023   dbl1       226     LIMF 2026-01-22 15:15:00  22256.0  17278.0  21571.0
+169361     rank  202689463.0   WZZZZ811   dbl2       852     LYBE 2026-01-24 19:35:00  27183.0  26497.0  26339.0
+169432     rank  202689507.0   ITYTY672   dbl2       609     SBGL 2026-01-24 21:30:00  40504.0  39467.0  39231.0
+171758     rank  213141089.0   SVII3006   dbl1       108     HLLB 2026-06-30 22:01:00  18059.0  14069.0  17510.0
+173774     rank  213142471.0       None   none       302     LBWN 2026-07-04 17:50:00  25564.0  24920.0  24772.0
+184024     rank  213151252.0   ISRSR384   dbl2       825     LLBG 2026-07-24 21:55:00  15358.0  14983.0  14896.0
+184818     rank  213153920.0       None   none       908     LIRZ 2026-07-26 09:30:00  19263.0  14989.0  18675.0
+185019     rank  213147307.0   RYRR388G   dbl1       308     LEPA 2026-07-26 13:00:00  33057.0  25538.0  32024.0
+186100     rank  213155642.0   FIEIE258   dbl2       827     UDYZ 2026-07-28 19:10:00  37379.0  36424.0  36206.0

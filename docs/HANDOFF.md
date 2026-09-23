@@ -8,7 +8,8 @@ that regenerates it. Nineteen days to the deadline (11 Oct 2026 23:59:59 CET, `P
 > weights) and v37 (weights fit on the 2025 holdout) both lost to it, 270.5691 and 270.6994, so the member weights are
 > not a lever (`LEDGER.md`, v36 and v37 rows). Each member alone lost too: v38 (LightGBM) 274.6858 and v39 (CatBoost)
 > 273.4283, so the mix is worth 2.9 to 4.1 s. v40 (the MLP alone) uploads at 00:05 UTC on 2026-09-24 via Windows task
-> `prc26-v40-20260924`; its score goes in a new `LEDGER.md` row. The top-3 gap review is
+> `prc26-v40-20260924`, and v41 (v34 plus the B1 bet) at 00:15 UTC via `prc26-v41-20260924`; each score goes in a new
+> `LEDGER.md` row. The top-3 gap review is
 > https://claude.ai/artifact/GxGV3b1LuLZ8ZwP56SXYrC (`analysis/gap.py`, `analysis/board_history.py`).
 >
 > **Running (Keith's go, protocol v6, commit `1a07bb5`).** v35: `loo_mean` fixed (`features.per`), `pw.parquet`
@@ -18,7 +19,12 @@ that regenerates it. Nineteen days to the deadline (11 Oct 2026 23:59:59 CET, `P
 > ra_lgb_pw_t7 nn3_pw_t7 --base=blend_ra_cb_wz+ra_lgb_pw_t7+nn3_pw_t7_v34` (the v34 blend cache is kept under that
 > name, because blend.py overwrites its own name before it reads the base), set `recal.py` W from the NNLS weights,
 > `python recal.py cv && python recal.py fit`, `python gate.py recal_holdout.parquet recal_holdout_v34.parquet`.
-> H1, the jump hunt (protocol section 4): three fresh agents write to `analysis/hunt/h1a|h1b|h1c/REPORT.md`.
+> LightGBM fold 0 landed at 207.15 in 1,631 s (`data/v35_cv_lgb.out`); the MLP jobs print only at the end.
+> If v35 passes, its file carries B1 too: `python combine.py data/merry-octopus_vN.parquet <v35 file>:1
+> --over=analysis/hunt/h1a/bet_hull_rank_override.parquet` (declared in the v41 row: B1 rides every later file).
+> H1, the jump hunt, is done (protocol section 4, Outcome): no candidate passes, and the one bet, B1, is v41
+> (`analysis/hunt/h1a/REPORT.md`). B1 is worth about 1 s against a 31.8 s gap, so from here we play for rank: v35,
+> then `ra_cb_wz_t7` when fifty frees the GPU.
 
 ## 1. Where we stand
 

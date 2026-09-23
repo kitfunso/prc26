@@ -1,0 +1,28 @@
+cls                                 ?  copy of a stamp  normal taxi
+part    which                                                      
+dev     SCHE                        0              145          317
+holdout SCHE                       88                0            0
+        SCHE+LOBT+IOBT+EOBT+AOBT    1                0            0
+rank    SCHE                      114                0            0
+        SCHE+LOBT+IOBT+EOBT+AOBT    1                0            0
+
+dev lane A rows with a stamp > 12 h before takeoff, by airport:
+ cls   copy of a stamp  normal taxi
+apt                               
+EDDF               91          187
+EDDM                9           11
+EGLL                1            1
+EHAM               27           64
+LEBL                5            6
+LEMD                2            4
+LFPG                5           22
+LSZH                1            1
+LTFM                4           21
+
+dev y and v34 p on those rows: {'count': 462.0, 'mean': 1108.0, 'std': 413.0, 'min': 43.0, '25%': 809.0, '50%': 1060.0, '75%': 1352.0, 'max': 2689.0} {'count': 462.0, 'mean': 1110.0, 'std': 350.0, 'min': 348.0, '25%': 859.0, '50%': 1094.0, '75%': 1314.0, 'max': 2867.0}
+
+LIRF rows, and holdout or rank rows where v34 predicts over 20000 s:
+             part   MVT_ID_mvt   apt FLIGHT_mvt CALLSIGN_flt                                             AIRCRAFT_OPERATOR_flt AIRCRAFT_TYPE_mvt STAND_mvt   g_SCHE   g_LOBT   g_IOBT   g_EOBT   g_AOBT   y        p
+110829   holdout  182641024.0  LIRF   ABRBR898       ABR898  6ca6fac8e98705cd05dc18159bca676f6bd973ae2efe32a823c766a188fe9926              B738       205  44817.0   1317.0   1317.0   1677.0   1017.0 NaN   1469.0
+1135613  holdout  192622644.0  LIRF    AEZ146R      AEZ146R  48910dcb821117a444345fed5c3a6252fbd8001e57ccbf6a8de57789aaf1a459              B738       234  87001.0  87001.0  87001.0  87001.0  87181.0 NaN  78773.0
+2322893     rank  213147416.0  LIRF     ITY340       ITY340  65b92f7aceccfa29f570209f189d1d2471db6ea69b035e01424f5bacec566c71              BCS3       204  94560.0  86820.0  86820.0  86280.0  86340.0 NaN  82117.0

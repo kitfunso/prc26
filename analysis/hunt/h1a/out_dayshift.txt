@@ -1,0 +1,95 @@
+lane B: label class by local-date gap (takeoff-15min vs schedule)
+ cls        big_other  copy  normal  shift1
+apt  dday                                 
+EDDF  0.0          1     2    1339       0
+      1.0          1     0      14       0
+EDDM -1.0          0     0       1       0
+      0.0          9     0     759       0
+      1.0          0     0       4       0
+EGLL  0.0         20     4     921       0
+      1.0          0     0       3       0
+EHAM -1.0          0     0       4       0
+      0.0          0    98    3157       0
+      1.0          0     0      16       0
+      2.0          0     0       1       0
+LEBL  0.0          0    31    1256       0
+      1.0          0     0      79       0
+LEMD  0.0          0     2     615       0
+      1.0          0     0      21       0
+LFPG -1.0          0     0       1       0
+      0.0         34     8    2785       0
+      1.0          1     1      63       0
+LIRF -1.0          0     0       1       0
+      0.0         42   512     439       0
+      1.0          1    75      14       7
+LSZH  0.0          1    36    1729       1
+LTFM -1.0          0     0       1       0
+      0.0        203   151    2611       0
+      1.0          3     0      19       0
+lane A: label class by local-date gap (takeoff-15min vs schedule)
+ cls        big_other   copy  normal
+apt  dday                          
+EDDF  0.0         47   2408  189162
+      1.0          0      0     323
+      2.0          0      0      12
+      3.0          0      0       2
+EDDM  0.0         36   7127  132256
+      1.0          0      0      51
+EGLL  0.0        446   9994  187942
+      1.0          0      0       6
+EHAM -1.0          0      0       1
+      0.0         26   2577  200950
+      1.0          1      0     165
+      2.0          0      0       6
+LEBL -1.0          0      1       3
+      0.0          1   8229  140566
+      1.0          0      1     552
+LEMD -1.0          0      2      28
+      0.0          0   7961  165378
+      1.0          0     13    2894
+LFPG -1.0          0      0      25
+      0.0        206   8469  187769
+      1.0         11      0     567
+LIRF -1.0          0      3       2
+      0.0        166  24030  108461
+      1.0          6     28     389
+LSZH  0.0         12   1242  109540
+LTFM -1.0          0      0      74
+      0.0        519  11509  210205
+      1.0         12      4    1113
+      2.0          0      0       2
+                        n           sse
+lane apt  cls                          
+A    EDDF normal      337  1.303781e+07
+     EDDM normal       51  5.945414e+06
+     EGLL normal        6  2.310923e+05
+     EHAM big_other     1  2.001202e+06
+          normal      171  5.998189e+06
+     LEBL copy          1  4.711807e+05
+          normal      552  4.027068e+07
+     LEMD copy         13  8.249466e+05
+          normal     2894  1.401601e+08
+     LFPG big_other    11  8.098092e+07
+          normal      567  5.365182e+07
+     LIRF big_other     6  5.401780e+05
+          copy         28  1.119450e+08
+          normal      389  7.972365e+07
+     LTFM big_other    12  2.106702e+07
+          copy          4  5.532397e+04
+          normal     1115  1.105423e+08
+B    EDDF big_other     1  1.312786e+07
+          normal       14  1.540298e+06
+     EDDM normal        4  1.121458e+05
+     EGLL normal        3  3.192317e+05
+     EHAM normal       17  1.782548e+06
+     LEBL normal       79  1.527069e+07
+     LEMD normal       21  8.306593e+05
+     LFPG big_other     1  1.188896e+07
+          copy          1  1.005521e+07
+          normal       63  1.682494e+07
+     LIRF big_other     1  1.161616e+06
+          copy         75  2.265889e+09
+          normal       14  5.619617e+08
+          shift1        7  8.779903e+09
+     LTFM big_other     3  2.512817e+07
+          normal       19  1.964230e+06

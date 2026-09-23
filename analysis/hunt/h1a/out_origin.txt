@@ -1,0 +1,50 @@
+   lane   apt         cls    n           sse     sse_B
+36    B  LIRF   phys_kday    7  8.779903e+09  8.779903
+39    B  LSZH  sched_kday    1  7.525700e+09  7.525700
+37    B  LIRF       sched  547  5.283010e+09  5.283010
+24    A  LIRF       sched  738  3.254111e+09  3.254111
+35    B  LIRF       other   43  1.921127e+09  1.921127
+40    B  LTFM       other  206  1.802435e+09  1.802435
+27    A  LTFM       other  508  1.528936e+09  1.528936
+19    A  LFPG       other  203  8.636381e+08  0.863638
+23    A  LIRF       other  150  5.402793e+08  0.540279
+9     A  EGLL       other  399  4.802194e+08  0.480219
+33    B  LFPG       other   35  4.319018e+08  0.431902
+31    B  EGLL       other   20  3.537629e+08  0.353763
+38    B  LSZH       other    1  3.018637e+08  0.301864
+3     A  EDDM       other   34  1.873079e+08  0.187308
+1     A  EDDF       other   46  1.476902e+08  0.147690
+30    B  EDDM       other    9  9.258545e+07  0.092585
+25    A  LSZH       other   12  9.258091e+07  0.092581
+32    B  EGLL       sched    3  6.627837e+07  0.066278
+26    A  LTFM        eobt   23  5.150452e+07  0.051505
+29    B  EDDF       other    2  4.814907e+07  0.048149
+28    A  LTFM       sched   11  4.675587e+07  0.046756
+41    B  LTFM       sched    6  4.283853e+07  0.042839
+20    A  LFPG       sched    5  3.972667e+07  0.039727
+13    A  EHAM       other   21  3.686152e+07  0.036862
+16    A  LFPG        eobt   11  3.010904e+07  0.030109
+10    A  EGLL       sched   19  2.677281e+07  0.026773
+5     A  EGLL        aobt   16  1.999883e+07  0.019999
+6     A  EGLL        eobt   25  1.491901e+07  0.014919
+17    A  LFPG        iobt    1  1.005632e+07  0.010056
+34    B  LFPG       sched    1  1.005521e+07  0.010055
+12    A  EHAM        eobt    2  9.486819e+06  0.009487
+11    A  EHAM        aobt    4  8.776351e+06  0.008776
+2     A  EDDM        eobt    2  8.450713e+06  0.008451
+21    A  LIRF        eobt   18  6.986888e+06  0.006987
+22    A  LIRF        lobt    4  5.395875e+06  0.005396
+8     A  EGLL        lobt    4  4.502162e+06  0.004502
+0     A  EDDF        eobt    1  3.334738e+06  0.003335
+4     A  EDDM       sched    1  1.301463e+06  0.001301
+18    A  LFPG        lobt    2  1.100406e+06  0.001100
+15    A  LEBL        iobt    1  5.746763e+05  0.000575
+cls                           aobt  eobt  iobt  lobt  other  phys_kday  sched  sched_kday
+lane yb                                                                                  
+A    (3600.0, 7200.0]           20    79     4    10   1331          0    755           0
+     (7200.0, 14400.0]           0     3     0     0     41          0     20           0
+     (14400.0, 43200.0]          0     0     0     0      1          0      0           0
+B    (3600.0, 7200.0]            0     0     0     0    267          0    244           0
+     (7200.0, 14400.0]           0     0     0     0     46          0    248           0
+     (14400.0, 43200.0]          0     0     0     0      3          0     53           0
+     (43200.0, 1000000000.0]     0     0     0     0      0          7     12           1

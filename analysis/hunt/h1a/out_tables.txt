@@ -1,0 +1,179 @@
+A. rows with zs > 12 h: label class by part, airport, lane B flag
+ cls                  ?  copy  day-sized  normal
+part    apt  laneB                             
+dev     EDDF 0       0     0          0     278
+             1       0     0          0      13
+        EDDM 0       0     0          0      20
+             1       0     0          0       3
+        EGLL 0       0     0          0       2
+        EHAM 0       0     0          0      91
+             1       0     0          0      10
+        LEBL 0       0     0          0      11
+             1       0     0          0       1
+        LEMD 0       0     0          0       6
+        LFPG 0       0     0          0      27
+             1       0     0          0       7
+        LIRF 1       0    12          6       0
+        LSZH 0       0     0          0       2
+        LTFM 0       0     0          0      25
+             1       0     0          0       1
+holdout EDDF 0      64     0          0       0
+             1       5     0          0       0
+        EDDM 0       3     0          0       0
+        EHAM 0      15     0          0       0
+             1       4     0          0       0
+        LEBL 0       1     0          0       0
+             1       1     0          0       0
+        LEMD 0       1     0          0       0
+        LFPG 0       3     0          0       0
+             1       1     0          0       0
+        LIRF 0       2     0          0       0
+             1      11     0          0       0
+rank    EDDF 0      43     0          0       0
+             1       4     0          0       0
+        EDDM 0       8     0          0       0
+        EGLL 0       3     0          0       0
+        EHAM 0      34     0          0       0
+             1       8     0          0       0
+        LEBL 0       5     0          0       0
+        LEMD 0       4     0          0       0
+        LFPG 0      17     0          0       0
+             1       2     0          0       0
+        LIRF 0       1     0          0       0
+             1      11     0          0       0
+ mean v34 p / zs on those rows, by part and LIRF lane B flag
+ lirf_b   False  True 
+part                 
+dev      0.017  1.193
+holdout  0.028  1.162
+rank     0.027  1.103
+
+B. am60: mean v34 residual (s) by within-airport decile
+ dec   0.0   1.0  2.0  3.0  4.0  5.0  6.0  7.0  8.0   9.0
+apt                                                     
+EDDF -3.0  -4.0 -2.0 -3.0 -2.0 -1.0  2.0  2.0  2.0   5.0
+EDDM -4.0  -0.0  1.0  1.0  1.0  1.0 -2.0 -0.0 -1.0  -0.0
+EGLL  9.0   7.0  6.0  8.0  8.0  2.0  0.0 -1.0 -5.0 -29.0
+EHAM -5.0  -4.0  2.0  1.0 -3.0 -2.0 -1.0  2.0  2.0   4.0
+LEBL -9.0  -5.0 -2.0  0.0  2.0  3.0  1.0 -5.0  4.0  -2.0
+LEMD -7.0  -7.0 -3.0 -2.0 -1.0 -4.0  1.0  1.0  5.0  14.0
+LFPG -6.0  -4.0 -6.0  0.0  1.0  2.0  7.0  5.0  5.0   6.0
+LIRF -1.0  -2.0  4.0 -0.0  9.0  1.0  1.0  2.0  4.0  -1.0
+LSZH -9.0  -4.0  1.0 -2.0  0.0  3.0  3.0 -2.0  5.0   4.0
+LTFM  0.0  14.0  9.0  0.0  1.0 -3.0 -1.0 -1.0 -5.0   4.0
+   top-decile SSE removable by a mean shift, in-sample (M): {'EDDF': 0.5, 'EDDM': 0.0, 'EGLL': 16.9, 'EHAM': 0.4, 'LEBL': 0.0, 'LEMD': 3.6, 'LFPG': 0.8, 'LIRF': 0.0, 'LSZH': 0.2, 'LTFM': 0.3}
+
+B. as60: mean v34 residual (s) by within-airport decile
+ dec    0.0   1.0   2.0  3.0   4.0   5.0   6.0   7.0   8.0   9.0
+apt                                                            
+EDDF  -8.0   2.0  -1.0 -1.0   1.0   0.0  -0.0   0.0  -0.0   3.0
+EDDM -14.0  -7.0  -0.0 -8.0  -0.0  11.0   5.0  17.0  -3.0  -3.0
+EGLL  10.0   5.0   6.0  8.0   6.0   3.0   3.0  -1.0 -10.0 -26.0
+EHAM  -1.0  -1.0  -2.0 -4.0  -3.0  -4.0   0.0   2.0   4.0   2.0
+LEBL   2.0  10.0  -9.0  7.0   2.0   0.0   5.0  -2.0 -18.0 -10.0
+LEMD  -3.0 -12.0  -6.0 -3.0  -2.0  -3.0  -2.0   3.0  10.0  15.0
+LFPG -11.0   5.0   0.0 -1.0  -0.0  -1.0   2.0   8.0   4.0   6.0
+LIRF  -1.0  -0.0   2.0  1.0   3.0   0.0  10.0   8.0  -2.0  -4.0
+LSZH  -3.0  -2.0   0.0  6.0  13.0  -4.0 -17.0   2.0   5.0  -1.0
+LTFM   8.0   9.0  10.0  1.0   1.0  -3.0  -0.0   4.0 -10.0  -2.0
+   top-decile SSE removable by a mean shift, in-sample (M): {'EDDF': 0.2, 'EDDM': 0.2, 'EGLL': 13.4, 'EHAM': 0.1, 'LEBL': 1.4, 'LEMD': 4.1, 'LFPG': 0.7, 'LIRF': 0.2, 'LSZH': 0.0, 'LTFM': 0.1}
+
+B. ds60: mean v34 residual (s) by within-airport decile
+ dec    0.0   1.0   2.0  3.0  4.0  5.0  6.0  7.0  8.0   9.0
+apt                                                       
+EDDF  -7.0   9.0  -0.0  1.0 -1.0  3.0  0.0  3.0 -2.0 -10.0
+EDDM -11.0  -2.0   1.0  9.0  6.0 -3.0 -0.0  1.0 -2.0  -3.0
+EGLL   7.0  -6.0   6.0  1.0  4.0  1.0  0.0 -0.0 -3.0  -6.0
+EHAM  -2.0  -0.0  -1.0 -0.0  1.0  1.0  1.0 -0.0 -5.0   1.0
+LEBL   2.0   3.0 -14.0  4.0  4.0 -2.0  1.0 -2.0 -5.0  -1.0
+LEMD  10.0  -4.0   5.0 -3.0 -0.0 -1.0 -2.0  1.0 -2.0  -5.0
+LFPG  -8.0  13.0   3.0  2.0  0.0  1.0  6.0  3.0  1.0  -9.0
+LIRF  10.0  -1.0   4.0 -2.0  4.0 -1.0 -0.0 -2.0 -3.0   8.0
+LSZH  -1.0   0.0   8.0 -0.0  5.0 -1.0 -3.0  0.0 -2.0  -6.0
+LTFM  15.0 -18.0  -5.0 -3.0 -1.0 -4.0 -2.0 -5.0 -3.0  45.0
+   top-decile SSE removable by a mean shift, in-sample (M): {'EDDF': 1.7, 'EDDM': 0.1, 'EGLL': 0.7, 'EHAM': 0.0, 'LEBL': 0.0, 'LEMD': 0.4, 'LFPG': 1.6, 'LIRF': 0.8, 'LSZH': 0.4, 'LTFM': 45.4}
+
+B. dm60: mean v34 residual (s) by within-airport decile
+ dec   0.0  1.0  2.0  3.0  4.0  5.0  6.0  7.0  8.0   9.0
+apt                                                    
+EDDF -1.0 -2.0 -0.0  1.0  0.0  3.0  1.0  5.0 -0.0 -10.0
+EDDM -3.0 -2.0  1.0 -1.0 -0.0  0.0  1.0  0.0  3.0  -3.0
+EGLL -2.0 -4.0  3.0  0.0  4.0  3.0  3.0  2.0 -1.0  -6.0
+EHAM -3.0 -1.0  1.0 -1.0 -1.0  0.0  2.0 -0.0 -1.0   1.0
+LEBL -5.0 -3.0  1.0  1.0 -0.0  0.0 -1.0 -1.0 -0.0  -3.0
+LEMD  1.0  1.0  1.0 -1.0  2.0  4.0 -2.0 -2.0 -2.0  -5.0
+LFPG  2.0  0.0  2.0  2.0 -0.0  4.0  2.0  5.0  4.0  -8.0
+LIRF  4.0  7.0  4.0  1.0 -1.0 -5.0  3.0 -4.0  5.0   2.0
+LSZH -4.0  3.0  1.0  2.0  3.0 -0.0  3.0  1.0 -3.0  -7.0
+LTFM -2.0 -6.0 -4.0 -6.0 -2.0 -1.0 -4.0 -2.0 -1.0  46.0
+   top-decile SSE removable by a mean shift, in-sample (M): {'EDDF': 2.0, 'EDDM': 0.1, 'EGLL': 0.6, 'EHAM': 0.0, 'LEBL': 0.2, 'LEMD': 0.4, 'LFPG': 1.3, 'LIRF': 0.0, 'LSZH': 0.5, 'LTFM': 48.3}
+
+C. LIRF lane B cell hedge (Beta(1,1) copy rate of the other folds' cell), dev OOF
+                         n  copy_rate  sse_v34_M  sse_cell_M    saved_M
+zg           shape                                                    
+(0.5, 1.0]   garbled   15      0.600     19.194       9.859      9.335
+             plain     13      0.154     74.442     325.899   -251.456
+(1.0, 2.0]   garbled   47      0.766    179.321     242.185    -62.864
+             plain    507      0.393   1499.386    3040.974  -1541.588
+(12.0, 99.0] garbled   14      0.643   3363.221   15546.796 -12183.575
+             plain      4      0.750    369.002    4659.549  -4290.547
+(2.0, 3.0]   garbled   39      0.795    492.456     418.785     73.671
+             plain    247      0.664   1607.470    3180.307  -1572.837
+(3.0, 4.0]   garbled   20      0.700    428.768     506.607    -77.840
+             plain     58      0.655   7487.288    7781.666   -294.378
+(4.0, 12.0]  garbled   29      1.000    467.125      34.552    432.573
+             plain     35      0.686   2471.109    2918.382   -447.274
+ holdout and rank rows per cell
+ part         holdout          rank      
+shape        garbled plain garbled plain
+zg                                      
+(0.5, 1.0]         4     4       4     3
+(1.0, 2.0]        15   179       4   163
+(12.0, 99.0]       9     2       8     3
+(2.0, 3.0]         6    92      15    92
+(3.0, 4.0]         5    33       6    25
+(4.0, 12.0]        7    27      12    20
+
+F. LIRF lane B rows whose takeoff - 15 min falls on a later UTC date than the schedule (zs < 12 h)
+ cls       ?  copy  shifted
+part                      
+dev       0    28        1
+holdout   7     0        0
+rank     15     0        0 
+ mean v34 p / zs by part: {'dev': 0.896, 'holdout': 1.03, 'rank': 1.016}
+
+D. dev lane A rows whose AOBT_3 is over 1 h before takeoff: class of y
+ cls          <= 1 h  other > 1 h  y = MVT - AOBT_3
+gb                                                
+(1.0, 2.0]     1458          127                19
+(2.0, 4.0]        9            5                 0
+(4.0, 12.0]       0            1                 0 
+ cls   <= 1 h  other > 1 h  y = MVT - AOBT_3
+apt                                        
+EDDF       2            0                 0
+EDDM       7            0                 0
+EGLL     188           82                15
+EHAM     108           22                 4
+LEMD       5            0                 0
+LFPG      39           15                 0
+LIRF       3            6                 0
+LTFM    1115            8                 0
+ ITY340 (rank 213147416): v34 82117; SSE change (M) of p = zs against v34 if the label is ...
+   SCHED copy y=94560: v34 SE 154.8M, p=zs SE 0.0M, saved +154.8M
+   LOBT y=86820: v34 SE 22.1M, p=zs SE 59.9M, saved -37.8M
+   EOBT_1 y=86280: v34 SE 17.3M, p=zs SE 68.6M, saved -51.2M
+   AOBT_3 y=86340: v34 SE 17.8M, p=zs SE 67.6M, saved -49.7M
+   normal taxi y=1110: v34 SE 6562.0M, p=zs SE 8732.9M, saved -2170.8M
+
+E. ten dev rows with the largest v34 squared error
+           MVT_ID_mvt   apt lane FLIGHT_mvt       zs        y          p   se_B
+635435   188253302.0  LSZH    B    NJE389D    939.0  87341.0    590.210  7.526
+811655   190201378.0  LIRF    B     ITY332  11694.0  87168.0   3058.263  7.074
+1188821  196129531.0  LIRF    B   ITYTY630  50581.0  87543.0  59810.750  0.769
+620624   189109908.0  LIRF    B     WMT7TL   1504.0  31268.0   4431.221  0.720
+1532607  200297323.0  LIRF    B   ITYTY680  56520.0  87480.0  63404.444  0.580
+989746   195000946.0  LIRF    B     WMT8PV   1679.0  25018.0   2615.974  0.502
+445059   187029010.0  LIRF    B   WMTMT2UK  59640.0  59641.0  79540.000  0.396
+996200   195005262.0  LIRF    B       None  45899.0  45899.0  63728.000  0.318
+1001840  195008713.0  LIRF    B   ITYTY672  46614.0  46609.0  64136.571  0.307
+117969   183662617.0  LSZH    B      HBCYH   1716.0  18409.0   1034.775  0.302

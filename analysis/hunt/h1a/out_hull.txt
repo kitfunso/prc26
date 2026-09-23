@@ -1,0 +1,30 @@
+mean physical taxi, LIRF lane B dev: 1034 s
+cls                     ?  copy  phys  shift
+part    zg    shape                         
+dev     4-12h garbled   0    29     0      0
+              plain     0    24    11      0
+        >12h  garbled   0     9     0      5
+              plain     0     3     0      1
+holdout 4-12h garbled   7     0     0      0
+              plain    27     0     0      0
+        >12h  garbled   9     0     0      0
+              plain     2     0     0      0
+rank    4-12h garbled  12     0     0      0
+              plain    20     0     0      0
+        >12h  garbled   8     0     0      0
+              plain     3     0     0      0
+dev OOF all hull: n=82 SSE v34 6.670B strategy H 7.729B
+dev OOF 4-12h: n=64 SSE v34 2.938B strategy H 2.953B
+dev OOF >12h: n=18 SSE v34 3.732B strategy H 4.776B
+  4-12h garbled: n=29 SSE v34 0.467B H 0.035B
+  4-12h plain: n=35 SSE v34 2.471B H 2.918B
+  >12h garbled: n=14 SSE v34 3.363B H 3.545B
+  >12h plain: n=4 SSE v34 0.369B H 1.231B
+holdout 4-12h garbled: n=7 mean p/zs v34 0.836 H 0.969 | SSE saved if all copies +0.237B, if all alternative -1.336B
+holdout 4-12h plain: n=27 mean p/zs v34 0.801 H 0.694 | SSE saved if all copies -0.596B, if all alternative +2.230B
+holdout >12h garbled: n=9 mean p/zs v34 1.157 H 1.111 | SSE saved if all copies -0.003B, if all alternative +1.049B
+holdout >12h plain: n=2 mean p/zs v34 1.185 H 1.184 | SSE saved if all copies -0.006B, if all alternative +0.084B
+rank 4-12h garbled: n=12 mean p/zs v34 0.892 H 0.969 | SSE saved if all copies +0.196B, if all alternative -1.221B
+rank 4-12h plain: n=20 mean p/zs v34 0.807 H 0.692 | SSE saved if all copies -0.687B, if all alternative +2.195B
+rank >12h garbled: n=8 mean p/zs v34 1.134 H 1.172 | SSE saved if all copies +0.169B, if all alternative +0.788B
+rank >12h plain: n=3 mean p/zs v34 1.020 H 1.247 | SSE saved if all copies -0.458B, if all alternative +2.091B

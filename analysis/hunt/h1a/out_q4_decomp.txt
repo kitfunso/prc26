@@ -1,0 +1,51 @@
+all dev rows: n=1740628 SSE_v34=101.016B
+                       sse_v34  sse_oracle  class_part  size_part    n
+yb    lane apt  cls                                                   
+1-12h A    EDDF phys     0.151       0.545       0.000      0.151   47
+           EDDM phys     0.196       0.437       0.000      0.196   36
+           EGLL copy     0.027       0.000       0.027      0.000   19
+                phys     0.520       5.133       0.000      0.520  446
+           EHAM phys     0.055       0.339       0.000      0.055   27
+           LFPG copy     0.040       0.000       0.040      0.000    5
+                phys     0.905       4.335       0.000      0.905  217
+           LIRF copy     3.254       0.000       3.254      0.000  738
+                phys     0.553       2.322       0.000      0.553  172
+           LSZH phys     0.093       0.134       0.000      0.093   12
+           LTFM copy     0.047       0.000       0.047      0.000   11
+                phys     1.580       5.935       0.000      1.580  531
+      B    EDDF phys     0.048       0.049       0.000      0.048    2
+           EDDM phys     0.093       0.125       0.000      0.093    9
+           EGLL copy     0.066       0.000       0.066      0.000    3
+                phys     0.354       0.440       0.000      0.354   20
+           LFPG phys     0.432       0.639       0.000      0.432   35
+           LIRF copy     3.256       0.000       3.256      0.000  535
+                phys     1.921       3.069       0.000      1.921   43
+           LSZH phys     0.302       0.316       0.000      0.302    1
+           LTFM copy     0.043       0.000       0.043      0.000    6
+                phys     1.802       4.122       0.000      1.802  206
+>12h  B    LIRF copy     2.027       0.000       2.027      0.000   12
+                shift    8.780       0.001       8.779      0.001    7
+           LSZH kcopy    7.526       0.000       7.526      0.000    1
+
+y 1-12h: SSE_v34 15.737B, class part 6.733B, size part 9.004B (groups with SSE > 0.02B)
+
+y >12h: SSE_v34 18.332B, class part 18.331B, size part 0.001B (groups with SSE > 0.02B)
+
+LIRF lane B by zs bin: copy rate vs v34's implied copy probability
+                  n  copy_rate  v34_implied_pcopy  sse_v34  sse_oracle
+zsb                                                                  
+(-99.0, 0.5]    63      0.460                NaN    1.681       2.219
+(0.5, 1.0]      28      0.393                NaN    0.094       0.367
+(1.0, 2.0]     554      0.424              0.435    1.679       0.241
+(2.0, 4.0]     364      0.679              0.682   10.016       0.303
+(4.0, 12.0]     64      0.828              0.815    2.938       0.001
+(12.0, 999.0]   18      0.667              1.000    3.732       0.001
+
+LIRF lane A by zs bin
+                   n  copy_rate  v34_implied_pcopy  sse_v34  sse_oracle
+zsb                                                                   
+(-99.0, 0.5]  84957      0.240                NaN    3.392       6.965
+(0.5, 1.0]    35992      0.082                NaN    5.142       7.853
+(1.0, 2.0]    10130      0.071              0.127    4.983       3.588
+(2.0, 4.0]     1735      0.012              0.039    0.335       0.904
+(4.0, 12.0]     271      0.000              0.010    0.042       0.065

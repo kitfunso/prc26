@@ -1,0 +1,33 @@
+LIRF ARR rows with BLOCK, by split: {'train': 160504, 'rank': 26839}
+                                mean   count
+band         shape   per                    
+(-99.0, 0.5] garbled 2025      0.348    3229
+                     rank-m01  0.289     173
+                     rank-m07  0.254     280
+             plain   2025      0.105  143640
+                     rank-m01  0.091    9832
+                     rank-m07  0.121   13193
+(0.5, 2.0]   garbled 2025      0.000     598
+                     rank-m01  0.000      49
+                     rank-m07  0.000      80
+             plain   2025      0.000   11218
+                     rank-m01  0.000     809
+                     rank-m07  0.000    1942
+(2.0, 4.0]   garbled 2025      0.000     141
+                     rank-m01  0.000      12
+                     rank-m07  0.000      22
+             plain   2025      0.000    1291
+                     rank-m01  0.000     120
+                     rank-m07  0.000     214
+(4.0, 12.0]  garbled 2025      0.000      66
+                     rank-m01  0.000       4
+                     rank-m07  0.000      11
+             plain   2025      0.000     288
+                     rank-m01  0.000      39
+                     rank-m07  0.000      44
+(12.0, 99.0] garbled 2025      0.000      11
+                     rank-m01  0.000       1
+                     rank-m07  0.000       1
+             plain   2025      0.000      22
+                     rank-m01  0.000       4
+                     rank-m07  0.000       9

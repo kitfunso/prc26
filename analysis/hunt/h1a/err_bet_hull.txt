@@ -1,0 +1,2 @@
+C:\Users\skf_s\prc26\analysis\hunt\h1a\inbound.py:27: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value 'nan' has dtype incompatible with bool, please explicitly cast to a compatible dtype first.
+  out.loc[out["in_BLOCK_TIME_UTC_mvt"].isna(), "in_copy"] = np.nan

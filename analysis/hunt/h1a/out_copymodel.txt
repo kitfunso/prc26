@@ -1,0 +1,16 @@
+lane A zs (0.5, 1.0]: n=35992 copy rate 0.082 mean pc 0.084 AUC 0.834 Brier 0.0511 base 0.0750
+lane A zs (1.0, 2.0]: n=10130 copy rate 0.071 mean pc 0.060 AUC 0.886 Brier 0.0370 base 0.0659
+lane A zs (2.0, 4.0]: n=1735 copy rate 0.012 mean pc 0.027 AUC 0.881 Brier 0.0059 base 0.0114
+lane A zs (4.0, 12.0]: n=271 copy rate 0.000 mean pc 0.014 AUC nan Brier 0.0027 base 0.0000
+lane B zs (0.5, 1.0]: n=28 copy rate 0.393 mean pc 0.436 AUC 0.840 Brier 0.1470 base 0.2385
+lane B zs (1.0, 2.0]: n=554 copy rate 0.424 mean pc 0.421 AUC 0.887 Brier 0.1326 base 0.2443
+lane B zs (2.0, 4.0]: n=364 copy rate 0.679 mean pc 0.641 AUC 0.850 Brier 0.1418 base 0.2181
+lane B zs (4.0, 12.0]: n=64 copy rate 0.828 mean pc 0.818 AUC 0.657 Brier 0.1645 base 0.1423
+lane B zs (12.0, 99.0]: n=18 copy rate 0.667 mean pc 0.864 AUC 0.639 Brier 0.3075 base 0.2222
+lane  part   
+A     dev        48128
+      holdout    11234
+      rank       11167
+B     dev         1028
+      holdout      383
+      rank         355

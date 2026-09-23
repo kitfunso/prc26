@@ -1,0 +1,5 @@
+read #1 L1: holdout rows 344419
+  L1 day-sized (MVT - AOBT_3): touched 1 rows, classes {'copy': 1}, SSE saved vs v34 +67.7M, boot_delta RMSE +0.3221 s [+0.0000, +1.1854]
+    id 192622644 LIRF AEZ146R zs 87001 y 87002 v34 78773 candidate 87181
+  L1 normal taxi: touched 1 rows, classes {'copy': 1}, SSE saved vs v34 -7309.7M, boot_delta RMSE -32.9829 s [-106.9691, +0.0000]
+    id 192622644 LIRF AEZ146R zs 87001 y 87002 v34 78773 candidate 1110
