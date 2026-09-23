@@ -317,6 +317,13 @@ same defect.
   `data/cache/pw_v34.parquet`) on exactly the 2,066 cells that were infinite, now NaN, and on no other cell. v34's
   member caches are kept as `*_v34.parquet`. Both PW members re-fit on CPU. `ra_cb_wz_t7` does not join: fifty still
   holds the GPU.
+- **Upload rule, declared 2026-09-23 before any v35 gate read** (the session's call under Keith's delegation, "decide
+  what best for us"). v35 carries B1 and takes a slot if its all-rows holdout gain against v34 is above zero, even
+  under section 3's 1.5 s floor. Why: the board keeps our best file, so a loss costs one slot of five; section 0 puts
+  the board move of a sub-1.5 s promise at mean +0.04, sd 0.407, so a best-of upload gains about +0.18 s on average
+  (the mean of max(0, X) for X ~ N(0.04, 0.407)); and v35 is a bug fix, not a search. Its board score chooses nothing:
+  the fixed members ride every later file whatever it scores. A slot spent this way is a section 8 breach and goes in
+  `LEDGER.md` as one. A gain of zero or below holds the slot.
 
 **H1, the jump hunt, declared 2026-09-23 before any hunt run.** Keith's go: "continue please, decide what best for
 us, lets try our best to reach top 3". The gap review (https://claude.ai/artifact/GxGV3b1LuLZ8ZwP56SXYrC,
@@ -433,3 +440,6 @@ python -c "import numpy as np;P=[('v22',11.54,310.891,292.887),('v23',1.66,292.8
   section 8 tripwire does not fire, since neither file passed the gate. v40 (the MLP alone) is scheduled for 2026-09-24.
 - v6 2026-09-23: section 4 declares H1, the jump hunt, and records that v35 has started. Both began on Keith's go
   ("continue please, decide what best for us, lets try our best to reach top 3"). Sections 0, 3 and 8 are unchanged.
+- v7 2026-09-23: section 4 records H1's outcome (no pass; B1 is v41) and declares v35's upload rule before its gate
+  read: a slot for any all-rows gain above zero, on best-of arithmetic from section 0. Sections 0, 3 and 8 are
+  unchanged; the rule covers v35 only.
