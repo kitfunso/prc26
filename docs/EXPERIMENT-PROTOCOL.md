@@ -1,4 +1,4 @@
-# EXPERIMENT PROTOCOL - prc26 (v4, 2026-09-23)
+# EXPERIMENT PROTOCOL - prc26 (v5, 2026-09-23)
 
 > Instantiated from the quant-ml-protocol skill. This file governs every run and every scorer slot.
 > Amendments are appended with a version bump and a date, never edited in place. An experiment not
@@ -26,6 +26,7 @@ in section 9):
 |---|---|---|
 | 1.5 s or more | 5 | mean +7.79, min +1.90, **every one positive** |
 | under 1.5 s | 9 | mean **+0.04**, sd 0.407, **5 of 9 negative**; v34's +0.99 is the only one above +0.18 (n = 7 after v34: mean +0.08, sd 0.463; n = 6 before it: mean -0.08, sd 0.253) |
+| a loss (below 0) | 2 | both lost, as promised: v38 -4.12 on -2.53, v39 -2.86 on -3.92; the size carried 1.63 and 0.73 times |
 
 - Transfer sd: **0.407 s** of board, 95% CI [0.275, 0.780] (n = 9, chi-square), re-estimated after the v36 and
   v37 uploads per section 8; it was 0.463 [0.298, 1.020] at n = 7 and 0.253 [0.158, 0.620] at n = 6.
@@ -369,7 +370,7 @@ same defect.
 
 ```
 python regime.py                       # docs/REGIME.md + data/cache/regime.parquet
-python -c "import numpy as np;P=[('v22',11.54,310.891,292.887),('v23',1.66,292.887,290.983),('v24',0.09,290.983,290.7995),('v25',4.40,290.7995,288.6796),('v26',7.42,288.6796,282.4241),('v28',8.41,282.4241,271.783),('v29',0.873,271.783,272.2175),('v30',0.220,271.783,271.9284),('v31',0.240,271.783,271.68),('v32',0.754,271.68,271.5521),('v33',0.402,271.5521,271.84),('v34',0.526,271.5521,270.5655),('v36',0.051,270.5655,270.5691),('v37',0.146,270.5655,270.6994)];b=[b0-b1 for n,h,b0,b1 in P if h<1.5];print(np.mean(b),np.std(b,ddof=1))"
+python -c "import numpy as np;P=[('v22',11.54,310.891,292.887),('v23',1.66,292.887,290.983),('v24',0.09,290.983,290.7995),('v25',4.40,290.7995,288.6796),('v26',7.42,288.6796,282.4241),('v28',8.41,282.4241,271.783),('v29',0.873,271.783,272.2175),('v30',0.220,271.783,271.9284),('v31',0.240,271.783,271.68),('v32',0.754,271.68,271.5521),('v33',0.402,271.5521,271.84),('v34',0.526,271.5521,270.5655),('v36',0.051,270.5655,270.5691),('v37',0.146,270.5655,270.6994),('v38',-2.526,270.5655,274.6858),('v39',-3.918,270.5655,273.4283)];b=[b0-b1 for n,h,b0,b1 in P if 0<=h<1.5];print(np.mean(b),np.std(b,ddof=1))"
 ```
 
 ## Amendment log
@@ -385,3 +386,7 @@ python -c "import numpy as np;P=[('v22',11.54,310.891,292.887),('v23',1.66,292.8
 - v4 2026-09-23: section 0 re-estimated after v36 (equal weights) and v37 (weights fit on the Jan+Jul 2025 holdout),
   both uploaded on Keith's instruction and both a section 8 breach: n = 9, sd 0.407 [0.275, 0.780], floor 0.81 /
   1.56 s. Both lost to v34 (0.004 and 0.134 s), so the member weights are not a lever. Section 3 is unchanged.
+- v5 2026-09-23: section 0 gains a row for promised losses after v38 and v39 (each v34 member alone, uploaded on
+  Keith's instruction, a section 8 breach). Both lost to v34 as the gate said (4.12 and 2.86 s). The under-1.5 s row,
+  the transfer sd and the floor are unchanged: the section 9 snippet now keeps negative promises out of that row. The
+  section 8 tripwire does not fire, since neither file passed the gate. v40 (the MLP alone) is scheduled for 2026-09-24.
