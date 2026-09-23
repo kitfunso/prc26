@@ -9,8 +9,16 @@ that regenerates it. Nineteen days to the deadline (11 Oct 2026 23:59:59 CET, `P
 > not a lever (`LEDGER.md`, v36 and v37 rows). Each member alone lost too: v38 (LightGBM) 274.6858 and v39 (CatBoost)
 > 273.4283, so the mix is worth 2.9 to 4.1 s. v40 (the MLP alone) uploads at 00:05 UTC on 2026-09-24 via Windows task
 > `prc26-v40-20260924`; its score goes in a new `LEDGER.md` row. The top-3 gap review is
-> https://claude.ai/artifact/GxGV3b1LuLZ8ZwP56SXYrC (`analysis/gap.py`, `analysis/board_history.py`). Nothing else is
-> running. Next is v35 (`docs/EXPERIMENT-PROTOCOL.md` section 4), which waits on Keith's go.
+> https://claude.ai/artifact/GxGV3b1LuLZ8ZwP56SXYrC (`analysis/gap.py`, `analysis/board_history.py`).
+>
+> **Running (Keith's go, protocol v6, commit `1a07bb5`).** v35: `loo_mean` fixed (`features.per`), `pw.parquet`
+> rebuilt (only the 2,066 infinite cells changed, to NaN), v34 caches kept as `*_v34.parquet`. Three detached CPU jobs
+> via the session scratchpad's `v35_chain.py`: `lgb` (lanea cv then fit at the cv iters), `nn_cv`, `nn_fit`; logs
+> `data/v35_*.out` / `.log`, driver errors in `data/v35_driver_*.err`. When all three land: `python blend.py ra_cb_wz
+> ra_lgb_pw_t7 nn3_pw_t7 --base=blend_ra_cb_wz+ra_lgb_pw_t7+nn3_pw_t7_v34` (the v34 blend cache is kept under that
+> name, because blend.py overwrites its own name before it reads the base), set `recal.py` W from the NNLS weights,
+> `python recal.py cv && python recal.py fit`, `python gate.py recal_holdout.parquet recal_holdout_v34.parquet`.
+> H1, the jump hunt (protocol section 4): three fresh agents write to `analysis/hunt/h1a|h1b|h1c/REPORT.md`.
 
 ## 1. Where we stand
 
