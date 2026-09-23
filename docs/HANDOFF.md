@@ -4,8 +4,10 @@ Written mid-campaign so the next session can pick up without re-deriving anythin
 that regenerates it. Nineteen days to the deadline (11 Oct 2026 23:59:59 CET, `PLAN.md:3`).
 
 > **Update 2026-09-23.** Sections 1, 3 and 4 are done and out of date. v34 (tuned LightGBM and MLP, shipped CatBoost)
-> is the file of record: board 270.5655, rank 28 of 178, NEW BEST by 0.99 s over v32 (`LEDGER.md`, last row). Nothing
-> is running. Next is v35 (`docs/EXPERIMENT-PROTOCOL.md` section 4), which waits on Keith's go.
+> is the file of record: board 270.5655, rank 28 of 178, NEW BEST by 0.99 s over v32 (`LEDGER.md`, v34 row). v36 (equal
+> weights) and v37 (weights fit on the 2025 holdout) both lost to it, 270.5691 and 270.6994, so the member weights are
+> not a lever (`LEDGER.md`, last two rows). Nothing is running. Next is v35 (`docs/EXPERIMENT-PROTOCOL.md` section 4),
+> which waits on Keith's go.
 
 ## 1. Where we stand
 

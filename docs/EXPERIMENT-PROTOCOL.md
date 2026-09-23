@@ -1,4 +1,4 @@
-# EXPERIMENT PROTOCOL - prc26 (v3, 2026-09-23)
+# EXPERIMENT PROTOCOL - prc26 (v4, 2026-09-23)
 
 > Instantiated from the quant-ml-protocol skill. This file governs every run and every scorer slot.
 > Amendments are appended with a version bump and a date, never edited in place. An experiment not
@@ -25,12 +25,12 @@ in section 9):
 | holdout promise | n | board delta |
 |---|---|---|
 | 1.5 s or more | 5 | mean +7.79, min +1.90, **every one positive** |
-| under 1.5 s | 7 | mean **+0.08**, sd 0.463, **3 of 7 negative**; v34's +0.99 is the only one above +0.18 (before v34, n = 6: mean -0.08, sd 0.253) |
+| under 1.5 s | 9 | mean **+0.04**, sd 0.407, **5 of 9 negative**; v34's +0.99 is the only one above +0.18 (n = 7 after v34: mean +0.08, sd 0.463; n = 6 before it: mean -0.08, sd 0.253) |
 
-- Transfer sd: **0.463 s** of board, 95% CI [0.298, 1.020] (n = 7, chi-square), re-estimated after the v34
-  upload per section 8; it was 0.253 [0.158, 0.620] at n = 6.
-- **Detectable-effect floor: 0.93 s of board** at the point estimate, **2.04 s** at the sd's upper
-  bound (0.51 and 1.24 before v34). Any holdout gain that projects below this is noise-sized and must be labeled so.
+- Transfer sd: **0.407 s** of board, 95% CI [0.275, 0.780] (n = 9, chi-square), re-estimated after the v36 and
+  v37 uploads per section 8; it was 0.463 [0.298, 1.020] at n = 7 and 0.253 [0.158, 0.620] at n = 6.
+- **Detectable-effect floor: 0.81 s of board** at the point estimate, **1.56 s** at the sd's upper
+  bound (0.93 and 2.04 at n = 7, 0.51 and 1.24 before v34). Any holdout gain that projects below this is noise-sized and must be labeled so.
 - Feature cap: row-level features ride 2.06M rows and are uncapped in practice. Day-level and
   window-level features (`DAY` 7, `WZ` 20, `PW` 5 = 32) ride 620 ranking airport-days, so the
   n_indep/8 cap is **77**. We are under it; the next day-level family must count against it.
@@ -339,7 +339,7 @@ same defect.
 
 | flag | source | first declared | rides until |
 |---|---|---|---|
-| holdout gains under 1.5 s do not carry | this file, section 0 | 2026-09-17 | the floor is re-measured with more uploads; after v34 (n = 7) the mean is +0.08 with sd 0.463, still about zero on average, but v34 carried +0.99 on a +0.526 promise |
+| holdout gains under 1.5 s do not carry | this file, section 0 | 2026-09-17 | the floor is re-measured with more uploads; after v37 (n = 9) the mean is +0.04 with sd 0.407, still about zero on average; v34 carried +0.99 on a +0.526 promise, then the weights-only v36 and v37 lost 0.004 and 0.134 on +0.051 and +0.146 |
 | the Jan+Jul 2025 holdout has been read 71 times (one line per read in `docs/RESULTS.md`, recounted 2026-09-22) | `docs/RESULTS.md` | 2026-09-17 | end of campaign; there is no untouched test but the board |
 | 16 ranking airport-days sit above any training day | `docs/REGIME.md` | 2026-09-17 | end of campaign |
 | **the holdout cannot measure a disruption change.** `w_sn24h >= 15`: holdout **0.00%** of lane A rows (max 13), ranking **2.18%** (max 47). Section 3's hot-slice test rides r, not weather, and its holdout rows are mild versions of the ranking's. A hot-day change is unfalsifiable on our gate | R1a, computed 2026-09-17 | 2026-09-17 | end of campaign |
@@ -369,7 +369,7 @@ same defect.
 
 ```
 python regime.py                       # docs/REGIME.md + data/cache/regime.parquet
-python -c "import numpy as np;P=[('v22',11.54,310.891,292.887),('v23',1.66,292.887,290.983),('v24',0.09,290.983,290.7995),('v25',4.40,290.7995,288.6796),('v26',7.42,288.6796,282.4241),('v28',8.41,282.4241,271.783),('v29',0.873,271.783,272.2175),('v30',0.220,271.783,271.9284),('v31',0.240,271.783,271.68),('v32',0.754,271.68,271.5521),('v33',0.402,271.5521,271.84),('v34',0.526,271.5521,270.5655)];b=[b0-b1 for n,h,b0,b1 in P if h<1.5];print(np.mean(b),np.std(b,ddof=1))"
+python -c "import numpy as np;P=[('v22',11.54,310.891,292.887),('v23',1.66,292.887,290.983),('v24',0.09,290.983,290.7995),('v25',4.40,290.7995,288.6796),('v26',7.42,288.6796,282.4241),('v28',8.41,282.4241,271.783),('v29',0.873,271.783,272.2175),('v30',0.220,271.783,271.9284),('v31',0.240,271.783,271.68),('v32',0.754,271.68,271.5521),('v33',0.402,271.5521,271.84),('v34',0.526,271.5521,270.5655),('v36',0.051,270.5655,270.5691),('v37',0.146,270.5655,270.6994)];b=[b0-b1 for n,h,b0,b1 in P if h<1.5];print(np.mean(b),np.std(b,ddof=1))"
 ```
 
 ## Amendment log
@@ -382,3 +382,6 @@ python -c "import numpy as np;P=[('v22',11.54,310.891,292.887),('v23',1.66,292.8
   sd 0.463 [0.298, 1.020], floor 0.93 / 2.04 s); the n = 6 values stay beside the new ones. Section 3's 1.5 s floor
   is unchanged. v34 won 0.99 s on a 0.526 promise that the declared rule held, which argues for re-deriving that
   floor; that call is Keith's.
+- v4 2026-09-23: section 0 re-estimated after v36 (equal weights) and v37 (weights fit on the Jan+Jul 2025 holdout),
+  both uploaded on Keith's instruction and both a section 8 breach: n = 9, sd 0.407 [0.275, 0.780], floor 0.81 /
+  1.56 s. Both lost to v34 (0.004 and 0.134 s), so the member weights are not a lever. Section 3 is unchanged.
