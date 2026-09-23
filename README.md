@@ -50,7 +50,7 @@ Holdout = January and July 2025, never used for model choice. CV = five folds ov
 by month pair. Every result line reports per lane (A = has a flight plan, B = no plan) and per month.
 Predictions are floored at 0. Board uploads are logged in `LEDGER.md` with the expected and actual score.
 
-## Reproduce the current build (v28 base; v32 is the file of record)
+## Reproduce the current build (v28 base; v34 is the file of record)
 
 The lane A blend is 0.5223 * CatBoost residual lane-A model with arrival recorder-mode and window-state features (`ra_cb_wz`)
 + 0.1564 * the LightGBM version (`ra_lgb_wz`) + 0.3213 * the MLP version (`nn3_wz`). Lane A is v25's design
@@ -114,6 +114,26 @@ NN_DEV=cpu CUDA_VISIBLE_DEVICES="" .venv-cpu/Scripts/python.exe nn.py fit nn3_pw
 python recal.py cv && python recal.py fit
 python combine.py data/merry-octopus_v32.parquet data/recal_rank.parquet:1 --over=data/laneb_rank.parquet
 python board.py check data/merry-octopus_v32.parquet
+```
+
+v34 (2026-09-23, the file of record, board 270.5655) is v32 with the LightGBM and MLP lane A members swapped for
+their R7-tuned re-fits, `ra_lgb_pw_t7` and `nn3_pw_t7` (Optuna TPE, 200 trials each, configs read back from
+`data/optuna.db`, `docs/EXPERIMENT-PROTOCOL.md` section 4). NNLS on OOF reweights the blend to 0.345484 `ra_cb_wz`
++ 0.265653 `ra_lgb_pw_t7` + 0.388863 `nn3_pw_t7`; the second stage is refit on it; lane B rows are v28's. Holdout
+305.24 all, 216.42 lane A, +0.526 [-0.123, +1.043] against v32, so the declared slot rule held it; Keith asked for
+the upload anyway. Board 270.5655, rank 28 of 178: NEW BEST by 0.99 s, 1.66 times the SSE the holdout promised.
+The extra commands, after the v32 chain:
+
+```
+python lanea.py cv ra_lgb_pw_t7 mix_cb_wx
+NN_DEV=cpu .venv-cpu/Scripts/python.exe nn.py cv nn3_pw_t7 mix_cb_wx
+python blend.py ra_cb_wz ra_lgb_pw_t7 nn3_pw_t7 --base=blend_ra_cb_wz+ra_lgb_pw+nn3_pw
+python lanea.py fit ra_lgb_pw_t7 mix_cb_wx 237 6938 8665
+NN_DEV=cpu .venv-cpu/Scripts/python.exe nn.py fit nn3_pw_t7 mix_cb_wx
+python recal.py cv && python recal.py fit
+python gate.py recal_holdout.parquet recal_holdout_v32.parquet
+python combine.py data/merry-octopus_v34.parquet data/recal_rank.parquet:1 --over=data/laneb_rank.parquet
+python board.py check data/merry-octopus_v34.parquet
 ```
 
 ```

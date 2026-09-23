@@ -1,6 +1,6 @@
 """File-level holdout gate for a lane A change (docs/EXPERIMENT-PROTOCOL.md section 3): a new second-stage holdout cache
 against a base one, lane B rows from laneb_holdout in both arms. `python gate.py [NEW] [BASE]`, cache file names,
-default recal_holdout vs recal_holdout_v32. Check: the same file in both arms prints +0.000 everywhere."""
+default recal_holdout vs recal_holdout_v34 (file of record). Check: the same file in both arms prints +0.000 everywhere."""
 import sys
 
 import numpy as np
@@ -11,7 +11,7 @@ from regime import slice_delta
 from train import HOLDOUT, boot_delta
 
 new = sys.argv[1] if len(sys.argv) > 1 else "recal_holdout.parquet"
-base = sys.argv[2] if len(sys.argv) > 2 else "recal_holdout_v32.parquet"
+base = sys.argv[2] if len(sys.argv) > 2 else "recal_holdout_v34.parquet"
 f = pd.read_parquet(CACHE / "feat.parquet", columns=["id", "split", "month", "day", "has_plan", "y"])
 f = f[(f["split"] == "train") & f["month"].isin(HOLDOUT)].reset_index(drop=True)
 lb = pd.read_parquet(CACHE / "laneb_holdout.parquet").set_index("id")["p"]

@@ -1,4 +1,4 @@
-# EXPERIMENT PROTOCOL - prc26 (v2, 2026-09-22)
+# EXPERIMENT PROTOCOL - prc26 (v3, 2026-09-23)
 
 > Instantiated from the quant-ml-protocol skill. This file governs every run and every scorer slot.
 > Amendments are appended with a version bump and a date, never edited in place. An experiment not
@@ -25,11 +25,12 @@ in section 9):
 | holdout promise | n | board delta |
 |---|---|---|
 | 1.5 s or more | 5 | mean +7.79, min +1.90, **every one positive** |
-| under 1.5 s | 6 | mean **-0.08**, sd 0.253, **3 of 6 negative** |
+| under 1.5 s | 7 | mean **+0.08**, sd 0.463, **3 of 7 negative**; v34's +0.99 is the only one above +0.18 (before v34, n = 6: mean -0.08, sd 0.253) |
 
-- Transfer sd: **0.253 s** of board, 95% CI [0.158, 0.620] (n = 6, chi-square).
-- **Detectable-effect floor: 0.51 s of board** at the point estimate, **1.24 s** at the sd's upper
-  bound. Any holdout gain that projects below this is noise-sized and must be labeled so.
+- Transfer sd: **0.463 s** of board, 95% CI [0.298, 1.020] (n = 7, chi-square), re-estimated after the v34
+  upload per section 8; it was 0.253 [0.158, 0.620] at n = 6.
+- **Detectable-effect floor: 0.93 s of board** at the point estimate, **2.04 s** at the sd's upper
+  bound (0.51 and 1.24 before v34). Any holdout gain that projects below this is noise-sized and must be labeled so.
 - Feature cap: row-level features ride 2.06M rows and are uncapped in practice. Day-level and
   window-level features (`DAY` 7, `WZ` 20, `PW` 5 = 32) ride 620 ranking airport-days, so the
   n_indep/8 cap is **77**. We are under it; the next day-level family must count against it.
@@ -42,7 +43,7 @@ in section 9):
   prediction and every model targets it.
 - Naive-baseline check: the airport mean scores RMSE 417 on lane A and 3,398 on lane B
   (`docs/AUDIT.md`, "Where the label variance sits"). Plain CatBoost on fold 0 scores 285 against
-  the stamp mixture's 253 (`PLAN.md:31`). Current: 217.18 lane A holdout, board 271.5521.
+  the stamp mixture's 253 (`PLAN.md:31`). Current: v34, 216.42 lane A holdout, board 270.5655 (v32 was 217.18 and 271.5521).
 - Carry / roll / basis decomposition: **N/A**, this is not a traded target.
 
 ## 2. Data register
@@ -287,6 +288,16 @@ The all-rows interval includes zero, so the slot rule holds the slot: no file bu
 needed lane A at 215.03; v34 reached 216.42. `recal.py` W and the recal caches are back on v32 (v34 copies
 `data/cache/recal_*_v34.parquet`); `data/recal_rank.parquet` was never refit.
 
+**v34 upload (2026-09-23): new best, board 270.5655.** Keith asked for the upload over the hold ("So we have three
+attempts to make, try it"). The file was built from the v34 weights (`recal.py fit`, then `combine.py`) and scored
+270.5655 against v32's 271.5521: +0.99 s, rank 28 of 178. Board SSE fell 184.4M against the 110.8M the holdout
+promised, 1.66 times (1.88 in seconds), the largest board gain from any promise under 1.5 s. It is a section 8 breach
+and `LEDGER.md` logs it as one. The declared rule would have left the 0.99 s on the table. One point, and it moves
+section 0: the transfer sd rises from 0.253 to 0.463 and the floor from 0.51 to 0.93 s. The ratio flag in section 7
+points the same way: the two changed members kept 1.0 and 0.59 times their CV lane A gain on the holdout (R7 table
+above), the lowest ratios yet, and v34 carried the most of the four. `recal.py` W, the recal caches and `gate.py`'s default base
+are now v34's; v32 copies stay in `data/cache/recal_*_v32.parquet` and `data/recal_rank_v32.parquet`.
+
 **v35, declared 2026-09-22 before any v35 run.** The independent review of v34 found that the MLP never sees three of
 the five PW columns. `loo_mean` (`features.py:232-243`) divides a float remainder by n = 0, which gives +inf or -inf on
 176 `pw_m`, 1,119 `pr_m` and 771 `pw30_m` rows of `pw.parquet`. With both signs in one column, `Enc` (`nn.py:47`) takes
@@ -328,7 +339,7 @@ same defect.
 
 | flag | source | first declared | rides until |
 |---|---|---|---|
-| holdout gains under 1.5 s do not carry | this file, section 0 | 2026-09-17 | the floor is re-measured with more uploads |
+| holdout gains under 1.5 s do not carry | this file, section 0 | 2026-09-17 | the floor is re-measured with more uploads; after v34 (n = 7) the mean is +0.08 with sd 0.463, still about zero on average, but v34 carried +0.99 on a +0.526 promise |
 | the Jan+Jul 2025 holdout has been read 71 times (one line per read in `docs/RESULTS.md`, recounted 2026-09-22) | `docs/RESULTS.md` | 2026-09-17 | end of campaign; there is no untouched test but the board |
 | 16 ranking airport-days sit above any training day | `docs/REGIME.md` | 2026-09-17 | end of campaign |
 | **the holdout cannot measure a disruption change.** `w_sn24h >= 15`: holdout **0.00%** of lane A rows (max 13), ranking **2.18%** (max 47). Section 3's hot-slice test rides r, not weather, and its holdout rows are mild versions of the ranking's. A hot-day change is unfalsifiable on our gate | R1a, computed 2026-09-17 | 2026-09-17 | end of campaign |
@@ -339,7 +350,7 @@ same defect.
 | **the MLP zeroes `pw_m`, `pr_m` and `pw30_m` on every row**: `loo_mean` returns +inf and -inf at n = 0, so the encoder mean is NaN (section 4, v35) | v34 review, checked 2026-09-22 | 2026-09-22 | the v35 re-fit |
 | **tree OOF is early-stopped on the fold it scores** (`lanea.py:75`), while the MLP holds out its own last 10% of days, so NNLS on OOF leans toward the trees. The holdout arm is clean: it fits at the CV mean iterations x 1.1 | v34 review, checked in code 2026-09-22 | 2026-09-22 | an inner validation split in `lanea.cv` |
 | **the MLP search ran on GPU, its re-fits on CPU.** The reviewer put the device-fair judge gain at about 3.07 s, not 3.481 | v34 review | 2026-09-22 | **closed 2026-09-22**: the CPU re-fit's judge-fold mean is 208.181, below the GPU's 208.572 (section 4) |
-| **a high holdout-to-OOF gain ratio has preceded a poor carry**: v31 at 2.4x carried 0.43, v32 at 5.9x carried 0.17, v33 at 9.6x carried -0.72. Three points | v34 review, not re-derived | 2026-09-22 | each upload adds a point |
+| **a high holdout-to-OOF gain ratio has preceded a poor carry**: v31 at 2.4x carried 0.43, v32 at 5.9x carried 0.17, v33 at 9.6x carried -0.72, and v34's two changed members at 1.0x and 0.59x carried 1.88. Four points, and the order holds: the lower the ratio, the better the carry | v34 review, not re-derived; v34's point from the section 4 R7 table (CV and holdout lane A deltas), 2026-09-23 | 2026-09-22 | each upload adds a point |
 | **no ledger point sits near the 1.5 s floor**: no holdout promise falls between 0.873 and 1.66 s, and `LEDGER.md:5` asks for about 3 s | v34 review | 2026-09-22 | the floor is re-measured with more uploads |
 
 ## 8. Scorer-slot contract
@@ -358,7 +369,7 @@ same defect.
 
 ```
 python regime.py                       # docs/REGIME.md + data/cache/regime.parquet
-python -c "import numpy as np;P=[('v22',11.54,310.891,292.887),('v23',1.66,292.887,290.983),('v24',0.09,290.983,290.7995),('v25',4.40,290.7995,288.6796),('v26',7.42,288.6796,282.4241),('v28',8.41,282.4241,271.783),('v29',0.873,271.783,272.2175),('v30',0.220,271.783,271.9284),('v31',0.240,271.783,271.68),('v32',0.754,271.68,271.5521),('v33',0.402,271.5521,271.84)];b=[b0-b1 for n,h,b0,b1 in P if h<1.5];print(np.mean(b),np.std(b,ddof=1))"
+python -c "import numpy as np;P=[('v22',11.54,310.891,292.887),('v23',1.66,292.887,290.983),('v24',0.09,290.983,290.7995),('v25',4.40,290.7995,288.6796),('v26',7.42,288.6796,282.4241),('v28',8.41,282.4241,271.783),('v29',0.873,271.783,272.2175),('v30',0.220,271.783,271.9284),('v31',0.240,271.783,271.68),('v32',0.754,271.68,271.5521),('v33',0.402,271.5521,271.84),('v34',0.526,271.5521,270.5655)];b=[b0-b1 for n,h,b0,b1 in P if h<1.5];print(np.mean(b),np.std(b,ddof=1))"
 ```
 
 ## Amendment log
@@ -367,3 +378,7 @@ python -c "import numpy as np;P=[('v22',11.54,310.891,292.887),('v23',1.66,292.8
 - v2 2026-09-22: section 0 says the verdict statistic rides airport-days. It does not. `boot_delta` (`train.py:45`)
   resamples calendar days, and the Jan+Jul 2025 holdout has 62 of them (checked 2026-09-22). The 620 figure counts the
   ranking file's airport-days and stays right for the feature cap. Found by the v34 review.
+- v3 2026-09-23: section 0's transfer rows and floor re-estimated after the v34 upload, as section 8 requires (n = 7,
+  sd 0.463 [0.298, 1.020], floor 0.93 / 2.04 s); the n = 6 values stay beside the new ones. Section 3's 1.5 s floor
+  is unchanged. v34 won 0.99 s on a 0.526 promise that the declared rule held, which argues for re-deriving that
+  floor; that call is Keith's.
