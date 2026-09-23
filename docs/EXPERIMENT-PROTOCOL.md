@@ -1,4 +1,4 @@
-# EXPERIMENT PROTOCOL - prc26 (v5, 2026-09-23)
+# EXPERIMENT PROTOCOL - prc26 (v6, 2026-09-23)
 
 > Instantiated from the quant-ml-protocol skill. This file governs every run and every scorer slot.
 > Amendments are appended with a version bump and a date, never edited in place. An experiment not
@@ -311,6 +311,41 @@ same defect.
   because the trees saw the same infinities. Nothing changes while v34's members are in flight.
 - **Joins the lane.** The tuned CatBoost `ra_cb_wz_t7`, once fifty frees the GPU.
 - **Gate.** Section 3 against the file of record, by `gate.py`, with NNLS weights by `blend.py`'s rule.
+- **Started 2026-09-23** on Keith's go. `features.per` divides a window sum by its count and gives NaN at n = 0, in
+  `loo_mean` and `window_state` alike (`window_state` had the same division; its inputs are whole seconds, so it gave
+  NaN, never inf, and `feat.parquet` is unchanged). The rebuilt `pw.parquet` differs from the old one (kept as
+  `data/cache/pw_v34.parquet`) on exactly the 2,066 cells that were infinite, now NaN, and on no other cell. v34's
+  member caches are kept as `*_v34.parquet`. Both PW members re-fit on CPU. `ra_cb_wz_t7` does not join: fifty still
+  holds the GPU.
+
+**H1, the jump hunt, declared 2026-09-23 before any hunt run.** Keith's go: "continue please, decide what best for
+us, lets try our best to reach top 3". The gap review (https://claude.ai/artifact/GxGV3b1LuLZ8ZwP56SXYrC,
+`analysis/gap.py`, `analysis/board_history.py`) found that each of the nine teams under 250 made one jump of 8.7 to
+21.5 s (1.60B to 3.80B of board SSE) from a best between 258 and 273, while tuning moves us under 1 s. Third place is
+31.8 s away (5.58B of board SSE). Lane B is 1.56% of holdout rows and 50.5% of holdout SSE, and the 14 rows with
+labels over 12 h hold 35.0%.
+
+- **Question.** Is there a group of rows worth at least 1.5 s of board (279.1M of squared error) that our design
+  misses by hours, and that we can find without reading the board?
+- **Who.** Three fresh agents. None has read `docs/LANEB.md`, `docs/LANEB_RUN.md`, `laneb.py` or `mix.py`, so their
+  misses do not share ours. H1a: the off-block stamp mechanism on rows with labels over 1 h (Opus). H1b: the files'
+  own structure, meaning row order, ids, cross-links between rows and stamp granularity (Sonnet). H1c: the public
+  record on the challenge and its data, web only (Sonnet). They get the raw files, the label rule
+  (`tests/test_label_timing.py`), v34's predictions and the error map.
+- **Data rules.** Build on the ten non-holdout 2025 months. Read the Jan+Jul 2025 holdout once per candidate, at most
+  three candidates per agent; each read is a verdict lane in N. Use 2026 rank rows only for label-free checks (counts,
+  shares, feature values). No board reads, no uploads, and no use of the v38 to v40 scores.
+- **Pass.** At least 279.1M less holdout SSE than v34 (lane A from `data/cache/recal_holdout_v34.parquet`, lane B from
+  `data/cache/laneb_holdout.parquet`), with a paired day-block interval (`train.boot_delta`) above zero, then
+  section 3 on the full file against v34. Inside lane B, away from the hull (LIRF, schedule 4 h or more before
+  takeoff) and the rows labelled over 12 h (5,326 rows), the bar is a lane B RMSE of 817.0 or lower, down from 848.5.
+- **Unjudgeable finds.** A find on the LIRF hull rows, or on rows more than 12 h late by schedule, cannot be gated on
+  2025. The agent writes the case for one declared bet: the mechanism, the 2025 evidence, the rank rows it touches and
+  the SSE it risks both ways. Keith has handed the session that call ("decide what best for us"). It goes in
+  `LEDGER.md` as a bet: one slot, and no second try tuned on its score.
+- **Kill.** If no candidate passes and no bet case is written, we stop chasing top 3 and play for rank: v35, then the
+  CatBoost `ra_cb_wz_t7` once the GPU is free.
+- **Cost.** Three agent runs. No scorer slot unless a candidate passes. The CPU is shared with the v35 re-fits.
 
 ## 5. NOT-DONE table
 
@@ -390,3 +425,5 @@ python -c "import numpy as np;P=[('v22',11.54,310.891,292.887),('v23',1.66,292.8
   Keith's instruction, a section 8 breach). Both lost to v34 as the gate said (4.12 and 2.86 s). The under-1.5 s row,
   the transfer sd and the floor are unchanged: the section 9 snippet now keeps negative promises out of that row. The
   section 8 tripwire does not fire, since neither file passed the gate. v40 (the MLP alone) is scheduled for 2026-09-24.
+- v6 2026-09-23: section 4 declares H1, the jump hunt, and records that v35 has started. Both began on Keith's go
+  ("continue please, decide what best for us, lets try our best to reach top 3"). Sections 0, 3 and 8 are unchanged.

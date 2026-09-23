@@ -194,6 +194,12 @@ def arrmode(f: pd.DataFrame, raw: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def per(s: np.ndarray, n: np.ndarray) -> np.ndarray:
+    """s / n, NaN where n is 0: a leave-one-out cumsum remainder is float noise there, so a bare s / 0 gives +-inf."""
+    with np.errstate(invalid="ignore", divide="ignore"):
+        return np.where(n > 0, s / n, np.nan)
+
+
 def window_state(f: pd.DataFrame, keys: tuple[str, ...], win: float, pre: str) -> pd.DataFrame:
     """Leave-one-out +-win stats within `keys` over neighbours with the stamps; z_aobt, d_ae, d_al only, never y."""
     za, dae, dal = f["z_aobt"].values, f["d_ae"].values, f["d_al"].values
@@ -216,11 +222,10 @@ def window_state(f: pd.DataFrame, keys: tuple[str, ...], win: float, pre: str) -
             cum = np.concatenate([[0.0], np.cumsum(v[o])])
             s[k][o] = cum[hi] - cum[lo] - v[o]
     n, nl = s["n"], s["nl"]
-    with np.errstate(invalid="ignore", divide="ignore"):
-        m, e, l = s["dz"] / n, s["de"] / n, s["dl"] / nl
-        d = {"n": n, "dz": m, "dz_sd": np.sqrt(np.maximum(s["dz2"] / n - m ** 2, 0)), "hi": s["hi"] / n,
-             "lo": s["lo"] / n, "dae": e, "dae_sd": np.sqrt(np.maximum(s["de2"] / n - e ** 2, 0)),
-             "dae0": s["de0"] / n, "dal": l, "dal_sd": np.sqrt(np.maximum(s["dl2"] / nl - l ** 2, 0))}
+    m, e, l = per(s["dz"], n), per(s["de"], n), per(s["dl"], nl)
+    d = {"n": n, "dz": m, "dz_sd": np.sqrt(np.maximum(per(s["dz2"], n) - m ** 2, 0)), "hi": per(s["hi"], n),
+         "lo": per(s["lo"], n), "dae": e, "dae_sd": np.sqrt(np.maximum(per(s["de2"], n) - e ** 2, 0)),
+         "dae0": per(s["de0"], n), "dal": l, "dal_sd": np.sqrt(np.maximum(per(s["dl2"], nl) - l ** 2, 0))}
     return pd.DataFrame({f"{pre}_{k}": v for k, v in d.items()}, index=f.index)
 
 
@@ -239,8 +244,7 @@ def loo_mean(f: pd.DataFrame, keys: tuple[str, ...], win: float, v: np.ndarray, 
         lo, hi = np.searchsorted(ts, ts - win, "left"), np.searchsorted(ts, ts + win, "right")
         for k, x in q.items():
             cum = np.concatenate([[0.0], np.cumsum(x[o])]); s[k][o] = cum[hi] - cum[lo] - x[o]
-    with np.errstate(invalid="ignore", divide="ignore"):
-        return pd.DataFrame({f"{pre}_n": s["n"], f"{pre}_m": s["s"] / s["n"], f"{pre}_hi": s["hi"] / s["n"]}, index=f.index)
+    return pd.DataFrame({f"{pre}_n": s["n"], f"{pre}_m": per(s["s"], s["n"]), f"{pre}_hi": per(s["hi"], s["n"])}, index=f.index)
 
 
 def pw_cols() -> pd.DataFrame:
