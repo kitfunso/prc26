@@ -1,4 +1,4 @@
-# EXPERIMENT PROTOCOL - prc26 (v6, 2026-09-23)
+# EXPERIMENT PROTOCOL - prc26 (v8, 2026-09-23)
 
 > Instantiated from the quant-ml-protocol skill. This file governs every run and every scorer slot.
 > Amendments are appended with a version bump and a date, never edited in place. An experiment not
@@ -324,6 +324,11 @@ same defect.
   (the mean of max(0, X) for X ~ N(0.04, 0.407)); and v35 is a bug fix, not a search. Its board score chooses nothing:
   the fixed members ride every later file whatever it scores. A slot spent this way is a section 8 breach and goes in
   `LEDGER.md` as one. A gain of zero or below holds the slot.
+- **Gate, 2026-09-23.** The re-fit blend (weights 0.36, 0.235, 0.405 by `blend.py`) loses to v34's blend on the
+  holdout, -0.18 [-0.61, +0.09]; the recal step then gains +1.79 [+1.14, +2.46] of lane A (218.14 to 216.35). Against
+  v34's file `gate.py` gives all rows +0.051 [-0.454, +0.398] and lane A +0.073 [-0.590, +0.548], 10.8M of SSE: flat,
+  but above zero. So v35 takes a slot under the rule above: `data/merry-octopus_v35.parquet` (sha256
+  e3a84bdfcd569309, B1 carried), scheduled for 2026-09-24 00:25 UTC after v40 and v41. It is a section 8 breach.
 
 **H1, the jump hunt, declared 2026-09-23 before any hunt run.** Keith's go: "continue please, decide what best for
 us, lets try our best to reach top 3". The gap review (https://claude.ai/artifact/GxGV3b1LuLZ8ZwP56SXYrC,
@@ -443,3 +448,5 @@ python -c "import numpy as np;P=[('v22',11.54,310.891,292.887),('v23',1.66,292.8
 - v7 2026-09-23: section 4 records H1's outcome (no pass; B1 is v41) and declares v35's upload rule before its gate
   read: a slot for any all-rows gain above zero, on best-of arithmetic from section 0. Sections 0, 3 and 8 are
   unchanged; the rule covers v35 only.
+- v8 2026-09-23: section 4 records v35's gate (all rows +0.051 [-0.454, +0.398]) and the slot it takes under the v7
+  rule, on 2026-09-24. Sections 0, 3 and 8 are unchanged.

@@ -13,7 +13,7 @@ from data import CACHE, rmse
 from regime import slice_delta
 from train import FOLDS, HOLDOUT, boot_delta
 
-W = {"ra_cb_wz": 0.345484, "ra_lgb_pw_t7": 0.265653, "nn3_pw_t7": 0.388863}
+W = {"ra_cb_wz": 0.36, "ra_lgb_pw_t7": 0.235, "nn3_pw_t7": 0.405}
 Z = ["z_aobt", "z_sched", "z_eobt", "z_lobt", "z_iobt"]
 COLS = ["p", "apt", *[f"d_{z}" for z in Z]]
 GROUPS = (HOLDOUT, *FOLDS)
