@@ -12,19 +12,15 @@ that regenerates it. Nineteen days to the deadline (11 Oct 2026 23:59:59 CET, `P
 > `LEDGER.md` row. The top-3 gap review is
 > https://claude.ai/artifact/GxGV3b1LuLZ8ZwP56SXYrC (`analysis/gap.py`, `analysis/board_history.py`).
 >
-> **Running (Keith's go, protocol v6, commit `1a07bb5`).** v35: `loo_mean` fixed (`features.per`), `pw.parquet`
-> rebuilt (only the 2,066 infinite cells changed, to NaN), v34 caches kept as `*_v34.parquet`. Three detached CPU jobs
-> via the session scratchpad's `v35_chain.py`: `lgb` (lanea cv then fit at the cv iters), `nn_cv`, `nn_fit`; logs
-> `data/v35_*.out` / `.log`, driver errors in `data/v35_driver_*.err`. When all three land: `python blend.py ra_cb_wz
-> ra_lgb_pw_t7 nn3_pw_t7 --base=blend_ra_cb_wz+ra_lgb_pw_t7+nn3_pw_t7_v34` (the v34 blend cache is kept under that
-> name, because blend.py overwrites its own name before it reads the base), set `recal.py` W from the NNLS weights,
-> `python recal.py cv && python recal.py fit`, `python gate.py recal_holdout.parquet recal_holdout_v34.parquet`.
-> LightGBM fold 0 landed at 207.15 in 1,631 s (`data/v35_cv_lgb.out`); the MLP jobs print only at the end.
-> If v35 passes, its file carries B1 too: `python combine.py data/merry-octopus_vN.parquet <v35 file>:1
-> --over=analysis/hunt/h1a/bet_hull_rank_override.parquet` (declared in the v41 row: B1 rides every later file).
-> H1, the jump hunt, is done (protocol section 4, Outcome): no candidate passes, and the one bet, B1, is v41
-> (`analysis/hunt/h1a/REPORT.md`). B1 is worth about 1 s against a 31.8 s gap, so from here we play for rank: v35,
-> then `ra_cb_wz_t7` when fifty frees the GPU.
+> **Update 2026-09-24.** v35 and v41 were both scored and both lost to v34 (`LEDGER.md`, the v41 upload and v35 upload
+> rows). v41 (v34 plus B1) scored 271.7314, 1.166 s worse, so **B1 is dead: drop it from every later file**, which
+> undoes the "B1 rides every later file" declaration in the v41 row. v35 (PW root fix plus B1) scored 271.716. Next to
+> v41 the fix is worth +0.015 s, so the PW fix is flat on the board. v40 was never uploaded. H1 is closed with no
+> winner. v34 is still the file of record. Only one lever is left untried: `ra_cb_wz_t7`, the tuned CatBoost re-fit
+> (`lanea.py cv ra_cb_wz_t7 mix_cb_wx`, then fit). It needs the GPU. At 17:30 UTC on 2026-09-24, fifty's
+> `eval.score_tso_backtest` held it at 100%, and Keith's rule is to wait. The 18.6-day estimate in the v34 row was
+> measured on a shared GPU, so time it again on a free GPU before counting on it before 11 Oct. The expected gain is
+> small: the tuning gained +1.142 on the judge folds, and recent holdout gains carried to the board at 0.15 or less.
 
 ## 1. Where we stand
 
