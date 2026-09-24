@@ -18,8 +18,11 @@ that regenerates it. Nineteen days to the deadline (11 Oct 2026 23:59:59 CET, `P
 > v41 the fix is worth +0.015 s, so the PW fix is flat on the board. v40 was never uploaded. H1 is closed with no
 > winner. v34 is still the file of record. Only one lever is left untried: `ra_cb_wz_t7`, the tuned CatBoost re-fit
 > (`lanea.py cv ra_cb_wz_t7 mix_cb_wx`, then fit). It needs the GPU. At 17:30 UTC on 2026-09-24, fifty's
-> `eval.score_tso_backtest` held it at 100%, and Keith's rule is to wait. The 18.6-day estimate in the v34 row was
-> measured on a shared GPU, so time it again on a free GPU before counting on it before 11 Oct. The expected gain is
+> `eval.score_tso_backtest` held it at 100%. On Keith's go it started anyway, beside fifty (pid 57436, `gpu_ram_part`
+> 0.3 in `c3287b0`, logs `data/r7_cv_cb.out` / `.log`). Fold 0 scored 203.33 in 5,813 s, the best fold 0 of any member
+> (tuned LightGBM 206.88, MLP 211.25). The whole cv run is about 10 h, so the 18.6-day estimate in the v34 row is wrong.
+> When cv lands: `python lanea.py fit ra_cb_wz_t7 mix_cb_wx <its 3 iters>`, then reblend and gate as for v35. The body
+> regressor stopped at 5,986 of the 6,000-iteration cap, so it may still be undertrained. The expected gain is
 > small: the tuning gained +1.142 on the judge folds, and recent holdout gains carried to the board at 0.15 or less.
 
 ## 1. Where we stand
