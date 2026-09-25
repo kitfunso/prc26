@@ -1,6 +1,6 @@
 """Lane A second stage: LightGBM on what the lane A blend leaves (y - p), from the blend, the airport and the distance
 from the blend to each plan stamp, so rows whose recorded off-block was copied from a stamp can move toward it
-(docs/RECAL.md). `python recal.py cv` / `python recal.py fit`."""
+(docs/RECAL.md). `python recal.py cv` / `python recal.py fit`, optionally followed by `member:weight ...` in place of W."""
 from __future__ import annotations
 
 import sys
@@ -69,4 +69,6 @@ def fit() -> None:
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 2:
+        W = {n: float(w) for n, w in (a.rsplit(":", 1) for a in sys.argv[2:])}
     {"cv": cv, "fit": fit}[sys.argv[1]]()
