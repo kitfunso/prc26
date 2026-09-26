@@ -62,9 +62,10 @@ def fit() -> None:
     tr, rk = (f["split"] == "train").values, (f["split"] == "rank").values
     m = lgb.LGBMRegressor(**PARAMS).fit(f.loc[tr, COLS], (f["y"] - f["p"]).values[tr])
     q = np.maximum(f.loc[rk, "p"].values + m.predict(f.loc[rk, COLS]), 0)
-    out = pd.read_parquet("data/ra_cb_wz_rank.parquet").set_index("MVT_ID_mvt")
-    out.loc[f.loc[rk, "id"].values, "TAXITIME_SEC_mvt"] = q
-    out.reset_index().to_parquet("data/recal_rank.parquet")
+    lb = pd.read_parquet("data/laneb_rank.parquet")
+    out = pd.concat([pd.DataFrame({"MVT_ID_mvt": f.loc[rk, "id"].values, "TAXITIME_SEC_mvt": q}), lb], ignore_index=True)
+    assert out["MVT_ID_mvt"].is_unique, "a lane B row is also a lane A row"
+    out.to_parquet("data/recal_rank.parquet")
     print(f"data/recal_rank.parquet {len(out)} rows; lane A {rk.sum()} rows, mean blend {f.loc[rk, 'p'].mean():.1f}, recal {q.mean():.1f}")
 
 
