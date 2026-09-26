@@ -24,6 +24,14 @@ that regenerates it. Nineteen days to the deadline (11 Oct 2026 23:59:59 CET, `P
 > When cv lands: `python lanea.py fit ra_cb_wz_t7 mix_cb_wx <its 3 iters>`, then reblend and gate as for v35. The body
 > regressor stopped at 5,986 of the 6,000-iteration cap, so it may still be undertrained. The expected gain is
 > small: the tuning gained +1.142 on the judge folds, and recent holdout gains carried to the board at 0.15 or less.
+>
+> **Update 2026-09-26.** `ra_cb_wz_t7` landed: holdout lane A 221.93 vs 223.71 shipped (`docs/RESULTS.md`). On Keith's
+> instruction every 1-, 2- and 3-member mix of the tuned C, L, N (NNLS and equal weights) was built by `grid.py` and
+> uploaded as v42-v51. **All 10 are void**: `recal.fit` took lane B from the old donor (`LEDGER.md`, v42-v51 row);
+> fixed in `82e5161`, all 11 `data/grid/*.parquet` rebuilt, lane B now matches v34 on 0 of 5,290 differing rows. The bad
+> files share one lane B, so their board order is a true lane A order, and one fixed upload gives every tag's true
+> score as sqrt(board^2 - K). Queued: fixed CLN and N upload at 00:05 UTC 2026-09-27 (`upload_fixed.py` in the session
+> scratchpad, log `data/grid/uploads.txt`). Then derive K from CLN, write every tag's true score to the ledger.
 
 ## 1. Where we stand
 
