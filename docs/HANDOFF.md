@@ -30,8 +30,8 @@ that regenerates it. Nineteen days to the deadline (11 Oct 2026 23:59:59 CET, `P
 > uploaded as v42-v51. **All 10 are void**: `recal.fit` took lane B from the old donor (`LEDGER.md`, v42-v51 row);
 > fixed in `82e5161`, all 11 `data/grid/*.parquet` rebuilt, lane B now matches v34 on 0 of 5,290 differing rows. The bad
 > files share one lane B, so their board order is a true lane A order, and one fixed upload gives every tag's true
-> score as sqrt(board^2 - K). Queued: fixed CLN and N upload at 00:05 UTC 2026-09-27 (`upload_fixed.py` in the session
-> scratchpad, log `data/grid/uploads.txt`). Then derive K from CLN, write every tag's true score to the ledger.
+> score as sqrt(board^2 - K). Queued: all 11 fixed files, 5 per UTC day from 00:01 UTC 2026-09-27, CLN and N first
+> (`upload_queue.py` in the session scratchpad, pid 56024, log `data/grid/uploads.txt`). Then derive K from CLN, write every tag's true score to the ledger.
 
 ## 1. Where we stand
 
