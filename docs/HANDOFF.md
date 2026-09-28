@@ -42,6 +42,14 @@ that regenerates it. Nineteen days to the deadline (11 Oct 2026 23:59:59 CET, `P
 > is still the 43 LIRF hull rows (`docs/LANEB.md` section 12), which only board reads can settle; the ban stands.
 > Ship stage: the GitHub repo is private and its default branch is the 2026-09-04 scaffold, so going public also means
 > making `campaign2` the default. History holds no secrets (`git log --all -p`, `.env` never committed).
+>
+> **Going public, approved by Keith 2026-09-28.** Windows task `prc26-public-20261011` runs `data/go-public.cmd` at
+> 21:30 UTC on 11 Oct (22:30 BST): default branch to `campaign2`, then public, logged to `data/go-public.log`. Any
+> 11 Oct upload must land before then. The task wakes the PC and catches up if it was off. `gh` was proven to run from
+> Task Scheduler with a read-only test. Afterwards check `gh repo view kitfunso/prc26 --json visibility`. A blob scan
+> of all three remote branches (`campaign2`, the scaffold `master`, `v1`) found no `.env` value, key pattern or data
+> file. The scaffold's `docs/data-viewer.html` holds 24 sample 2025 training rows. The site sets no data licence and no
+> date for the code to go public.
 
 ## 1. Where we stand
 
