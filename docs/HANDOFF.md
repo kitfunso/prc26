@@ -32,6 +32,16 @@ that regenerates it. Nineteen days to the deadline (11 Oct 2026 23:59:59 CET, `P
 > files share one lane B, so their board order is a true lane A order, and one fixed upload gives every tag's true
 > score as sqrt(board^2 - K). Queued: all 11 fixed files, 5 per UTC day from 00:01 UTC 2026-09-27, CLN and N first
 > (`upload_queue.py` in the session scratchpad, pid 56024, log `data/grid/uploads.txt`). Then derive K from CLN, write every tag's true score to the ledger.
+>
+> **Update 2026-09-28.** v53 (CLN) is the file of record, 270.43, rank 38 of 196; v54-v62 all scored as predicted
+> (`LEDGER.md`). L uploads as v63 at 00:01 UTC 2026-09-29, predicted 274.6906. `README.md` now rebuilds v53 and
+> `requirements.txt` pins torch (`153a4a0`). Two checks for a lever we lack found none. `analysis/board_history.py`:
+> each top-15 team made one upload worth 0.9 to 3.8B SSE; ours peaked at 0.18B. kind-mango's public repo (last commit
+> 2026-09-26 11:32 UTC, `docs/AUDIT_PROMPT.md`) prices reading `AOBT_3_flt` at 254 to 271 s, and their next upload
+> scored 270.58, so their 11 s jump was most likely switching on the field v34 has always used. The one lever that size
+> is still the 43 LIRF hull rows (`docs/LANEB.md` section 12), which only board reads can settle; the ban stands.
+> Ship stage: the GitHub repo is private and its default branch is the 2026-09-04 scaffold, so going public also means
+> making `campaign2` the default. History holds no secrets (`git log --all -p`, `.env` never committed).
 
 ## 1. Where we stand
 
