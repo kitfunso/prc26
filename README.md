@@ -50,7 +50,7 @@ Holdout = January and July 2025, never used for model choice. CV = five folds ov
 by month pair. Every result line reports per lane (A = has a flight plan, B = no plan) and per month.
 Predictions are floored at 0. Board uploads are logged in `LEDGER.md` with the expected and actual score.
 
-## Reproduce the current build (v28 base; v34 is the file of record)
+## Reproduce the current build (v28 base; v53 is the file of record)
 
 The lane A blend is 0.5223 * CatBoost residual lane-A model with arrival recorder-mode and window-state features (`ra_cb_wz`)
 + 0.1564 * the LightGBM version (`ra_lgb_wz`) + 0.3213 * the MLP version (`nn3_wz`). Lane A is v25's design
@@ -134,6 +134,23 @@ python recal.py cv && python recal.py fit
 python gate.py recal_holdout.parquet recal_holdout_v32.parquet
 python combine.py data/merry-octopus_v34.parquet data/recal_rank.parquet:1 --over=data/laneb_rank.parquet
 python board.py check data/merry-octopus_v34.parquet
+```
+
+v53 (2026-09-27, the file of record, board 270.43) is v34 with the CatBoost member swapped for its R7-tuned re-fit,
+`ra_cb_wz_t7`. It is the `CLN` file of `grid.py`, which builds every 1-, 2- and 3-member mix of the three tuned
+members (NNLS and equal weights) and runs each through the second stage. NNLS on OOF weights it 0.442565
+`ra_cb_wz_t7` + 0.168605 `ra_lgb_pw_t7` + 0.388830 `nn3_pw_t7`; lane B rows are v28's. Holdout 304.99 all, 216.06
+lane A, against v34's 305.24 and 216.42. Board 270.43, rank 35 of 195: NEW BEST by 0.136 s, about half the 0.254 s
+the holdout promised. Every other grid file lost to v34 (`LEDGER.md`, v53 to v62 rows). The extra commands, after
+the v34 chain:
+
+```
+cp data/cache/recal_holdout.parquet data/cache/recal_holdout_v34.parquet   # the gate's base arm
+python lanea.py cv ra_cb_wz_t7 mix_cb_wx     # about 12 h on the GPU
+python lanea.py fit ra_cb_wz_t7 mix_cb_wx 2503 4354 6594
+python grid.py CLN                           # NNLS, recal.py cv and fit, gate vs v34 -> data/grid/CLN.parquet
+cp data/grid/CLN.parquet data/merry-octopus_v53.parquet
+python board.py check data/merry-octopus_v53.parquet
 ```
 
 ```
