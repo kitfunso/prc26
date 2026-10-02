@@ -50,33 +50,53 @@ def lb() -> None:
 
 def check(path: str) -> pd.DataFrame:
     sub, tpl = pd.read_parquet(path), pd.read_parquet("data/submitting.parquet")
-    assert list(sub.columns) == list(tpl.columns), (list(sub.columns), list(tpl.columns))
-    assert len(sub) == len(tpl) and set(sub["MVT_ID_mvt"]) == set(tpl["MVT_ID_mvt"]), "row set differs from the template"
-    assert sub["MVT_ID_mvt"].is_unique, "duplicate ids"
-    p = sub["TAXITIME_SEC_mvt"].to_numpy(dtype=float)
-    assert np.isfinite(p).all() and (p >= 0).all(), "NaN or negative predictions"
+    columns = ["MVT_ID_mvt", "TAXITIME_SEC_mvt"]
+    if list(tpl.columns) != columns or list(sub.columns) != columns:
+        raise ValueError(f"submission and template must have columns {columns} in that order")
+    if tpl.empty or tpl["MVT_ID_mvt"].isna().any() or not tpl["MVT_ID_mvt"].is_unique:
+        raise ValueError("template must contain non-null, unique ids and at least one row")
+    if sub["MVT_ID_mvt"].isna().any() or not sub["MVT_ID_mvt"].is_unique:
+        raise ValueError("submission ids must be non-null and unique")
+    if len(sub) != len(tpl) or set(sub["MVT_ID_mvt"]) != set(tpl["MVT_ID_mvt"]):
+        raise ValueError("row set differs from the template")
+    dtype = sub["TAXITIME_SEC_mvt"].dtype
+    if (not pd.api.types.is_numeric_dtype(dtype) or pd.api.types.is_bool_dtype(dtype)
+            or pd.api.types.is_complex_dtype(dtype)):
+        raise ValueError("predictions must have a real numeric dtype")
+    p = sub["TAXITIME_SEC_mvt"].to_numpy(dtype=float, na_value=np.nan)
+    if not np.isfinite(p).all() or (p < 0).any():
+        raise ValueError("predictions must be finite and non-negative")
     print(f"{path}: {len(sub)} rows ok, mean {p.mean():.1f}, p50 {np.median(p):.0f}, max {p.max():.0f}, sha256 {hashlib.sha256(Path(path).read_bytes()).hexdigest()[:16]}")
     return sub
 
 
 def _s3():
+    env = dict(os.environ)
+    env_path = Path(".env")
+    if env_path.exists():
+        for line in env_path.read_text(encoding="utf-8").splitlines():
+            if not line.strip() or line.lstrip().startswith("#"):
+                continue
+            k, separator, v = line.partition("=")
+            if separator and k.strip():
+                env.setdefault(k.strip(), v.strip())
+    if not env.get("PRC_KEY", "").strip() or not env.get("PRC_SECRET", "").strip():
+        raise ValueError("set PRC_KEY and PRC_SECRET in the environment or .env")
     import boto3
     from botocore.config import Config
-    env = dict(os.environ)
-    for line in Path(".env").read_text(encoding="utf-8").splitlines():
-        k, _, v = line.partition("=")
-        env.setdefault(k.strip(), v.strip())
     return boto3.client("s3", endpoint_url=ENDPOINT, aws_access_key_id=env["PRC_KEY"], aws_secret_access_key=env["PRC_SECRET"],
                         region_name="us-east-1", config=Config(s3={"addressing_style": "path"}))
 
 
 def upload(path: str) -> None:
-    assert re.fullmatch(rf"{US}_v\d+\.parquet", Path(path).name), "name must be merry-octopus_vN.parquet"
+    if not re.fullmatch(rf"{US}_v\d+\.parquet", Path(path).name):
+        raise ValueError("name must be merry-octopus_vN.parquet")
     check(path)
     data, s3, key = Path(path).read_bytes(), _s3(), Path(path).name
     s3.put_object(Bucket=BUCKET, Key=key, Body=data)
     head = s3.head_object(Bucket=BUCKET, Key=key)
-    assert head["ContentLength"] == len(data) and head["ETag"].strip('"') == hashlib.md5(data).hexdigest(), "stored bytes differ"
+    if head["ContentLength"] != len(data) or head["ETag"].strip('"') != hashlib.md5(data).hexdigest():
+        raise RuntimeError("stored bytes differ")
     print("uploaded", key, len(data), "bytes")
 
 
