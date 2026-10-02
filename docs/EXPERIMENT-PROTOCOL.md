@@ -450,3 +450,68 @@ python -c "import numpy as np;P=[('v22',11.54,310.891,292.887),('v23',1.66,292.8
   unchanged; the rule covers v35 only.
 - v8 2026-09-23: section 4 records v35's gate (all rows +0.051 [-0.454, +0.398]) and the slot it takes under the v7
   rule, on 2026-09-24. Sections 0, 3 and 8 are unchanged.
+
+## Amendment v9 — 2026-10-02: first-place campaign and validation corrections
+
+Keith requested a next-step plan to seriously challenge first place and to commit/push it.
+The current execution queue is [CONTENDER-PLAN.md](CONTENDER-PLAN.md), CP0–CP5.
+This is a prospective declaration. No new model recipe or competition submission is recorded
+as executed by this amendment.
+
+### Correctness findings and interpretation
+
+- `laneb.copy_hist()` builds airline/flight copy history from all training months before outer
+  exclusion. January/July held-out labels can enter each other's features despite `HIST_GAP=3`.
+  A five-row synthetic hidden-label mutation changed `h_al`/`h_flt` from 0.5 to 0.0.
+  Fix permitted source-label scopes and cross-fit training aggregates before interpreting a new gain.
+- Development tree folds are also early-stopping evaluation sets. Global donor OOF caches and
+  non-holdout recalibration OOF outputs do not isolate all outer evaluation labels.
+  Rebuild the entire feature/model/meta pipeline within outer training scopes.
+- The tuning judge groups were not scored by the search objective, but their labels participate in
+  fits used while searching other groups. Treat their old results as development evidence,
+  not independent nested evaluation of the complete selection process.
+- `nn.fit()` does not subsequently train gradients on the final 10% of fit days; `nn.train()`
+  returns stopping epoch rather than best-weight epoch. CP3 declares the corrective comparison.
+- Near-zero day-mean residuals and linear day-level correlations do not close all conditional
+  row-level interactions. The earlier state-oracle gain is a result for that model/feature experiment,
+  not an information-theoretic ceiling on Lane A.
+- Repeated historical holdout and leaderboard use remains adaptive evidence. Repairing code does
+  not create an untouched test. Bootstrap intervals do not quantify year-transfer or selection bias.
+
+Earlier measured scores and nulls remain in the ledger. New CP2 hypotheses must differ explicitly
+from prior snow/ATFM/DST tests; B1's failed flight-string override remains closed.
+
+### Prospective experiment register
+
+| ID | Hypothesis/implementation | Initial variant cap | Gate/status |
+| --- | --- | ---: | --- |
+| CP0 | Fit-scope isolation, ranking-like masking, stopping separation, immutable champion and actual-file gates | Correctness/control work | PLANNED; passing mutation/provenance tests and clean baseline required |
+| CP1 | Calibrated hierarchical physical/copy/date-shift probabilities predict high-cost outcomes | 3 | PLANNED; whole-file SSE, calibration, sparse-cell and episode confirmation |
+| CP2 | Conditional disruption/recorder-state features improve individual flights within days | 2 | PLANNED; outer/episode confirmation and no clear hot-slice harm |
+| CP3 | True all-data NN fit and bounded Huber/MSE comparison improve ensemble prediction | 2 | PLANNED; complete fit coverage, best-epoch bookkeeping and seed/ensemble evidence |
+| CP4 | Nested meta-fitting selects a small robust survivor ensemble | 3 inexpensive meta-recipes | PLANNED; outer-only evaluation and frozen lineage |
+| CP5 | Full fit and actual-file validation deliver the selected recipe reliably | 1 primary, at most 1 justified alternative | PLANNED; existing Stage-6 sign-off and exact candidate hash |
+
+Maximum eight initial substantive model recipes including the control. At most two receive expensive
+confirmation. Before any run, record the exact variants, scopes, parameters, metric, stress slices,
+budget and stop rule. Adding variants after a result requires a dated declaration before their run.
+
+### Governing rules for CP0–CP5
+
+Primary statistic is paired pooled **whole-file SSE gain**, with pooled RMSE and per-month/lane
+reports. The implementation of `train.boot_delta` resamples calendar days; preserve day-level
+dependence and add month-stratified multi-day-block sensitivity when appropriate. Use at least
+2,000 resamples for these prospective comparisons, without claiming selection-bias correction.
+
+Retain section 3's 1.5 s submission floor, approximately 3 s target, paired interval excluding zero,
+hot-regime review and explicit sign-off. The historical transfer floor is a campaign budget heuristic,
+not a universal estimate of zero expected gain below 1.5 s. No automatic submission authorization
+follows from this plan or from a passing local gate.
+
+Require label-scope isolation and validation of the actual assembled candidate. CP1 changes Lane B
+only after its own confirmation; otherwise Lane B must match the declared control exactly.
+v42–v51's donor assembly error is already fixed but motivates the file-level gate.
+
+The published scorer cap is five files per day. Keep a buffer, prefer October 10 for final uploads,
+and preserve the actual v53 file. The official deadline remains October 11, 23:59:59 CET.
+Respect the standing GPU wait rule and the already approved local publication schedule.

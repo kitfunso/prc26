@@ -1,5 +1,18 @@
 # Hand-off, 2026-09-22
 
+
+> **Current execution update — 2026-10-02.** Follow [CONTENDER-PLAN.md](CONTENDER-PLAN.md),
+> CP0–CP5, and protocol amendment v9. Start with fit-scope isolation and a clean baseline:
+> the review confirmed held-out-label dependency in Lane B copy history, scored-fold stopping
+> and incomplete nested feature/meta isolation. The NN also needs a true all-data refit.
+> v53 (270.43 s) remains the latest recorded champion; preserve the exact file and manifest.
+> Historical sections below include completed jobs, stale “next” steps and stronger validation
+> claims than the code supports. They are history, not a current job-status report.
+> CP1 targets calibrated catastrophic recording mechanisms; CP2 conditional Lane A disruption;
+> CP3 the full-data NN; CP4 the nested ensemble; CP5 final build/release.
+> No new training or scorer upload was executed by the plan commit. Per-upload sign-off,
+> the standing instruction to wait for unrelated GPU jobs, and the approved publication task remain.
+
 Written mid-campaign so the next session can pick up without re-deriving anything. Every number below has the command
 that regenerates it. Nineteen days to the deadline (11 Oct 2026 23:59:59 CET, `PLAN.md:3`).
 

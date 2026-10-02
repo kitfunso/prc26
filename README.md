@@ -1,5 +1,12 @@
 # PRC Data Challenge 2026: taxi-out time, team merry-octopus
 
+
+Current recorded champion: **v53, 270.43 s**. The next-step campaign plan is
+[PLAN.md](PLAN.md) and [docs/CONTENDER-PLAN.md](docs/CONTENDER-PLAN.md).
+The October 2 review identified validation isolation and final-NN-fit issues; prospective work
+is declared in [protocol amendment v9](docs/EXPERIMENT-PROTOCOL.md#amendment-v9--2026-10-02-first-place-campaign-and-validation-corrections).
+The reproduction history below describes existing recipes, not a newly measured contender.
+
 Predict `TAXITIME_SEC_mvt` (takeoff minus off-block, seconds) for departures at ten European airports.
 Scored by RMSE on January and July 2026. Licence: GPLv3 (`LICENSE`).
 
@@ -46,9 +53,12 @@ and overrides the stamp probabilities on those rows (`bclf` in `mix.py`). It hel
 
 ## Validation (`train.py`, `mix.py`)
 
-Holdout = January and July 2025, never used for model choice. CV = five folds over the other ten months,
-by month pair. Every result line reports per lane (A = has a flight plan, B = no plan) and per month.
-Predictions are floored at 0. Board uploads are logged in `LEDGER.md` with the expected and actual score.
+Historical evaluation uses January and July 2025 plus five month-pair folds over the other ten months.
+Jan/July has been read repeatedly and is not an untouched model-choice test. The October 2 audit found
+held-out-label dependencies in copy history and multi-stage caches, plus scored-fold early stopping
+in development CV. [CP0](docs/CONTENDER-PLAN.md#3-cp0--establish-a-trustworthy-comparison)
+defines the corrections; its clean scores are pending. Every result reports per lane and month.
+Predictions are floored at 0. Board uploads are logged in `LEDGER.md` with expected and actual scores.
 
 ## Reproduce the current build (v28 base; v53 is the file of record)
 

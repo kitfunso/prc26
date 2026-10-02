@@ -1,35 +1,67 @@
-# PRC 2026 taxi-out, campaign 2 (from first principles)
+# PRC 2026 taxi-out — current campaign plan
 
-Deadline 11 Oct 2026 23:59:59 CET. Board 2026-09-10: ours 294.99 (rank 30/95), leader ~245.
-Board = RMSE over Jan+Jul 2026 departures at 10 airports; best file per team counts; 3 scored files a day.
-Campaign 1 lives on branch `v1` (100 modules, 64 holdout verdicts, exhausted at 2 s gains).
+Updated 2 October 2026. Active branch: `campaign2`.
+Latest recorded champion: **v53, 270.43 s**, `data/merry-octopus_v53.parquet`.
+The official deadline is **11 October 2026, 23:59:59 CET**.
 
-## Reframe
-Label = takeoff time (given) minus off-block time (blanked). The unknown is ONE timestamp.
-Composite squared error splits ~51/49 between lane A (339,551 rows with a flight plan, ~206 s) and
-lane B (5,290 rows with no plan, ~1,618 s). Reaching 245 needs lane B ~1,000 s or lane A ~142 s.
+The next objective is a serious first-place challenge through better recording-mechanism predictions
+and transferable Lane A gains. Matching the September 23 leader's 235.3074 s would require roughly
+**24.3% less SSE**; refresh the live leaderboard before execution. That score is a historical
+benchmark, not a verified current first-place target.
 
-## Steps
-0. Archive v1, orphan master, keep data + keys + licence.           [done]
-1. Data pass: per-airport mechanism of the recorded off-block (AOBT copy / schedule copy / physics / day shift).
-2. Constraints in the test file itself: stamps, stand bounds from arrivals, runway sequence, turnaround.
-3. Noise floor from the simplest mixture; decides whether lane A or lane B gets the time.
-4. External data: no ADS-B (licence, and not decided by Keith). Web check of what other teams say they use.
-5. Model dev: baselines, leakage+drift audit, CV by month with Jan/Jul holdout, family comparison,
-   Optuna tuning on CV only, ablation, error analysis, seed bag + blend on OOF, full-2025 refit, file checks.
-6. Board: LEDGER.md row per upload (expected vs actual). Upload only expected gains > ~3 s, CI excluding zero,
-   after `board.py check`. Day budget: 3 scored files; never more than 2 on a day without a fresh holdout win.
-7. Ship: README reproduces the best file, requirements pinned, repo public GPLv3 before the deadline.
+## Execute this plan
 
-## Rules folded in from the plan review
-- As-of rule: features may use any movement in the same file, before or after the takeoff (the rules allow it;
-  dep_after and arr_off look forward). State it in the README.
-- Predictions are floored at 0 (no upper clip). Month and year are never features; hour/wday are.
-- Optuna: price 2-3 trials in wall time before setting the budget; SQLite study; CV only, holdout untouched.
-- Every result line: per lane and per month, plus a paired day-block bootstrap against the previous best.
-- Both lanes are a stamp mixture (AOBT / EOBT / schedule copy / physical); `mix.py` writes the conditional mean out
-  explicitly: multiclass P(class) x known stamp gap + regressor on physical rows. Fold 0: 253 vs 285 plain CatBoost.
+The detailed queue, hypotheses, acceptance tests, budgets and dates are in
+[docs/CONTENDER-PLAN.md](docs/CONTENDER-PLAN.md). Experiment declarations and submission authority
+are in [docs/EXPERIMENT-PROTOCOL.md](docs/EXPERIMENT-PROTOCOL.md), amendment v9.
 
-## Files
-data.py (load + features, cached), explore.py (steps 1-3 numbers), train.py (CV, tune, refit),
-submit.py (build + check + upload), board.py (leaderboard), LEDGER.md.
+| Order | Work | Required result |
+| --- | --- | --- |
+| CP0 | Freeze the exact champion; repair fold-aware history, nested feature/meta fitting and scored-fold early stopping | Passing hidden-label mutation and actual-file gates; clean frozen baseline |
+| CP1 | Calibrated hierarchical copy/physical/date-shift mechanisms, especially catastrophic Lane B rows | Supported whole-file SSE reduction and uncertainty/calibration checks |
+| CP2 | Within-day disruption and recorder-state interactions in Lane A | Gains across outer blocks and episodes; no clear hot-slice harm |
+| CP3 | True all-data NN refit; bounded Huber-versus-MSE comparison | Complete fit-day coverage and measured ensemble contribution |
+| CP4 | Nested blend/recalibration using surviving members | One robust frozen recipe |
+| CP5 | Full-data build, exact candidate validation and reproduction package | Signed-off submission and verified final release |
+
+CP0 comes first: the review confirmed that `laneb.copy_hist()` can use held-out January labels
+for July history and vice versa. Development tree folds also select their early-stopping point,
+and global OOF caches are not sufficient isolation for later pipeline stages. The final NN
+reserves the last 10% of fit days without an all-data gradient refit. These findings do not establish
+a measured ranking gain from their repair.
+
+## Dates and compute
+
+- 2–3 October: validation, champion lineage and runtime pricing.
+- 3–5 October: recording-mechanism CPU screen.
+- 5–7 October: disruption screen, NN correction and at most two expensive survivors.
+- 8 October: freeze the recipe.
+- 9 October: full-data fit and assembled-file verification.
+- 10 October: substantive signed-off upload(s) and release rehearsal.
+- 11 October: final verification before the official deadline.
+
+Limit initial model recipes to eight including the control; avoid another broad 200-trial search
+or blend grid. Price runtime first. Use one GPU job at a time and respect the standing instruction
+to wait for unrelated `fifty` jobs. No GPU is exposed to the reviewing workspace.
+
+## Operating rules
+
+- Target the recorded label, including artifacts. Do not rewrite training targets into physically
+  plausible taxi times. Preserve the champion's zero prediction floor and no upper clip as control.
+- Features may use permitted movements before or after takeoff in the same supplied file.
+  Evaluation must hide departure targets/block times and match ranking-file context boundaries.
+- Every label-derived feature, model, stopping choice and meta-stage needs an explicit fit scope.
+- Keep the current hour/weekday feature policy for the control. Calendar variants, if ever proposed,
+  require a distinct declaration; the plan does not silently add month/year features.
+- Jan/July 2025 is a repeatedly studied historical stress set, not an untouched model-choice holdout.
+- Compare whole-file pooled SSE/RMSE, with per-month/lane results and paired calendar-day/episode checks.
+- The existing submission floor is 1.5 s all-row gain, target about 3 s, paired interval excluding zero,
+  plus explicit Keith sign-off for each upload. These are budget rules, not guaranteed transfer laws.
+- Five files per day is the published scorer cap, not a target. Avoid scorer probes.
+- Inspect the actual candidate artifact, exact IDs and unchanged lanes; preserve v53 as fallback.
+- Record every run and upload. Final code and documented external sources must satisfy eligibility.
+
+[README.md](README.md) contains historical reproduction instructions.
+[LEDGER.md](LEDGER.md) is the measured score record.
+[docs/HANDOFF.md](docs/HANDOFF.md) has the latest execution pointer and local-machine constraints.
+[docs/CONTENDER-PLAN.md](docs/CONTENDER-PLAN.md) is the current next-step plan.
