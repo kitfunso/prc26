@@ -2,14 +2,16 @@
 
 > **Resumed score work — 2026-10-03.** Keith reiterated his instruction to keep improving
 > the score after the session stopped too early on the failed MSE lead. The task remains open.
-> The original tuned CatBoost January/July reference is actively fitting on all permitted
-> Lane A days (restart PID 27196, launched 21:09 London). Controller PID 59744 waits for its
-> replay-checked completion, then runs `analysis/champion_screen.py --months 1-7` serially.
+> The original tuned CatBoost January/July member completed with saved-model replay passing.
+> Its restart PID 27196 exited successfully. Controller PID 59744 started the full serial
+> pipeline, PID 52408, running `analysis/champion_screen.py --months 1-7`. The first original
+> donor scope is group-2-5-9-12. Verify the current active record and actual processes.
 > It writes `data/runs/clean-champion-20261003/active.json` and the live HTML job record.
 > Codex heartbeat `continue-prc26-score-campaign` is ACTIVE, attached to this chat,
 > checking every half hour. It should repair failed fits, inspect completed references,
 > continue confirmation or the next declared experiment, and stay quiet on unchanged work.
-> The automation was created and its app card was read; future wakeups are not yet observed.
+> The first heartbeat wakeup was observed in this chat and performed the completion/handoff
+> check. Later wakeups still need actual process/log verification.
 > Recheck these processes and records before treating this dated checkpoint as current.
 > Plan: [CLEAN-CHAMPION-2026-10-03.html](CLEAN-CHAMPION-2026-10-03.html).
 > The reviewed rebuild restores the original full C/L/N neighbour donor, raw OOF arithmetic,
@@ -29,8 +31,16 @@
 > and CatBoost without validation have regression checks. Both slash formats are covered;
 > the path-check correction's explicit compatibility entry retains the actual running fit's
 > engine hashes while allowing that verified component to enter the next queued stage.
-> It does not relax input, label, configuration, dependency or artifact checks. Tail refit
-> completed at 21:15 London; body refit is running at this checkpoint. Recheck live logs.
+> It does not relax input, label, configuration, dependency or artifact checks. All three
+> refit heads are now saved; complete.json records checkpoint replay PASS. The queued
+> pipeline successfully reused this component after its fingerprint/artifact checks.
+> `python analysis/champion_checkpoint_audit.py` checks actual cold-input bytes, allowed
+> fit/stopping/query IDs, all-row/day coverage, prediction IDs/finiteness/floor and the
+> preserved champion. first-member-audit.json records PASS, Lane A-only descriptive errors
+> and 2,704.4 seconds of saved-component cost including the interrupted first attempt.
+> January/July Lane A member RMSE is 222.2729 s, versus AOBT-only 410.2841 s; this is a
+> reused member diagnostic, not an assembled whole-file ensemble or a new scorer result.
+> The donor-chain cost, full comparison, weather/episode checks and confirmation remain open.
 > Full suite: 73 passed; current F lint passes. The baseline and its comparison remain
 > incomplete while the fits run. The controller currently covers January/July only, then
 > the main session must inspect results, price the chain, continue confirmation or declare

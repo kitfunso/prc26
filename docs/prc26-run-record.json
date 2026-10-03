@@ -11396,7 +11396,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-03T20:16:38.035537+00:00",
+  "recorded_utc": "2026-10-03T20:36:55.688382+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12022,20 +12022,178 @@
   ],
   "clean_champion_active": {
     "status": "running",
-    "phase": "Full CatBoost reference is training",
-    "pid": 27196,
+    "phase": "Full neighbour and meta reconstruction is training",
+    "pid": 52408,
     "controller_pid": 59744,
-    "checked_utc": "2026-10-03T20:17:07.415793+00:00",
+    "checked_utc": "2026-10-03T20:37:20.999535+00:00",
     "active_component": {
-      "component": "1-7\\outer\\ra_cb_wz_t7",
-      "fit_rows": 1723531,
-      "fit_days": 303,
+      "component": "1-7\\donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-2-5-9-12\\ra_cb_wz",
+      "fit_rows": 1051799,
+      "fit_days": 183,
       "stage": "full refit",
-      "started_file_mtime": 1791058183.780971
+      "started_file_mtime": 1791059268.326995
     },
-    "completed_components": [],
+    "completed_components": [
+      {
+        "component": "1-7\\outer\\ra_cb_wz_t7",
+        "seconds": 2704.432467731531,
+        "checkpoint_replay": "PASS"
+      }
+    ],
     "error": null,
     "scope": "Full original C/L/N donor and meta chain; January/July first. No new scorer result yet."
+  },
+  "clean_champion_first_member": {
+    "checked_utc": "2026-10-03T20:35:00.156426+00:00",
+    "member": "ra_cb_wz_t7",
+    "scope_checks": "PASS",
+    "prediction_checks": "PASS",
+    "checkpoint_replay": "PASS",
+    "fit_rows": 1723531,
+    "fit_days": 303,
+    "iterations": [
+      2914,
+      4220,
+      6000
+    ],
+    "fit_files": [
+      "training_2025-02-01_2025-03-01.parquet",
+      "training_2025-03-01_2025-04-01.parquet",
+      "training_2025-04-01_2025-05-01.parquet",
+      "training_2025-05-01_2025-06-01.parquet",
+      "training_2025-06-01_2025-07-01.parquet",
+      "training_2025-08-01_2025-09-01.parquet",
+      "training_2025-09-01_2025-10-01.parquet",
+      "training_2025-10-01_2025-11-01.parquet",
+      "training_2025-11-01_2025-12-01.parquet",
+      "training_2025-12-01_2026-01-01.parquet"
+    ],
+    "query_files": [
+      "training_2025-01-01_2025-02-01.parquet",
+      "training_2025-07-01_2025-08-01.parquet"
+    ],
+    "runtime_seconds": 2704.432467731531,
+    "runtime_includes_prior_attempt": true,
+    "model_and_prediction_hashes": {
+      "predictions.parquet": "575c89bde8cf89622defea0dfad87a2dc91779af104f3a140a777c962c546b32",
+      "refit\\body.model": "450f9916cf94d556177f1f4c7f5760d4a6db8c990c04c37cfcb2ac74aa1cd066",
+      "refit\\gate.model": "670bb3cedaba01d621975f3643aa5629d2ac4803c95918df79d188ae0d9458c4",
+      "refit\\tail.model": "a9c8b12bc98fd03aa90903d0bb9c0c4e109203f6cbd22b14c5c36da1f0aaee63",
+      "selection\\body.model": "c62090caab2d94a6a2de04a13dacb842efc9de635ec15a15f87bfab2603b201f",
+      "selection\\gate.model": "f268b7befc1cb49f296881572994db6c3e96806e41a65bf6d9a7fae28bd86258",
+      "selection\\tail.model": "e0f3e44a25502fdc54d7d6bdae5eb809b512eee292c0412ba3c3a5f056cc1320"
+    },
+    "champion_preserved": "PASS",
+    "budget_snapshot": {
+      "limit_seconds": 158400,
+      "used_seconds": 2704.432467731531,
+      "completed_gpu_components": 1,
+      "accounting": "Saved GPU-family component wall time, including selection/refit/replay; conservative GPU-time proxy.",
+      "status": "within budget"
+    },
+    "laneA_descriptive_errors": {
+      "rows": 339046,
+      "rmse": 222.27294348949155,
+      "sse": 16750656259.161383,
+      "mean_signed_error": -0.3744299115692843,
+      "aobt_only_rmse": 410.28410758560017
+    },
+    "by_file": {
+      "training_2025-01-01_2025-02-01.parquet": {
+        "rows": 152271,
+        "rmse": 198.5372028838144,
+        "sse": 6002069193.868929,
+        "mean_signed_error": -3.5866844279930055,
+        "aobt_only_rmse": 362.6882745047415
+      },
+      "training_2025-07-01_2025-08-01.parquet": {
+        "rows": 186775,
+        "rmse": 239.8923046783482,
+        "sse": 10748587065.292452,
+        "mean_signed_error": 2.2444066964904485,
+        "aobt_only_rmse": 445.3390171462021
+      }
+    },
+    "by_airport": {
+      "EDDF": {
+        "rows": 36231,
+        "rmse": 175.27045167093925,
+        "sse": 1113006582.1555457,
+        "mean_signed_error": 0.2821614095982925,
+        "aobt_only_rmse": 256.28178256401804
+      },
+      "EDDM": {
+        "rows": 26854,
+        "rmse": 162.95929071586664,
+        "sse": 713127584.9838248,
+        "mean_signed_error": -2.250445594409682,
+        "aobt_only_rmse": 387.7523636888463
+      },
+      "EGLL": {
+        "rows": 39744,
+        "rmse": 232.60775474214503,
+        "sse": 2150403472.550333,
+        "mean_signed_error": -8.061568497155303,
+        "aobt_only_rmse": 492.83358112304853
+      },
+      "EHAM": {
+        "rows": 40141,
+        "rmse": 167.38161803888931,
+        "sse": 1124614583.746747,
+        "mean_signed_error": -0.9071243875487164,
+        "aobt_only_rmse": 340.8847428561593
+      },
+      "LEBL": {
+        "rows": 28490,
+        "rmse": 216.32470681732187,
+        "sse": 1333228831.4308116,
+        "mean_signed_error": 1.6518244994549505,
+        "aobt_only_rmse": 321.1907176113237
+      },
+      "LEMD": {
+        "rows": 35019,
+        "rmse": 170.7484815175876,
+        "sse": 1020980483.7545393,
+        "mean_signed_error": -8.01724558105954,
+        "aobt_only_rmse": 272.11775993753696
+      },
+      "LFPG": {
+        "rows": 38732,
+        "rmse": 246.71854190529496,
+        "sse": 2357618347.44459,
+        "mean_signed_error": -8.731121682235804,
+        "aobt_only_rmse": 385.1246668761372
+      },
+      "LIRF": {
+        "rows": 26131,
+        "rmse": 374.63802769700123,
+        "sse": 3667581275.0995436,
+        "mean_signed_error": 2.6499579748415023,
+        "aobt_only_rmse": 644.3770557235721
+      },
+      "LSZH": {
+        "rows": 21822,
+        "rmse": 173.40038880586857,
+        "sse": 656137236.7554119,
+        "mean_signed_error": -3.362128945748499,
+        "aobt_only_rmse": 277.8671353356538
+      },
+      "LTFM": {
+        "rows": 45882,
+        "rmse": 238.68664542409186,
+        "sse": 2613957861.240034,
+        "mean_signed_error": 18.65796923800806,
+        "aobt_only_rmse": 522.4923444102386
+      }
+    },
+    "stages": {
+      "reference_recipe": "partial: tuned CatBoost member checked; original donor and remaining members fitting",
+      "meta_and_evaluation": "pending",
+      "candidate_and_confirmation": "pending"
+    },
+    "limit": "Lane A member diagnostic on reused January/July files. No assembled whole-file ensemble, confirmation result, promotion evidence or new scorer gain.",
+    "command": "python analysis/champion_checkpoint_audit.py",
+    "audit_code_hash": "111385de9b5cf64127bece5491f5c5055c34811c48ae037fff851b584f8974e7"
   },
   "clean_champion_checks": {
     "full_suite_passed": 73,
