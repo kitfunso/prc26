@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import sys
 import time
+from pathlib import Path
 
 import lightgbm as lgb
 import numpy as np
@@ -13,7 +14,7 @@ from catboost import CatBoostClassifier, Pool
 
 from data import CACHE, rmse
 from features import CAT, DAY, NUM, OCC, WX, build
-from train import BASE, FOLDS, HOLDOUT, LGB, RESULTS, fit_predict, report, stopping_split
+from train import BASE, FOLDS, HOLDOUT, LGB, RESULTS, fit_predict, report, save_model, stopping_split
 
 Z = ("z_aobt", "z_eobt", "z_sched")
 CLF_LGB = dict(objective="multiclass", num_class=4, learning_rate=0.05, num_leaves=127, min_child_samples=50, feature_fraction=0.8,
@@ -62,18 +63,21 @@ def label(d: pd.DataFrame) -> np.ndarray:
     return m
 
 
-def fit_clf(cfg: dict, tr: pd.DataFrame, lab: np.ndarray, te: pd.DataFrame, va: pd.DataFrame | None, lab_va: np.ndarray | None, iters: int | None) -> tuple[np.ndarray, int]:
+def fit_clf(cfg: dict, tr: pd.DataFrame, lab: np.ndarray, te: pd.DataFrame, va: pd.DataFrame | None, lab_va: np.ndarray | None,
+            iters: int | None, model_path: Path | None = None) -> tuple[np.ndarray, int]:
     cols, params = cfg["cat"] + cfg["num"], dict(cfg["clf"]["params"])
     if cfg["clf"]["family"] == "lgb":
         n = iters or params.pop("n_estimators")
         m = lgb.LGBMClassifier(**{**params, "n_estimators": n})
         m.fit(tr[cols], lab, eval_set=[(va[cols], lab_va)] if va is not None else None, categorical_feature=cfg["cat"],
               callbacks=[lgb.early_stopping(100, verbose=False)] if va is not None else None)
+        save_model(m, model_path, "lgb")
         return m.predict_proba(te[cols]), (m.best_iteration_ or n) if va is not None else n
     if iters:
         params.update(iterations=iters); params.pop("od_type"); params.pop("od_wait")
     m = CatBoostClassifier(**params)
     m.fit(Pool(tr[cols], lab, cat_features=cfg["cat"]), eval_set=Pool(va[cols], lab_va, cat_features=cfg["cat"]) if va is not None else None, use_best_model=va is not None)
+    save_model(m, model_path, "cb")
     best = m.get_best_iteration()
     return m.predict_proba(Pool(te[cols], cat_features=cfg["cat"])), best + 1 if best >= 0 else params["iterations"]
 

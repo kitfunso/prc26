@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 import sys
 import time
+from pathlib import Path
 
 import lightgbm as lgb
 import numpy as np
@@ -16,7 +17,7 @@ from sklearn.metrics import log_loss
 from data import CACHE, rmse
 from features import ARR, DAY, NUM, OCC, WX, WZ, build
 from mix import B_CAT, B_NUM
-from train import FOLDS, HOLDOUT, LGB, RESULTS, boot_delta, report
+from train import FOLDS, HOLDOUT, LGB, RESULTS, boot_delta, report, save_model
 
 DOC = "docs/LANEB_RUN.md"
 BLEND = CACHE / "blend_ra_cb+ra_cb_s1+ra_cb_s2+ra_lgb+nn3_holdout.parquet"
@@ -52,8 +53,12 @@ def _window(f: pd.DataFrame, a: pd.DataFrame, near: np.ndarray, tail: np.ndarray
     """+-2h share/p90 around each lane-B row's own takeoff, from lane-A rows of the same airport only."""
     out = {c: np.full(len(f), np.nan) for c in ("w_est_share", "w_tail_share", "w_za_p90")}
     b = f[f["has_plan"] == 0]
-    for apt, ix in b.groupby("apt", observed=True).indices.items():
+    keys = ["file", "apt"] if "file" in f else "apt"
+    for key, ix in b.groupby(keys, observed=True).indices.items():
+        apt = key[1] if "file" in f else key
         m = (a["apt"].values == apt)
+        if "file" in f:
+            m &= a["file"].values == key[0]
         order = np.argsort(a["t_off"].values[m])
         ta, za = a["t_off"].values[m][order], a["z_aobt"].values[m][order]
         na, ta_ = near[m][order], tail[m][order]
@@ -75,9 +80,10 @@ def augment(f: pd.DataFrame) -> pd.DataFrame:
     a = f[f["has_plan"] == 1]
     za, zs = a["z_aobt"].values, a["z_sched"].values
     near_a, tail_a = (za > 3600) & ((zs - za) >= NEAR_LO) & ((zs - za) <= NEAR_HI), za > 3600
-    day = a.assign(near=near_a, tail=tail_a).groupby(["apt", "day"], observed=True).agg(
+    keys = (["file"] if "file" in f else []) + ["apt", "day"]
+    day = a.assign(near=near_a, tail=tail_a).groupby(keys, observed=True).agg(
         est_share=("near", "mean"), a_tail_share=("tail", "mean"), a_za_p90=("z_aobt", lambda s: s.quantile(.9))).reset_index()
-    f = f.merge(day, on=["apt", "day"], how="left")
+    f = f.merge(day, on=keys, how="left")
     return pd.concat([f, _window(f, a, near_a, tail_a)], axis=1)
 
 
@@ -158,7 +164,7 @@ def _cost_w(d: pd.DataFrame, tau0: pd.Series) -> np.ndarray:
     return w / w.mean()
 
 
-def fit_clf(tr, lab, keep, te, va, vlab, vkeep, cols, iters) -> tuple[np.ndarray, int]:
+def fit_clf(tr, lab, keep, te, va, vlab, vkeep, cols, iters, model_path: Path | None = None) -> tuple[np.ndarray, int]:
     """Multiclass over whichever of {copy, near, phys} are present in tr, expanded back to a fixed 3-column P. Rows are
     cost-weighted (`_cost_w`, tau0 = the airport's median physical y in tr), see docs/LANEB.md section 5."""
     present = sorted(set(lab[keep].tolist()))
@@ -175,13 +181,14 @@ def fit_clf(tr, lab, keep, te, va, vlab, vkeep, cols, iters) -> tuple[np.ndarray
         it = m.best_iteration_ or n
     else:
         m.fit(tr[cols][keep], y, sample_weight=_cost_w(tr[keep], tau0), categorical_feature=B_CAT); it = n
+    save_model(m, model_path, "lgb")
     raw, P = m.predict_proba(te[cols]), np.zeros((len(te), 3))
     for v, i in remap.items():
         P[:, v] = raw[:, i]
     return P, it
 
 
-def fit_tau(tr, phys, te, va, vphys, cols, iters) -> tuple[np.ndarray, int]:
+def fit_tau(tr, phys, te, va, vphys, cols, iters, model_path: Path | None = None) -> tuple[np.ndarray, int]:
     params = dict(LGB); n = iters or params.pop("n_estimators")
     m = lgb.LGBMRegressor(**{**params, "n_estimators": n})
     if va is not None:
@@ -190,6 +197,7 @@ def fit_tau(tr, phys, te, va, vphys, cols, iters) -> tuple[np.ndarray, int]:
         it = m.best_iteration_ or n
     else:
         m.fit(tr[cols][phys], tr["y"][phys], categorical_feature=TAU_CAT); it = n
+    save_model(m, model_path, "lgb")
     return m.predict(te[cols]), it
 
 
@@ -203,16 +211,18 @@ def clf_logloss(tr: pd.DataFrame, va: pd.DataFrame, use_day: bool, iters: int) -
     return log_loss(vlab[vkeep], p, labels=[0, 1, 2]), int(vkeep.sum())
 
 
-def predict(tr, te, va=None, iters=None, use_shift=True, use_day=True, use_hist=True):
+def predict(tr, te, va=None, iters=None, use_shift=True, use_day=True, use_hist=True, model_dir: Path | None = None):
     """tr/te/va: lane-B rows only. yhat = P(copy)*z_sched + P(phys)*tau, shift rows get 86400+tau on top."""
     lab, keep, phys = _labels(tr)
     clf_cols = B_CAT + B_NUM + ["cross", "sched_hour"] + (HIST if use_hist else []) + (DAY_COLS if use_day else [])
     vlab = vkeep = vphys = None
     if va is not None:
         vlab, vkeep, vphys = _labels(va)
-    P, it_c = fit_clf(tr, lab, keep, te, va, vlab, vkeep, clf_cols, iters[0] if iters else None)
+    gate_path = model_dir / "gate.model" if model_dir else None
+    tau_path = model_dir / "tau.model" if model_dir else None
+    P, it_c = fit_clf(tr, lab, keep, te, va, vlab, vkeep, clf_cols, iters[0] if iters else None, model_path=gate_path)
     tcols = TAU_CAT + tau_num(tr) + DAY + OCC + WX + ARR + WZ
-    tau, it_t = fit_tau(tr, phys, te, va, vphys, tcols, iters[1] if iters else None)
+    tau, it_t = fit_tau(tr, phys, te, va, vphys, tcols, iters[1] if iters else None, model_path=tau_path)
     rate, n_shift = shift_rate(tr)
     p_shift = np.where(use_shift & (te["apt"].values == APT_SHIFT) & (te["z_sched"].values > Z_SHIFT), rate, 0.0)
     Psum = P.sum(1, keepdims=True); Psum[Psum == 0] = 1.0; P = P / Psum

@@ -65,7 +65,20 @@ def boot_delta(y: np.ndarray, p0: np.ndarray, p1: np.ndarray, day: np.ndarray, n
     return float(rmse(y, p0) - rmse(y, p1)), float(np.percentile(d, 2.5)), float(np.percentile(d, 97.5))
 
 
-def fit_predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame | None = None, iters: int | None = None) -> tuple[np.ndarray, int]:
+def save_model(model: object, path: Path | None, family: str) -> None:
+    if path is None:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if family == "lgb":
+        model.booster_.save_model(str(path))
+    elif family in ("cb", "xgb"):
+        model.save_model(str(path))
+    else:
+        raise ValueError(f"model persistence is unsupported for {family}")
+
+
+def fit_predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame | None = None, iters: int | None = None,
+                model_path: Path | None = None) -> tuple[np.ndarray, int]:
     cols = cfg["cat"] + cfg["num"]
     params = dict(cfg["params"])
     w = cfg["weight"](tr) if "weight" in cfg else None
@@ -75,11 +88,13 @@ def fit_predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame 
         m = lgb.LGBMRegressor(**{**params, "n_estimators": n})
         m.fit(tr[cols], tr["y"], sample_weight=w, eval_set=[(va[cols], va["y"])] if va is not None else None,
               callbacks=[lgb.early_stopping(200, verbose=False)] if va is not None else None, categorical_feature=cfg["cat"])
+        save_model(m, model_path, fam)
         return m.predict(te[cols]), (m.best_iteration_ or n) if va is not None else n
     if fam == "xgb":
         n = iters or params.pop("n_estimators")
         m = xgb.XGBRegressor(**{**params, "n_estimators": n}, early_stopping_rounds=200 if va is not None else None)
         m.fit(tr[cols], tr["y"], sample_weight=w, eval_set=[(va[cols], va["y"])] if va is not None else None, verbose=False)
+        save_model(m, model_path, fam)
         return m.predict(te[cols]), (m.best_iteration + 1) if va is not None else n
     if fam == "ridge":
         pre = ColumnTransformer(
@@ -95,6 +110,7 @@ def fit_predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame 
     m = CatBoostRegressor(**params)
     pool = Pool(tr[cols], tr["y"], cat_features=cfg["cat"], weight=w)
     m.fit(pool, eval_set=Pool(va[cols], va["y"], cat_features=cfg["cat"]) if va is not None else None, use_best_model=va is not None)
+    save_model(m, model_path, "cb")
     best = m.get_best_iteration()
     return m.predict(Pool(te[cols], cat_features=cfg["cat"])), best + 1 if best >= 0 else params["iterations"]
 

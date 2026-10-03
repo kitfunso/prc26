@@ -1,5 +1,26 @@
 # Hand-off, 2026-09-22
 
+> **Resumed score work — 2026-10-03.** Keith reiterated his instruction to keep improving
+> the score after the session stopped too early on the failed MSE lead. The task remains open.
+> The original tuned CatBoost January/July reference is actively fitting on all permitted
+> Lane A days (PID 24560, launched 20:29 London). Controller PID 51476 waits for its
+> replay-checked completion, then runs `analysis/champion_screen.py --months 1-7` serially.
+> It writes `data/runs/clean-champion-20261003/active.json` and the live HTML job record.
+> Recheck these processes and records before treating this dated checkpoint as current.
+> Plan: [CLEAN-CHAMPION-2026-10-03.html](CLEAN-CHAMPION-2026-10-03.html).
+> The reviewed rebuild restores the original full C/L/N neighbour donor, raw OOF arithmetic,
+> original mixture-B inputs for whole-file NNLS, six-decimal applied weights, fixed residual
+> recalibration and a separately scoped final recording-B override. Stopping-day donors
+> are rebuilt separately. Lane B day/window context is now file-aware. Cache fingerprints
+> include permitted targets, inputs, source/weather provenance, code and package versions;
+> model replay precedes component completion. Raw predictions actually used are saved.
+> Full suite: 68 passed; current F lint passes. The baseline and its comparison remain
+> incomplete while the fits run. The controller currently covers January/July only, then
+> the main session must inspect results, price the chain, continue confirmation or declare
+> the next distinct experiment. No upload or new scorer gain. Do not end the campaign at
+> a component or candidate rejection. The reference checks a 44-hour GPU-family allowance
+> inside the existing campaign envelope, at saved-component boundaries.
+
 > **Continuation checkpoint — 2026-10-03.** Eight initial recipes, including
 > the isolated CPU control, are declared in CONTENDER-RUN-2026-10-03.md.
 > CP1's three mechanisms fail the winter screen; normalized weather has a

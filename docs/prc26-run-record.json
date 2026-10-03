@@ -9822,8 +9822,8 @@
     "upload": "None attempted; no candidate has passed the complete promotion gate. Per-upload sign-off remains required."
   },
   "leaderboard": {
-    "fetched_utc": "2026-10-03 16:54",
-    "submissions": 4198,
+    "fetched_utc": "2026-10-03 19:40",
+    "submissions": 4219,
     "teams": 222,
     "leader": {
       "rank": 1,
@@ -9886,15 +9886,15 @@
         "rank": 7,
         "team": "adventurous-radio",
         "score": 223.0867,
-        "subs": 43,
+        "subs": 44,
         "at": "2026-10-03T00:03"
       },
       {
         "rank": 8,
         "team": "zesty-puzzle",
-        "score": 224.9185,
-        "subs": 99,
-        "at": "2026-10-03T16:44"
+        "score": 224.1147,
+        "subs": 100,
+        "at": "2026-10-03T17:05"
       },
       {
         "rank": 9,
@@ -10026,15 +10026,15 @@
         "rank": 27,
         "team": "dynamic-lobster",
         "score": 244.1913,
-        "subs": 33,
+        "subs": 34,
         "at": "2026-10-01T05:58"
       },
       {
         "rank": 28,
         "team": "loyal-anchor",
-        "score": 244.9873,
-        "subs": 40,
-        "at": "2026-10-02T21:04"
+        "score": 244.5803,
+        "subs": 43,
+        "at": "2026-10-03T19:06"
       },
       {
         "rank": 29,
@@ -10115,24 +10115,24 @@
       },
       {
         "rank": 40,
+        "team": "smart-jigsaw",
+        "score": 261.4041,
+        "subs": 29,
+        "at": "2026-10-03T19:05"
+      },
+      {
+        "rank": 41,
         "team": "playful-village",
         "score": 261.9373,
         "subs": 13,
         "at": "2026-10-01T22:32"
       },
       {
-        "rank": 41,
-        "team": "dynamic-emu",
-        "score": 262.665,
-        "subs": 41,
-        "at": "2026-10-03T16:31"
-      },
-      {
         "rank": 42,
-        "team": "smart-jigsaw",
-        "score": 262.6957,
-        "subs": 25,
-        "at": "2026-10-03T01:24"
+        "team": "dynamic-emu",
+        "score": 262.6136,
+        "subs": 42,
+        "at": "2026-10-03T19:01"
       },
       {
         "rank": 43,
@@ -10159,7 +10159,7 @@
         "rank": 46,
         "team": "kind-earthquake",
         "score": 268.5216,
-        "subs": 29,
+        "subs": 30,
         "at": "2026-09-16T17:40"
       },
       {
@@ -10269,45 +10269,45 @@
       },
       {
         "rank": 62,
+        "team": "peaceful-bridge",
+        "score": 276.1954,
+        "subs": 12,
+        "at": "2026-10-03T18:50"
+      },
+      {
+        "rank": 63,
         "team": "amazing-marshmallow",
         "score": 276.3011,
         "subs": 37,
         "at": "2026-10-03T12:42"
       },
       {
-        "rank": 63,
+        "rank": 64,
         "team": "resourceful-horse",
         "score": 276.516,
         "subs": 24,
         "at": "2026-10-02T20:55"
       },
       {
-        "rank": 64,
+        "rank": 65,
         "team": "merry-llama",
         "score": 276.5305,
         "subs": 44,
         "at": "2026-10-01T23:58"
       },
       {
-        "rank": 65,
+        "rank": 66,
         "team": "likable-eagle",
         "score": 276.9855,
         "subs": 25,
         "at": "2026-09-13T09:09"
       },
       {
-        "rank": 66,
+        "rank": 67,
         "team": "silly-net",
         "score": 277.8673,
         "subs": 30,
         "at": "2026-09-15T20:51"
-      },
-      {
-        "rank": 67,
-        "team": "peaceful-bridge",
-        "score": 278.104,
-        "subs": 11,
-        "at": "2026-10-02T13:31"
       },
       {
         "rank": 68,
@@ -10767,226 +10767,226 @@
       {
         "rank": 133,
         "team": "amiable-zipper",
-        "score": 318.8312,
-        "subs": 3,
-        "at": "2026-10-03T15:49"
+        "score": 318.6456,
+        "subs": 6,
+        "at": "2026-10-03T19:15"
       },
       {
         "rank": 134,
+        "team": "upbeat-net",
+        "score": 318.7975,
+        "subs": 2,
+        "at": "2026-10-03T19:02"
+      },
+      {
+        "rank": 135,
         "team": "motivated-ostrich",
         "score": 319.2111,
         "subs": 20,
         "at": "2026-09-16T18:49"
       },
       {
-        "rank": 135,
+        "rank": 136,
         "team": "vibrant-jewel",
         "score": 319.5959,
         "subs": 14,
         "at": "2026-09-14T10:53"
       },
       {
-        "rank": 136,
+        "rank": 137,
         "team": "brisk-monkey",
         "score": 322.185,
         "subs": 7,
         "at": "2026-09-11T00:01"
       },
       {
-        "rank": 137,
+        "rank": 138,
         "team": "funny-jewel",
         "score": 323.851,
         "subs": 9,
         "at": "2026-09-10T17:04"
       },
       {
-        "rank": 138,
+        "rank": 139,
         "team": "knowing-helicopter",
         "score": 324.0731,
         "subs": 2,
         "at": "2026-09-10T08:36"
       },
       {
-        "rank": 139,
+        "rank": 140,
         "team": "confident-umbrella",
         "score": 324.3448,
         "subs": 5,
         "at": "2026-09-06T22:48"
       },
       {
-        "rank": 140,
+        "rank": 141,
         "team": "jubilant-jacket",
         "score": 328.4953,
         "subs": 4,
         "at": "2026-09-15T02:43"
       },
       {
-        "rank": 141,
+        "rank": 142,
         "team": "smart-parrot",
         "score": 328.9146,
         "subs": 6,
         "at": "2026-10-02T00:00"
       },
       {
-        "rank": 142,
+        "rank": 143,
         "team": "faithful-donkey",
         "score": 329.4867,
         "subs": 2,
         "at": "2026-09-06T04:47"
       },
       {
-        "rank": 143,
+        "rank": 144,
         "team": "sensible-igloo",
         "score": 330.3943,
         "subs": 3,
         "at": "2026-09-05T16:33"
       },
       {
-        "rank": 144,
+        "rank": 145,
         "team": "nice-igloo",
         "score": 337.2187,
         "subs": 5,
         "at": "2026-09-17T10:29"
       },
       {
-        "rank": 145,
+        "rank": 146,
         "team": "zany-xylophone",
         "score": 339.5894,
         "subs": 26,
         "at": "2026-10-03T13:30"
       },
       {
-        "rank": 146,
+        "rank": 147,
         "team": "reliable-hamburger",
         "score": 343.306,
         "subs": 2,
         "at": "2026-09-04T11:06"
       },
       {
-        "rank": 147,
+        "rank": 148,
         "team": "affectionate-ukulele",
         "score": 347.7259,
         "subs": 2,
         "at": "2026-09-09T14:11"
       },
       {
-        "rank": 148,
+        "rank": 149,
         "team": "vigorous-x-ray",
         "score": 348.6559,
         "subs": 5,
         "at": "2026-09-15T19:02"
       },
       {
-        "rank": 149,
+        "rank": 150,
         "team": "zippy-ant",
         "score": 354.9456,
         "subs": 4,
         "at": "2026-09-11T04:51"
       },
       {
-        "rank": 150,
+        "rank": 151,
         "team": "gentle-octopus",
         "score": 358.9738,
         "subs": 5,
         "at": "2026-09-29T04:03"
       },
       {
-        "rank": 151,
+        "rank": 152,
         "team": "motivated-ukulele",
         "score": 359.0516,
         "subs": 1,
         "at": "2026-09-29T05:09"
       },
       {
-        "rank": 152,
+        "rank": 153,
         "team": "jubilant-puzzle",
         "score": 360.8565,
         "subs": 16,
         "at": "2026-10-02T02:12"
       },
       {
-        "rank": 153,
+        "rank": 154,
         "team": "dynamic-muffin",
         "score": 365.3666,
         "subs": 2,
         "at": "2026-09-08T22:47"
       },
       {
-        "rank": 154,
+        "rank": 155,
         "team": "merry-scooter",
         "score": 368.5487,
         "subs": 5,
         "at": "2026-09-19T10:21"
       },
       {
-        "rank": 155,
+        "rank": 156,
         "team": "respectful-parrot",
         "score": 379.5644,
         "subs": 12,
         "at": "2026-10-02T15:37"
       },
       {
-        "rank": 156,
+        "rank": 157,
         "team": "gentle-violin",
         "score": 382.9385,
         "subs": 13,
         "at": "2026-10-02T14:35"
       },
       {
-        "rank": 157,
+        "rank": 158,
         "team": "vigorous-jungle",
         "score": 389.8638,
         "subs": 3,
         "at": "2026-09-07T08:23"
       },
       {
-        "rank": 158,
+        "rank": 159,
         "team": "knowledgeable-forest",
         "score": 394.9471,
         "subs": 2,
         "at": "2026-10-02T15:22"
       },
       {
-        "rank": 159,
+        "rank": 160,
         "team": "thoughtful-glove",
         "score": 396.7445,
         "subs": 4,
         "at": "2026-10-03T12:05"
       },
       {
-        "rank": 160,
+        "rank": 161,
         "team": "jolly-snowflake",
         "score": 398.9513,
         "subs": 8,
         "at": "2026-09-12T16:06"
       },
       {
-        "rank": 161,
+        "rank": 162,
         "team": "cheerful-jacket",
         "score": 404.4759,
         "subs": 4,
         "at": "2026-09-15T15:23"
       },
       {
-        "rank": 162,
+        "rank": 163,
         "team": "hardworking-noodle",
         "score": 405.7433,
         "subs": 2,
         "at": "2026-09-30T18:32"
       },
       {
-        "rank": 163,
-        "team": "upbeat-net",
-        "score": 405.8603,
-        "subs": 1,
-        "at": "2026-09-09T17:43"
-      },
-      {
         "rank": 164,
         "team": "joyful-xerox",
         "score": 407.9686,
         "subs": 6,
-        "at": "2026-10-03T16:48"
+        "at": "2026-10-03T19:01"
       },
       {
         "rank": 165,
@@ -11074,24 +11074,24 @@
       },
       {
         "rank": 177,
+        "team": "lighthearted-sandwich",
+        "score": 521.6754,
+        "subs": 4,
+        "at": "2026-10-03T19:25"
+      },
+      {
+        "rank": 178,
         "team": "gracious-yogurt",
         "score": 521.9559,
         "subs": 7,
         "at": "2026-09-11T08:16"
       },
       {
-        "rank": 178,
+        "rank": 179,
         "team": "delightful-quilt",
         "score": 524.1873,
         "subs": 3,
         "at": "2026-10-03T13:45"
-      },
-      {
-        "rank": 179,
-        "team": "lighthearted-sandwich",
-        "score": 526.6321,
-        "subs": 3,
-        "at": "2026-10-01T04:55"
       },
       {
         "rank": 180,
@@ -11249,101 +11249,101 @@
       },
       {
         "rank": 202,
+        "team": "enthusiastic-snowflake",
+        "score": 591.5432,
+        "subs": 7,
+        "at": "2026-10-03T18:15"
+      },
+      {
+        "rank": 203,
         "team": "delightful-zoo",
         "score": 597.5365,
         "subs": 3,
         "at": "2026-09-07T04:15"
       },
       {
-        "rank": 203,
+        "rank": 204,
         "team": "outgoing-iguana",
         "score": 598.5854,
         "subs": 4,
         "at": "2026-09-17T10:03"
       },
       {
-        "rank": 204,
+        "rank": 205,
         "team": "creative-cactus",
         "score": 599.959,
         "subs": 10,
         "at": "2026-09-30T06:54"
       },
       {
-        "rank": 205,
+        "rank": 206,
         "team": "organized-hedgehog",
         "score": 602.1377,
         "subs": 3,
         "at": "2026-09-11T16:54"
       },
       {
-        "rank": 206,
+        "rank": 207,
         "team": "zestful-jewel",
         "score": 604.06,
         "subs": 5,
         "at": "2026-09-29T03:56"
       },
       {
-        "rank": 207,
+        "rank": 208,
         "team": "nimble-barn",
         "score": 609.6169,
         "subs": 1,
         "at": "2026-09-19T09:20"
       },
       {
-        "rank": 208,
+        "rank": 209,
         "team": "thoughtful-jungle",
         "score": 613.4944,
         "subs": 3,
         "at": "2026-09-09T00:03"
       },
       {
-        "rank": 209,
+        "rank": 210,
         "team": "gracious-tractor",
         "score": 618.2682,
         "subs": 3,
         "at": "2026-09-06T07:25"
       },
       {
-        "rank": 210,
+        "rank": 211,
         "team": "gracious-kangaroo",
         "score": 619.2649,
         "subs": 1,
         "at": "2026-09-14T01:39"
       },
       {
-        "rank": 211,
+        "rank": 212,
         "team": "jubilant-mushroom",
         "score": 622.2266,
         "subs": 5,
         "at": "2026-09-17T15:05"
       },
       {
-        "rank": 212,
+        "rank": 213,
         "team": "tiny-flamingo",
         "score": 625.0155,
         "subs": 3,
         "at": "2026-09-29T13:23"
       },
       {
-        "rank": 213,
+        "rank": 214,
         "team": "sincere-donkey",
         "score": 625.4325,
         "subs": 7,
         "at": "2026-09-06T07:40"
       },
       {
-        "rank": 214,
+        "rank": 215,
         "team": "amiable-castle",
         "score": 640.2951,
         "subs": 1,
         "at": "2026-09-21T08:25"
-      },
-      {
-        "rank": 215,
-        "team": "enthusiastic-snowflake",
-        "score": 650.5927,
-        "subs": 4,
-        "at": "2026-09-07T19:31"
       },
       {
         "rank": 216,
@@ -11396,7 +11396,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-03T18:07:49.231375+00:00",
+  "recorded_utc": "2026-10-03T19:42:11.105893+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12004,7 +12004,7 @@
     "disruption.py": "2037302e15f529817d7167e8d6d065e863d6f4dc2e1d21b635fc19bf82dde11c",
     "neighbours.py": "c59b2adac6007aa0b637454d6907b43f4bc78767ede3ca6ef2826c7acd3ab9d6",
     "nn.py": "515f0f486014016d1eaf444be4a77ce0efd1e21b3fef4c5168fc766c54513f89",
-    "laneb.py": "0947bcdc834fa1ea4fea39668ef6d02e2955d586bd857ce416143ab6326fbf48",
+    "laneb.py": "1d2def7b8a829c9c78ca5e6b9daede9e89937c0d113653eff848ba34bd76dadb",
     "analysis\\contender_screen.py": "f628b61e13f2ea6c6f281bf647932f1cca232289966f42e9adb7dbaff95770d7",
     "analysis\\neural_screen.py": "e8e5ebca6b22a880c493de1236accf12b93b23d8415a861ca6564024cda1c0f8",
     "analysis\\disruption_screen.py": "af5de33d62c58e1570126881f026c11430f1d8cd8fd7640dd2a7ddb5898baf3a",
@@ -12019,5 +12019,22 @@
     "CPU control/proxy donor differs from clean-v53.",
     "Original champion fitted-checkpoint lineage incomplete.",
     "No candidate uploaded; no board gain established."
-  ]
+  ],
+  "clean_champion_active": {
+    "status": "running",
+    "phase": "Full CatBoost reference is training",
+    "pid": 24560,
+    "controller_pid": 51476,
+    "checked_utc": "2026-10-03T19:42:36.459552+00:00",
+    "active_component": {
+      "component": "1-7\\outer\\ra_cb_wz_t7",
+      "fit_rows": 1723531,
+      "fit_days": 303,
+      "stage": "budget selection",
+      "started_file_mtime": 1791055802.857225
+    },
+    "completed_components": [],
+    "error": null,
+    "scope": "Full original C/L/N donor and meta chain; January/July first. No new scorer result yet."
+  }
 }

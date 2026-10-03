@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import sys
 import time
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -46,14 +47,16 @@ def _c(d: pd.DataFrame) -> pd.DataFrame:
     return d.assign(y=d["y"] - d["z_aobt"])
 
 
-def predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame | None = None, iters: tuple[int, ...] | None = None) -> tuple[np.ndarray, tuple[int, ...]]:
+def predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame | None = None, iters: tuple[int, ...] | None = None,
+            model_dir: Path | None = None) -> tuple[np.ndarray, tuple[int, ...]]:
     tr, va = _c(tr), _c(va) if va is not None else None
     t = (tr["y"].abs() > TAIL).values
     tv = (va["y"].abs() > TAIL).values if va is not None else None
     it = iters or (None, None, None)
-    P, i0 = fit_clf(cfg, tr, t.astype(int), te, va, tv.astype(int) if va is not None else None, it[0])
-    ct, i1 = fit_predict(cfg["reg"], tr[t], te, va[tv] if va is not None else None, it[1])
-    cb, i2 = fit_predict(cfg["reg"], tr[~t], te, va[~tv] if va is not None else None, it[2])
+    paths = [model_dir / head if model_dir else None for head in ("gate.model", "tail.model", "body.model")]
+    P, i0 = fit_clf(cfg, tr, t.astype(int), te, va, tv.astype(int) if va is not None else None, it[0], model_path=paths[0])
+    ct, i1 = fit_predict(cfg["reg"], tr[t], te, va[tv] if va is not None else None, it[1], model_path=paths[1])
+    cb, i2 = fit_predict(cfg["reg"], tr[~t], te, va[~tv] if va is not None else None, it[2], model_path=paths[2])
     return P[:, 1] * ct + (1 - P[:, 1]) * cb + te["z_aobt"].values, (i0, i1, i2)
 
 
