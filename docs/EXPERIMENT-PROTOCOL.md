@@ -515,3 +515,108 @@ v42–v51's donor assembly error is already fixed but motivates the file-level g
 The published scorer cap is five files per day. Keep a buffer, prefer October 10 for final uploads,
 and preserve the actual v53 file. The official deadline remains October 11, 23:59:59 CET.
 Respect the standing GPU wait rule and the already approved local publication schedule.
+
+### CP0 Lane B repair diagnostic — declared 2026-10-03
+
+Scope: isolate `laneb.copy_hist` source labels and Lane B stopping budgets. This is
+correctness work within CP0; the complete multi-stage CP0 baseline remains outstanding.
+The local branch is `codex/validation-scope-20261003`, based on the October 2 plan.
+
+Run `python analysis/laneb_scope_diagnostic.py`.
+Two fixed-budget arms compare legacy all-training-month history with history restricted
+to development months. Both fit the same Lane B training rows at 117 classifier and
+238 tau iterations, the historical `docs/LANEB_RUN.md` budgets. January/July 2025 are
+the diagnostic evaluation rows; their labels never feed corrected history.
+No parameters or variants are selected from this comparison.
+
+Keep the existing donor and v53 Lane A holdout predictions fixed. Report Lane B and
+whole-file SSE/RMSE, each evaluation month, history changes, and 2,000 paired calendar-day
+bootstrap resamples. Treat the result as a diagnostic correction on reused data, not
+fresh confirmation or a completely isolated champion evaluation: donor and Lane A
+caches still have the previously identified validation limitations.
+
+Checks: mutate excluded departure labels and require identical corrected history;
+verify real Lane B inner stopping excludes outer IDs; freeze v53 bytes and validate
+template IDs, predictions and Lane B parity. Preserve large outputs under
+`data/runs/cp0-laneb-scope-20261003/`; no existing caches or scored files are overwritten.
+Budget: two fixed-budget CPU fits and one training-only iteration-selection check;
+no GPU training, tuning or scorer upload. Stop on failed scope/assembly checks.
+
+Measured checkpoint: 22 local tests passed, including nine focused scope tests;
+real-data hidden-label mutation and champion schema/ID/Lane B parity checks passed.
+All 5,373 held-out Lane B rows have changed history. At fixed historical budgets,
+legacy-history Lane B RMSE is 1735.6383 and corrected history is 1732.6492 s.
+Keeping v53 Lane A fixed gives whole-file 304.8745 versus 304.6092 s, gain
+0.2653 [0.0258, 0.5974] from 2,000 calendar-day bootstrap resamples; SSE improves
+55.70 million seconds². Dropping the largest-gain day leaves 29.33 million seconds².
+The training-only stopping check selects 93 classifier and 314 tau iterations.
+Verdict: correctness repair checked; small diagnostic gain, below the submission
+floor. Complete clean-v53 remains unfinished. No model promotion or scorer upload.
+See [STATUS-2026-10-03.html](STATUS-2026-10-03.html) and the isolated manifest.
+
+### Contender continuation register — 2026-10-03
+
+Exact prospective declarations and construction limits live in
+[CONTENDER-RUN-2026-10-03.md](CONTENDER-RUN-2026-10-03.md). Isolated artifacts:
+`data/runs/contender-20261003/`. Eight initial recipes include the CPU control.
+This control/proxy donor is not a reconstructed clean-v53. Both development
+blocks are reused; they are not newly untouched tests.
+
+Measured complete-file screens: CP1 hierarchy and calibration reverse in
+winter; explicit outcomes lose in both blocks. CP2 normalized weather gains
+0.1656 seconds pooled, uncertain and below floor; signed recorder experts
+lose 1.8903 seconds in winter with clear hot-slice harm, so stop that recipe.
+Sampled MSE improves over corrected sampled Huber in both two-month blocks,
+but both standalone networks trail the CPU tree. Nested sampled simplex blend
+gains 1.1697 seconds pooled, below floor; winter uncertainty and weather harm
+prevent promotion. Fixed and shrunk meta methods do not clear the gate either.
+
+Checks: 35 tests pass, F lint passes, real Lane B excluded-label mutation,
+missing-query-target inference, inner stopping calls and control reproduction
+pass. Cold January independent rebuild and departure label/block mutation agree
+exactly. Whole-file membership follows supplied file month, including UTC
+boundary cases. Construction interruptions are recorded separately in the HTML.
+
+After Keith requested continued work, the missing full-capacity CP3 comparison
+was declared before running: original Huber/MSE recipes on every permitted
+outer day, original 150-epoch cap and patience, seed zero, nested proxy donor,
+inner budget selection and all-row refit. Outputs have a separate neural-full
+directory and stage runtimes/checkpoints. No sampled model has been promoted;
+no upload or additional architecture search. Full comparison and subsequent
+confirmation remain pending at this checkpoint.
+
+Additional checked evidence: full suite 61 passed in 65.38 s, followed by two
+focused meta-input checks. Submission validation now uses explicit exceptions;
+26 guard tests pass under optimized Python, and the preserved champion passes
+the actual-file check in both modes. No S3 upload was attempted. Read-only
+publication preflight inspected task/script/settings and authenticated repo
+access, without executing the script's visibility-changing commands.
+
+Cold ranking-support audit uses 120,000 matched airport/month rows, five-day
+calendar blocks and a fixed diagnostic classifier. Year-separation AUC is
+.8073, January .6466 and July .9222. Matched training has no rows with at least
+15 snow reports per day; ranking has 8,028, versus 6,107 across all 2025.
+Reporting counts are not elapsed exposure. This is a transfer/support warning,
+not a predictive gain or a weighting experiment. Weather hashes/spans, range
+coverage and classifier scopes are saved under the isolated run directory.
+
+First full Huber member: selected epoch 67, stopped at 82, then refit every
+1,417,542 permitted Lane A rows across 244 days. Full checkpoint encoder,
+target scaling, donor-source hashes and actual-file/Lane B parity pass.
+Whole-file February/March gain over the CPU control is -2.0572 s, uncertain.
+Both first-block losses are now complete. MSE uses best epoch 69, stopping 84,
+and the same complete refit rows/days. It loses to full Huber by 1.8848 s,
+calendar-day interval [-3.0016, -0.8151], five-day [-2.8262, -1.0511], with losses
+in February and March. The declared clear-reversal rule stops the job before
+completing its second block. The conditional full MSE meta check fails its
+prerequisite and is skipped. This is one full block, not complete confirmation.
+
+Actual-file checkpoint prediction replays, category/numeric encoder and target
+scale coverage, nested donor hashes and unchanged Lane B pass for both models.
+Both full networks improve ordinary rows but materially harm winter weather
+versus the CPU control; hot-slice intervals are recorded in artifact_checks.json.
+Descriptive airport, recording-class, signed-residual, schedule-gap and influential
+row reports cover the recorded files. Missing diagnostic stamps export as JSON
+null; no target-derived diagnostic enters features or a new promotion rule.
+Final full suite: 62 passed in 46.53 s; F lint passes. No board gain or new upload.
+Complete clean-v53 and original fitted-checkpoint lineage remain partial.

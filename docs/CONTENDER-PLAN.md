@@ -1,6 +1,18 @@
 # First-place campaign plan — 2 October 2026
 
-Status: **planned**. CP0–CP5 below have not been executed by this documentation change.
+Status: **initial screens measured; full-data MSE lead rejected**. The 2026-10-03 continuation
+implemented cold monthly inputs, nested CPU neighbour donors, training-only
+stopping and full supplied-row neural refits. CP1/CP2 initial screens and a
+sampled CP3/CP4 comparison are measured; none passes the full promotion gate.
+The first full-capacity block compares both original neural losses on every
+permitted fit day. MSE reverses against Huber with both paired intervals below
+zero, so the declared stop rule rejects it before completing the second block.
+Complete clean-v53 and remaining confirmation folds remain unfinished.
+No new recipe qualifies for upload. The scoped campaign driver supplies the
+current evidence; legacy global PW/tune/recal/blend paths are not a clean-v53
+reconstruction and must not be used as promotion evidence.
+Declarations: [CONTENDER-RUN-2026-10-03.md](CONTENDER-RUN-2026-10-03.md).
+See [STATUS-2026-10-03.html](STATUS-2026-10-03.html) for checks, measurements and limits.
 Implementation baseline: `campaign2` at `a3503dcd148c21a511a134754503621254b60a8b`.
 Keith requested this plan to seriously challenge first place and authorized committing and pushing it.
 

@@ -1,5 +1,71 @@
 # Hand-off, 2026-09-22
 
+> **Continuation checkpoint — 2026-10-03.** Eight initial recipes, including
+> the isolated CPU control, are declared in CONTENDER-RUN-2026-10-03.md.
+> CP1's three mechanisms fail the winter screen; normalized weather has a
+> small uncertain gain; signed recorder experts harm winter and hot rows.
+> Corrected sampled MSE beats Huber in both development blocks. A nested
+> sampled blend gives autumn gains but weak winter results, below the pooled
+> promotion floor and with winter-weather harm. No scorer upload or promotion.
+> `python analysis/neural_screen.py full` was stopped after its first full block: all permitted
+> outer fit days, original CELL_T7 cap/patience/optimizer, the same nested
+> 80-tree proxy donor and both declared losses. MSE loses to Huber by 1.8848 s,
+> day interval [-3.0016, -0.8151], five-day [-2.8262, -1.0511], reversing both
+> winter months. Declared reversal rule rejects the lead; second full block
+> and conditional full-MSE meta check are not completed. No training job remains
+> from this run. Preserved files: data/runs/contender-20261003/neural-full/.
+> This comparison is not the full clean-v53 reconstruction. Full confirmation
+> folds, champion donor/meta lineage, upload checks and release rehearsal remain.
+> 62 tests pass in the full suite; two focused meta checks and 26
+> optimized-Python submission tests pass. Static F lint passes. Real Lane B excluded-label mutation,
+> missing-query-target, stopping-call and saved-control reproduction pass.
+> Cold features are per supplied file; two UTC month-boundary cases are scoped
+> by file membership. No claim of faulty clocks is supported.
+> Current board snapshot: 2026-10-03 16:54 UTC, v53 270.43 s, rank 51/222;
+> leader strong-crane 216.5675 s. Champion and global prediction caches preserved.
+> Updated local report: [STATUS-2026-10-03.html](STATUS-2026-10-03.html).
+> Submission guard equivalents from unmerged PR #1 are applied locally;
+> the actual preserved champion passes normal and optimized Python checks.
+> Full Huber's first member refits all 1,417,542 rows across 244 days at epoch
+> 67, with checkpoint encoder/target scale and donor ID hashes matching its
+> declared scope. Its first whole-file gain over the CPU control is -2.0572 s.
+> Full MSE refits the same rows/days at epoch 69, selection stops at 84.
+> Both checkpoint prediction replays pass at 1e-4 s absolute tolerance plus
+> 1e-7 relative tolerance; actual IDs and unchanged Lane B pass. Both networks
+> lose on winter weather despite improving ordinary rows. This comparison is
+> one full block, not complete CV or a champion comparison.
+> Ranking-support audit: five-day-grouped matched year AUC .8073; January
+> .6466, July .9222. Severe snow-report counts are absent from matched 2025
+> Jan/July but present in other training months and ranking. No density weights.
+> Publication preflight: task Ready at 21:30 UTC on October 11; script/action,
+> authenticated read access and campaign2 existence checked. Task requires
+> interactive login and AC. Future execution is not verified; no visibility
+> command was run. Private repo/default master remain live. Local changes
+> still need to reach the intended release branch. Record: release_preflight.json.
+> Local correctness commits: 1f2f3cb (fit scopes/all-row refits) and 68645a0
+> (explicit submission guards). Research and results are saved with this checkpoint. Legacy global
+> PW/tune/recal/blend paths remain outside the scoped campaign proof; complete
+> clean-v53 is still unfinished. Do not reopen rejected recipes without a new
+> prospective declaration and a distinct source of signal.
+
+> **Current execution update — 2026-10-03.** Local branch `codex/validation-scope-20261003`,
+> based on `9d0bc36`; changes are local and uncommitted. Live board: v53 remains best at
+> 270.43 s, rank 51/222; strong-crane leads at 216.5675 s. This machine has the data and
+> a working RTX 5080, with torch 2.10.0+cu128 (not the requirements.txt torch pin).
+> Lane B history now requires permitted training IDs; each CV fold excludes its entire
+> outer month block across both lanes. Stopping budgets come from an inner training split,
+> followed by an outer-training refit. Tests: `python -m pytest tests/ -q`, 22 passed.
+> `python analysis/laneb_scope_diagnostic.py` regenerates the diagnostic and preserved v53
+> manifest under `data/runs/cp0-laneb-scope-20261003/`, without changing global caches.
+> Fixed-budget history correction: full-file reused holdout 304.8745 to 304.6092 s,
+> gain 0.2653 [0.0258, 0.5974]. Historical Lane A/donor caches remain fixed, so this is
+> not the fully clean baseline or a new board gain. Real-data hidden-label mutation passes.
+> Next: finish Lane A stopping, neighbour-prediction and meta/recalibration scopes,
+> cold ranking-like masking/boundaries, then clean-v53. CP1–CP4 have not started.
+> Exact champion bytes and Lane B parity pass; fitted-model lineage remains incomplete.
+> Publication task is Ready for 11 October at 22:30 London; no rehearsal or upload here.
+> Full status: [STATUS-2026-10-03.html](STATUS-2026-10-03.html). Submission sign-off still applies.
+
 
 > **Current execution update — 2026-10-02.** Follow [CONTENDER-PLAN.md](CONTENDER-PLAN.md),
 > CP0–CP5, and protocol amendment v9. Start with fit-scope isolation and a clean baseline:
