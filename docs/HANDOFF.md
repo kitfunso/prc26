@@ -5,7 +5,24 @@
 > The original tuned CatBoost January/July member completed with saved-model replay passing.
 > Its restart PID 27196 exited successfully. Controller PID 59744 started the full serial
 > pipeline, PID 52408, running `analysis/champion_screen.py --months 1-7`. The first original
-> donor scope is group-2-5-9-12. Verify the current active record and actual processes.
+> donor's three cross-fit scopes, group-2-5-9-12, group-3-6-10 and group-4-8-11, and the
+> full-scope donor now have all three saved members each with checkpoint replay PASS.
+> The separate stopping-day-excluded donor is training: its first group is saved and the
+> group-3-6-10 CatBoost member is in full refit. Direct process and log checks at 22:38 UTC
+> confirm both controller and pipeline alive, with tree progress and no recorded error.
+> Budget.json records 9,000.2
+> seconds of completed GPU-family component cost, within the declared allowance.
+> `python analysis/champion_donor_audit.py` passes actual cold-input bytes, permitted/query
+> IDs, stopping coverage, saved prediction hashes and reconstruction of the saved PW
+> features from raw cross-fit/floored full predictions, including matching empty-window
+> missing positions and rejecting infinities. An initially overstrict finite-feature check
+> rejected the original per() empty-window NaNs; the audit now follows that declared rule.
+> Training was unaffected. Its first-donor-audit.json records
+> 6,182.4 seconds of total component wall time and 5,399.8 seconds of GPU-family wall time.
+> The latter is a conservative compute proxy, not measured GPU utilization. Remaining
+> stopping/meta donor costs and the full reference comparison are pending. This is component
+> progress, not a full reference result or score gain. Verify the current active record
+> and actual processes.
 > It writes `data/runs/clean-champion-20261003/active.json` and the live HTML job record.
 > Codex heartbeat `continue-prc26-score-campaign` is ACTIVE, attached to this chat,
 > checking every half hour. It should repair failed fits, inspect completed references,
