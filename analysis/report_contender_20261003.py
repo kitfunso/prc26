@@ -68,7 +68,7 @@ def main() -> None:
     active_path = ROOT / "data/runs/clean-champion-20261003/active.json"
     active = json.loads(active_path.read_text(encoding="utf-8")) if active_path.exists() else {}
     records["clean_champion_active"] = active
-    records["clean_champion_checks"] = {"full_suite_passed": 68, "full_suite_seconds": 70.72,
+    records["clean_champion_checks"] = {"full_suite_passed": 73, "full_suite_seconds": 57.17,
                                          "command": "python -m pytest tests/ -q", "full_model_comparison": "pending"}
     (OUT / "prc26-run-record.json").write_text(json.dumps(records, indent=2, allow_nan=False), encoding="utf-8")
     rows = []
@@ -81,6 +81,8 @@ def main() -> None:
     status = "Full-data MSE lead rejected" if decision else ("Full-capacity comparison running" if len(full.get("blocks", [])) < 2 else "Full-capacity comparison measured")
     if active.get("status") == "running":
         status = "Full champion reconstruction running"
+    elif active.get("status") == "failed":
+        status = "Reference fit needs repair"
     model_rows = []
     for progress in records["neural_full_progress"]:
         for name, info in progress.get("models", {}).items():
@@ -90,7 +92,7 @@ def main() -> None:
     page = f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PRC26 campaign status</title><link rel="icon" href="data:,"><style>{css}</style><main>
 <div class="eyebrow">PRC26 · checked research checkpoint · {html.escape(records['recorded_utc'])}</div>
 <h1>{status}.</h1><p class="lead">The frozen champion remains the scored best. The full original neighbour-model and recalibration chain is the current research task. No new scorer gain is established. The earlier MSE lead remains rejected.</p>
-<section id="active-run"><h2>Work running now</h2><p id="active-state">{html.escape(active.get('phase', 'No active job record yet.'))}</p><p id="active-detail" class="muted">Last job check: {html.escape(active.get('checked_utc', 'not recorded'))}</p><p>The completed reference will be evaluated before choosing the next distinct score experiment. Checkpoints and predictions are saved after each verified component. A failed candidate moves the campaign to its next supported step.</p></section>
+<section id="active-run"><h2>Current work</h2><p id="active-state">{html.escape(active.get('phase', 'No active job record yet.'))}</p><p id="active-detail" class="muted">Last job check: {html.escape(active.get('checked_utc', 'not recorded'))}</p><p>Implementation checks: done, with 73 full-suite tests and the source review. Full fitted reference: partial; see the live job state above. Complete comparison and error census: pending. Candidate preparation and submission: pending. The completed reference will be evaluated before choosing the next distinct score experiment. Checkpoints and predictions are saved after each verified component. A failed candidate moves the campaign to its next supported step.</p><p>The first fit saved its full classifier, then stopped because CatBoost returned no best-iteration value without a validation set. Both fitting paths now accept that result. Checked checkpoint recovery preserves the selected tree budgets, original scope and source hashes, completed classifier and spent compute. Native checkpoint reuse, both Windows path formats and changed-scope rejection pass. A recorded compatibility entry covers this path-check correction while the resumed fit continues; the fit's actual source specification remains preserved.</p><p>Follow-up checks in this chat are set for every half hour, with updates on meaningful results or failures. The local controller updates this page's job record while the fits run.</p></section>
 <div class="cards"><div class="card"><strong>{board['us']['rank']} / {board['teams']}</strong><span>Live leaderboard rank</span></div><div class="card"><strong>{board['us']['score']:.2f} s</strong><span>Our scored champion</span></div><div class="card"><strong>{board['leader']['score']:.2f} s</strong><span>Current leader</span></div></div>
 <p class="muted">Live API snapshot: {board['fetched_utc']} UTC. <a href="https://prc-data-challenge-2026.netlify.app/">Official deadline</a>: 11 October 2026, 23:59:59 CET.</p>
 <section><h2>Decision so far</h2><p>Keep v53 as the fallback. Hierarchical/copy/date-shift alternatives lost on the winter screen. Weather normalization has a small pooled gain with an interval spanning zero. The signed-residual recipe harms whole-file and hot-weather performance. The sampled MSE network beats its Huber counterpart in both two-month blocks, but standalone networks trail the CPU tree.</p>

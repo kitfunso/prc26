@@ -6,7 +6,8 @@ import pandas as pd
 import pytest
 from pathlib import Path
 
-from champion import fit_member, frame_hash
+from champion import fit_member, frame_hash, load_completed, verified_selection, write_record
+from campaign import file_hash
 from mix import fit_clf
 from train import fit_predict
 
@@ -39,6 +40,79 @@ def test_query_fingerprint_ignores_excluded_labels() -> None:
     columns = ["id", "apt", "x"]
     assert frame_hash(rows, columns) == frame_hash(rows.assign(y=-987654.), columns)
     assert frame_hash(rows, [*columns, "y"]) != frame_hash(rows.assign(y=-987654.), [*columns, "y"])
+
+
+def test_catboost_fixed_budget_accepts_missing_best_iteration() -> None:
+    rows = sample()
+    params = {"task_type": "CPU", "iterations": 4, "verbose": False, "thread_count": 1,
+              "random_seed": 0, "od_type": "Iter", "od_wait": 2}
+    cfg = {"cat": ["apt"], "num": ["x"], "params": {**params, "loss_function": "RMSE"},
+           "clf": {"family": "cb", "params": {**params, "loss_function": "Logloss"}}}
+    p, count = fit_predict(cfg, rows, rows, iters=4)
+    assert count == 4 and np.isfinite(p).all()
+    p, count = fit_clf(cfg, rows, (rows.y > rows.y.median()).to_numpy(int), rows, None, None, 4)
+    assert count == 4 and p.shape == (len(rows), 2)
+
+
+def test_native_refit_restart_skips_saved_heads(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    import lanea
+
+    rows = sample().assign(z_aobt=1200., y=lambda frame: 1200. + np.linspace(-1000., 1000., len(frame)))
+    params = {"task_type": "CPU", "iterations": 4, "verbose": False, "thread_count": 1,
+              "random_seed": 0, "od_type": "Iter", "od_wait": 2}
+    cfg = {"cat": ["apt"], "num": ["x"], "reg": {"cat": ["apt"], "num": ["x"],
+           "params": {**params, "loss_function": "RMSE"}},
+           "clf": {"family": "cb", "params": {**params, "loss_function": "Logloss"}}}
+    expected, _ = lanea.predict(cfg, rows, rows, iters=(4, 4, 4), model_dir=tmp_path)
+
+    def reject(*args: object, **kwargs: object) -> None:
+        raise AssertionError("saved head was fitted again")
+
+    monkeypatch.setattr(lanea, "fit_clf", reject)
+    monkeypatch.setattr(lanea, "fit_predict", reject)
+    actual, counts = lanea.predict(cfg, rows, rows, iters=(4, 4, 4), model_dir=tmp_path, resume=True)
+    np.testing.assert_allclose(actual, expected)
+    assert counts == (4, 4, 4) and not tuple(tmp_path.glob("*.tmp.model"))
+    with pytest.raises(ValueError, match="budget changed"):
+        lanea.predict(cfg, rows, rows, iters=(5, 4, 4), model_dir=tmp_path, resume=True)
+
+
+@pytest.mark.parametrize("separator", ("/", "\\"))
+def test_partial_recovery_requires_matching_scopes_and_model_hashes(tmp_path: Path, separator: str) -> None:
+    directory = tmp_path / "selection"
+    directory.mkdir()
+    for head in ("gate", "tail", "body"):
+        (directory / f"{head}.model").write_bytes(head.encode())
+    hashes = {f"selection{separator}{path.name}": file_hash(path) for path in directory.iterdir()}
+    original = {"config": {"loss": "RMSE"}, "fit_input_hash": "permitted-targets", "engine_hashes": {"train.py": "old"}}
+    resumed = {**original, "engine_hashes": {"train.py": "repaired"}}
+    write_record(tmp_path / "selection.json", {"specification": original, "iterations": (4, 4, 4)})
+    with pytest.raises(ValueError, match="changed"):
+        verified_selection(tmp_path, resumed)
+    write_record(tmp_path / "recovery.json", {"original_specification": original,
+                                            "resumed_engine_hashes": resumed["engine_hashes"], "artifact_hashes": hashes})
+    assert verified_selection(tmp_path, resumed)["iterations"] == [4, 4, 4]
+    with pytest.raises(ValueError, match="specifications"):
+        verified_selection(tmp_path, {**resumed, "fit_input_hash": "different-targets"})
+    (directory / "gate.model").write_bytes(b"changed")
+    with pytest.raises(ValueError, match="checkpoint changed"):
+        verified_selection(tmp_path, resumed)
+
+
+def test_completed_compatibility_is_explicit_and_keeps_scope_checks(tmp_path: Path) -> None:
+    original = {"name": "ra_cb_wz_t7", "fit_input_hash": "same-permitted-targets", "engine_hashes": {"champion.py": "first-resume"}}
+    resumed = {**original, "engine_hashes": {"champion.py": "windows-path-repair"}}
+    rows = pd.DataFrame({"id": (1, 2), "p": (900., 1000.)})
+    rows.to_parquet(tmp_path / "predictions.parquet")
+    write_record(tmp_path / "complete.json", {"specification": original,
+        "artifact_hashes": {"predictions.parquet": file_hash(tmp_path / "predictions.parquet")}})
+    with pytest.raises(ValueError, match="changed"):
+        load_completed(tmp_path, resumed, rows)
+    write_record(tmp_path / "recovery.json", {"completed_engine_compatibility": {
+        "execution_engine_hashes": original["engine_hashes"], "resumed_engine_hashes": resumed["engine_hashes"]}})
+    np.testing.assert_array_equal(load_completed(tmp_path, resumed, rows)[0], rows.p)
+    with pytest.raises(ValueError, match="changed"):
+        load_completed(tmp_path, {**resumed, "fit_input_hash": "changed-targets"}, rows)
 
 
 def test_donor_scopes_use_file_month_and_exclude_hidden_targets(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:

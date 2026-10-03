@@ -79,7 +79,7 @@ def fit_clf(cfg: dict, tr: pd.DataFrame, lab: np.ndarray, te: pd.DataFrame, va: 
     m.fit(Pool(tr[cols], lab, cat_features=cfg["cat"]), eval_set=Pool(va[cols], lab_va, cat_features=cfg["cat"]) if va is not None else None, use_best_model=va is not None)
     save_model(m, model_path, "cb")
     best = m.get_best_iteration()
-    return m.predict_proba(Pool(te[cols], cat_features=cfg["cat"])), best + 1 if best >= 0 else params["iterations"]
+    return m.predict_proba(Pool(te[cols], cat_features=cfg["cat"])), best + 1 if best is not None and best >= 0 else params["iterations"]
 
 
 def predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame | None = None, iters: tuple[int, ...] | None = None) -> tuple[np.ndarray, tuple[int, ...], np.ndarray]:

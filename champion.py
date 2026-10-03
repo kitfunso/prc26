@@ -58,7 +58,7 @@ def specification(name: str, fit: pd.DataFrame, query: pd.DataFrame, selection: 
             "provenance": fit.attrs.get("provenance", {}),
             "versions": {name: version(name) for name in ("numpy", "pandas", "torch", "catboost", "lightgbm")},
             "engine_hashes": {p: file_hash(Path(__file__).parent / p) for p in
-                              ("champion.py", "train.py", "mix.py", "lanea.py", "nn.py", "features.py", "campaign.py", "weather.py")}}
+                              ("champion.py", "checkpoints.py", "train.py", "mix.py", "lanea.py", "nn.py", "features.py", "campaign.py", "weather.py")}}
 
 
 def load_completed(directory: Path, spec: dict, query: pd.DataFrame) -> tuple[np.ndarray, dict] | None:
@@ -67,7 +67,12 @@ def load_completed(directory: Path, spec: dict, query: pd.DataFrame) -> tuple[np
         return None
     record = json.loads(path.read_text(encoding="utf-8"))
     if record["specification"] != spec:
-        raise ValueError(f"saved component scope/configuration changed: {directory}")
+        recovery_path = directory / "recovery.json"
+        repair = json.loads(recovery_path.read_text(encoding="utf-8")).get("completed_engine_compatibility", {}) if recovery_path.exists() else {}
+        saved = record["specification"]
+        expected = {**saved, "engine_hashes": repair.get("resumed_engine_hashes")}
+        if saved["engine_hashes"] != repair.get("execution_engine_hashes") or expected != spec:
+            raise ValueError(f"saved component scope/configuration changed: {directory}")
     for name, digest in record["artifact_hashes"].items():
         if file_hash(directory / name) != digest:
             raise ValueError(f"saved component artifact changed: {directory / name}")
@@ -110,12 +115,48 @@ def tree_fit(cfg: dict, fit: pd.DataFrame, query: pd.DataFrame, selection: pd.Da
     inner, stop = stopping_split(selection)
     if inner.id.isin(query.id).any() or stop.id.isin(query.id).any():
         raise ValueError("outer query labels entered tree selection")
-    _, iterations = lanea.predict(cfg, inner, stop.assign(y=np.nan), stop, model_dir=directory / "selection")
-    info = {"iterations": iterations, "inner_fit_rows": len(inner), "stopping_rows": len(stop),
+    scope = {"inner_fit_rows": len(inner), "stopping_rows": len(stop),
             "inner_fit_ids_hash": ids_hash(inner.id), "stopping_ids_hash": ids_hash(stop.id)}
-    write_record(directory / "selection.json", {"specification": spec, **info})
-    p, _ = lanea.predict(cfg, fit, query, iters=iterations, model_dir=directory / "refit")
+    if (directory / "selection.json").exists():
+        selected = verified_selection(directory, spec)
+        if any(selected[key] != value for key, value in scope.items()):
+            raise ValueError("saved stopping scope changed")
+        iterations = tuple(selected["iterations"])
+        logging.info("Reuse verified stopping selection: %s", iterations)
+    else:
+        if any((directory / "refit").glob("*.model")):
+            raise ValueError("refit models have no verified selection record")
+        _, iterations = lanea.predict(cfg, inner, stop.assign(y=np.nan), stop, model_dir=directory / "selection")
+        hashes = {str(path.relative_to(directory)): file_hash(path) for path in (directory / "selection").glob("*.model")}
+        write_record(directory / "selection.json", {"specification": spec, "iterations": iterations, **scope,
+                                                   "artifact_hashes": hashes})
+    info = {"iterations": iterations, **scope}
+    if (directory / "recovery.json").exists():
+        info["recovery"] = json.loads((directory / "recovery.json").read_text(encoding="utf-8"))
+    p, _ = lanea.predict(cfg, fit, query, iters=iterations, model_dir=directory / "refit", resume=True)
     return p, info
+
+
+def verified_selection(directory: Path, spec: dict) -> dict:
+    selected = json.loads((directory / "selection.json").read_text(encoding="utf-8"))
+    saved_spec = selected["specification"]
+    hashes = selected.get("artifact_hashes", {})
+    if saved_spec != spec:
+        path = directory / "recovery.json"
+        if not path.exists():
+            raise ValueError("saved selection scope/configuration changed")
+        recovery = json.loads(path.read_text(encoding="utf-8"))
+        expected = {**saved_spec, "engine_hashes": recovery["resumed_engine_hashes"]}
+        if recovery["original_specification"] != saved_spec or expected != spec:
+            raise ValueError("recovery does not match the original and resumed specifications")
+        hashes = recovery["artifact_hashes"]
+    hashes = {name.replace("\\", "/"): digest for name, digest in hashes.items()}
+    if not hashes or not all(f"selection/{name}.model" in hashes for name in ("gate", "tail", "body")):
+        raise ValueError("saved selection model hashes are missing")
+    for name, digest in hashes.items():
+        if file_hash(directory / name) != digest:
+            raise ValueError(f"recovery checkpoint changed: {name}")
+    return selected
 
 
 def replay_tree(cfg: dict, query: pd.DataFrame, directory: Path) -> np.ndarray:
@@ -175,8 +216,10 @@ def fit_member(name: str, fit: pd.DataFrame, query: pd.DataFrame, directory: Pat
     pd.DataFrame({"id": query.id.values, "p": p}).to_parquet(directory / "predictions.parquet")
     replay = replay_neural(query, directory / "refit.pt") if name.startswith("nn") else replay_tree(spec["config"], query, directory / "refit")
     np.testing.assert_allclose(p, replay, rtol=1e-7, atol=1e-4)
+    elapsed = time.monotonic() - start
+    recovered_seconds = info.get("recovery", {}).get("prior_fit_seconds", 0.)
     record = {"specification": spec, "fit_rows": len(fit), "fit_days": int(fit.day.nunique()),
-              "runtime_seconds": time.monotonic() - start, "checkpoint_replay": "PASS", **info,
+              "runtime_seconds": elapsed + recovered_seconds, "checkpoint_replay": "PASS", **info,
               "artifact_hashes": {str(path.relative_to(directory)): file_hash(path)
                                   for path in sorted(directory.rglob("*")) if path.is_file() and path.suffix in (".pt", ".model", ".parquet")}}
     write_record(directory / "complete.json", record)

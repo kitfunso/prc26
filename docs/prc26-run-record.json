@@ -11396,7 +11396,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-03T19:42:11.105893+00:00",
+  "recorded_utc": "2026-10-03T20:16:38.035537+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12023,18 +12023,24 @@
   "clean_champion_active": {
     "status": "running",
     "phase": "Full CatBoost reference is training",
-    "pid": 24560,
-    "controller_pid": 51476,
-    "checked_utc": "2026-10-03T19:42:36.459552+00:00",
+    "pid": 27196,
+    "controller_pid": 59744,
+    "checked_utc": "2026-10-03T20:17:07.415793+00:00",
     "active_component": {
       "component": "1-7\\outer\\ra_cb_wz_t7",
       "fit_rows": 1723531,
       "fit_days": 303,
-      "stage": "budget selection",
-      "started_file_mtime": 1791055802.857225
+      "stage": "full refit",
+      "started_file_mtime": 1791058183.780971
     },
     "completed_components": [],
     "error": null,
     "scope": "Full original C/L/N donor and meta chain; January/July first. No new scorer result yet."
+  },
+  "clean_champion_checks": {
+    "full_suite_passed": 73,
+    "full_suite_seconds": 57.17,
+    "command": "python -m pytest tests/ -q",
+    "full_model_comparison": "pending"
   }
 }

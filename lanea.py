@@ -5,12 +5,14 @@ from __future__ import annotations
 import json
 import sys
 import time
+import logging
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 from data import CACHE, rmse
+from checkpoints import tree_prediction
 from features import ARR, CAT, DAY, NUM, OCC, PW, SNOW, WX, WZ, build, with_pw
 from mix import CLF_CB, CLF_LGB, fit_clf
 from train import BASE, FOLDS, HOLDOUT, LGB, RESULTS, fit_predict, report, stopping_split
@@ -48,15 +50,28 @@ def _c(d: pd.DataFrame) -> pd.DataFrame:
 
 
 def predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame | None = None, iters: tuple[int, ...] | None = None,
-            model_dir: Path | None = None) -> tuple[np.ndarray, tuple[int, ...]]:
+            model_dir: Path | None = None, resume: bool = False) -> tuple[np.ndarray, tuple[int, ...]]:
+    if resume and (va is not None or iters is None or model_dir is None):
+        raise ValueError("checkpoint reuse requires a fixed-budget refit and verified model directory")
     tr, va = _c(tr), _c(va) if va is not None else None
     t = (tr["y"].abs() > TAIL).values
     tv = (va["y"].abs() > TAIL).values if va is not None else None
     it = iters or (None, None, None)
     paths = [model_dir / head if model_dir else None for head in ("gate.model", "tail.model", "body.model")]
-    P, i0 = fit_clf(cfg, tr, t.astype(int), te, va, tv.astype(int) if va is not None else None, it[0], model_path=paths[0])
-    ct, i1 = fit_predict(cfg["reg"], tr[t], te, va[tv] if va is not None else None, it[1], model_path=paths[1])
-    cb, i2 = fit_predict(cfg["reg"], tr[~t], te, va[~tv] if va is not None else None, it[2], model_path=paths[2])
+    outputs = []
+    for index, path in enumerate(paths):
+        if resume and path.exists():
+            logging.info("Reuse saved %s with %s trees", path, it[index])
+            prediction = tree_prediction(cfg if index == 0 else cfg["reg"], te, path, index == 0, it[index])
+            outputs.append((prediction, it[index]))
+        elif index == 0:
+            outputs.append(fit_clf(cfg, tr, t.astype(int), te, va, tv.astype(int) if va is not None else None,
+                                   it[0], model_path=path))
+        else:
+            mask = t if index == 1 else ~t
+            validation = va[tv if index == 1 else ~tv] if va is not None else None
+            outputs.append(fit_predict(cfg["reg"], tr[mask], te, validation, it[index], model_path=path))
+    (P, i0), (ct, i1), (cb, i2) = outputs
     return P[:, 1] * ct + (1 - P[:, 1]) * cb + te["z_aobt"].values, (i0, i1, i2)
 
 

@@ -69,12 +69,14 @@ def save_model(model: object, path: Path | None, family: str) -> None:
     if path is None:
         return
     path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f"{path.stem}.tmp{path.suffix}")
     if family == "lgb":
-        model.booster_.save_model(str(path))
+        model.booster_.save_model(str(temporary))
     elif family in ("cb", "xgb"):
-        model.save_model(str(path))
+        model.save_model(str(temporary))
     else:
         raise ValueError(f"model persistence is unsupported for {family}")
+    temporary.replace(path)
 
 
 def fit_predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame | None = None, iters: int | None = None,
@@ -112,7 +114,7 @@ def fit_predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame 
     m.fit(pool, eval_set=Pool(va[cols], va["y"], cat_features=cfg["cat"]) if va is not None else None, use_best_model=va is not None)
     save_model(m, model_path, "cb")
     best = m.get_best_iteration()
-    return m.predict(Pool(te[cols], cat_features=cfg["cat"])), best + 1 if best >= 0 else params["iterations"]
+    return m.predict(Pool(te[cols], cat_features=cfg["cat"])), best + 1 if best is not None and best >= 0 else params["iterations"]
 
 
 def report(y: pd.Series, p: np.ndarray, f: pd.DataFrame) -> dict[str, float]:

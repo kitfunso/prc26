@@ -3,9 +3,13 @@
 > **Resumed score work — 2026-10-03.** Keith reiterated his instruction to keep improving
 > the score after the session stopped too early on the failed MSE lead. The task remains open.
 > The original tuned CatBoost January/July reference is actively fitting on all permitted
-> Lane A days (PID 24560, launched 20:29 London). Controller PID 51476 waits for its
+> Lane A days (restart PID 27196, launched 21:09 London). Controller PID 59744 waits for its
 > replay-checked completion, then runs `analysis/champion_screen.py --months 1-7` serially.
 > It writes `data/runs/clean-champion-20261003/active.json` and the live HTML job record.
+> Codex heartbeat `continue-prc26-score-campaign` is ACTIVE, attached to this chat,
+> checking every half hour. It should repair failed fits, inspect completed references,
+> continue confirmation or the next declared experiment, and stay quiet on unchanged work.
+> The automation was created and its app card was read; future wakeups are not yet observed.
 > Recheck these processes and records before treating this dated checkpoint as current.
 > Plan: [CLEAN-CHAMPION-2026-10-03.html](CLEAN-CHAMPION-2026-10-03.html).
 > The reviewed rebuild restores the original full C/L/N neighbour donor, raw OOF arithmetic,
@@ -14,7 +18,20 @@
 > are rebuilt separately. Lane B day/window context is now file-aware. Cache fingerprints
 > include permitted targets, inputs, source/weather provenance, code and package versions;
 > model replay precedes component completion. Raw predictions actually used are saved.
-> Full suite: 68 passed; current F lint passes. The baseline and its comparison remain
+> The first attempt saved its full classifier and then failed when CatBoost returned None
+> for best iteration without validation. Both wrappers now return the fixed budget in that
+> case. Atomic native saves and checked partial restart are added. Recovery verifies the
+> original source bytes, unchanged inputs/scopes/configuration/dependencies, selected tree
+> counts/features and saved-model hashes. Selected budgets and the full classifier are
+> reused; the unfinished tail/body regressors continue. Prior fit time is charged to the
+> compute record. Logs: outer-C-resume-1.out/.err; controller-resume-1.out/.err. First attempt
+> logs and original selection provenance are retained. Native restart, scope/hash rejection
+> and CatBoost without validation have regression checks. Both slash formats are covered;
+> the path-check correction's explicit compatibility entry retains the actual running fit's
+> engine hashes while allowing that verified component to enter the next queued stage.
+> It does not relax input, label, configuration, dependency or artifact checks. Tail refit
+> completed at 21:15 London; body refit is running at this checkpoint. Recheck live logs.
+> Full suite: 73 passed; current F lint passes. The baseline and its comparison remain
 > incomplete while the fits run. The controller currently covers January/July only, then
 > the main session must inspect results, price the chain, continue confirmation or declare
 > the next distinct experiment. No upload or new scorer gain. Do not end the campaign at
