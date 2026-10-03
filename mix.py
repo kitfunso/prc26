@@ -13,7 +13,7 @@ from catboost import CatBoostClassifier, Pool
 
 from data import CACHE, rmse
 from features import CAT, DAY, NUM, OCC, WX, build
-from train import BASE, FOLDS, HOLDOUT, LGB, RESULTS, fit_predict, report
+from train import BASE, FOLDS, HOLDOUT, LGB, RESULTS, fit_predict, report, stopping_split
 
 Z = ("z_aobt", "z_eobt", "z_sched")
 CLF_LGB = dict(objective="multiclass", num_class=4, learning_rate=0.05, num_leaves=127, min_child_samples=50, feature_fraction=0.8,
@@ -74,7 +74,8 @@ def fit_clf(cfg: dict, tr: pd.DataFrame, lab: np.ndarray, te: pd.DataFrame, va: 
         params.update(iterations=iters); params.pop("od_type"); params.pop("od_wait")
     m = CatBoostClassifier(**params)
     m.fit(Pool(tr[cols], lab, cat_features=cfg["cat"]), eval_set=Pool(va[cols], lab_va, cat_features=cfg["cat"]) if va is not None else None, use_best_model=va is not None)
-    return m.predict_proba(Pool(te[cols], cat_features=cfg["cat"])), m.get_best_iteration() or params["iterations"]
+    best = m.get_best_iteration()
+    return m.predict_proba(Pool(te[cols], cat_features=cfg["cat"])), best + 1 if best >= 0 else params["iterations"]
 
 
 def predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame | None = None, iters: tuple[int, ...] | None = None) -> tuple[np.ndarray, tuple[int, ...], np.ndarray]:
@@ -101,7 +102,9 @@ def cv(name: str) -> None:
     oof, its, t0 = np.full(len(tr), np.nan), [], time.time()
     for i, months in enumerate(FOLDS):
         va = tr["month"].isin(months).values
-        p, it, _ = predict(cfg, tr[~va], tr[va], tr[va])
+        inner, stop = stopping_split(tr[~va])
+        _, it, _ = predict(cfg, inner, stop, stop)
+        p, _, _ = predict(cfg, tr[~va], tr[va], iters=it)
         oof[va] = p; its.append(it)
         print(f"fold {i} {months}: {rmse(tr['y'].values[va], p):.2f} at {it} iters, {time.time() - t0:.0f}s", flush=True)
     it = tuple(int(np.mean([x[j] for x in its]) * 1.1) for j in range(len(its[0])))

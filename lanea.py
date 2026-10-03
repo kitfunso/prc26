@@ -12,7 +12,7 @@ import pandas as pd
 from data import CACHE, rmse
 from features import ARR, CAT, DAY, NUM, OCC, PW, SNOW, WX, WZ, build, with_pw
 from mix import CLF_CB, CLF_LGB, fit_clf
-from train import BASE, FOLDS, HOLDOUT, LGB, RESULTS, fit_predict, report
+from train import BASE, FOLDS, HOLDOUT, LGB, RESULTS, fit_predict, report, stopping_split
 
 TAIL = 600.0
 REG = {**BASE, "thread_count": 8, "gpu_ram_part": 0.5}
@@ -62,6 +62,12 @@ def _merge_b(a: pd.DataFrame, donor: pd.DataFrame, rows: pd.DataFrame, col: str)
     return pd.concat([a, b[["id", col]]], ignore_index=True)
 
 
+def outer_predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame) -> tuple[np.ndarray, tuple[int, ...]]:
+    inner, stop = stopping_split(tr)
+    _, iterations = predict(cfg, inner, stop, stop)
+    return predict(cfg, tr, te, iters=iterations)
+
+
 def cv(name: str, donor: str) -> None:
     cfg, f = CONFIGS[name], build()
     if set(PW) & set(cfg["num"]):
@@ -72,7 +78,7 @@ def cv(name: str, donor: str) -> None:
     oof, its, t0 = np.full(len(ta), np.nan), [], time.time()
     for i, months in enumerate(FOLDS):
         va = ta["month"].isin(months).values
-        p, it = predict(cfg, ta[~va], ta[va], ta[va])
+        p, it = outer_predict(cfg, ta[~va], ta[va])
         oof[va] = p; its.append(it)
         print(f"fold {i} {months}: {rmse(ta['y'].values[va], p):.2f} at {it} iters, {time.time() - t0:.0f}s", flush=True)
     it = tuple(int(np.mean([x[j] for x in its]) * 1.1) for j in range(3))

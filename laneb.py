@@ -78,12 +78,14 @@ def augment(f: pd.DataFrame) -> pd.DataFrame:
     day = a.assign(near=near_a, tail=tail_a).groupby(["apt", "day"], observed=True).agg(
         est_share=("near", "mean"), a_tail_share=("tail", "mean"), a_za_p90=("z_aobt", lambda s: s.quantile(.9))).reset_index()
     f = f.merge(day, on=["apt", "day"], how="left")
-    return pd.concat([f, _window(f, a, near_a, tail_a), copy_hist(f)], axis=1)
+    return pd.concat([f, _window(f, a, near_a, tail_a)], axis=1)
 
 
 def _hist_rates(a: pd.DataFrame, q: pd.DataFrame) -> np.ndarray:
     """Copy share of a's rows by (airport, airline), shrunk toward the airport share, and by (airport, flight number),
     shrunk toward the airline share; plus log(1 + rows behind the flight share)."""
+    if a.empty:
+        return np.tile((0.5, 0.5, 0.0), (len(q), 1))
     p0 = q["apt_s"].map(a.groupby("apt_s")["copy"].mean()).fillna(a["copy"].mean()).values
     s_al, s_flt = (a.groupby(k)["copy"].agg(["sum", "size"]) for k in ("k_al", "k_flt"))
     r_al = (q["k_al"].map(s_al["sum"]).fillna(0).values + HIST_K[0] * p0) / (q["k_al"].map(s_al["size"]).fillna(0).values + HIST_K[0])
@@ -92,20 +94,51 @@ def _hist_rates(a: pd.DataFrame, q: pd.DataFrame) -> np.ndarray:
     return np.column_stack([r_al, r_flt, np.log1p(n_flt)])
 
 
-def copy_hist(f: pd.DataFrame) -> pd.DataFrame:
-    """Lane B rows: how often the same airline and the same flight number copy the schedule in lane A (takeoff HIST_Z+
-    after the schedule). Copy status follows the airline and the flight far more than the day (docs/LANEB.md section 6).
-    2025 rows see lane A months HIST_GAP+ away from their own; rank rows see all of 2025."""
+def copy_hist(f: pd.DataFrame, fit_ids: pd.Index) -> pd.DataFrame:
+    """Only permitted departure labels feed history; the month gap also cross-fits training rows."""
+    fit_ids = pd.Index(fit_ids)
+    if not fit_ids.is_unique or not fit_ids.isin(f.loc[f["split"] == "train", "id"]).all():
+        raise ValueError("history fit IDs must be unique training departure IDs")
     r = pd.read_parquet(CACHE / "raw.parquet", columns=["MVT_ID_mvt", "FLIGHT_mvt", "PHASE_mvt"])
     flt = r[r["PHASE_mvt"] == "DEP"].drop_duplicates("MVT_ID_mvt").set_index("MVT_ID_mvt")["FLIGHT_mvt"]
-    apt = f["apt"].astype(str)
-    f = f.assign(apt_s=apt, k_al=apt + "|" + f["airline"].astype(str), k_flt=apt + "|" + f["id"].map(flt).astype(str),
-                 copy=(np.abs(f["y"] - f["z_sched"]) < COPY_TOL).astype(float))
-    a = f[(f["split"] == "train") & (f["has_plan"] == 1) & (f["z_sched"] >= HIST_Z)]
-    b, out = f[f["has_plan"] == 0], pd.DataFrame(np.nan, index=f.index, columns=HIST)
+    source = f["id"].isin(fit_ids) & (f["has_plan"] == 1) & (f["z_sched"] >= HIST_Z)
+    keys = f.loc[source | (f["has_plan"] == 0), ["id", "apt", "airline", "split", "month"]].copy()
+    apt = keys["apt"].astype(str)
+    keys = keys.assign(apt_s=apt, k_al=apt + "|" + keys["airline"].astype(str),
+                       k_flt=apt + "|" + keys["id"].map(flt).astype(str))
+    a = keys.loc[f.index[source]].assign(copy=(np.abs(f.loc[source, "y"] - f.loc[source, "z_sched"]) < COPY_TOL).astype(float))
+    b, out = keys.loc[f.index[f["has_plan"] == 0]], pd.DataFrame(np.nan, index=f.index, columns=HIST)
     for (split, m), q in b.groupby(["split", "month"], observed=True):
         out.loc[q.index] = _hist_rates(a if split == "rank" else a[(a["month"] - m).abs() >= HIST_GAP], q)
     return out
+
+
+def history_rows(f: pd.DataFrame, fit_ids: pd.Index) -> pd.DataFrame:
+    b = f[f["has_plan"] == 0]
+    return pd.concat([b, copy_hist(f, fit_ids).loc[b.index]], axis=1)
+
+
+def stopping_split(tr: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    days = np.sort(tr["day"].unique())
+    if len(days) < 2:
+        raise ValueError("iteration selection needs at least two training days")
+    stop = tr["day"].isin(days[-max(1, int(np.ceil(len(days) * 0.1))):])
+    return tr[~stop], tr[stop]
+
+
+def outer_predict(f: pd.DataFrame, fit_mask: pd.Series, eval_ids: pd.Index) -> tuple[pd.DataFrame, pd.DataFrame, np.ndarray, tuple[int, int]]:
+    fit_ids = pd.Index(f.loc[fit_mask, "id"])
+    if fit_ids.isin(eval_ids).any():
+        raise ValueError("outer evaluation IDs overlap training IDs")
+    scoped = history_rows(f, fit_ids)
+    trn = scoped[scoped["id"].isin(fit_ids)]
+    van = scoped[scoped["id"].isin(eval_ids)]
+    inner_train, inner_stop = stopping_split(trn)
+    inner = fit_mask & ~f["day"].isin(inner_stop["day"].unique())
+    selected = history_rows(f, pd.Index(f.loc[inner, "id"]))
+    _, it, *_ = predict(selected.loc[inner_train.index], selected.loc[inner_stop.index], selected.loc[inner_stop.index])
+    p, _, *_ = predict(trn, van, iters=it)
+    return trn, van, p, it
 
 
 def shift_rate(tr: pd.DataFrame) -> tuple[float, int]:
@@ -160,12 +193,12 @@ def fit_tau(tr, phys, te, va, vphys, cols, iters) -> tuple[np.ndarray, int]:
     return m.predict(te[cols]), it
 
 
-def clf_logloss(tr: pd.DataFrame, va: pd.DataFrame, use_day: bool) -> tuple[float, int]:
+def clf_logloss(tr: pd.DataFrame, va: pd.DataFrame, use_day: bool, iters: int) -> tuple[float, int]:
     """Classifier-only fit (no tau) to isolate the day features' effect on multiclass log loss."""
     lab, keep, _ = _labels(tr)
     vlab, vkeep, _ = _labels(va)
     cols = B_CAT + B_NUM + ["cross", "sched_hour"] + HIST + (DAY_COLS if use_day else [])
-    P, _ = fit_clf(tr, lab, keep, va, va, vlab, vkeep, cols, None)
+    P, _ = fit_clf(tr, lab, keep, va, None, None, None, cols, iters)
     p = np.clip(P[vkeep], 1e-9, 1); p /= p.sum(1, keepdims=True)
     return log_loss(vlab[vkeep], p, labels=[0, 1, 2]), int(vkeep.sum())
 
@@ -243,7 +276,8 @@ def overall(f: pd.DataFrame, ho: pd.DataFrame, ph: np.ndarray) -> tuple[float, f
 
 def cv(donor: str) -> None:
     f = augment(build())
-    b = f[f["has_plan"] == 0]
+    development = (f["split"] == "train") & ~f["month"].isin(HOLDOUT)
+    b = history_rows(f, pd.Index(f.loc[development, "id"]))
     tr_all, ho = b[(b["split"] == "train") & ~b["month"].isin(HOLDOUT)], b[(b["split"] == "train") & b["month"].isin(HOLDOUT)]
     copy, near, phys, shift = classes(tr_all)
     print(f"flight copy history on lane B rows: train {np.mean(tr_all['h_nflt'] > 0):.3f}, holdout {np.mean(ho['h_nflt'] > 0):.3f}")
@@ -251,10 +285,10 @@ def cv(donor: str) -> None:
     oof, its, t0 = np.full(len(tr_all), np.nan), [], time.time(); ll_day = ll_noday = n_ll = 0
     for i, months in enumerate(FOLDS):
         va = tr_all["month"].isin(months).values
-        trn, van = tr_all[~va], tr_all[va]
-        p, it, *_ = predict(trn, van, van)
+        outer = development & ~f["month"].isin(months)
+        trn, van, p, it = outer_predict(f, outer, pd.Index(tr_all.loc[va, "id"]))
         oof[va] = p = hull(van, hull_prior(trn, van, p)); its.append(it)
-        l1, n1 = clf_logloss(trn, van, True); l0, n0 = clf_logloss(trn, van, False)
+        l1, n1 = clf_logloss(trn, van, True, it[0]); l0, n0 = clf_logloss(trn, van, False, it[0])
         ll_day += l1 * n1; ll_noday += l0 * n0; n_ll += n1
         print(f"fold {i} {months}: rmse {rmse(van['y'].values, p):.1f} at {it} iters, {time.time() - t0:.0f}s", flush=True)
     print(f"day-feature multiclass logloss: with {ll_day / n_ll:.4f}, without {ll_noday / n_ll:.4f}")
@@ -316,7 +350,7 @@ def write_doc(donor, it, rate, n_shift, ll_d, ll_nd, rmse_new, rmse_donor, d, by
 
 def fit(it_clf: int, it_tau: int, donor: str = "mix_cb_wx") -> None:
     f = augment(build())
-    b = f[f["has_plan"] == 0]
+    b = history_rows(f, pd.Index(f.loc[f["split"] == "train", "id"]))
     tr, rk = b[b["split"] == "train"], b[b["split"] == "rank"]
     p, _, P, _, _ = predict(tr, rk, iters=(it_clf, it_tau))
     dr = pd.read_parquet(f"data/{donor}_rank.parquet")[["MVT_ID_mvt", "TAXITIME_SEC_mvt"]].rename(columns={"MVT_ID_mvt": "id", "TAXITIME_SEC_mvt": "donor"})

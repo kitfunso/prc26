@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from data import CACHE, departures, load_raw, secs
-from weather import SNOW, WX, join
+from weather import SNOW as SNOW, WX as WX, join
 
 W = 900.0
 TOL = 60.0                # arrival copy tolerance, same as mix.label
@@ -280,11 +280,7 @@ def with_pw(f: pd.DataFrame) -> pd.DataFrame:
     return f.merge(pw_cols(), on="id", how="left")
 
 
-def build(refresh: bool = False) -> pd.DataFrame:
-    out = CACHE / "feat.parquet"
-    if out.exists() and not refresh:
-        return pd.read_parquet(out)
-    raw = load_raw()
+def build_frame(raw: pd.DataFrame) -> pd.DataFrame:
     dep = departures(raw)
     ep = lambda c: secs(dep[c], pd.Timestamp(0, tz="UTC"))  # noqa: E731  (parquet stamps are ms, so never astype int64)
     f = pd.DataFrame(index=dep.index)
@@ -316,6 +312,14 @@ def build(refresh: bool = False) -> pd.DataFrame:
         f[c] = f[c].astype(str).fillna("NA").astype("category")
     f = f.reset_index(drop=True)
     f = pd.concat([f, winstate(f)], axis=1)  # after the CAT cast: a missing runway is then its own level, not a dropped key
+    return f
+
+
+def build(refresh: bool = False) -> pd.DataFrame:
+    out = CACHE / "feat.parquet"
+    if out.exists() and not refresh:
+        return pd.read_parquet(out)
+    f = build_frame(load_raw())
     tmp = out.with_suffix(".tmp.parquet")  # another process may be reading feat.parquet: write, then atomic rename
     f.to_parquet(tmp)
     tmp.replace(out)
