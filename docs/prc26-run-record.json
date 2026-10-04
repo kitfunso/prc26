@@ -11396,7 +11396,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-04T20:13:49.115117+00:00",
+  "recorded_utc": "2026-10-04T20:45:14.018116+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12025,13 +12025,13 @@
     "phase": "Full reference 2-3 is training",
     "pid": 78840,
     "controller_pid": 73236,
-    "checked_utc": "2026-10-04T20:14:16.484496+00:00",
+    "checked_utc": "2026-10-04T20:45:48.049360+00:00",
     "active_component": {
-      "component": "2-3\\donors\\b448a2e762bf55d2bd2c9d5797fc65b9436aafa5cbe73ed45832e6e7d629e34e\\group-8\\ra_cb_wz",
-      "fit_rows": 614879,
-      "fit_days": 105,
+      "component": "2-3\\meta-5-9-12\\ra_lgb_pw_t7",
+      "fit_rows": 888432,
+      "fit_days": 152,
       "stage": "full refit",
-      "started_file_mtime": 1791144594.461893
+      "started_file_mtime": 1791146198.7478673
     },
     "completed_components": [
       {
@@ -12840,6 +12840,21 @@
         "checkpoint_replay": "PASS"
       },
       {
+        "component": "2-3\\donors\\b448a2e762bf55d2bd2c9d5797fc65b9436aafa5cbe73ed45832e6e7d629e34e\\full\\nn3_wz",
+        "seconds": 91.32799999997951,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\b448a2e762bf55d2bd2c9d5797fc65b9436aafa5cbe73ed45832e6e7d629e34e\\full\\ra_cb_wz",
+        "seconds": 748.6720000000205,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\b448a2e762bf55d2bd2c9d5797fc65b9436aafa5cbe73ed45832e6e7d629e34e\\full\\ra_lgb_wz",
+        "seconds": 104.65700000000652,
+        "checkpoint_replay": "PASS"
+      },
+      {
         "component": "2-3\\donors\\b448a2e762bf55d2bd2c9d5797fc65b9436aafa5cbe73ed45832e6e7d629e34e\\group-4-10\\nn3_wz",
         "seconds": 64.73400000005495,
         "checkpoint_replay": "PASS"
@@ -12867,6 +12882,21 @@
       {
         "component": "2-3\\donors\\b448a2e762bf55d2bd2c9d5797fc65b9436aafa5cbe73ed45832e6e7d629e34e\\group-6-11\\ra_lgb_wz",
         "seconds": 65.51599999994505,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\b448a2e762bf55d2bd2c9d5797fc65b9436aafa5cbe73ed45832e6e7d629e34e\\group-8\\nn3_wz",
+        "seconds": 95.31300000008196,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\b448a2e762bf55d2bd2c9d5797fc65b9436aafa5cbe73ed45832e6e7d629e34e\\group-8\\ra_cb_wz",
+        "seconds": 463.5320000000065,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\b448a2e762bf55d2bd2c9d5797fc65b9436aafa5cbe73ed45832e6e7d629e34e\\group-8\\ra_lgb_wz",
+        "seconds": 77.71900000004098,
         "checkpoint_replay": "PASS"
       },
       {
@@ -16978,6 +17008,281 @@
         },
         "limit": "Selected donor only. Remaining nested meta donor chains and full reference evaluation remain pending. Native checkpoint replay is retained from completion records; no new model fit or GPU replay.",
         "command": "python analysis/champion_donor_audit.py --months 2-3 --meta-group 5 9 12",
+        "audit_code_hash": "27ea7b831a3f89e36eabcbba32bdc1db7a0a7b2646687325d7eeb8f119118c59"
+      }
+    },
+    {
+      "block": "2-3",
+      "export": "prc26-2-3-meta-5-9-12-selection-donor-audit.json",
+      "audit": {
+        "checked_utc": "2026-10-04T20:43:48.378354+00:00",
+        "months": [
+          2,
+          3
+        ],
+        "scope_checks": "PASS",
+        "prediction_lineage_checks": "PASS",
+        "window_reproduction": "PASS",
+        "cold_feature_hash": "120e19f81510f5773a8743d0513d97e3a65c9b43a7394a42356979a46bc3bd09",
+        "donor_path": "data\\runs\\clean-champion-20261003\\2-3\\donors\\b448a2e762bf55d2bd2c9d5797fc65b9436aafa5cbe73ed45832e6e7d629e34e",
+        "fit_rows": 803731,
+        "fit_days": 136,
+        "scopes": [
+          {
+            "scope": "group-4-10",
+            "fit_rows": 445767,
+            "fit_days": 75,
+            "query_rows": 357964,
+            "members": [
+              {
+                "member": "ra_cb_wz",
+                "seconds": 722.0320000000065,
+                "gpu_family": true,
+                "checkpoint_replay": "PASS",
+                "prediction_hash": "77246bbf566a3b891fb590fae57fb8e3f73ce7bc55d5b4c9cb9343f68945fde6",
+                "model_hashes": {
+                  "predictions.parquet": "ea7fe8745c29b2361ebea78fef2cdcb463611cb09e60e43a33121b62bf09c651",
+                  "refit\\body.model": "b65ac93aaab5bb0e31b83b468327f7e412ee3ed28263dc607c6b961d4dc80bd9",
+                  "refit\\gate.model": "0f2726f164f380fe1425e624405c14c82aec41d1fea9dceb01b605708630fffe",
+                  "refit\\tail.model": "bbb5f3e8050c634bb8026eb461d7435572a5c3c33f69efa0c2c7199de7f3fc97",
+                  "selection\\body.model": "be1307a66c542220f0b863c945852d5047bb211b3185981695a1a6be2c654c80",
+                  "selection\\gate.model": "5b19644479cafd1733632b866b96dd29bec545430bad75bd2dcd28051d284d22",
+                  "selection\\tail.model": "a89db7cc2ae00bbbcdd7043207643d7675bc1e0e185bb38b2066ef00bfa8fbe7"
+                }
+              },
+              {
+                "member": "ra_lgb_wz",
+                "seconds": 60.328000000095926,
+                "gpu_family": false,
+                "checkpoint_replay": "PASS",
+                "prediction_hash": "45fb5e309c95d203c9ea412a98ae624f0af3b124db9688a645c3a9833d83ce2f",
+                "model_hashes": {
+                  "predictions.parquet": "b22a81f52465cd2e8ab9c36cded0993f843df49772e1adf7857ef806d3f071ed",
+                  "refit\\body.model": "61bf042b2e8e7f8a53b4fd5a533f489062b7927627503aee80762253061d226b",
+                  "refit\\gate.model": "35ea45388d4abe8f0d680b8497a67f6a8a90b61889884cc87eb6f53f7825f329",
+                  "refit\\tail.model": "d16b005fbe70e59b5355bcc48ced4c4f424cb14eceaed86372130cfd4f773c36",
+                  "selection\\body.model": "7636d2a8d02601b2616ca727f686638f54742cdcc7659f8d070bb2352107dcab",
+                  "selection\\gate.model": "7198be03bdac724f901db8494fb6149a51d6ae92c7e12fa59f8fd2cbf1e70bed",
+                  "selection\\tail.model": "643d70d86692a3aee41ee0419c2634ce55bb6c84122f4a3f8fb1e5d13d323a77"
+                }
+              },
+              {
+                "member": "nn3_wz",
+                "seconds": 64.73400000005495,
+                "gpu_family": true,
+                "checkpoint_replay": "PASS",
+                "prediction_hash": "73ba097650d8c0c3b6473b8aab8d96a94ac5bf7e71f05cbdb78527925262d4f7",
+                "model_hashes": {
+                  "predictions.parquet": "7459dd0c206d904a3a339004ff9a46afc2c55712b4d486f563c8c3b73ed09e48",
+                  "refit.pt": "5807fd2b1e12443586efe7345cbd6fc1b0866c2a108a5833eb0b3bff85ed5ff2",
+                  "selection.pt": "532e5e3e5a1802e77980b205954005ce708a8b8e197137831a5a0b296bf215fe"
+                }
+              }
+            ],
+            "component_wall_seconds": 847.0940000001574,
+            "gpu_family_wall_seconds": 786.7660000000615
+          },
+          {
+            "scope": "group-6-11",
+            "fit_rows": 546816,
+            "fit_days": 92,
+            "query_rows": 256915,
+            "members": [
+              {
+                "member": "ra_cb_wz",
+                "seconds": 547.0310000000754,
+                "gpu_family": true,
+                "checkpoint_replay": "PASS",
+                "prediction_hash": "c4fa1e68b079a03349cdeb27c8538e8384afaf3d823693a42ae50e4b96b572d4",
+                "model_hashes": {
+                  "predictions.parquet": "8eefb335d685023dd1bbb3451d2d354a549d11badc7ef21169acd283e56aa6dc",
+                  "refit\\body.model": "915926bc7c51c978babcba2916ce2db790adce427ce35299b46a4ad3a6bc8f05",
+                  "refit\\gate.model": "05de43ae09fa5e505819305d8abfd75dbfdbfdb710e875361d49050440261ef9",
+                  "refit\\tail.model": "82748d38c6de2bed4167550915c5eb65c4e80298c69de1b0789b1edb6e1447cb",
+                  "selection\\body.model": "b257c29ac93c6cc2409dedf9790e7cba163d25bf2232cbfa72125ca63c92138f",
+                  "selection\\gate.model": "b3b1f10c783f3963703bd37ba3eb2ebfd2a420a336f5039def3c2e3ef92917e8",
+                  "selection\\tail.model": "d39740bbadd0c14857b1990e06fa9599b4d67960049faa077cec7f51b74879b2"
+                }
+              },
+              {
+                "member": "ra_lgb_wz",
+                "seconds": 65.51599999994505,
+                "gpu_family": false,
+                "checkpoint_replay": "PASS",
+                "prediction_hash": "1032df96ab653b87f0100f303bdddc00490b763fd86ef2506387e6884bc047c8",
+                "model_hashes": {
+                  "predictions.parquet": "d246075fcc9654ce69b6a5d8722decc6ddc50f6ebad18a7be370332fa58f694c",
+                  "refit\\body.model": "2230b2b8239cf5755e051424c15c1f753d60f0a1a42a118d605080af83d93f9e",
+                  "refit\\gate.model": "404b9fbf4e95ea9340ee726220aa6ca02f4be5f4ba11d097a42a988b61b99e13",
+                  "refit\\tail.model": "dc14214a4517678a6f310522f4de82f5e710a61b1afde6c62aeeca569fcdc028",
+                  "selection\\body.model": "9e934f97c9d3e37eb20a3d351f7110603bed73f15b02292d58efe682f2c4b5d9",
+                  "selection\\gate.model": "fb1bd5e5c1f01a08ce74858e1e7dfdee26f6fd0c42d4932276398ab52209824f",
+                  "selection\\tail.model": "de40e6b34a9eaeac196cae3121889854b41186030204a6a004cff513754d0606"
+                }
+              },
+              {
+                "member": "nn3_wz",
+                "seconds": 58.85900000005495,
+                "gpu_family": true,
+                "checkpoint_replay": "PASS",
+                "prediction_hash": "5f9044443e3984b67602bdc19f37ea74a4f3c7ecbcc6371264053d62507130e7",
+                "model_hashes": {
+                  "predictions.parquet": "cd6b694c3b39fe4e7fa17f1f53a9b38f5b568c96fdbe4ed526fd73bc36fc2580",
+                  "refit.pt": "f75e5537ab46f5c65c28e7ecef0d6206f1e9ce501ebe25b238306c7031a1bd1a",
+                  "selection.pt": "7ce1ed031326dfaec9e7ba1957057226bb5816d9440d1cc493677238a33885c3"
+                }
+              }
+            ],
+            "component_wall_seconds": 671.4060000000754,
+            "gpu_family_wall_seconds": 605.8900000001304
+          },
+          {
+            "scope": "group-8",
+            "fit_rows": 614879,
+            "fit_days": 105,
+            "query_rows": 188852,
+            "members": [
+              {
+                "member": "ra_cb_wz",
+                "seconds": 463.5320000000065,
+                "gpu_family": true,
+                "checkpoint_replay": "PASS",
+                "prediction_hash": "0847e86bcf671aa5aa0b4af278f09075a69f173a861cc5eb3a9b96c8272f75c9",
+                "model_hashes": {
+                  "predictions.parquet": "726fd6d469ad4fa2e9e90501fabb013cfbdb1b329d0c5d6fa07b01c43d26a706",
+                  "refit\\body.model": "7b16825d800b7651126eaacda83a04c5ab9bd785b403f8ad680f90171137440f",
+                  "refit\\gate.model": "37527a5e1ddc63237f3421f3ee1a007ab2a30105b6b42e5d4975f8084880208d",
+                  "refit\\tail.model": "3f875a50e0d28a0dcfb2a66c2a42a7cade9919a567ac3e2ff5ac17a140223b54",
+                  "selection\\body.model": "45847f5fd5cbcae6cef8ff93ecc6385eb3a45f1d99e9424d0369d6f00db5162c",
+                  "selection\\gate.model": "539fc0557596c5e6faf962bc8c18e8ae807d4f227a471f84d271ba1062539905",
+                  "selection\\tail.model": "4105853b8dc21f718147ff0aa315a5c96541b364d91c48754daaa292b4a8abb2"
+                }
+              },
+              {
+                "member": "ra_lgb_wz",
+                "seconds": 77.71900000004098,
+                "gpu_family": false,
+                "checkpoint_replay": "PASS",
+                "prediction_hash": "9e6026f0b38f43692d080a938be4b7e536d937b52f576a1c21484a53603e97f6",
+                "model_hashes": {
+                  "predictions.parquet": "98ea7f0c18c9a5f07ea21216c638f8736f643532c07b5f74bcc0a17f840e420e",
+                  "refit\\body.model": "2e9860e69a8e632cd87294ff7027ba044b241990b7d904686ef7dbd9a76c5384",
+                  "refit\\gate.model": "324fd340d7282e05a97c87efa8397bf146b92badb7e2c494c23145e70cea373d",
+                  "refit\\tail.model": "d2e2c3cf13346494c8cc26192953ff868b9b5338eaf72b590b79e78bdb36988f",
+                  "selection\\body.model": "4bea42da006eeda4cd388ca40720c14d5165a8f93e3f9ce48e61df409428c56a",
+                  "selection\\gate.model": "2c95b07a35059c82caa80ff829bc68d3d08a6de31779dafcc9a9cc1f0afcd203",
+                  "selection\\tail.model": "41d76bc1560584d5c8a0b168eab5babfa0cfb88bcdb80aba2cb2e3c5b912c2bd"
+                }
+              },
+              {
+                "member": "nn3_wz",
+                "seconds": 95.31300000008196,
+                "gpu_family": true,
+                "checkpoint_replay": "PASS",
+                "prediction_hash": "e6e91e6ad37680f892734ed4602f5ee191637631701355cb314e90d32ccb03b2",
+                "model_hashes": {
+                  "predictions.parquet": "f7d545129dae30f013c4aadc613cf1d85b707d3bf091ad070ae7785d26166ad3",
+                  "refit.pt": "5d52f59e86fa8507cb9bc40e3276158f1ab504513bc3a711b0bf2616ffe833e6",
+                  "selection.pt": "dad1c8563add6a9b82878f634563d8de057f3562d4f9e3a7b777793a4d457102"
+                }
+              }
+            ],
+            "component_wall_seconds": 636.5640000001295,
+            "gpu_family_wall_seconds": 558.8450000000885
+          },
+          {
+            "scope": "full",
+            "fit_rows": 803731,
+            "fit_days": 136,
+            "query_rows": 1258846,
+            "members": [
+              {
+                "member": "ra_cb_wz",
+                "seconds": 748.6720000000205,
+                "gpu_family": true,
+                "checkpoint_replay": "PASS",
+                "prediction_hash": "72439561f07952f216b335bd7c5a2fcefad08653e2701b38377ea21f64f7f52f",
+                "model_hashes": {
+                  "predictions.parquet": "72439561f07952f216b335bd7c5a2fcefad08653e2701b38377ea21f64f7f52f",
+                  "refit\\body.model": "aa8da6096001d5861e7c36710f898868872f82e3c77983ec1e2653f18b64c19c",
+                  "refit\\gate.model": "5a284bb90eea13e268218f1be0f268ec6bcdd4a807a4e0d6930117ceb427a5f8",
+                  "refit\\tail.model": "b4c3498297edff14db8b6bfcc75186aac8865c2a01a829e376043abe1d95a39d",
+                  "selection\\body.model": "f9b62f6e7bc86d23cf620d959e5ec147239b72a2fedaaf62d9b43a7920bb82f2",
+                  "selection\\gate.model": "cf3dfda5fd008b76711cb9c867a40a6aed9447d6ed91f40fe7417652c9cb8169",
+                  "selection\\tail.model": "a0ef64822a9f1b95f3ac4a6356e3630e3ca1bd408a40415e008e8773257eab49"
+                }
+              },
+              {
+                "member": "ra_lgb_wz",
+                "seconds": 104.65700000000652,
+                "gpu_family": false,
+                "checkpoint_replay": "PASS",
+                "prediction_hash": "e447fafb9cd1f45c015a4361ef3b49e55ec6600ebc3a694fe72589a1bf2229f2",
+                "model_hashes": {
+                  "predictions.parquet": "e447fafb9cd1f45c015a4361ef3b49e55ec6600ebc3a694fe72589a1bf2229f2",
+                  "refit\\body.model": "0281ddfab35c5e4ef1e1d54c637de8e6ccbc20b6806cc554ba30493e23651a6e",
+                  "refit\\gate.model": "958b0be50e71c4f2821919d61dde603eba14c58d60e23c8e9fc7e27f5bea413c",
+                  "refit\\tail.model": "c70938f5f4a205ea5f20a743ea8eb95381a981e3ddbd6245b63a457f5bf956ec",
+                  "selection\\body.model": "1f87ba6640002307a1cd407085c9a20ba6e03f3a8138d01cf159f42758984bff",
+                  "selection\\gate.model": "ae0a32695ac0b6c2db3ae40c4a92feff4b8c0f34e1cb66c509a309f3b03b6753",
+                  "selection\\tail.model": "01876caaa3feec7b6a304255044ade81c6cacbfd3e8d6e126d782cf1f0225365"
+                }
+              },
+              {
+                "member": "nn3_wz",
+                "seconds": 91.32799999997951,
+                "gpu_family": true,
+                "checkpoint_replay": "PASS",
+                "prediction_hash": "52082ae0fa4a447281c5150fc2bfa225034d67124e6736407415839ee2838b60",
+                "model_hashes": {
+                  "predictions.parquet": "52082ae0fa4a447281c5150fc2bfa225034d67124e6736407415839ee2838b60",
+                  "refit.pt": "01347de38a4327a2db294951ea5db3b82dde51dd5dd5a73e0d95eb90821ca00b",
+                  "selection.pt": "78e75e9ebae14239ca39f4e800329c053a24a770dd11e13b98038ca4352208eb"
+                }
+              }
+            ],
+            "component_wall_seconds": 944.6570000000065,
+            "gpu_family_wall_seconds": 840.0
+          }
+        ],
+        "weights": {
+          "ra_cb_wz": 0.5223,
+          "ra_lgb_wz": 0.1564,
+          "nn3_wz": 0.3213
+        },
+        "donor_mode": "downstream_stopping_excluded",
+        "excluded_meta_months": [
+          5,
+          9,
+          12
+        ],
+        "excluded_downstream_stopping": {
+          "rows": 84701,
+          "days": 16,
+          "ids_hash": "ffbc23d85345b32489c29df7630cfe9a30a93cc5dbc1581689c90f44dc5923b3",
+          "rule": "Latest training-only stopping days excluded from every donor member fit."
+        },
+        "output_hash": "3ad75aa18e0a2e8cd271dadb05cd4ae6f181ec691df37ab734f32a53f11d193d",
+        "output_rows": 2085047,
+        "missing_window_counts": {
+          "pw_n": 0,
+          "pw_m": 887,
+          "pw_hi": 887,
+          "pr_m": 5667,
+          "pw30_m": 2469
+        },
+        "missing_window_rule": "The original features.per returns NaN for an empty window. Missing positions match the rebuilt features; infinities are rejected.",
+        "component_wall_seconds": 3099.721000000369,
+        "gpu_family_wall_seconds": 2791.5010000002803,
+        "accounting": "Saved selection/refit/replay component wall time; GPU-family subtotal is a conservative proxy, not GPU utilization.",
+        "stages": {
+          "audited_donor": "checked",
+          "reference_recipe": "partial: remaining members and nested meta fits pending",
+          "meta_and_evaluation": "pending",
+          "candidate_and_confirmation": "pending"
+        },
+        "limit": "Selected donor only. Remaining nested meta donor chains and full reference evaluation remain pending. Native checkpoint replay is retained from completion records; no new model fit or GPU replay.",
+        "command": "python analysis/champion_donor_audit.py --months 2-3 --selection-donor --meta-group 5 9 12",
         "audit_code_hash": "27ea7b831a3f89e36eabcbba32bdc1db7a0a7b2646687325d7eeb8f119118c59"
       }
     },
