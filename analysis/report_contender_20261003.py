@@ -31,6 +31,19 @@ def aggregate(prefix: str, names: tuple[str, ...]) -> dict:
     return {name: paired_metrics(both, both.control.values, both[name].values) for name in names if name in both and both[name].notna().all()}
 
 
+def render_donor(audit: dict, selection: bool = False) -> str:
+    if not audit:
+        return ""
+    tag = "selection-donor" if selection else "first-donor"
+    title = "Stopping-day neighbour donor" if selection else "First neighbour donor"
+    exclusion = audit.get("excluded_downstream_stopping", {})
+    scope_note = (f"The downstream model's {exclusion['rows']:,} stopping rows over {exclusion['days']} days are excluded from every donor fit. "
+                  if selection else "The fit uses the full permitted outer-training scope. ")
+    cost_rows = "".join(f"<tr><td>{html.escape(scope['scope'])}</td><td>{scope['fit_rows']:,}</td><td>{scope['query_rows']:,}</td><td>{scope['component_wall_seconds']/60:.1f}</td><td>{scope['gpu_family_wall_seconds']/60:.1f}</td></tr>"
+                        for scope in audit["scopes"])
+    return f"""<section id="{tag}"><h2>{title}: saved and checked</h2><p>{scope_note}The original CatBoost, LightGBM and Huber neural blend has all three cross-fit groups and its full permitted-scope fit saved. Each native checkpoint passed prediction replay. The separate audit checks actual cold-input bytes, ordered permitted/query IDs, training-only stopping coverage, saved prediction bytes and the declared raw/floored arithmetic. January and July labels are excluded from donor fits. Its saved neighbour features reproduce from those actual predictions, including the original missing values for empty windows. Missing-value positions match; infinities are rejected.</p><p>Recorded component wall time: {audit['component_wall_seconds']/60:.1f} minutes. GPU-family subtotal: {audit['gpu_family_wall_seconds']/60:.1f} minutes. {html.escape(audit['accounting'])} These are completed outer-donor costs; nested meta donor chains are additional.</p><div class="scroll"><table><thead><tr><th>Scope</th><th>Fit rows</th><th>Query rows</th><th>Component minutes</th><th>GPU-family minutes</th></tr></thead><tbody>{cost_rows}</tbody></table></div><p>Stage 1 reference recipe: partial, this donor checked. Stage 2 meta/evaluation: pending. Stage 3 candidate/confirmation: pending. No whole-file reference comparison or new scorer gain yet. Native replay is retained from member completion records; this audit does not run a new model fit or GPU replay.</p><p><a href="prc26-{tag}-audit.json">Donor scope, arithmetic and cost record</a>. Regenerate with <code>{html.escape(audit['command'])}</code>.</p></section>"""
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     template = OUT / "prc26-status-2026-10-03.html"
@@ -78,6 +91,11 @@ def main() -> None:
     records["clean_champion_first_donor"] = donor
     if donor:
         shutil.copy2(donor_path, OUT / "prc26-first-donor-audit.json")
+    selection_path = ROOT / "data/runs/clean-champion-20261003/selection-donor-audit.json"
+    selection = json.loads(selection_path.read_text(encoding="utf-8")) if selection_path.exists() else {}
+    records["clean_champion_selection_donor"] = selection
+    if selection:
+        shutil.copy2(selection_path, OUT / "prc26-selection-donor-audit.json")
     records["clean_champion_checks"] = {"full_suite_passed": 73, "full_suite_seconds": 57.17,
                                          "command": "python -m pytest tests/ -q", "full_model_comparison": "pending"}
     (OUT / "prc26-run-record.json").write_text(json.dumps(records, indent=2, allow_nan=False), encoding="utf-8")
@@ -99,19 +117,15 @@ def main() -> None:
             metric = progress["results"][name]
             model_rows.append(f"<tr><td>{progress['months']} {name}</td><td>{info['refit']['fit_rows']:,} / {info['refit']['fit_days']}</td><td>{info['epochs']}</td><td>{metric['gain']:+.3f}</td><td>{info['selection_seconds']+info['refit_seconds']:.0f}s</td></tr>")
     checkpoint = records["champion_checkpoint"]
-    donor_section = ""
-    if donor:
-        cost_rows = "".join(f"<tr><td>{html.escape(scope['scope'])}</td><td>{scope['fit_rows']:,}</td><td>{scope['query_rows']:,}</td><td>{scope['component_wall_seconds']/60:.1f}</td><td>{scope['gpu_family_wall_seconds']/60:.1f}</td></tr>"
-                            for scope in donor["scopes"])
-        donor_section = f"""<section id="first-donor"><h2>First neighbour donor: saved and checked</h2><p>The original CatBoost, LightGBM and Huber neural blend has all three cross-fit groups and its full permitted-scope fit saved. Each native checkpoint passed prediction replay. The separate audit checks actual cold-input bytes, ordered permitted/query IDs, training-only stopping coverage, saved prediction bytes and the declared raw/floored arithmetic. Its saved neighbour features reproduce from those actual predictions.</p><p>Recorded component wall time: {donor['component_wall_seconds']/60:.1f} minutes. GPU-family subtotal: {donor['gpu_family_wall_seconds']/60:.1f} minutes. {html.escape(donor['accounting'])} These are completed first-donor costs; remaining stopping-day and meta donor chains are additional.</p><div class="scroll"><table><thead><tr><th>Scope</th><th>Fit rows</th><th>Query rows</th><th>Component minutes</th><th>GPU-family minutes</th></tr></thead><tbody>{cost_rows}</tbody></table></div><p>Stage 1 reference recipe: partial, first donor checked and stopping-day donor training. Stage 2 meta/evaluation: pending. Stage 3 candidate/confirmation: pending. No whole-file reference comparison or new scorer gain yet.</p><p><a href="prc26-first-donor-audit.json">Donor scope, arithmetic and cost record</a>. Regenerate with <code>{html.escape(donor['command'])}</code>.</p></section>"""
+    donor_section = render_donor(donor) + render_donor(selection, selection=True)
     first_section = ""
     if first:
         file_rows = "".join(f"<tr><td>{html.escape(name)}</td><td>{value['rows']:,}</td><td>{value['rmse']:.3f}</td><td>{value['aobt_only_rmse']:.3f}</td></tr>"
                             for name, value in first["by_file"].items())
         first_section = f"""<section id="first-member"><h2>First reconstructed member: saved and checked</h2><p>The full tuned CatBoost Lane A member is complete. Saved-model replay, input bytes, permitted/stopping/query ID scopes, all-row/day refit coverage, output IDs, finite nonnegative predictions and unchanged scored champion pass. The controller reused the completed member and began the original cross-fitted neighbour models.</p><p>Fit: {first['fit_rows']:,} rows over {first['fit_days']} permitted days. Query: {first['laneA_descriptive_errors']['rows']:,} Lane A rows in the complete January/July files. Recorded selection/refit/replay cost is {first['runtime_seconds']/60:.1f} minutes, including the interrupted first attempt. It is a GPU-family wall-time proxy, not measured GPU utilization. The donor-chain price remains pending.</p><div class="scroll"><table><thead><tr><th>Supplied file</th><th>Lane A rows</th><th>Member RMSE, seconds</th><th>AOBT-only RMSE, seconds</th></tr></thead><tbody>{file_rows}</tbody></table></div><p>{html.escape(first['limit'])}</p><p>Stage 1 reference recipe: partial, first member checked. Stage 2 meta/evaluation: pending. Stage 3 candidate/confirmation: pending. <a href="prc26-first-member-audit.json">Scope, cost and descriptive error record</a>. Regenerate with <code>{html.escape(first['command'])}</code>.</p></section>"""
     if donor:
-        first_section = first_section.replace("The donor-chain price remains pending.", "The first outer donor cost is recorded below; remaining stopping/meta donor costs are pending.")
-        donor_section = donor_section.replace("Its saved neighbour features reproduce from those actual predictions.", "Its saved neighbour features reproduce from those actual predictions, including the original missing values for empty windows. Missing-value positions match; infinities are rejected.")
+        price_note = "Both outer donor chains are checked and priced below; nested meta donor costs remain pending." if selection else "The first outer donor cost is recorded below; remaining stopping/meta donor costs are pending."
+        first_section = first_section.replace("The donor-chain price remains pending.", price_note)
     page = f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PRC26 campaign status</title><link rel="icon" href="data:,"><style>{css}</style><main>
 <div class="eyebrow">PRC26 · checked research checkpoint · {html.escape(records['recorded_utc'])}</div>
 <h1>{status}.</h1><p class="lead">The frozen champion remains the scored best. The full original neighbour-model and recalibration chain is the current research task. No new scorer gain is established. The earlier MSE lead remains rejected.</p>

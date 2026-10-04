@@ -7,11 +7,13 @@
 > pipeline, PID 52408, running `analysis/champion_screen.py --months 1-7`. The first original
 > donor's three cross-fit scopes, group-2-5-9-12, group-3-6-10 and group-4-8-11, and the
 > full-scope donor now have all three saved members each with checkpoint replay PASS.
-> The separate stopping-day-excluded donor is training: its first group is saved and the
-> group-3-6-10 CatBoost member is in full refit. Direct process and log checks at 22:38 UTC
-> confirm both controller and pipeline alive, with tree progress and no recorded error.
-> Budget.json records 9,000.2
-> seconds of completed GPU-family component cost, within the declared allowance.
+> The separate stopping-day-excluded donor is now saved: all three cross-fit groups and
+> its full-scope C/L/N members have checkpoint replay PASS. The downstream tuned LightGBM
+> is selecting its budget on 1,723,531 rows over 303 permitted days. Direct process and
+> log checks at 01:07 London on 4 October confirm both controller and pipeline alive.
+> LightGBM's selection gate and tail models are saved, process CPU time has increased,
+> and no error is recorded. Budget.json records 13,370.9 seconds of completed
+> GPU-family component cost, within the declared allowance.
 > `python analysis/champion_donor_audit.py` passes actual cold-input bytes, permitted/query
 > IDs, stopping coverage, saved prediction hashes and reconstruction of the saved PW
 > features from raw cross-fit/floored full predictions, including matching empty-window
@@ -19,8 +21,15 @@
 > rejected the original per() empty-window NaNs; the audit now follows that declared rule.
 > Training was unaffected. Its first-donor-audit.json records
 > 6,182.4 seconds of total component wall time and 5,399.8 seconds of GPU-family wall time.
-> The latter is a conservative compute proxy, not measured GPU utilization. Remaining
-> stopping/meta donor costs and the full reference comparison are pending. This is component
+> The separate downstream stopping-day donor is checked with
+> `python analysis/champion_donor_audit.py --selection-donor`. Actual fit/query hashes,
+> cold inputs, stopping coverage, prediction bytes and window reproduction pass. Its fit
+> excludes 164,028 downstream stopping rows across 31 days as well as January/July labels.
+> selection-donor-audit.json records 5,976.0 seconds of total component wall time and
+> 5,266.7 seconds of GPU-family wall time. Native replay PASS is retained from the saved
+> completion records; this read-only audit does not repeat a model fit or GPU replay.
+> Both GPU-family subtotals are conservative compute proxies, not measured GPU utilization.
+> Nested meta donor costs and the full reference comparison are pending. This is component
 > progress, not a full reference result or score gain. Verify the current active record
 > and actual processes.
 > It writes `data/runs/clean-champion-20261003/active.json` and the live HTML job record.
@@ -57,7 +66,8 @@
 > and 2,704.4 seconds of saved-component cost including the interrupted first attempt.
 > January/July Lane A member RMSE is 222.2729 s, versus AOBT-only 410.2841 s; this is a
 > reused member diagnostic, not an assembled whole-file ensemble or a new scorer result.
-> The donor-chain cost, full comparison, weather/episode checks and confirmation remain open.
+> Both outer donor chains are checked and priced; nested meta donor costs, full comparison,
+> weather/episode checks and confirmation remain open.
 > Full suite: 73 passed; current F lint passes. The baseline and its comparison remain
 > incomplete while the fits run. The controller currently covers January/July only, then
 > the main session must inspect results, price the chain, continue confirmation or declare

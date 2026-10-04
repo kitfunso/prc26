@@ -1,6 +1,7 @@
-"""Audit the first saved neighbour donor's scopes, arithmetic and cost."""
+"""Audit saved outer neighbour donors' scopes, arithmetic and cost."""
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from datetime import datetime, timezone
@@ -25,7 +26,7 @@ def read(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def input_rows() -> tuple[pd.DataFrame, pd.Series, str]:
+def input_rows(selection_donor: bool) -> tuple[pd.DataFrame, pd.Series, str, dict]:
     source = ROOT / "data/runs/contender-20261003"
     digest = read(source / "inputs.json")["feature_hash"]
     if file_hash(source / "cold_features.parquet") != digest:
@@ -35,7 +36,16 @@ def input_rows() -> tuple[pd.DataFrame, pd.Series, str]:
     if not frame.id.is_unique or not np.isfinite(frame.y).all():
         raise ValueError("cold input IDs or labels failed")
     fit, _ = outer_masks(frame, (1, 7))
-    return frame, fit & (frame.has_plan == 1), digest
+    fit &= frame.has_plan == 1
+    excluded = {}
+    if selection_donor:
+        inner, stop = stopping_split(frame[fit])
+        if inner.id.isin(stop.id).any() or inner.day.isin(stop.day).any():
+            raise ValueError("downstream stopping rows or days entered the donor fit")
+        fit = frame.id.isin(inner.id)
+        excluded = {"rows": len(stop), "days": int(stop.day.nunique()),
+                    "ids_hash": ids_hash(stop.id), "rule": "Latest training-only stopping days excluded from every donor member fit."}
+    return frame, fit, digest, excluded
 
 
 def check_selection(record: dict, train: pd.DataFrame) -> None:
@@ -110,15 +120,8 @@ def scope_values(frame: pd.DataFrame, fit: pd.Series, scope: dict, target: Path,
         "gpu_family_wall_seconds": sum(cost["seconds"] for cost in costs if cost["gpu_family"])}
 
 
-def main() -> None:
-    frame, fit, digest = input_rows()
-    target = RUN / "1-7/donors" / ids_hash(frame.loc[fit, "id"])
-    record = read(target / "pw.json")
-    groups = [list(group) for group in month_groups(frame, pd.Index(frame.loc[fit, "id"]))] + [None]
-    if [scope["group"] for scope in record["scopes"]] != groups or record["weights"] != PW_BLEND:
-        raise ValueError("donor cross-fit recipe changed")
-    if record["fit_ids_hash"] != target.name or record["engine_hash"] != file_hash(ROOT / "champion_neighbours.py"):
-        raise ValueError("donor scope or producer lineage changed")
+def reproduce_windows(frame: pd.DataFrame, fit: pd.Series, target: Path,
+                      record: dict, digest: str) -> tuple[pd.DataFrame, list[dict]]:
     prediction, coverage, costs = pd.Series(0., index=frame.id.values), pd.Series(0, index=frame.id.values), []
     for scope in record["scopes"]:
         query, values, cost = scope_values(frame, fit, scope, target, digest)
@@ -136,21 +139,40 @@ def main() -> None:
         raise ValueError("saved neighbour features contain infinities")
     np.testing.assert_array_equal(saved[PW].isna().values, rebuilt[PW].isna().values)
     np.testing.assert_allclose(saved[PW].to_numpy(float), rebuilt[PW].to_numpy(float), rtol=1e-12, atol=1e-10)
+    return saved, costs
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--selection-donor", action="store_true")
+    selection_donor = parser.parse_args().selection_donor
+    frame, fit, digest, excluded = input_rows(selection_donor)
+    target = RUN / "1-7/donors" / ids_hash(frame.loc[fit, "id"])
+    record = read(target / "pw.json")
+    groups = [list(group) for group in month_groups(frame, pd.Index(frame.loc[fit, "id"]))] + [None]
+    if [scope["group"] for scope in record["scopes"]] != groups or record["weights"] != PW_BLEND:
+        raise ValueError("donor cross-fit recipe changed")
+    if record["fit_ids_hash"] != target.name or record["engine_hash"] != file_hash(ROOT / "champion_neighbours.py"):
+        raise ValueError("donor scope or producer lineage changed")
+    saved, costs = reproduce_windows(frame, fit, target, record, digest)
     audit = {"checked_utc": datetime.now(timezone.utc).isoformat(), "scope_checks": "PASS",
         "prediction_lineage_checks": "PASS", "window_reproduction": "PASS", "cold_feature_hash": digest,
         "donor_path": str(target.relative_to(ROOT)), "fit_rows": int(fit.sum()),
         "fit_days": int(frame.loc[fit, "day"].nunique()), "scopes": costs, "weights": PW_BLEND,
+        "donor_mode": "downstream_stopping_excluded" if selection_donor else "full_outer_training",
+        "excluded_downstream_stopping": excluded,
         "output_hash": record["output_hash"], "output_rows": len(saved),
         "missing_window_counts": {name: int(saved[name].isna().sum()) for name in PW},
         "missing_window_rule": "The original features.per returns NaN for an empty window. Missing positions match the rebuilt features; infinities are rejected.",
         "component_wall_seconds": sum(cost["component_wall_seconds"] for cost in costs),
         "gpu_family_wall_seconds": sum(cost["gpu_family_wall_seconds"] for cost in costs),
         "accounting": "Saved selection/refit/replay component wall time; GPU-family subtotal is a conservative proxy, not GPU utilization.",
-        "stages": {"first_outer_donor": "checked", "reference_recipe": "partial: stopping-day donor and remaining members fitting",
+        "stages": {"audited_outer_donor": "checked", "reference_recipe": "partial: remaining members and nested meta fits pending",
                    "meta_and_evaluation": "pending", "candidate_and_confirmation": "pending"},
-        "limit": "First outer donor only. Other stopping/meta donor chains and full reference evaluation remain pending. Native checkpoint replay is retained from completion records; no new model fit or GPU replay.",
-        "command": "python analysis/champion_donor_audit.py", "audit_code_hash": file_hash(Path(__file__))}
-    write_record(RUN / "first-donor-audit.json", audit)
+        "limit": "Selected outer donor only. Nested meta donor chains and full reference evaluation remain pending. Native checkpoint replay is retained from completion records; no new model fit or GPU replay.",
+        "command": "python analysis/champion_donor_audit.py" + (" --selection-donor" if selection_donor else ""),
+        "audit_code_hash": file_hash(Path(__file__))}
+    write_record(RUN / ("selection-donor-audit.json" if selection_donor else "first-donor-audit.json"), audit)
     print(json.dumps({key: audit[key] for key in ("scope_checks", "window_reproduction", "component_wall_seconds", "gpu_family_wall_seconds")}))
 
 
