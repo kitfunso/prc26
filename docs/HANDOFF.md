@@ -1,6 +1,6 @@
 # Hand-off, 2026-09-22
 
-> **Current campaign checkpoint, 4 October 2026, 20:13 London.** The full January/July
+> **Current campaign checkpoint, 4 October 2026, 20:50 London.** The full January/July
 > clean reference is now measured and checked. All three inner complete-file tables
 > pass native lineage, scopes, raw/floor arithmetic and identical original mixture B.
 > Command: `python analysis/champion_assembly_audit.py --meta-group 4 8 11`.
@@ -152,12 +152,25 @@
 > 07d50921c9965fa1848569df08648db2c8404ac385f07234de922520557e2eab.
 > Its fit/query/stopping scopes and raw-value lineage close with this group's complete
 > inner-table proof, still pending. No new fit or GPU replay ran in the native reader.
-> This group's full original neighbour donor is now training under
-> 315b31373a8256a8a60f4ccfc01503e70bf0f915af8c3ad735c7538ad6b145cf.
-> Group-4-10 LightGBM has reached full refit on 530,468 rows over 91 days, querying
-> 357,964 donor rows. Error is null; its CPU activity is checked against the actual
-> process. The whole feature file is not yet saved. Audit it after completion with
+> This group's full original neighbour donor is now saved and checked:
 > `python analysis/champion_donor_audit.py --months 2-3 --meta-group 5 9 12`.
+> Proof: 2-3/meta-5-9-12-donor-audit.json. All twelve C/L/N components retain native
+> replay PASS across group-4-10, group-6-11, group-8 and full. Actual cold bytes,
+> fit/query/stopping scopes, full refit rows/days, native model/prediction bytes,
+> source/configuration, raw/floor arithmetic and neighbour feature reconstruction pass.
+> Every fit excludes January/July, February/March and inner May/September/December
+> labels. Full fit: 888,432 Lane A rows over 152 days; saved features cover all
+> 2,085,047 ordered cold rows. Output SHA:
+> 056e22e0b86c2da7986607815e1f8e7e22aacf124360782a9f77e1efbb15043c.
+> Saved selection/refit/replay wall cost: 2,621.876 seconds; GPU-family proxy:
+> 1,970.641 seconds. Original empty-window missing positions reproduce; infinities fail.
+> This read-only audit ran no new fit or GPU replay. The full second-inner donor stage
+> is checked and priced. Its separate stopping-day-excluded donor is now training under
+> b448a2e762bf55d2bd2c9d5797fc65b9436aafa5cbe73ed45832e6e7d629e34e.
+> Group-4-10 CatBoost is selecting budgets on 445,767 rows over 75 days, querying
+> 357,964 donor rows. Error is null; controller and pipeline command lines and actual
+> logs were checked. Audit the stopping donor only after its whole feature file is saved:
+> `python analysis/champion_donor_audit.py --months 2-3 --selection-donor --meta-group 5 9 12`.
 > Remaining inner tables and full-block evaluation remain pending. Existing proofs
 > are preserved; no serial fit was restarted.
 > Current controller/pipeline command
@@ -183,7 +196,7 @@
 > `python analysis/champion_assembly_audit.py --months 2-3 --meta-group <group>`.
 > Close the whole block with `python analysis/champion_evaluation_audit.py --months 2-3`.
 > New component proofs export separately in the local status page. Budget.json now
-> records 61,944.7895 GPU-family seconds globally, with 17,752.970 in the confirmation
+> records 63,401.8365 GPU-family seconds globally, with 19,210.017 in the confirmation
 > block; both declared limits remain in force. Reprice from actual completed records.
 > The campaign remains OPEN. Inspect each completed block and continue the approved
 > work; a completed component, failed candidate or expected budget stop does not end it.
