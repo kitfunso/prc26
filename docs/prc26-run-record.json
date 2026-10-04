@@ -11396,7 +11396,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-04T15:17:18.952328+00:00",
+  "recorded_utc": "2026-10-04T15:54:24.245557+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12025,13 +12025,13 @@
     "phase": "Full reference 2-3 is training",
     "pid": 78840,
     "controller_pid": 73236,
-    "checked_utc": "2026-10-04T15:17:49.674255+00:00",
+    "checked_utc": "2026-10-04T15:54:47.778408+00:00",
     "active_component": {
-      "component": "2-3\\outer\\ra_lgb_pw_t7",
-      "fit_rows": 1417542,
-      "fit_days": 244,
-      "stage": "full refit",
-      "started_file_mtime": 1791126146.9981189
+      "component": "2-3\\meta-4-8-11\\ra_cb_wz_t7",
+      "fit_rows": 893511,
+      "fit_days": 153,
+      "stage": "budget selection",
+      "started_file_mtime": 1791129176.720813
     },
     "completed_components": [
       {
@@ -12720,8 +12720,23 @@
         "checkpoint_replay": "PASS"
       },
       {
+        "component": "2-3\\outer\\mixtureB",
+        "seconds": 409.34399999992456,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\outer\\nn3_pw_t7",
+        "seconds": 651.7970000000205,
+        "checkpoint_replay": "PASS"
+      },
+      {
         "component": "2-3\\outer\\ra_cb_wz_t7",
         "seconds": 1838.515999999945,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\outer\\ra_lgb_pw_t7",
+        "seconds": 1960.2189999999246,
         "checkpoint_replay": "PASS"
       }
     ],
@@ -15876,6 +15891,382 @@
         "limit": "Lane A member diagnostic on reused block 2-3 files. No assembled whole-file ensemble, confirmation result, promotion evidence or new scorer gain.",
         "replay_limit": "Native replay PASS retained from the completion record; no new model fit or GPU replay.",
         "command": "python analysis/champion_checkpoint_audit.py --months 2-3",
+        "audit_code_hash": "4e8a060b1de8f9e6b54acd84700127f1752d4a4cd47d34a77608c8eb04dff4d2"
+      }
+    },
+    {
+      "block": "2-3",
+      "export": "prc26-2-3-nn3_pw_t7-audit.json",
+      "audit": {
+        "checked_utc": "2026-10-04T15:47:35.541950+00:00",
+        "months": [
+          2,
+          3
+        ],
+        "member": "nn3_pw_t7",
+        "scope_checks": "PASS",
+        "prediction_checks": "PASS",
+        "checkpoint_replay": "PASS",
+        "fit_rows": 1417542,
+        "fit_days": 244,
+        "iterations": null,
+        "epochs": 64,
+        "selection": {
+          "best_epoch": 64,
+          "stopping_epoch": 79,
+          "fit_rows": 1285162,
+          "fit_days": 219,
+          "mode": "selection"
+        },
+        "refit": {
+          "best_epoch": 64,
+          "stopping_epoch": 64,
+          "fit_rows": 1417542,
+          "fit_days": 244,
+          "mode": "all_rows"
+        },
+        "input_fingerprints": {
+          "checks": "PASS",
+          "fit_input_hash": "7ef81f49a76f7d2790bd747d3b9a9e9dc278c50a11a6f11842346563b281006e",
+          "query_input_hash": "6e557d6cff43e632090a91b84ca9d3def3abf3b2a760dfa4e1d4b26f6f1d3c84",
+          "selection_input_hash": "25f557975843a34342fc0020a84a9381423202f1ee9c7ceba7ad2fe5e13062f1",
+          "full_donor": {
+            "path": "data\\runs\\clean-champion-20261003\\2-3\\donors\\a571fa3e9e2d173e0c918d68807630bd29efda5816fccd69050f57786f8cfeca",
+            "output_hash": "a06753dd99936740b4c71348369f21c2e762941ca5014f22b834429835ef0c21",
+            "audit_code_hash": "27ea7b831a3f89e36eabcbba32bdc1db7a0a7b2646687325d7eeb8f119118c59",
+            "audit_checked_utc": "2026-10-04T14:13:19.622451+00:00"
+          },
+          "selection_donor": {
+            "path": "data\\runs\\clean-champion-20261003\\2-3\\donors\\e2acebd793f4fa4a09e59da23982c43a8cc2c26c416c27f4db5b354f00de6b0e",
+            "output_hash": "3621a1529ef74d7d1c166c1947598afe5f701186fc3af5b5ae223c2e097c2ea3",
+            "audit_code_hash": "27ea7b831a3f89e36eabcbba32bdc1db7a0a7b2646687325d7eeb8f119118c59",
+            "audit_checked_utc": "2026-10-04T15:13:25.735081+00:00"
+          }
+        },
+        "native_artifact_checks": "PASS",
+        "fit_files": [
+          "training_2025-04-01_2025-05-01.parquet",
+          "training_2025-05-01_2025-06-01.parquet",
+          "training_2025-06-01_2025-07-01.parquet",
+          "training_2025-08-01_2025-09-01.parquet",
+          "training_2025-09-01_2025-10-01.parquet",
+          "training_2025-10-01_2025-11-01.parquet",
+          "training_2025-11-01_2025-12-01.parquet",
+          "training_2025-12-01_2026-01-01.parquet"
+        ],
+        "query_files": [
+          "training_2025-02-01_2025-03-01.parquet",
+          "training_2025-03-01_2025-04-01.parquet"
+        ],
+        "runtime_seconds": 651.7970000000205,
+        "runtime_includes_prior_attempt": false,
+        "model_and_prediction_hashes": {
+          "predictions.parquet": "8196d6cb27947d0c353e8aca3c70b0b0f7940737293a1ebcbd99c7e951db5e61",
+          "refit.pt": "1833dcb16e9fde87a18d795295cb15d2687adbe87a37fb4433442f9f5e966deb",
+          "selection.pt": "37b0f08219b7c389feb113020cfb662d7ef0fccbc46f04232fa7e826cdcf02f8"
+        },
+        "champion_preserved": "PASS",
+        "budget_snapshot": {
+          "limit_seconds": 158400,
+          "used_seconds": 53184.02246773185,
+          "completed_gpu_components": 94,
+          "accounting": "Saved GPU-family component wall time, including selection/refit/replay; conservative GPU-time proxy.",
+          "status": "within budget",
+          "block": {
+            "months": "2-3",
+            "used_seconds": 8992.203000000096,
+            "limit_seconds": 43200.0
+          }
+        },
+        "laneA_descriptive_errors": {
+          "rows": 305989,
+          "rmse": 220.1323417668825,
+          "sse": 14827690814.155287,
+          "mean_signed_error": 14.37999008991009,
+          "aobt_only_rmse": 354.7685602059499
+        },
+        "by_file": {
+          "training_2025-02-01_2025-03-01.parquet": {
+            "rows": 142622,
+            "rmse": 251.02141214127641,
+            "sse": 8986861716.280693,
+            "mean_signed_error": 19.946642249262187,
+            "aobt_only_rmse": 365.93379178861744
+          },
+          "training_2025-03-01_2025-04-01.parquet": {
+            "rows": 163367,
+            "rmse": 189.08413125846062,
+            "sse": 5840829097.874595,
+            "mean_signed_error": 9.520213854372221,
+            "aobt_only_rmse": 344.72559933887317
+          }
+        },
+        "by_airport": {
+          "EDDF": {
+            "rows": 32577,
+            "rmse": 147.77128942528282,
+            "sse": 711362903.5546856,
+            "mean_signed_error": -0.43764769947909044,
+            "aobt_only_rmse": 227.25015287039417
+          },
+          "EDDM": {
+            "rows": 22836,
+            "rmse": 142.47907941771442,
+            "sse": 463577378.40578353,
+            "mean_signed_error": 3.3784396970391084,
+            "aobt_only_rmse": 340.6567165213726
+          },
+          "EGLL": {
+            "rows": 37078,
+            "rmse": 207.0985670668249,
+            "sse": 1590268615.4874187,
+            "mean_signed_error": 7.919780426114384,
+            "aobt_only_rmse": 353.8050395928785
+          },
+          "EHAM": {
+            "rows": 37562,
+            "rmse": 156.10250228535858,
+            "sse": 915310486.1962638,
+            "mean_signed_error": -3.748954963534285,
+            "aobt_only_rmse": 266.32981236178745
+          },
+          "LEBL": {
+            "rows": 26204,
+            "rmse": 151.02258484198944,
+            "sse": 597656144.952254,
+            "mean_signed_error": 21.29542425288042,
+            "aobt_only_rmse": 259.0366677320721
+          },
+          "LEMD": {
+            "rows": 32884,
+            "rmse": 168.5013688152083,
+            "sse": 933665918.1458209,
+            "mean_signed_error": 29.840900171921064,
+            "aobt_only_rmse": 268.3099481706054
+          },
+          "LFPG": {
+            "rows": 35918,
+            "rmse": 198.3109452852655,
+            "sse": 1412555483.7740455,
+            "mean_signed_error": -8.591394947143232,
+            "aobt_only_rmse": 319.1924025205296
+          },
+          "LIRF": {
+            "rows": 23130,
+            "rmse": 299.28627307867686,
+            "sse": 2071806680.349392,
+            "mean_signed_error": 28.147482619819527,
+            "aobt_only_rmse": 445.19376574905505
+          },
+          "LSZH": {
+            "rows": 19233,
+            "rmse": 153.14671377116275,
+            "sse": 451089165.25298774,
+            "mean_signed_error": 14.706543579318746,
+            "aobt_only_rmse": 243.00819319128493
+          },
+          "LTFM": {
+            "rows": 38567,
+            "rmse": 383.779219649686,
+            "sse": 5680398038.036634,
+            "mean_signed_error": 52.37028172232079,
+            "aobt_only_rmse": 588.7590033064312
+          }
+        },
+        "stages": {
+          "reference_recipe": "partial: this Lane A member checked; Lane B and nested meta fits pending",
+          "meta_and_evaluation": "pending",
+          "candidate_and_confirmation": "pending"
+        },
+        "limit": "Lane A member diagnostic on reused block 2-3 files. No assembled whole-file ensemble, confirmation result, promotion evidence or new scorer gain.",
+        "replay_limit": "Native replay PASS retained from the completion record; no new model fit or GPU replay.",
+        "command": "python analysis/champion_checkpoint_audit.py --months 2-3 --member nn3_pw_t7",
+        "audit_code_hash": "4e8a060b1de8f9e6b54acd84700127f1752d4a4cd47d34a77608c8eb04dff4d2"
+      }
+    },
+    {
+      "block": "2-3",
+      "export": "prc26-2-3-ra_lgb_pw_t7-audit.json",
+      "audit": {
+        "checked_utc": "2026-10-04T15:43:33.125370+00:00",
+        "months": [
+          2,
+          3
+        ],
+        "member": "ra_lgb_pw_t7",
+        "scope_checks": "PASS",
+        "prediction_checks": "PASS",
+        "checkpoint_replay": "PASS",
+        "fit_rows": 1417542,
+        "fit_days": 244,
+        "iterations": [
+          219,
+          6335,
+          7999
+        ],
+        "epochs": null,
+        "selection": null,
+        "refit": null,
+        "input_fingerprints": {
+          "checks": "PASS",
+          "fit_input_hash": "7ef81f49a76f7d2790bd747d3b9a9e9dc278c50a11a6f11842346563b281006e",
+          "query_input_hash": "6e557d6cff43e632090a91b84ca9d3def3abf3b2a760dfa4e1d4b26f6f1d3c84",
+          "selection_input_hash": "25f557975843a34342fc0020a84a9381423202f1ee9c7ceba7ad2fe5e13062f1",
+          "full_donor": {
+            "path": "data\\runs\\clean-champion-20261003\\2-3\\donors\\a571fa3e9e2d173e0c918d68807630bd29efda5816fccd69050f57786f8cfeca",
+            "output_hash": "a06753dd99936740b4c71348369f21c2e762941ca5014f22b834429835ef0c21",
+            "audit_code_hash": "27ea7b831a3f89e36eabcbba32bdc1db7a0a7b2646687325d7eeb8f119118c59",
+            "audit_checked_utc": "2026-10-04T14:13:19.622451+00:00"
+          },
+          "selection_donor": {
+            "path": "data\\runs\\clean-champion-20261003\\2-3\\donors\\e2acebd793f4fa4a09e59da23982c43a8cc2c26c416c27f4db5b354f00de6b0e",
+            "output_hash": "3621a1529ef74d7d1c166c1947598afe5f701186fc3af5b5ae223c2e097c2ea3",
+            "audit_code_hash": "27ea7b831a3f89e36eabcbba32bdc1db7a0a7b2646687325d7eeb8f119118c59",
+            "audit_checked_utc": "2026-10-04T15:13:25.735081+00:00"
+          }
+        },
+        "native_artifact_checks": "PASS",
+        "fit_files": [
+          "training_2025-04-01_2025-05-01.parquet",
+          "training_2025-05-01_2025-06-01.parquet",
+          "training_2025-06-01_2025-07-01.parquet",
+          "training_2025-08-01_2025-09-01.parquet",
+          "training_2025-09-01_2025-10-01.parquet",
+          "training_2025-10-01_2025-11-01.parquet",
+          "training_2025-11-01_2025-12-01.parquet",
+          "training_2025-12-01_2026-01-01.parquet"
+        ],
+        "query_files": [
+          "training_2025-02-01_2025-03-01.parquet",
+          "training_2025-03-01_2025-04-01.parquet"
+        ],
+        "runtime_seconds": 1960.2189999999246,
+        "runtime_includes_prior_attempt": false,
+        "model_and_prediction_hashes": {
+          "predictions.parquet": "7b728cd288d4a321d866b19d7c5d2191c1d94f52642acb384c4319c976886d55",
+          "refit\\body.model": "2d78d4e46861ec8f471e9eb2affc5169272d39d5c354b79d24fbe2dbfc6e40be",
+          "refit\\gate.model": "3daa71304d79b2fd1f0efe0d17cf1eda7338cb4c766f374e3d483d3aad70137a",
+          "refit\\tail.model": "b5d7b3ea4c8129e8215dbc3537433e62b61ab328a2ca1e56f3a0795d264f30d8",
+          "selection\\body.model": "8bcd3539064a1c2bc711c973d48af8c2310a9addd747a87585092cb1566c64bf",
+          "selection\\gate.model": "1f0a7be02299d31161b8a3aa1653d09c36384311879e35bd790bb983d85b4c4c",
+          "selection\\tail.model": "9c69419bae80b1102d4898b50d69f404e62e31ba23f2ceb5f4abf28793b62a17"
+        },
+        "champion_preserved": "PASS",
+        "budget_snapshot": {
+          "limit_seconds": 158400,
+          "used_seconds": 52532.22546773183,
+          "completed_gpu_components": 93,
+          "accounting": "Saved GPU-family component wall time, including selection/refit/replay; conservative GPU-time proxy.",
+          "status": "within budget",
+          "block": {
+            "months": "2-3",
+            "used_seconds": 8340.406000000075,
+            "limit_seconds": 43200.0
+          }
+        },
+        "laneA_descriptive_errors": {
+          "rows": 305989,
+          "rmse": 208.7182043315772,
+          "sse": 13329887182.558779,
+          "mean_signed_error": 8.271887878424572,
+          "aobt_only_rmse": 354.7685602059499
+        },
+        "by_file": {
+          "training_2025-02-01_2025-03-01.parquet": {
+            "rows": 142622,
+            "rmse": 226.4889186189483,
+            "sse": 7316113573.739611,
+            "mean_signed_error": 11.54238117536911,
+            "aobt_only_rmse": 365.93379178861744
+          },
+          "training_2025-03-01_2025-04-01.parquet": {
+            "rows": 163367,
+            "rmse": 191.8630616658551,
+            "sse": 6013773608.81917,
+            "mean_signed_error": 5.4166949998332745,
+            "aobt_only_rmse": 344.72559933887317
+          }
+        },
+        "by_airport": {
+          "EDDF": {
+            "rows": 32577,
+            "rmse": 148.04455283542381,
+            "sse": 713996286.3888857,
+            "mean_signed_error": -1.9070021421648395,
+            "aobt_only_rmse": 227.25015287039417
+          },
+          "EDDM": {
+            "rows": 22836,
+            "rmse": 138.42164050758075,
+            "sse": 437550332.60665524,
+            "mean_signed_error": -5.273588291492285,
+            "aobt_only_rmse": 340.6567165213726
+          },
+          "EGLL": {
+            "rows": 37078,
+            "rmse": 208.21957888164897,
+            "sse": 1607531262.7534084,
+            "mean_signed_error": 1.525059381706821,
+            "aobt_only_rmse": 353.8050395928785
+          },
+          "EHAM": {
+            "rows": 37562,
+            "rmse": 159.4134637354472,
+            "sse": 954550050.2050261,
+            "mean_signed_error": 6.103660246044887,
+            "aobt_only_rmse": 266.32981236178745
+          },
+          "LEBL": {
+            "rows": 26204,
+            "rmse": 147.00589675212365,
+            "sse": 566287665.3479958,
+            "mean_signed_error": 8.342105872141554,
+            "aobt_only_rmse": 259.0366677320721
+          },
+          "LEMD": {
+            "rows": 32884,
+            "rmse": 171.19109039734442,
+            "sse": 963711310.0632017,
+            "mean_signed_error": 20.95905360161687,
+            "aobt_only_rmse": 268.3099481706054
+          },
+          "LFPG": {
+            "rows": 35918,
+            "rmse": 209.5075959734829,
+            "sse": 1576564318.253985,
+            "mean_signed_error": -14.021219671239885,
+            "aobt_only_rmse": 319.1924025205296
+          },
+          "LIRF": {
+            "rows": 23130,
+            "rmse": 293.6393342029423,
+            "sse": 1994362475.2132359,
+            "mean_signed_error": 8.845614701445323,
+            "aobt_only_rmse": 445.19376574905505
+          },
+          "LSZH": {
+            "rows": 19233,
+            "rmse": 150.41655250109002,
+            "sse": 435149303.50900126,
+            "mean_signed_error": -0.07257833506961461,
+            "aobt_only_rmse": 243.00819319128493
+          },
+          "LTFM": {
+            "rows": 38567,
+            "rmse": 325.26097147896195,
+            "sse": 4080184178.217385,
+            "mean_signed_error": 47.20211246507651,
+            "aobt_only_rmse": 588.7590033064312
+          }
+        },
+        "stages": {
+          "reference_recipe": "partial: this Lane A member checked; Lane B and nested meta fits pending",
+          "meta_and_evaluation": "pending",
+          "candidate_and_confirmation": "pending"
+        },
+        "limit": "Lane A member diagnostic on reused block 2-3 files. No assembled whole-file ensemble, confirmation result, promotion evidence or new scorer gain.",
+        "replay_limit": "Native replay PASS retained from the completion record; no new model fit or GPU replay.",
+        "command": "python analysis/champion_checkpoint_audit.py --months 2-3 --member ra_lgb_pw_t7",
         "audit_code_hash": "4e8a060b1de8f9e6b54acd84700127f1752d4a4cd47d34a77608c8eb04dff4d2"
       }
     },
