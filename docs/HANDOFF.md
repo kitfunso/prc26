@@ -1,6 +1,6 @@
 # Hand-off, 2026-09-22
 
-> **Current campaign checkpoint, 4 October 2026, 17:42 London.** The full January/July
+> **Current campaign checkpoint, 4 October 2026, 18:15 London.** The full January/July
 > clean reference is now measured and checked. All three inner complete-file tables
 > pass native lineage, scopes, raw/floor arithmetic and identical original mixture B.
 > Command: `python analysis/champion_assembly_audit.py --meta-group 4 8 11`.
@@ -98,18 +98,27 @@
 > and prediction bytes for this newly saved member. Prediction SHA:
 > f42d7f0f6e54ab75564d6f3d4ba5462daec435c4f18ba5c4a8fcf0959d8bd9f4.
 > Its full scope/raw-value checks close with the complete inner-table proof, still pending.
-> This inner scope's original neighbour donor has advanced: group-5-10 now has all
-> three C/L/N members saved with native replay PASS, fitting 526,153 rows over 91 days
-> and querying 367,358 donor rows. Group-6-12's CatBoost is also saved with replay PASS.
-> Its LightGBM is now refitting 548,843 rows over 92 days, querying 344,668 donor rows.
-> Its quiet refit shows rising CPU time across live samples. Current error is null.
-> Four donor components have completion records; the whole
-> donor and complete inner table are unfinished. Their actual scope/native-byte/window
-> and raw-assembly checks remain pending until the matching artifacts are saved.
-> Use `python analysis/champion_donor_audit.py --months 2-3 --meta-group 4 8 11`
-> when this full donor finishes; add `--selection-donor` for its separate stopping donor.
-> Nested meta stages and whole-file evaluation remain pending. Existing proofs are
-> preserved; the serial job was not restarted.
+> This inner scope's full original neighbour donor is now saved and checked:
+> `python analysis/champion_donor_audit.py --months 2-3 --meta-group 4 8 11`.
+> Proof: 2-3/meta-4-8-11-donor-audit.json. All twelve C/L/N components have native
+> replay PASS across group-5-10, group-6-12, group-9 and the full fit. Actual cold bytes,
+> fit/query/stopping scopes, full refit rows/days, native model/prediction bytes,
+> source/configuration, raw/floor blend arithmetic and neighbour feature reconstruction
+> pass. January/July, February/March and inner April/August/November labels are excluded
+> from all donor fits. The full fit covers 893,511 Lane A rows over 153 days; its saved
+> neighbour features cover every ordered cold row, 2,085,047. Output SHA:
+> 0e4006be44e6aaa9baa50a78aaefbf24ef274ca2884ad434b1750dfb15801088.
+> Saved selection/refit/replay wall cost: 3,262.110 seconds; GPU-family proxy:
+> 2,493.391 seconds. Matching original empty-window missing positions reproduce;
+> infinities are rejected. This read-only audit ran no new fit or GPU replay.
+> The separate downstream stopping-day-excluded donor is now training under
+> 4965b69912607a21dc08eec688cd0c92db56343e6585ba585a23a7c7439a8c32.
+> Its group-5-10 CatBoost is selecting budgets on 442,418 rows over 75 days, querying
+> 367,358 donor rows. Current error is null and iteration logs advance. Audit it with
+> `python analysis/champion_donor_audit.py --months 2-3 --meta-group 4 8 11 --selection-donor`
+> after its whole feature file is saved. The complete inner table, remaining nested
+> chains and whole-file evaluation remain pending. Existing proofs are preserved;
+> the serial job was not restarted.
 > Current controller/pipeline command
 > lines were checked directly; the serial pipeline continues without restarting fits.
 > Logs: pipeline-2-3.out/.err and controller-2-3.out/.err. Verify actual processes.
@@ -133,7 +142,7 @@
 > `python analysis/champion_assembly_audit.py --months 2-3 --meta-group <group>`.
 > Close the whole block with `python analysis/champion_evaluation_audit.py --months 2-3`.
 > New component proofs export separately in the local status page. Budget.json now
-> records 56,246.4295 GPU-family seconds globally, with 12,054.610 in the confirmation
+> records 57,508.0705 GPU-family seconds globally, with 13,316.251 in the confirmation
 > block; both declared limits remain in force. Reprice from actual completed records.
 > The campaign remains OPEN. Inspect each completed block and continue the approved
 > work; a completed component, failed candidate or expected budget stop does not end it.
