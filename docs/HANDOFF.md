@@ -1,6 +1,6 @@
 # Hand-off, 2026-09-22
 
-> **Current campaign checkpoint, 4 October 2026, 22:47 London.** The full January/July
+> **Current campaign checkpoint, 4 October 2026, 23:04 London.** The full January/July
 > clean reference is now measured and checked. All three inner complete-file tables
 > pass native lineage, scopes, raw/floor arithmetic and identical original mixture B.
 > Command: `python analysis/champion_assembly_audit.py --meta-group 4 8 11`.
@@ -208,8 +208,8 @@
 > No new fit or GPU replay ran in this native-only check. The final inner full original
 > neighbour donor is training under
 > 2303f7a58a7128f6108ba513a9ec4375392fdabf41065b33769abbddfb6a3873.
-> Its group-4-9 CatBoost and LightGBM are saved; neural budget selection advances,
-> fitting 697,453 Lane A rows over 123 days and querying 355,688 rows. Actual process
+> Its group-4-9 and group-5-11 members are saved; group-8-12 CatBoost selection advances,
+> fitting 700,261 Lane A rows over 121 days and querying 352,880 rows. Actual process
 > command lines, active state and job logs were checked; error is null. The donor's
 > completed scope/window/native-byte audit remains pending. Existing saved components
 > and proofs are preserved; no serial fit was restarted. The remaining final-inner
@@ -237,8 +237,33 @@
 > `python analysis/champion_assembly_audit.py --months 2-3 --meta-group <group>`.
 > Close the whole block with `python analysis/champion_evaluation_audit.py --months 2-3`.
 > New component proofs export separately in the local status page. Budget.json now
-> records 68,960.0885 GPU-family seconds globally, with 24,768.269 in the confirmation
+> records 69,776.6195 GPU-family seconds globally, with 25,584.800 in the confirmation
 > block; both declared limits remain in force. Reprice from actual completed records.
+> Final preparation now has a separate checked input and cost record. Command:
+> `python analysis/champion_preparation.py --output <local output directory>`.
+> Actual cold training/ranking feature hashes, ranking bytes and recorded weather hashes
+> match. Ranking departure targets and off-block labels are hidden; IDs are unique,
+> disjoint from training and cover the actual template in its order. Lane A anchors
+> are finite. Existing cold ranking features are reused, without a new feature rebuild
+> or model inference. Inputs cover 2,085,047 training and 344,841 ranking departures,
+> including 339,551 Lane A and 5,290 Lane B ranking rows.
+> Prospective unchanged-method inner groups are 1/4/7/10, 2/5/8/11 and 3/6/9/12.
+> The full chain has 113 saved components. Each family's observed component wall time
+> per fit row, read from the first block's matched start/completion records, prices the
+> planned full-training scopes. Median-rate GPU-family price: 14.48 hours; each family's
+> 90th-percentile-rate sensitivity: 19.24 hours. All component wall work: 19.00/24.19 hours.
+> These are planning estimates, not runtime intervals or guarantees. Stopping budgets
+> and query costs vary; feature construction, residual fitting, audits and other CPU
+> overhead are unpriced. The 16-hour planning reserve is tight. Keep September/October
+> deferred and reprice after confirmation; this record expands no compute allocation.
+> Proof: preparation/readiness.json. Local report: FINAL-PREPARATION-2026-10-04.html,
+> exported as prc26-final-preparation-2026-10-04.html/json and linked in the status page.
+> Preparation inputs/cost are checked; ranking driver, fitted candidate and upload remain
+> pending. The current training-file month parser rejects ranking.parquet; the cold
+> ranking cache also has split=train. The final entry point needs an explicit ranking
+> split and training/query contract, all-eligible training scopes and bounded accounting.
+> Make that source change after the running confirmation's source checks close, retaining
+> its completed proof bytes. No fitting module or recipe was changed for preparation.
 > The campaign remains OPEN. Inspect each completed block and continue the approved
 > work; a completed component, failed candidate or expected budget stop does not end it.
 

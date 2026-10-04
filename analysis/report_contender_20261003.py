@@ -105,6 +105,13 @@ def render_confirmation(proof: dict) -> str:
     return f"""<section id="confirmation-{block}-{html.escape(Path(proof['export']).stem)}"><h2>Confirmation {block}: {html.escape(name)} checked</h2><p>{coverage}{cost} Actual permitted/query/stopping scope and prediction coverage pass. Additional native, input, arithmetic and replay checks are recorded in this component's proof.</p><p>{html.escape(audit['limit'])} Reference construction for this block remains partial until its full evaluation passes. Candidate preparation remains pending.</p><p><a href="{html.escape(proof['export'])}">Saved confirmation component proof</a>. Regenerate with <code>{html.escape(audit['command'])}</code>.</p></section>"""
 
 
+def render_preparation(record: dict) -> str:
+    if not record:
+        return ""
+    price = record["pricing"]
+    return f"""<section id="final-preparation"><h2>Final preparation: inputs checked and full chain priced</h2><p>Existing cold ranking bytes, weather bytes, hidden departure labels, disjoint IDs, Lane A anchors and actual template coverage pass the preparation checks. The full ranking entry point and fitted candidate remain pending while February/March confirmation continues.</p><p>The unchanged all-training recipe prices at {price['gpu_median_seconds']/3600:.2f} GPU-family hours using median observed per-row rates, or {price['gpu_p90_seconds']/3600:.2f} hours using each family's 90th-percentile rate. The 16-hour planning reserve is tight; September/October remains deferred. {html.escape(price['limit'])}</p><p>Checked {html.escape(record['checked_utc'])}. <a href="prc26-final-preparation-2026-10-04.html">Full preparation, source and cost report</a>; <a href="prc26-final-preparation-2026-10-04.json">machine-readable record</a>. This prices preparation; it does not select a recipe or authorize an upload.</p></section>"""
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     template = OUT / "prc26-status-2026-10-03.html"
@@ -142,6 +149,14 @@ def main() -> None:
     active_path = ROOT / "data/runs/clean-champion-20261003/active.json"
     active = json.loads(active_path.read_text(encoding="utf-8")) if active_path.exists() else {}
     records["clean_champion_active"] = active
+    preparation_path = ROOT / "data/runs/clean-champion-20261003/preparation/readiness.json"
+    preparation = json.loads(preparation_path.read_text(encoding="utf-8")) if preparation_path.exists() else {}
+    if preparation:
+        if preparation["inputs"]["checks"] != "PASS":
+            raise ValueError("preparation input checks did not pass")
+        records["final_preparation"] = preparation
+        shutil.copy2(preparation_path, OUT / "prc26-final-preparation-2026-10-04.json")
+        shutil.copy2(preparation_path.with_name("readiness.html"), OUT / "prc26-final-preparation-2026-10-04.html")
     first_path = ROOT / "data/runs/clean-champion-20261003/first-member-audit.json"
     first = json.loads(first_path.read_text(encoding="utf-8")) if first_path.exists() else {}
     records["clean_champion_first_member"] = first
@@ -231,7 +246,8 @@ def main() -> None:
     page = f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PRC26 campaign status</title><link rel="icon" href="data:,"><style>{css}</style><main>
 <div class="eyebrow">PRC26 · checked research checkpoint · {html.escape(records['recorded_utc'])}</div>
 <h1>{status}.</h1><p class="lead">The frozen champion remains the scored best. The full original neighbour-model and recalibration chain is the current research task. No new scorer gain is established. The earlier MSE lead remains rejected.</p>
-<section id="active-run"><h2>Current work</h2><p id="active-state">{html.escape(active.get('phase', 'No active job record yet.'))}</p><p id="active-detail" class="muted">Last job check: {html.escape(active.get('checked_utc', 'not recorded'))}</p><p>Implementation checks: done, with the earlier 73 full-suite tests and source review, plus four passing block-budget checks. January/July fitted reference, complete-file comparison and error census: checked. February/March confirmation: running; see the live job state above. Candidate preparation and submission: pending. Checkpoints and predictions are saved after each verified component. A failed candidate moves the campaign to its next supported step.</p><p>The first fit saved its full classifier, then stopped because CatBoost returned no best-iteration value without a validation set. Both fitting paths now accept that result. Checked checkpoint recovery preserves the selected tree budgets, original scope and source hashes, completed classifier and spent compute. Native checkpoint reuse, both Windows path formats and changed-scope rejection pass. The completed fit's actual source specification remains preserved alongside the recorded compatibility entry for the path-check correction.</p><p>Follow-up checks in this chat are set for every half hour, with updates on meaningful results or failures. The local controller updates this page's job record while the fits run.</p></section>
+<section id="active-run"><h2>Current work</h2><p id="active-state">{html.escape(active.get('phase', 'No active job record yet.'))}</p><p id="active-detail" class="muted">Last job check: {html.escape(active.get('checked_utc', 'not recorded'))}</p><p>Implementation checks: done, with the earlier 73 full-suite tests and source review, plus four passing block-budget checks. January/July fitted reference, complete-file comparison and error census: checked. February/March confirmation: running; see the live job state above. Preparation input/cost checks: {'checked below' if preparation else 'pending'}. Ranking driver, fitted candidate and submission: pending. Checkpoints and predictions are saved after each verified component. A failed candidate moves the campaign to its next supported step.</p><p>The first fit saved its full classifier, then stopped because CatBoost returned no best-iteration value without a validation set. Both fitting paths now accept that result. Checked checkpoint recovery preserves the selected tree budgets, original scope and source hashes, completed classifier and spent compute. Native checkpoint reuse, both Windows path formats and changed-scope rejection pass. The completed fit's actual source specification remains preserved alongside the recorded compatibility entry for the path-check correction.</p><p>Follow-up checks in this chat are set for every half hour, with updates on meaningful results or failures. The local controller updates this page's job record while the fits run.</p></section>
+{render_preparation(preparation)}
 {first_section}
 {outer_section}
 {''.join(render_evaluation(audit) for audit in evaluations)}

@@ -11396,7 +11396,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-04T21:48:21.844658+00:00",
+  "recorded_utc": "2026-10-04T22:07:56.421515+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12025,13 +12025,13 @@
     "phase": "Full reference 2-3 is training",
     "pid": 78840,
     "controller_pid": 73236,
-    "checked_utc": "2026-10-04T21:48:37.255909+00:00",
+    "checked_utc": "2026-10-04T22:08:16.916466+00:00",
     "active_component": {
-      "component": "2-3\\donors\\2303f7a58a7128f6108ba513a9ec4375392fdabf41065b33769abbddfb6a3873\\group-5-11\\ra_cb_wz",
-      "fit_rows": 708568,
-      "fit_days": 122,
-      "stage": "budget selection",
-      "started_file_mtime": 1791150510.858998
+      "component": "2-3\\donors\\2303f7a58a7128f6108ba513a9ec4375392fdabf41065b33769abbddfb6a3873\\group-8-12\\ra_cb_wz",
+      "fit_rows": 700261,
+      "fit_days": 121,
+      "stage": "full refit",
+      "started_file_mtime": 1791151356.6049612
     },
     "completed_components": [
       {
@@ -12615,6 +12615,21 @@
         "checkpoint_replay": "PASS"
       },
       {
+        "component": "2-3\\donors\\2303f7a58a7128f6108ba513a9ec4375392fdabf41065b33769abbddfb6a3873\\group-5-11\\nn3_wz",
+        "seconds": 131.31200000003446,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\2303f7a58a7128f6108ba513a9ec4375392fdabf41065b33769abbddfb6a3873\\group-5-11\\ra_cb_wz",
+        "seconds": 615.6720000000205,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\2303f7a58a7128f6108ba513a9ec4375392fdabf41065b33769abbddfb6a3873\\group-5-11\\ra_lgb_wz",
+        "seconds": 86.73400000005495,
+        "checkpoint_replay": "PASS"
+      },
+      {
         "component": "2-3\\donors\\315b31373a8256a8a60f4ccfc01503e70bf0f915af8c3ad735c7538ad6b145cf\\full\\nn3_wz",
         "seconds": 99.0,
         "checkpoint_replay": "PASS"
@@ -13043,6 +13058,2186 @@
     "error": null,
     "block": "2-3",
     "scope": "Full original C/L/N donor and meta chain; block 2-3. January/July labels remain excluded. No new scorer result yet."
+  },
+  "final_preparation": {
+    "checked_utc": "2026-10-04T22:07:55.038138+00:00",
+    "inputs": {
+      "checks": "PASS",
+      "training_rows": 2085047,
+      "ranking_rows": 344841,
+      "ranking_laneA_rows": 339551,
+      "ranking_laneB_rows": 5290,
+      "template_order_matches": true,
+      "source_hashes": {
+        "data\\runs\\contender-20261003\\cold_features.parquet": "120e19f81510f5773a8743d0513d97e3a65c9b43a7394a42356979a46bc3bd09",
+        "data\\runs\\contender-20261003\\cold_ranking.parquet": "ea36874d5fef3dc0bbbcd7b2c687a7615170d2c7d943af877ea5aed862c5b6db",
+        "data\\ranking.parquet": "9db75e3a56fa09b87aab72e191a53da3fe763d9887ad2b23aea9cde6a6325f86",
+        "data\\weather\\2026-09-05\\EDDF.csv": "1b89ffb238a745f71a23e46ed9392538c161288dc71d97fd6f5630d6cfcffe83",
+        "data\\weather\\2026-09-05\\EDDM.csv": "f411c7782ff03d3c2e9b02a7c71119319516a284b0b1dc89e8e088a4b8cf88a1",
+        "data\\weather\\2026-09-05\\EGLL.csv": "7944751fa1a2e6eab5800ae8f329746d05706a86ceac59d461909898c1127703",
+        "data\\weather\\2026-09-05\\EHAM.csv": "fe8d7f911719a5a6adb0c6b7b9a1f8e494878031ac3265bffd34a243315c2b8d",
+        "data\\weather\\2026-09-05\\LEBL.csv": "2da3fa8602f08a082f4976c76dbbf8978bf643bc5156ff6273a02167b80803f4",
+        "data\\weather\\2026-09-05\\LEMD.csv": "3957297fb05a5dbe20b6158e99f6f6971ab2b5c85f0131f380318d48c8f52527",
+        "data\\weather\\2026-09-05\\LFPG.csv": "66dcc60c077eb1ca47a45ea40304c4be8ce0cf25ce4ab02dad1b40de21e03f3a",
+        "data\\weather\\2026-09-05\\LIRF.csv": "1f2ec0a35d63dfc4513dab325fccef4897774bbc9838b9ce1875c93a3871cd01",
+        "data\\weather\\2026-09-05\\LSZH.csv": "470d647873f7841683dcc6daa5e09e8f1ad0f0c01fc63945d935316c16819254",
+        "data\\weather\\2026-09-05\\LTFM.csv": "17a16b1dab4c8a9c1cea0356d87c4a2b3abaf8f37a3c6b258a82dbe9b2aa4965"
+      },
+      "template_hash": "0d383408ed5ac27bfcfd12d6b961cee77c8a6364b10dad9fe3ec81115c79652b",
+      "limit": "Existing cold ranking features are reused; this does not rebuild their features or validate model inference.",
+      "split_metadata": "The existing cold ranking cache says train; the final entry point must assign rank without changing the cache."
+    },
+    "observed": {
+      "proof_hash": "3e292f7035d50861cd94174f9eaaa1f7adc0af67bcce749b9914fe8c86bf627a",
+      "component_wall_seconds": 57554.9594677313,
+      "gpu_family_wall_seconds": 44191.81946773175,
+      "observations": [
+        {
+          "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\full\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 155.09299999999348,
+          "gpu_family": true,
+          "fit_rows": 950561,
+          "fit_days": 164,
+          "record_hash": "9dc3692ff31ddbee5ad3bd679e4b1ff96a7bc4fefe86b0c12cc3370811687a33",
+          "start_record_hash": "c8a03cee6cdf0ac1c787ba616657e2ce6559b6f4eda8b2c1dff9bb9d266d1801"
+        },
+        {
+          "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\full\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 751.625,
+          "gpu_family": true,
+          "fit_rows": 950561,
+          "fit_days": 164,
+          "record_hash": "8ebe26ec3b751ced17cbed2f9673590e66e0d6697741a640003f63360459f324",
+          "start_record_hash": "6cf07e3036f25b6fde55b5f9eb42f22a7a51415487dab50b7f9be0431aa16316"
+        },
+        {
+          "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\full\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 143.25,
+          "gpu_family": false,
+          "fit_rows": 950561,
+          "fit_days": 164,
+          "record_hash": "bf07fbe5f035c14b2f4c30a97cdd487efd1b1f837ff8f9cda07c7689c06594a4",
+          "start_record_hash": "3103ea95fe080fc1568432ba0a8517599ba1656298cabae25f20a3ac19ea5056"
+        },
+        {
+          "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\group-3-8\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 87.84399999992456,
+          "gpu_family": true,
+          "fit_rows": 598342,
+          "fit_days": 102,
+          "record_hash": "04263607df27286845fcb4cbc26cca751102cb08cb90cef9c68807b5f7b56d7c",
+          "start_record_hash": "11e68c28a9b4ce468830f7850429ec2663844d87d07665bb5386cc7377da0e47"
+        },
+        {
+          "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\group-3-8\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 635.0310000000754,
+          "gpu_family": true,
+          "fit_rows": 598342,
+          "fit_days": 102,
+          "record_hash": "cd7ecb586a80b445d0cd2675674d136018ba0e5232292a7b9b90786f8be9a89b",
+          "start_record_hash": "21b9295d78ba0837c385db59f8d6dc39a2071f1123aad045c35512632fa5cf6f"
+        },
+        {
+          "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\group-3-8\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 80.67199999990407,
+          "gpu_family": false,
+          "fit_rows": 598342,
+          "fit_days": 102,
+          "record_hash": "cbaa0f774a595f292bdee39f70aaabeae07653bd6e079e3ebc8746729d4b74d4",
+          "start_record_hash": "2aba348ef287b31e8ee382cacab9eee22e4274173eb61043cae4f38d0e9061e7"
+        },
+        {
+          "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\group-4-10\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 96.76600000006147,
+          "gpu_family": true,
+          "fit_rows": 592597,
+          "fit_days": 103,
+          "record_hash": "a50d9c0a02ac9a72439eec4fe96da1ee4ce087141ee4b2050261dfa16f2d3728",
+          "start_record_hash": "4142478deebf58404ff7d7e7634c5ee1973b60633d9e8ff1964bf1b467031488"
+        },
+        {
+          "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\group-4-10\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 670.6089999999385,
+          "gpu_family": true,
+          "fit_rows": 592597,
+          "fit_days": 103,
+          "record_hash": "c0f6a9b90997ce09c4681858b2803d7e27551757411c341969bcd5cbe769205c",
+          "start_record_hash": "14c03648de2e8a04d9e51b44a74101f114e60c273a5dc7192fed3e2f18eafb90"
+        },
+        {
+          "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\group-4-10\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 90.29700000002049,
+          "gpu_family": false,
+          "fit_rows": 592597,
+          "fit_days": 103,
+          "record_hash": "6251d95473fe0f4b82dd339120325b5ff9ebc0f31432c72f0f5d7997f2872633",
+          "start_record_hash": "70c8c3963fcea392c600b3073801853b0e17a86095443f7ecab6cff9a8a89845"
+        },
+        {
+          "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\group-6-11\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 121.29700000002049,
+          "gpu_family": true,
+          "fit_rows": 710183,
+          "fit_days": 123,
+          "record_hash": "86760da2d619e129fde42e9c28f479908d8c0e56d32b4d11ac6ff6265ff32615",
+          "start_record_hash": "12f9d30e94b04232b4fdc7166d6b2cc0641a3d3d3c09942ce53fd5d792d5adcd"
+        },
+        {
+          "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\group-6-11\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 718.484999999986,
+          "gpu_family": true,
+          "fit_rows": 710183,
+          "fit_days": 123,
+          "record_hash": "7c1c4dc5503a663cd99fa3ccfc9790947514635f51e8f718957e3f5617152f5e",
+          "start_record_hash": "1317623912dab26c49a1ba9804006f8b963f968da635732d9049749bcd214167"
+        },
+        {
+          "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\group-6-11\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 94.18799999996554,
+          "gpu_family": false,
+          "fit_rows": 710183,
+          "fit_days": 123,
+          "record_hash": "be45b988ee21210ec68e7863c3df279644eb80d724d42deae76d1e00a7d801fe",
+          "start_record_hash": "65de7de870589fa54949765ba80f995f2d1773482b435c17b7f6e91d8dfaa179"
+        },
+        {
+          "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\full\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 115.46900000004098,
+          "gpu_family": true,
+          "fit_rows": 1079484,
+          "fit_days": 189,
+          "record_hash": "c3426f1cc54dc08590b1dd50ae0554c9d139607da3b0e2abb6dcbaba19855dd3",
+          "start_record_hash": "9e134cf73345511cfb2125461fcad773c80e290618f08352c94d6acb6bed32fe"
+        },
+        {
+          "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\full\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 941.109000000055,
+          "gpu_family": true,
+          "fit_rows": 1079484,
+          "fit_days": 189,
+          "record_hash": "5d825140503aeb4d5584e40b9d90069997a90dc5f7c904249f9604ff3d9f3fed",
+          "start_record_hash": "927e99bd00173454eb974da16f9aa060bdeb4a7a4ccfe58e532dab94c5723594"
+        },
+        {
+          "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\full\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 130.5,
+          "gpu_family": false,
+          "fit_rows": 1079484,
+          "fit_days": 189,
+          "record_hash": "dd11e0200b594e8f80053e1c65aa12490f34b8f6ba0daa72ac05d6269ef80f0d",
+          "start_record_hash": "24abba54d71ac20c98f4d2ba69841481c0364c774c62edad43b7175bfc2e75bf"
+        },
+        {
+          "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\group-2-8-12\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 82.92200000002049,
+          "gpu_family": true,
+          "fit_rows": 700261,
+          "fit_days": 121,
+          "record_hash": "ecfe09b3e183e749766da9164532101d41a35adc290f50c6819a53a59a8b1dcf",
+          "start_record_hash": "7b22dfb8abca8b7e44b93401e051ad19c53de3e38708b0d9253aef8a16058985"
+        },
+        {
+          "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\group-2-8-12\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 549.0629999999655,
+          "gpu_family": true,
+          "fit_rows": 700261,
+          "fit_days": 121,
+          "record_hash": "6333f59237436cac795fd35c096e8a3b97b7624fd5c94081a451a9e2a0b80116",
+          "start_record_hash": "e18401210f2f1ed3bfe6dae5d374df0309587cf8553b1d9dc027ca1b1e906104"
+        },
+        {
+          "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\group-2-8-12\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 99.95299999997951,
+          "gpu_family": false,
+          "fit_rows": 700261,
+          "fit_days": 121,
+          "record_hash": "33e2866612d2a2610e4772f35b339528049b9feb6c262733ab1abb7898d38917",
+          "start_record_hash": "e2c6bce3215af7da138e91a0b4b15c40fa916767568c59e8c9ce3f4a6566868b"
+        },
+        {
+          "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\group-4-9\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 99.375,
+          "gpu_family": true,
+          "fit_rows": 723796,
+          "fit_days": 129,
+          "record_hash": "069b801a40f5afd2dfc624c1c78f32061ac5c8f145687986c490fd0378258c1b",
+          "start_record_hash": "d398564718eb21bf7255800aab21d2042abd1d69bca7a53629d972019449378a"
+        },
+        {
+          "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\group-4-9\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 940.655999999959,
+          "gpu_family": true,
+          "fit_rows": 723796,
+          "fit_days": 129,
+          "record_hash": "85b59bbb1e4b6dbfc479d0f36d272ed42328b86b191d85f077961a1b4e033ce5",
+          "start_record_hash": "b041e1dec349f10402ac730c2808e26443df0ef65cdcc9c0e0cce2309d71df71"
+        },
+        {
+          "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\group-4-9\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 85.54700000002049,
+          "gpu_family": false,
+          "fit_rows": 723796,
+          "fit_days": 129,
+          "record_hash": "177fa04546979d9dc598a6869e6c7cc3ea438346616e68b3e691bd76f613986a",
+          "start_record_hash": "bb9448d332c80eeb89430588aa6ca4b6fd03f54eed898c1678b1907b09816fea"
+        },
+        {
+          "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\group-5-11\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 87.45299999997951,
+          "gpu_family": true,
+          "fit_rows": 734911,
+          "fit_days": 128,
+          "record_hash": "ddfafa8f63446f07f6aa2b47de40338530cc6e67556885f24eddafbec591851e",
+          "start_record_hash": "722d2ba67867a763ded6f18677b349255b53b7c0236ebc279dc0bfd5506e61ae"
+        },
+        {
+          "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\group-5-11\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 945.890000000014,
+          "gpu_family": true,
+          "fit_rows": 734911,
+          "fit_days": 128,
+          "record_hash": "b315c0c6c3feda794f2a292de41ff49cc6dab6743115b8fc74076ff2188aafc5",
+          "start_record_hash": "75ccc9a734fd396b55123da4c82c34657fe18c20bb5d7d81210b2d67718334e6"
+        },
+        {
+          "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\group-5-11\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 78.07799999997951,
+          "gpu_family": false,
+          "fit_rows": 734911,
+          "fit_days": 128,
+          "record_hash": "d5dea78313e39540ce7ee5a87419889d3f4b9c2f9efe90adeb41f1281d873d96",
+          "start_record_hash": "ac79198faddccbcb8d4dc46b71caf217d4516af2a251562fba14c3828625a25a"
+        },
+        {
+          "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\full\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 216.34400000004098,
+          "gpu_family": true,
+          "fit_rows": 1195763,
+          "fit_days": 211,
+          "record_hash": "9b5426431f89a174b8e50d49e1dfb7f6dfcf084e56598e5c29837f68eddd366d",
+          "start_record_hash": "2bbd413671fec424dd0ffb9581e00685fc81df06fd8cbdf44309fdab8a357f8d"
+        },
+        {
+          "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\full\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 963.125,
+          "gpu_family": true,
+          "fit_rows": 1195763,
+          "fit_days": 211,
+          "record_hash": "cd4a3f4377a6e2b72f5b7cf177d4ca0e6553f231db0bc756ae8064d5328fe785",
+          "start_record_hash": "975a0f9e03929d5e4f3b552053f9bcac57ab8a85ff0819388e88794c1e5c64b9"
+        },
+        {
+          "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\full\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 144.375,
+          "gpu_family": false,
+          "fit_rows": 1195763,
+          "fit_days": 211,
+          "record_hash": "5f635befce55501c6497af07962d2409231fda4975ee0ced0323bd7d963af885",
+          "start_record_hash": "0bdcac624080f7eefe7cef1cfd3a36313566b8e966ed1ce987dc0600526263f3"
+        },
+        {
+          "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\group-2-8-12\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 95.10900000005495,
+          "gpu_family": true,
+          "fit_rows": 700261,
+          "fit_days": 121,
+          "record_hash": "8260f922e9ccf5147bc1bb8c4ceb3b6b2302e67b3b588b9024e20ff9a90fd6f6",
+          "start_record_hash": "4f08b00feda9b0b99700af36e5283161aa58083b0b2ceca06e3742181f87795a"
+        },
+        {
+          "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\group-2-8-12\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 458.905999999959,
+          "gpu_family": true,
+          "fit_rows": 700261,
+          "fit_days": 121,
+          "record_hash": "242328212c355aacaf2d1b550c2482282699f106a820add3c275cec731da8f42",
+          "start_record_hash": "6b15c91d8e4acf16da91e94c4be499f1fcabaedf8e3be671e376ac30e2e9712a"
+        },
+        {
+          "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\group-2-8-12\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 104.03099999995902,
+          "gpu_family": false,
+          "fit_rows": 700261,
+          "fit_days": 121,
+          "record_hash": "96b284f71b9e138d8fb983eba597ac39ad171e46d18c7f50ff9267bc53b7def7",
+          "start_record_hash": "f54c4150a0b6ef5034450f7fa6ce1b5e091624bfb5ad24b41bb8ae66a38beae6"
+        },
+        {
+          "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\group-4-9\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 137.67199999990407,
+          "gpu_family": true,
+          "fit_rows": 840075,
+          "fit_days": 151,
+          "record_hash": "63da4593ce9b37573838b4a301188e2db6c53d45145b57e23f4e2cc2f1814226",
+          "start_record_hash": "378fc30cafba3ee44ef45d1653e6fbd0643f55bb547071360208b3c9c9e9cc7f"
+        },
+        {
+          "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\group-4-9\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 854.25,
+          "gpu_family": true,
+          "fit_rows": 840075,
+          "fit_days": 151,
+          "record_hash": "4c6f0779736055ac45680f3eb3f502e9fae03ba799016d50c15a85eb93d0704c",
+          "start_record_hash": "7a2357dae8efdea3541bfb478ee4b609a56794a3539ccf7ea78cc41d4fce67e4"
+        },
+        {
+          "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\group-4-9\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 161.28099999995902,
+          "gpu_family": false,
+          "fit_rows": 840075,
+          "fit_days": 151,
+          "record_hash": "a7b33461360c26d1124c12968a1844509ca271323f2579506eacdfd9cab97963",
+          "start_record_hash": "723d647fceab219e585fbff4d02dc2883310b02e6b0dbc1aace6d7b88abad2f4"
+        },
+        {
+          "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\group-5-11\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 106.59299999999348,
+          "gpu_family": true,
+          "fit_rows": 851190,
+          "fit_days": 150,
+          "record_hash": "48addca661f8668d8490032c3a48c30eada972d89c46320fb2cfecc9d12ad844",
+          "start_record_hash": "a2fb81bf5636e0b9af834a1278e857d0b2f86cf217c621e0cd8bf3afa70f4104"
+        },
+        {
+          "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\group-5-11\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 750.875,
+          "gpu_family": true,
+          "fit_rows": 851190,
+          "fit_days": 150,
+          "record_hash": "6bfd2574653d0547bbf411c60a071ce094249c100718614b3e31162a7a78718c",
+          "start_record_hash": "1f89eae7fedd52796243f1551466e0ed7a8d33e42d6b0fd5fc921e3dc6239f65"
+        },
+        {
+          "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\group-5-11\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 115.25,
+          "gpu_family": false,
+          "fit_rows": 851190,
+          "fit_days": 150,
+          "record_hash": "dfac9d6b56d180d5960642d13488b7574c20e74d5f109fc13a196cb4ba753285",
+          "start_record_hash": "e1280ff30579cd3b7a4638d7bf1095e074dbdc73171c5d58e5745a9dc209537d"
+        },
+        {
+          "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\full\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 184.84400000004098,
+          "gpu_family": true,
+          "fit_rows": 1199500,
+          "fit_days": 212,
+          "record_hash": "e7cd58b7d69282ebf61eea6abaec3756c24c8b27279e47c9797852430883f158",
+          "start_record_hash": "f98e80d5f6550a8f2fe2267505d7a7259e25b91a55bc09874ca2d0cf0f0066b4"
+        },
+        {
+          "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\full\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 967.469000000041,
+          "gpu_family": true,
+          "fit_rows": 1199500,
+          "fit_days": 212,
+          "record_hash": "a8b15412dbfbc95833b9412825b9a4ce2faf68773cb0eea72e57de539ba3cc37",
+          "start_record_hash": "f68095ed753d3d8d277dab0aa95bd8909dc16bc70165e72b3ffe2ca02873a206"
+        },
+        {
+          "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\full\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 156.01500000001397,
+          "gpu_family": false,
+          "fit_rows": 1199500,
+          "fit_days": 212,
+          "record_hash": "b0b238b1eaa79fe6716686a71560ebd7e06abb388d61e7b46d783e123fab3b69",
+          "start_record_hash": "86d0e63e09ed9295591ff12a57634e1b2400b82f5d34ef2a48ea51af5605c341"
+        },
+        {
+          "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-2-6-12\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 137.6720000000205,
+          "gpu_family": true,
+          "fit_rows": 712210,
+          "fit_days": 123,
+          "record_hash": "c11ae9c0152c93ac95610452503d692d886a88a9e62decfb9e9145a2abce2b83",
+          "start_record_hash": "1574369aaa4887bdb1324046b7cf71174127b84c798a67888f7d84f7e1148511"
+        },
+        {
+          "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-2-6-12\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 948.6719999999041,
+          "gpu_family": true,
+          "fit_rows": 712210,
+          "fit_days": 123,
+          "record_hash": "17cbe524c3ec09b148f0cd7ec97ccf3d9fe9e7f9cd5c9f8c8f298f9ee2615128",
+          "start_record_hash": "3d20feebbda24f0d7593782c08245d7f2b7a8d0fd7b8a0730cd2e5817fcf3fc1"
+        },
+        {
+          "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-2-6-12\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 104.96799999999348,
+          "gpu_family": false,
+          "fit_rows": 712210,
+          "fit_days": 123,
+          "record_hash": "5a21cbd6ad2ebe6a9d7c4981454e356bed7a42dcd31d5f8a62f297dd99a63945",
+          "start_record_hash": "ed4afcbb639eb3a2006264252a21802524fe01cf4c95755ac86c29dda9f75726"
+        },
+        {
+          "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-3-9\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 81.96799999999348,
+          "gpu_family": true,
+          "fit_rows": 854648,
+          "fit_days": 151,
+          "record_hash": "4f6e8ae6dcf3e49c746507d7a9f201e6d253c9cebb4d8db29eebc820905038c3",
+          "start_record_hash": "23486a5822c17e55b85161e18526ca8c8174b295adc984af9c6cabbb6f6c9f61"
+        },
+        {
+          "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-3-9\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 745.844000000041,
+          "gpu_family": true,
+          "fit_rows": 854648,
+          "fit_days": 151,
+          "record_hash": "cf157757657b532213ea433afaa52da92270e7982aa3c37d1691b8f010577a4a",
+          "start_record_hash": "5bbf37628b694bed7cd56ac4f3fe5baefe33f467a6ebc7aab26524e308f42291"
+        },
+        {
+          "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-3-9\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 110.09400000004098,
+          "gpu_family": false,
+          "fit_rows": 854648,
+          "fit_days": 151,
+          "record_hash": "6825eca706e342c7d80c625103ba79b152ac58e66d77fe68c4c3081db18ba50e",
+          "start_record_hash": "e87a835b1c3f52cf2c344f660d22290c2e65fd9535aa8f91d0b8d0dfb302a9fc"
+        },
+        {
+          "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-5-10\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 100.14100000006147,
+          "gpu_family": true,
+          "fit_rows": 832142,
+          "fit_days": 150,
+          "record_hash": "ac5142a9dbdc02bf5b8bd340fbe83e7a41fcd5f67c590ddd4ce9e8f67536f2b9",
+          "start_record_hash": "929f6cbeeb9a0867f11efd2c26b446a75099d2525951f447ecfb20a7d5ebb845"
+        },
+        {
+          "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-5-10\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 777.890000000014,
+          "gpu_family": true,
+          "fit_rows": 832142,
+          "fit_days": 150,
+          "record_hash": "331a42e33fac2819d5b76ce2babe66230fa25f8fb41fd29efde47018e425eba8",
+          "start_record_hash": "d56f21b0eaaf5593bee1ccbcc983b4f3cb6751bc248c19757554200ea6940c89"
+        },
+        {
+          "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-5-10\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 100.42099999997299,
+          "gpu_family": false,
+          "fit_rows": 832142,
+          "fit_days": 150,
+          "record_hash": "1f448b2097ea24a2bb8c914a21e6cfd44daece61d2a88f7d71ea1fec37249efe",
+          "start_record_hash": "941b6d0b155e407abd5be1b3b20e7d44e43eaf26fcfd04e2add15448c979a195"
+        },
+        {
+          "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\full\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 213.14099999994505,
+          "gpu_family": true,
+          "fit_rows": 1559503,
+          "fit_days": 272,
+          "record_hash": "1fd7febf2f83c306a423c5c5689e3c826d38b0f71a20547a3fe8b9777c4c2c08",
+          "start_record_hash": "8e820c4130848180bf041746b2eb80e6d0d95435e5e23dbf963e6d6f21269c96"
+        },
+        {
+          "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\full\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 1342.5929999999935,
+          "gpu_family": true,
+          "fit_rows": 1559503,
+          "fit_days": 272,
+          "record_hash": "68a9097b96032da47384115e7f2a67622bc06bb0b6f75ca5fe0909483b720cc6",
+          "start_record_hash": "8f32c58ff8dc8f833f004fc848739c15af2743353432ae26e45c3619d576a454"
+        },
+        {
+          "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\full\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 225.5470000000205,
+          "gpu_family": false,
+          "fit_rows": 1559503,
+          "fit_days": 272,
+          "record_hash": "b21cd33f979ac37da286e78b5cc4b353c6c38334f74672e5b47739f55f04834f",
+          "start_record_hash": "109ea39ea3a0ef8c285f5c929b8d84c75d36a0d759af9ce023e6073aa4d80999"
+        },
+        {
+          "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\group-2-5-9\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 238.875,
+          "gpu_family": true,
+          "fit_rows": 1051799,
+          "fit_days": 183,
+          "record_hash": "c2bc5a3147fc6a35c2c2379eb428113dca6d1e0bb54fca2df1f73fdb28b1f87c",
+          "start_record_hash": "41b59eff50a6db443c52af2b9c05ebb462b84a5d88a64c9b7a7445c740d6b69f"
+        },
+        {
+          "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\group-2-5-9\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 657.140999999945,
+          "gpu_family": true,
+          "fit_rows": 1051799,
+          "fit_days": 183,
+          "record_hash": "215ff2bcc9e5a76a3b2db7b155f6c92a23e5ec9f5297e1284d2ed509fff7320e",
+          "start_record_hash": "3a4708e7af105f78c8454efff728cd7d874e392c9ae3b7b3b013cafec2fa01d3"
+        },
+        {
+          "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\group-2-5-9\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 154.98399999993853,
+          "gpu_family": false,
+          "fit_rows": 1051799,
+          "fit_days": 183,
+          "record_hash": "acd2dafcef7e4543be6273964df0518915014625b454bd6dc256737402d92220",
+          "start_record_hash": "d6a084baab103a5a9c004941b8d43642ed2ab3d314400256b34788e70d28cbb2"
+        },
+        {
+          "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\group-3-6-10\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 409.59399999992456,
+          "gpu_family": true,
+          "fit_rows": 1031735,
+          "fit_days": 180,
+          "record_hash": "3146a5a2fd90474b121a70429577f322ad46f2f6b8606433ff99114cc60be209",
+          "start_record_hash": "db364d4e907004c39c60888c8ba84acca71ffad4380ce8056afbcee995ba25da"
+        },
+        {
+          "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\group-3-6-10\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 826.015999999945,
+          "gpu_family": true,
+          "fit_rows": 1031735,
+          "fit_days": 180,
+          "record_hash": "3673ba91de7e197094bf8797bde70bf55ab4de7ca89fbd1688d565f04e247cab",
+          "start_record_hash": "2fd95ebb82ee1cc0a4dd8479f4faea708e96f53a97d86c7b6124bb65f6402922"
+        },
+        {
+          "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\group-3-6-10\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 150.5779999999795,
+          "gpu_family": false,
+          "fit_rows": 1031735,
+          "fit_days": 180,
+          "record_hash": "2f2255372a9d3bdb4729deae72f6c5f9a1efa3667615fede49e9e2e23ea7e6a6",
+          "start_record_hash": "2e4a6a6c4a75e38044fd29af2759d83e2aab876460bcaf095459c19b5b23c42c"
+        },
+        {
+          "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\group-4-8-11\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 266.780999999959,
+          "gpu_family": true,
+          "fit_rows": 1035472,
+          "fit_days": 181,
+          "record_hash": "68dee3352f83ac1668c8c23814d0a7ad962a8e326228a4dbc080158ba2bf976f",
+          "start_record_hash": "5b03db3a0e026c865d1c31fee1cdde7f88773f75a86348ea6541e288688de4a2"
+        },
+        {
+          "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\group-4-8-11\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 1312.5779999999795,
+          "gpu_family": true,
+          "fit_rows": 1035472,
+          "fit_days": 181,
+          "record_hash": "f269ce7ae2b9d4fe165855a9d207347c6da5bc53ca2364449bdfe0c8d9412980",
+          "start_record_hash": "f65b234938f5e469632a831e4cf80436696520c7b28aff8ee1064316ebc95261"
+        },
+        {
+          "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\group-4-8-11\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 178.18799999996554,
+          "gpu_family": false,
+          "fit_rows": 1035472,
+          "fit_days": 181,
+          "record_hash": "948c9d4c28ed8694f3a9bf4c4e23cdf16b17331f28478d0b7adb1e5f6cb7c54c",
+          "start_record_hash": "a59c4647a05ae61297a241868f2610d608a4f0c06b7fdbdec94c39fca8653bd9"
+        },
+        {
+          "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\full\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 508.76500000001397,
+          "gpu_family": true,
+          "fit_rows": 1723531,
+          "fit_days": 303,
+          "record_hash": "6e668cc1f62ad1a489888b65771c74ebdcea83b93b9fe83393d6f8da63da5a37",
+          "start_record_hash": "1275a7074f969b28d1f9abdbe19027a7d7ce2ef404a6de92c5069787d7cf87e3"
+        },
+        {
+          "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\full\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 1588.454000000027,
+          "gpu_family": true,
+          "fit_rows": 1723531,
+          "fit_days": 303,
+          "record_hash": "47d9630993e9ac39e0f837629bbacf4344d6522f0ecd5dc63a4f614996bb433c",
+          "start_record_hash": "778856424b97b3311699593f09496572ed26baf4fda6b70480f308d5e8b576bd"
+        },
+        {
+          "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\full\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 279.64100000006147,
+          "gpu_family": false,
+          "fit_rows": 1723531,
+          "fit_days": 303,
+          "record_hash": "06749f41a3bcb9c275141b362068bb413c110ce7c23772d5ca93573914ba5cfb",
+          "start_record_hash": "5a4a496b0a1df39341a4c5a912329898b6ff91643532c5a63bec659552e49a26"
+        },
+        {
+          "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-2-5-9-12\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 243.26599999994505,
+          "gpu_family": true,
+          "fit_rows": 1051799,
+          "fit_days": 183,
+          "record_hash": "de70f93466b9cd3948996606b30888df6ed539e639f05860bfb98ff859384d28",
+          "start_record_hash": "a87facbaff10f9de3317621d55ef63fe2c1326ea9d2f1c986018e4e8b471ae3b"
+        },
+        {
+          "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-2-5-9-12\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 722.6410000000615,
+          "gpu_family": true,
+          "fit_rows": 1051799,
+          "fit_days": 183,
+          "record_hash": "41af0de9e899d7dfa5439ef8743406fb722fd86bbb6002f72db3a40db1edc34a",
+          "start_record_hash": "89be9c6a78441cce87593c46f78d6589a302de979b0850f053e324f38c4ab8de"
+        },
+        {
+          "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-2-5-9-12\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 143.78099999995902,
+          "gpu_family": false,
+          "fit_rows": 1051799,
+          "fit_days": 183,
+          "record_hash": "f7bdea9415cd3ff5e291cb7936f0e40b199a9ac5cf6732bfa29240b81e6d1463",
+          "start_record_hash": "ef99bd286f0dc51d7db29510f85613968e76e726bff32927cf315fc3e70e785c"
+        },
+        {
+          "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-3-6-10\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 258.2970000000205,
+          "gpu_family": true,
+          "fit_rows": 1195763,
+          "fit_days": 211,
+          "record_hash": "6828e8a3968468bbe937d067d5f348d5f1e04cea2fa1861a0b2d7ebcb937fa98",
+          "start_record_hash": "ab4a366bda148b6a1017facc275a06b2ea89c56e89e778e71705fb042cf6b980"
+        },
+        {
+          "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-3-6-10\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 995.640999999945,
+          "gpu_family": true,
+          "fit_rows": 1195763,
+          "fit_days": 211,
+          "record_hash": "dbf28c08d96e4ec23ee91feee3b5eb7c3d4bf43460368496c3d00bb74ee7ab96",
+          "start_record_hash": "f88c7be5e2a704f54c1be93677e4f95a3847f0e9db4f2d82a80f269eb572a6b0"
+        },
+        {
+          "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-3-6-10\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 176.78099999995902,
+          "gpu_family": false,
+          "fit_rows": 1195763,
+          "fit_days": 211,
+          "record_hash": "af0b6e3e0a7fdf66001b162fe27eb518c3e53aa44c7a952c3bb3e20a26215abe",
+          "start_record_hash": "00baa59200dd115f7fa6f48ea2fda30b129878b8d5913ac9a09099005fb03aba"
+        },
+        {
+          "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-4-8-11\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 222.59400000004098,
+          "gpu_family": true,
+          "fit_rows": 1199500,
+          "fit_days": 212,
+          "record_hash": "c6e2e6c7257e900119133299b6fc3929a16f721e5de036e8336015115e506c83",
+          "start_record_hash": "538b6ddbaf7301bd1650d98b57b6a2d3153b51674833ca0b153d19b6491343f5"
+        },
+        {
+          "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-4-8-11\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 860.125,
+          "gpu_family": true,
+          "fit_rows": 1199500,
+          "fit_days": 212,
+          "record_hash": "b2647ebdb86e68cf066aaca666ed1901165fd2dcac55b69c753a4eec72eb9b20",
+          "start_record_hash": "527dc8627b1b73170e482fd8200a050c9c63164512e3dc5e1fe259f8aa7dd145"
+        },
+        {
+          "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-4-8-11\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 182.39099999994505,
+          "gpu_family": false,
+          "fit_rows": 1199500,
+          "fit_days": 212,
+          "record_hash": "214cf1ff417a19b1af4df0cb856524aceb7015b976dca5ae9a6334b31ad036a2",
+          "start_record_hash": "462324721d74b36e59d91df99029c9705c3de88cc4da96dcf0d631368eaf63ff"
+        },
+        {
+          "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\full\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 208.375,
+          "gpu_family": true,
+          "fit_rows": 1051799,
+          "fit_days": 183,
+          "record_hash": "c07f7741fcc51353127611342637f952ecc819a4cd2961bc22a4056dd361300d",
+          "start_record_hash": "074928cdb2d1b10abf4907d508f37ef9645a04ac42916f911b936b3e1c987227"
+        },
+        {
+          "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\full\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 598.2179999999935,
+          "gpu_family": true,
+          "fit_rows": 1051799,
+          "fit_days": 183,
+          "record_hash": "fae8ba7549745f178be7ffd3f58a78134b759897a98f308f9b35f56699e096ba",
+          "start_record_hash": "147d9613f100e44ae1d9327d49170fab65538d4edac310c11ccaa1376be50260"
+        },
+        {
+          "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\full\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 155.454000000027,
+          "gpu_family": false,
+          "fit_rows": 1051799,
+          "fit_days": 183,
+          "record_hash": "218b94495ca0388af618e4c87c95ae8fccfada88fd1c7680210a12b6dc472cd4",
+          "start_record_hash": "c31c2157a37dfc1cca61f143c99078fc6ed3cb6ed64a2f0ce9d2b59d90bb05b1"
+        },
+        {
+          "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\group-3-8\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 60.60900000005495,
+          "gpu_family": true,
+          "fit_rows": 699580,
+          "fit_days": 121,
+          "record_hash": "8cf27593dfa2dd3c5893789ba2a5695a3fe9ac8763352cce2273af69eb3c5784",
+          "start_record_hash": "b502caea5051b1f57ddf01e25719e15db4e60011965775042810c7c184ecd061"
+        },
+        {
+          "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\group-3-8\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 407.56200000003446,
+          "gpu_family": true,
+          "fit_rows": 699580,
+          "fit_days": 121,
+          "record_hash": "10b7b34c54716ece5e21bc916e69e6b724f6bf766a1dfa0b8797a5d309a4db81",
+          "start_record_hash": "399d09dea9ade7464b8ee87e3b66be24315eb5eeedd4b983bece12ecf676864b"
+        },
+        {
+          "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\group-3-8\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 74.93799999996554,
+          "gpu_family": false,
+          "fit_rows": 699580,
+          "fit_days": 121,
+          "record_hash": "32fa8b8755ea361d2928882650b2977bb557bf20b2f60b68b732c66ef1fc03c6",
+          "start_record_hash": "3ad2828e90b0dd7dae54dbd845bb652179194ef92848cb9ce19529ad6e15a229"
+        },
+        {
+          "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\group-4-10\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 78.76500000001397,
+          "gpu_family": true,
+          "fit_rows": 693835,
+          "fit_days": 122,
+          "record_hash": "de1281d145302f11f0a3dd2ed91e0b3b5f93029e8e13ceff602adcbae2a2cb65",
+          "start_record_hash": "fdd14da51f5cbd12822b797bec4bceea1bdf5c0e13ffbbe2085e7387dd66ad2c"
+        },
+        {
+          "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\group-4-10\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 606.4679999999935,
+          "gpu_family": true,
+          "fit_rows": 693835,
+          "fit_days": 122,
+          "record_hash": "46a851747651f969f1777e4d65e7a0c78c15f7643a67d6027e5fcebcb5ff52ac",
+          "start_record_hash": "af6f84dafe386362dc0b79b838b2db05926115dace4fe441963c05dea485dc3c"
+        },
+        {
+          "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\group-4-10\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 137.75,
+          "gpu_family": false,
+          "fit_rows": 693835,
+          "fit_days": 122,
+          "record_hash": "0d04f158238f3afbe5c65dbdcd4e93e58a915cb763dbb70b55154ad21872d15c",
+          "start_record_hash": "1ae03150c8e2b626c2c6f9293aba3ed1017cbab5e4a3cc58d140994c8bfc4c24"
+        },
+        {
+          "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\group-6-11\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 121.92099999997299,
+          "gpu_family": true,
+          "fit_rows": 710183,
+          "fit_days": 123,
+          "record_hash": "d286d74b62588cbfb4aead420fdcade2627286a2741746daf178f669f441384c",
+          "start_record_hash": "08cbe0f3728b9dabc710e86de885d7f2448d1fbdd565c2e9c2dd22fe8fa1b17c"
+        },
+        {
+          "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\group-6-11\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 652.1560000000754,
+          "gpu_family": true,
+          "fit_rows": 710183,
+          "fit_days": 123,
+          "record_hash": "cd8e337fd09d28d3cbf9e7d79a4176077939656281984d19ca1daa054056a9f5",
+          "start_record_hash": "08f08f8a2c74067ca6ee8376a6ff4625ff8c61b491a202f758cc17bb78f57097"
+        },
+        {
+          "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\group-6-11\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 102.31200000003446,
+          "gpu_family": false,
+          "fit_rows": 710183,
+          "fit_days": 123,
+          "record_hash": "f5dda481bc18f6a833baf3df8eaa9a4fbb20990d05b31d7899bd3f3fb60684ac",
+          "start_record_hash": "89e5066b9cdde1e52cdb183d0fdbe3a533b0ad808592e834be9be5d3cda3b2e8"
+        },
+        {
+          "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\full\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 134.64000000001397,
+          "gpu_family": true,
+          "fit_rows": 1083221,
+          "fit_days": 190,
+          "record_hash": "5892423addc832263bd844f640049eba7e2c0e414334bc3a164370cbed0bc69a",
+          "start_record_hash": "fdabf966784fbe6d8b4899296af15ba88f9010dd24d85b3dc3eb46634a035b43"
+        },
+        {
+          "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\full\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 860.030999999959,
+          "gpu_family": true,
+          "fit_rows": 1083221,
+          "fit_days": 190,
+          "record_hash": "b92796d939a60f18774f45f1ee8080befe95bbb4033aa3389bcd72d306d4fdbf",
+          "start_record_hash": "a51762d7e525aca7d2539c39feaf4f2521fb52280d899b1568f55dc6ed95a9fb"
+        },
+        {
+          "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\full\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 156.01600000006147,
+          "gpu_family": false,
+          "fit_rows": 1083221,
+          "fit_days": 190,
+          "record_hash": "d354b318b75f33d6f5b10ddbc4b85e5e32dbecd5f69bf60dc55600e447d604ef",
+          "start_record_hash": "a92013fe0fe6dff1c32a9bb561fd7a6b59eab4ff46da90f2e5cc4f0f6f2ce59f"
+        },
+        {
+          "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-2-6-12\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 112.625,
+          "gpu_family": true,
+          "fit_rows": 712210,
+          "fit_days": 123,
+          "record_hash": "e19427af332aea0c2e2aa5644cfcaee2d489f0766d0ab85138b981d6827e5e4e",
+          "start_record_hash": "2bc1ba5620401ea9295587e6dc69d74aa50071d06747e7fb176698a8c7353316"
+        },
+        {
+          "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-2-6-12\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 815.0320000000065,
+          "gpu_family": true,
+          "fit_rows": 712210,
+          "fit_days": 123,
+          "record_hash": "0e35df46b80e44b3fea33e0d6aa35e594bbb98edef15ffc11b4c0cf51782dbc7",
+          "start_record_hash": "7083a2dcc830b42f2d61625d7f2b228b21bf1b82099412787edd4e5da6375630"
+        },
+        {
+          "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-2-6-12\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 99.14099999994505,
+          "gpu_family": false,
+          "fit_rows": 712210,
+          "fit_days": 123,
+          "record_hash": "793f39da474b843721dd4e6136ea4b10f336d1e23f541e372ad083c2e0d5cf27",
+          "start_record_hash": "c7f7ef9e0a3aa4a1b8c869c2d3d8a4dee6585784becf6cfc6a5d5fac5f057987"
+        },
+        {
+          "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-3-9\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 53.54700000002049,
+          "gpu_family": true,
+          "fit_rows": 738369,
+          "fit_days": 129,
+          "record_hash": "4f853b8ce7054d7b762f231147ab59d84aa8ff11a0da5718bb12bc39dc334ca9",
+          "start_record_hash": "667fbb0c7a52672cbc43944c8706933b249210e8d3c1e9dbc82b79e81cb9fe7b"
+        },
+        {
+          "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-3-9\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 715.484999999986,
+          "gpu_family": true,
+          "fit_rows": 738369,
+          "fit_days": 129,
+          "record_hash": "8eabeb6b85017a4fb6ce1728c05de4064f71dae4f15e03cee1ba3a02e9be0cc1",
+          "start_record_hash": "f5215c01608942ad633254410dd6e71be79dfadacd2773a882e2e50a3f0a2d9f"
+        },
+        {
+          "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-3-9\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 100.23399999993853,
+          "gpu_family": false,
+          "fit_rows": 738369,
+          "fit_days": 129,
+          "record_hash": "9a28296c14505bd2ef52eea8ab294ba74f29673e58670c4e4723150e7ebe8adc",
+          "start_record_hash": "cb98d59966a74445767fa153055f53b61dbb5c7bf338ca011b4acb611a8a7cec"
+        },
+        {
+          "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-5-10\\nn3_wz",
+          "name": "nn3_wz",
+          "seconds": 89.0,
+          "gpu_family": true,
+          "fit_rows": 715863,
+          "fit_days": 128,
+          "record_hash": "22a8981514040033372c0b3b31a7a03ebbf48a2a00ff9d0b1e59d2dc367eb0a2",
+          "start_record_hash": "746a8eff25b4f5da7ccd686d869107b71f0e91e00c394e529acbf41ae4228f13"
+        },
+        {
+          "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-5-10\\ra_cb_wz",
+          "name": "ra_cb_wz",
+          "seconds": 694.4689999999246,
+          "gpu_family": true,
+          "fit_rows": 715863,
+          "fit_days": 128,
+          "record_hash": "43ee2099cb2b0a4bb56520f3f9bcddbf60354f0f00cc7f451810ea0e4803e261",
+          "start_record_hash": "b5e602cf61635ffa48c85a865b68dd7eb7ded6d6acfcb2338c1dcf31290aa1b3"
+        },
+        {
+          "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-5-10\\ra_lgb_wz",
+          "name": "ra_lgb_wz",
+          "seconds": 85.28100000007544,
+          "gpu_family": false,
+          "fit_rows": 715863,
+          "fit_days": 128,
+          "record_hash": "6a04e6c73db67b66481af50425e7304b73e744613a4a0ced7274b1ee2ff491c8",
+          "start_record_hash": "d7f8e859603cdae1e7945f8e56a3c2fd76351b0afc7ed3a88503c0316ae43d9a"
+        },
+        {
+          "path": "meta-2-5-9-12\\mixtureB",
+          "name": "mix_cb_wx_raw",
+          "seconds": 486.98400000005495,
+          "gpu_family": true,
+          "fit_rows": 1062067,
+          "fit_days": 184,
+          "record_hash": "3b83b8193d02a82107b21a111dae98d36556bcbd3755ef66cf07e9983db48bc1",
+          "start_record_hash": "af229e2c445e2eb451ebd4e11f9a6cfb11e2b62b0da7a910c4bc5a73f29e240e"
+        },
+        {
+          "path": "meta-2-5-9-12\\nn3_pw_t7",
+          "name": "nn3_pw_t7",
+          "seconds": 403.5929999999935,
+          "gpu_family": true,
+          "fit_rows": 1051799,
+          "fit_days": 183,
+          "record_hash": "eae9694bc8fbf69dead14d6ce0ebd4d51f5fafff28f9f1c3366e8c282d6c0ffc",
+          "start_record_hash": "be4b71deeb5eecd144a4d5f4f2e391876612f1ce6b918c479e156f063daba23e"
+        },
+        {
+          "path": "meta-2-5-9-12\\ra_cb_wz_t7",
+          "name": "ra_cb_wz_t7",
+          "seconds": 1468.9379999999655,
+          "gpu_family": true,
+          "fit_rows": 1051799,
+          "fit_days": 183,
+          "record_hash": "a635e8a8e573f4ea7218b8e165dac150d44fa02813b0564a3c9cb31df1a614b3",
+          "start_record_hash": "41f56b41614c573e2ca0b79452f45e623a8b29dd35951d4f309ab92c1a16ed76"
+        },
+        {
+          "path": "meta-2-5-9-12\\ra_lgb_pw_t7",
+          "name": "ra_lgb_pw_t7",
+          "seconds": 2044.4220000000205,
+          "gpu_family": false,
+          "fit_rows": 1051799,
+          "fit_days": 183,
+          "record_hash": "d4ad16859ed8704b1757cb76fadbc723aa0df1cb0ad43f8d0f4e5ee5cf6c7ccb",
+          "start_record_hash": "ebfd1d158ccfb2623f372ec08dbc879b90667442f4cd97ef3a84458256bdb66b"
+        },
+        {
+          "path": "meta-3-6-10\\mixtureB",
+          "name": "mix_cb_wx_raw",
+          "seconds": 258.81299999996554,
+          "gpu_family": true,
+          "fit_rows": 1207362,
+          "fit_days": 211,
+          "record_hash": "fe3ade0562546596175ad827bbf807b74e60736aae6c2fa0729c9dfac8c86176",
+          "start_record_hash": "d65b996464adb82b8b5ac9d9b8e0d6a39c74c6c2ebfd7d591fd35c1e50d97a89"
+        },
+        {
+          "path": "meta-3-6-10\\nn3_pw_t7",
+          "name": "nn3_pw_t7",
+          "seconds": 646.8120000000345,
+          "gpu_family": true,
+          "fit_rows": 1195763,
+          "fit_days": 211,
+          "record_hash": "ea2dd26aab6b7919e3b5f8c9e3d1937e866cda6ff9b6cfee87336366320eab87",
+          "start_record_hash": "b6760fbcc1fd24378b1fd18fd25f8c2e8dd2e21d47f479e8bc9d52be64666b79"
+        },
+        {
+          "path": "meta-3-6-10\\ra_cb_wz_t7",
+          "name": "ra_cb_wz_t7",
+          "seconds": 2040.734000000055,
+          "gpu_family": true,
+          "fit_rows": 1195763,
+          "fit_days": 211,
+          "record_hash": "8204cd5646ef9aade43c2cd24db50185b0e13bca9d041a107ae36721fc9484a7",
+          "start_record_hash": "e2cae186e2dd355ec2844fd800c700fefcf6f5da966205c45ef996220ed8c38c"
+        },
+        {
+          "path": "meta-3-6-10\\ra_lgb_pw_t7",
+          "name": "ra_lgb_pw_t7",
+          "seconds": 2335.8429999999935,
+          "gpu_family": false,
+          "fit_rows": 1195763,
+          "fit_days": 211,
+          "record_hash": "8fce3bc3b36034a4de2aa0ad566252e6f41751d87c29ca29428a79033de24a2e",
+          "start_record_hash": "18cf0a504c66a3ec7c9133c0f27e92ceb7556f7974a4c3ec0f3726115954b7c6"
+        },
+        {
+          "path": "meta-4-8-11\\mixtureB",
+          "name": "mix_cb_wx_raw",
+          "seconds": 429.625,
+          "gpu_family": true,
+          "fit_rows": 1211827,
+          "fit_days": 213,
+          "record_hash": "b32bd8b2354f2d61a55aaaf9f69c2053240f592bcc4713b9cbe6ce5e8a0e3098",
+          "start_record_hash": "5c0a9784ee1278327e238b3ee9da94734b450d93cc241067b4f75d8207316f36"
+        },
+        {
+          "path": "meta-4-8-11\\nn3_pw_t7",
+          "name": "nn3_pw_t7",
+          "seconds": 645.9060000000754,
+          "gpu_family": true,
+          "fit_rows": 1199500,
+          "fit_days": 212,
+          "record_hash": "b4860f1aa5c7a65251146767bb2bcd5cde5376ee0f4afb38f5f59aff6f8f1358",
+          "start_record_hash": "5783457a6403505de4bbe7424be249f313c74ab3d7e48209724ecf75161549b9"
+        },
+        {
+          "path": "meta-4-8-11\\ra_cb_wz_t7",
+          "name": "ra_cb_wz_t7",
+          "seconds": 2043.1560000000754,
+          "gpu_family": true,
+          "fit_rows": 1199500,
+          "fit_days": 212,
+          "record_hash": "ce99efbd0ca3157fb02334a318a25df5cf8287360662dcae574c2eb7ac6af901",
+          "start_record_hash": "d287d4a23d06406518974f37d48b4542ac1a27bfc07b291e9affe2e53e0b0fdc"
+        },
+        {
+          "path": "meta-4-8-11\\ra_lgb_pw_t7",
+          "name": "ra_lgb_pw_t7",
+          "seconds": 1984.390999999945,
+          "gpu_family": false,
+          "fit_rows": 1199500,
+          "fit_days": 212,
+          "record_hash": "c581a7ed022fba496f71713e4f92f91f90cb6498054eee9c63e8089f8267ca8b",
+          "start_record_hash": "3b0e3b7117b3ab84f544c8e28f6d88d9cd08d424d60077c27539ff91428fcff1"
+        },
+        {
+          "path": "outer\\laneB",
+          "name": "laneb",
+          "seconds": 37.296999999904074,
+          "gpu_family": false,
+          "fit_rows": 17097,
+          "fit_days": 303,
+          "record_hash": "baa229c9c5c5268586ee22f9e8de21f8376bcd61e3b532c75773f2cbb1fc7795",
+          "start_record_hash": "dae6ac84ad3c0291d284e8a76ac6a4d1eb3e14ed8b534b95c3f0e47bb2f4e0cc"
+        },
+        {
+          "path": "outer\\mixtureB",
+          "name": "mix_cb_wx",
+          "seconds": 841.0320000000065,
+          "gpu_family": true,
+          "fit_rows": 1740628,
+          "fit_days": 303,
+          "record_hash": "8073de3decbca36dd3aabd12db10bc069084ea75a88cffcca9f7bd7b5a63ec18",
+          "start_record_hash": "695477eefaf3c99bd2ded3ae272999b397b0d00c85511de4ceabd297a0d715fa"
+        },
+        {
+          "path": "outer\\nn3_pw_t7",
+          "name": "nn3_pw_t7",
+          "seconds": 820.3280000000959,
+          "gpu_family": true,
+          "fit_rows": 1723531,
+          "fit_days": 303,
+          "record_hash": "4478e3899b764fc94adaab8bb2271a83cbca35860896d55f273b83dad5617ccb",
+          "start_record_hash": "0729dcd04ef9bafa219c416271cf6c35608acf8b0cff4c4cc04259991afcc026"
+        },
+        {
+          "path": "outer\\ra_cb_wz_t7",
+          "name": "ra_cb_wz_t7",
+          "seconds": 2704.432467731531,
+          "gpu_family": true,
+          "fit_rows": 1723531,
+          "fit_days": 303,
+          "record_hash": "968d699270b74742e4c091b67567c1eeb7e9f587a99f2e5395171bdfb745f249",
+          "start_record_hash": "e858dc38f585af3402ca47053685457be1acb806d12134cbbacf4d61f5c0d1e9"
+        },
+        {
+          "path": "outer\\ra_lgb_pw_t7",
+          "name": "ra_lgb_pw_t7",
+          "seconds": 2759.25,
+          "gpu_family": false,
+          "fit_rows": 1723531,
+          "fit_days": 303,
+          "record_hash": "92ab67c9ac3026ab1a79e9b89bff207d50136e67cb73517082332f0ac4dd5db4",
+          "start_record_hash": "64ef2046bf5bd6b7a27743262d93a822a8edd55a93dde002c742f58c4140cabe"
+        }
+      ]
+    },
+    "meta_groups": [
+      [
+        1,
+        4,
+        7,
+        10
+      ],
+      [
+        2,
+        5,
+        8,
+        11
+      ],
+      [
+        3,
+        6,
+        9,
+        12
+      ]
+    ],
+    "pricing": {
+      "component_count": 113,
+      "family_counts": {
+        "ra_cb_wz_t7": 4,
+        "ra_lgb_pw_t7": 4,
+        "nn3_pw_t7": 4,
+        "mix_cb_wx": 1,
+        "ra_cb_wz": 32,
+        "ra_lgb_wz": 32,
+        "nn3_wz": 32,
+        "mix_cb_wx_raw": 3,
+        "laneb": 1
+      },
+      "all_median_seconds": 68384.79691135991,
+      "all_p90_seconds": 87074.56741603465,
+      "gpu_median_seconds": 52136.007187963405,
+      "gpu_p90_seconds": 69256.55818268191,
+      "rates": {
+        "nn3_wz": {
+          "n": 32,
+          "median": 0.00015611770716750852,
+          "p90": 0.0002308681601712405
+        },
+        "ra_cb_wz": {
+          "n": 32,
+          "median": 0.0008733862303682906,
+          "p90": 0.0012552889353759787
+        },
+        "ra_lgb_wz": {
+          "n": 32,
+          "median": 0.00014338324178768457,
+          "p90": 0.00016126151079145948
+        },
+        "mix_cb_wx_raw": {
+          "n": 3,
+          "median": 0.0003545266774877932,
+          "p90": 0.00043772513123553375
+        },
+        "nn3_pw_t7": {
+          "n": 4,
+          "median": 0.0005072185765314232,
+          "p90": 0.0005401877385254207
+        },
+        "ra_cb_wz_t7": {
+          "n": 4,
+          "median": 0.0016362314594582411,
+          "p90": 0.0017056481809810907
+        },
+        "ra_lgb_pw_t7": {
+          "n": 4,
+          "median": 0.0017990433891704645,
+          "p90": 0.0019505246459190326
+        },
+        "laneb": {
+          "n": 1,
+          "median": 0.0021814938293211717,
+          "p90": 0.0021814938293211717
+        },
+        "mix_cb_wx": {
+          "n": 1,
+          "median": 0.0004831773359959776,
+          "p90": 0.0004831773359959776
+        }
+      },
+      "components": [
+        {
+          "scope": "ranking",
+          "name": "ra_cb_wz_t7",
+          "fit_rows": 2062577,
+          "gpu_family": true,
+          "median_seconds": 3374.8533749550006,
+          "p90_seconds": 3518.0307081834353
+        },
+        {
+          "scope": "ranking",
+          "name": "ra_lgb_pw_t7",
+          "fit_rows": 2062577,
+          "gpu_family": false,
+          "median_seconds": 3710.6655165050493,
+          "p90_seconds": 4023.1072726057405
+        },
+        {
+          "scope": "ranking",
+          "name": "nn3_pw_t7",
+          "fit_rows": 2062577,
+          "gpu_family": true,
+          "median_seconds": 1046.1773699264534,
+          "p90_seconds": 1114.1788051645467
+        },
+        {
+          "scope": "ranking",
+          "name": "mix_cb_wx",
+          "fit_rows": 2085047,
+          "gpu_family": true,
+          "median_seconds": 1007.4474548864051,
+          "p90_seconds": 1007.4474548864051
+        },
+        {
+          "scope": "ranking/full-source/group-1-4-7-10",
+          "name": "ra_cb_wz",
+          "fit_rows": 1365567,
+          "gpu_family": true,
+          "median_seconds": 1192.6674144453355,
+          "p90_seconds": 1714.1811456145692
+        },
+        {
+          "scope": "ranking/full-source/group-1-4-7-10",
+          "name": "ra_lgb_wz",
+          "fit_rows": 1365567,
+          "gpu_family": false,
+          "median_seconds": 195.79942333828305,
+          "p90_seconds": 220.21339750696094
+        },
+        {
+          "scope": "ranking/full-source/group-1-4-7-10",
+          "name": "nn3_wz",
+          "fit_rows": 1365567,
+          "gpu_family": true,
+          "median_seconds": 213.1891890236131,
+          "p90_seconds": 315.2659408805604
+        },
+        {
+          "scope": "ranking/full-source/group-2-5-8-11",
+          "name": "ra_cb_wz",
+          "fit_rows": 1386530,
+          "gpu_family": true,
+          "median_seconds": 1210.976209992546,
+          "p90_seconds": 1740.4957675668559
+        },
+        {
+          "scope": "ranking/full-source/group-2-5-8-11",
+          "name": "ra_lgb_wz",
+          "fit_rows": 1386530,
+          "gpu_family": false,
+          "median_seconds": 198.8051662358783,
+          "p90_seconds": 223.5939225576823
+        },
+        {
+          "scope": "ranking/full-source/group-2-5-8-11",
+          "name": "nn3_wz",
+          "fit_rows": 1386530,
+          "gpu_family": true,
+          "median_seconds": 216.46188451896558,
+          "p90_seconds": 320.1056301222301
+        },
+        {
+          "scope": "ranking/full-source/group-3-6-9-12",
+          "name": "ra_cb_wz",
+          "fit_rows": 1373057,
+          "gpu_family": true,
+          "median_seconds": 1199.209077310794,
+          "p90_seconds": 1723.5832597405351
+        },
+        {
+          "scope": "ranking/full-source/group-3-6-9-12",
+          "name": "ra_lgb_wz",
+          "fit_rows": 1373057,
+          "gpu_family": false,
+          "median_seconds": 196.8733638192728,
+          "p90_seconds": 221.42124622278897
+        },
+        {
+          "scope": "ranking/full-source/group-3-6-9-12",
+          "name": "nn3_wz",
+          "fit_rows": 1373057,
+          "gpu_family": true,
+          "median_seconds": 214.35851065029775,
+          "p90_seconds": 316.99514340024297
+        },
+        {
+          "scope": "ranking/full-source/full",
+          "name": "ra_cb_wz",
+          "fit_rows": 2062577,
+          "gpu_family": true,
+          "median_seconds": 1801.4263508743377,
+          "p90_seconds": 2589.1300864609802
+        },
+        {
+          "scope": "ranking/full-source/full",
+          "name": "ra_lgb_wz",
+          "fit_rows": 2062577,
+          "gpu_family": false,
+          "median_seconds": 295.7389766967171,
+          "p90_seconds": 332.61428314371614
+        },
+        {
+          "scope": "ranking/full-source/full",
+          "name": "nn3_wz",
+          "fit_rows": 2062577,
+          "gpu_family": true,
+          "median_seconds": 322.0047920964382,
+          "p90_seconds": 476.1833572015167
+        },
+        {
+          "scope": "ranking/stopping-excluded-source/group-1-4-7-10",
+          "name": "ra_cb_wz",
+          "fit_rows": 1170134,
+          "gpu_family": true,
+          "median_seconds": 1021.9789232857694,
+          "p90_seconds": 1468.8562631072355
+        },
+        {
+          "scope": "ranking/stopping-excluded-source/group-1-4-7-10",
+          "name": "ra_lgb_wz",
+          "fit_rows": 1170134,
+          "gpu_family": false,
+          "median_seconds": 167.77760624599048,
+          "p90_seconds": 188.69757666845365
+        },
+        {
+          "scope": "ranking/stopping-excluded-source/group-1-4-7-10",
+          "name": "nn3_wz",
+          "fit_rows": 1170134,
+          "gpu_family": true,
+          "median_seconds": 182.6786371587454,
+          "p90_seconds": 270.1466837338143
+        },
+        {
+          "scope": "ranking/stopping-excluded-source/group-2-5-8-11",
+          "name": "ra_cb_wz",
+          "fit_rows": 1222502,
+          "gpu_family": true,
+          "median_seconds": 1067.716413397696,
+          "p90_seconds": 1534.5932340750048
+        },
+        {
+          "scope": "ranking/stopping-excluded-source/group-2-5-8-11",
+          "name": "ra_lgb_wz",
+          "fit_rows": 1222502,
+          "gpu_family": false,
+          "median_seconds": 175.28629985192796,
+          "p90_seconds": 197.1425194655808
+        },
+        {
+          "scope": "ranking/stopping-excluded-source/group-2-5-8-11",
+          "name": "nn3_wz",
+          "fit_rows": 1222502,
+          "gpu_family": true,
+          "median_seconds": 190.8542092476935,
+          "p90_seconds": 282.23678754566185
+        },
+        {
+          "scope": "ranking/stopping-excluded-source/group-3-6-9",
+          "name": "ra_cb_wz",
+          "fit_rows": 1341652,
+          "gpu_family": true,
+          "median_seconds": 1171.7803827460777,
+          "p90_seconds": 1684.1609107250526
+        },
+        {
+          "scope": "ranking/stopping-excluded-source/group-3-6-9",
+          "name": "ra_lgb_wz",
+          "fit_rows": 1341652,
+          "gpu_family": false,
+          "median_seconds": 192.37041311093057,
+          "p90_seconds": 216.35682847638319
+        },
+        {
+          "scope": "ranking/stopping-excluded-source/group-3-6-9",
+          "name": "nn3_wz",
+          "fit_rows": 1341652,
+          "gpu_family": true,
+          "median_seconds": 209.45563405670214,
+          "p90_seconds": 309.7447288300651
+        },
+        {
+          "scope": "ranking/stopping-excluded-source/full",
+          "name": "ra_cb_wz",
+          "fit_rows": 1867144,
+          "gpu_family": true,
+          "median_seconds": 1630.7378597147715,
+          "p90_seconds": 2343.8052039536465
+        },
+        {
+          "scope": "ranking/stopping-excluded-source/full",
+          "name": "ra_lgb_wz",
+          "fit_rows": 1867144,
+          "gpu_family": false,
+          "median_seconds": 267.7171596044245,
+          "p90_seconds": 301.09846230520884
+        },
+        {
+          "scope": "ranking/stopping-excluded-source/full",
+          "name": "nn3_wz",
+          "fit_rows": 1867144,
+          "gpu_family": true,
+          "median_seconds": 291.49424023157053,
+          "p90_seconds": 431.0641000547707
+        },
+        {
+          "scope": "meta-1-4-7-10",
+          "name": "ra_cb_wz_t7",
+          "fit_rows": 1365567,
+          "gpu_family": true,
+          "median_seconds": 2234.383685398012,
+          "p90_seconds": 2329.1768695578053
+        },
+        {
+          "scope": "meta-1-4-7-10",
+          "name": "ra_lgb_pw_t7",
+          "fit_rows": 1365567,
+          "gpu_family": false,
+          "median_seconds": 2456.7142838193436,
+          "p90_seconds": 2663.5720891537158
+        },
+        {
+          "scope": "meta-1-4-7-10",
+          "name": "nn3_pw_t7",
+          "fit_rows": 1365567,
+          "gpu_family": true,
+          "median_seconds": 692.6409498982861,
+          "p90_seconds": 737.6625495349432
+        },
+        {
+          "scope": "meta-1-4-7-10",
+          "name": "mix_cb_wx_raw",
+          "fit_rows": 1379666,
+          "gpu_family": true,
+          "median_seconds": 489.1284030228737,
+          "p90_seconds": 603.9144809112039
+        },
+        {
+          "scope": "meta-1-4-7-10/full-source/group-2-6-11",
+          "name": "ra_cb_wz",
+          "fit_rows": 881329,
+          "gpu_family": true,
+          "median_seconds": 769.7406130242551,
+          "p90_seconds": 1106.322542125976
+        },
+        {
+          "scope": "meta-1-4-7-10/full-source/group-2-6-11",
+          "name": "ra_lgb_wz",
+          "fit_rows": 881329,
+          "gpu_family": false,
+          "median_seconds": 126.36780910149825,
+          "p90_seconds": 142.1244460443262
+        },
+        {
+          "scope": "meta-1-4-7-10/full-source/group-2-6-11",
+          "name": "nn3_wz",
+          "fit_rows": 881329,
+          "gpu_family": true,
+          "median_seconds": 137.59106274023313,
+          "p90_seconds": 203.4708047355592
+        },
+        {
+          "scope": "meta-1-4-7-10/full-source/group-3-8-12",
+          "name": "ra_cb_wz",
+          "fit_rows": 849320,
+          "gpu_family": true,
+          "median_seconds": 741.7843931763966,
+          "p90_seconds": 1066.1419985935263
+        },
+        {
+          "scope": "meta-1-4-7-10/full-source/group-3-8-12",
+          "name": "ra_lgb_wz",
+          "fit_rows": 849320,
+          "gpu_family": false,
+          "median_seconds": 121.77825491511625,
+          "p90_seconds": 136.96262634540236
+        },
+        {
+          "scope": "meta-1-4-7-10/full-source/group-3-8-12",
+          "name": "nn3_wz",
+          "fit_rows": 849320,
+          "gpu_family": true,
+          "median_seconds": 132.59389105150834,
+          "p90_seconds": 196.08094579663796
+        },
+        {
+          "scope": "meta-1-4-7-10/full-source/group-5-9",
+          "name": "ra_cb_wz",
+          "fit_rows": 1000485,
+          "gpu_family": true,
+          "median_seconds": 873.8098226900192,
+          "p90_seconds": 1255.8977505096361
+        },
+        {
+          "scope": "meta-1-4-7-10/full-source/group-5-9",
+          "name": "ra_lgb_wz",
+          "fit_rows": 1000485,
+          "gpu_family": false,
+          "median_seconds": 143.4527826599516,
+          "p90_seconds": 161.33972262419334
+        },
+        {
+          "scope": "meta-1-4-7-10/full-source/group-5-9",
+          "name": "nn3_wz",
+          "fit_rows": 1000485,
+          "gpu_family": true,
+          "median_seconds": 156.19342425548476,
+          "p90_seconds": 230.98013122892354
+        },
+        {
+          "scope": "meta-1-4-7-10/full-source/full",
+          "name": "ra_cb_wz",
+          "fit_rows": 1365567,
+          "gpu_family": true,
+          "median_seconds": 1192.6674144453355,
+          "p90_seconds": 1714.1811456145692
+        },
+        {
+          "scope": "meta-1-4-7-10/full-source/full",
+          "name": "ra_lgb_wz",
+          "fit_rows": 1365567,
+          "gpu_family": false,
+          "median_seconds": 195.79942333828305,
+          "p90_seconds": 220.21339750696094
+        },
+        {
+          "scope": "meta-1-4-7-10/full-source/full",
+          "name": "nn3_wz",
+          "fit_rows": 1365567,
+          "gpu_family": true,
+          "median_seconds": 213.1891890236131,
+          "p90_seconds": 315.2659408805604
+        },
+        {
+          "scope": "meta-1-4-7-10/stopping-excluded-source/group-2-6-11",
+          "name": "ra_cb_wz",
+          "fit_rows": 748949,
+          "gpu_family": true,
+          "median_seconds": 654.1217438481009,
+          "p90_seconds": 940.1473928609039
+        },
+        {
+          "scope": "meta-1-4-7-10/stopping-excluded-source/group-2-6-11",
+          "name": "ra_lgb_wz",
+          "fit_rows": 748949,
+          "gpu_family": false,
+          "median_seconds": 107.38673555364457,
+          "p90_seconds": 120.77664724575278
+        },
+        {
+          "scope": "meta-1-4-7-10/stopping-excluded-source/group-2-6-11",
+          "name": "nn3_wz",
+          "fit_rows": 748949,
+          "gpu_family": true,
+          "median_seconds": 116.92420066539835,
+          "p90_seconds": 172.9084776920904
+        },
+        {
+          "scope": "meta-1-4-7-10/stopping-excluded-source/group-3-8-12",
+          "name": "ra_cb_wz",
+          "fit_rows": 849320,
+          "gpu_family": true,
+          "median_seconds": 741.7843931763966,
+          "p90_seconds": 1066.1419985935263
+        },
+        {
+          "scope": "meta-1-4-7-10/stopping-excluded-source/group-3-8-12",
+          "name": "ra_lgb_wz",
+          "fit_rows": 849320,
+          "gpu_family": false,
+          "median_seconds": 121.77825491511625,
+          "p90_seconds": 136.96262634540236
+        },
+        {
+          "scope": "meta-1-4-7-10/stopping-excluded-source/group-3-8-12",
+          "name": "nn3_wz",
+          "fit_rows": 849320,
+          "gpu_family": true,
+          "median_seconds": 132.59389105150834,
+          "p90_seconds": 196.08094579663796
+        },
+        {
+          "scope": "meta-1-4-7-10/stopping-excluded-source/group-5-9",
+          "name": "ra_cb_wz",
+          "fit_rows": 868105,
+          "gpu_family": true,
+          "median_seconds": 758.1909535138649,
+          "p90_seconds": 1089.722601244564
+        },
+        {
+          "scope": "meta-1-4-7-10/stopping-excluded-source/group-5-9",
+          "name": "ra_lgb_wz",
+          "fit_rows": 868105,
+          "gpu_family": false,
+          "median_seconds": 124.47170911209791,
+          "p90_seconds": 139.99192382561992
+        },
+        {
+          "scope": "meta-1-4-7-10/stopping-excluded-source/group-5-9",
+          "name": "nn3_wz",
+          "fit_rows": 868105,
+          "gpu_family": true,
+          "median_seconds": 135.52656218065,
+          "p90_seconds": 200.4178041854547
+        },
+        {
+          "scope": "meta-1-4-7-10/stopping-excluded-source/full",
+          "name": "ra_cb_wz",
+          "fit_rows": 1233187,
+          "gpu_family": true,
+          "median_seconds": 1077.0485452691812,
+          "p90_seconds": 1548.005996349497
+        },
+        {
+          "scope": "meta-1-4-7-10/stopping-excluded-source/full",
+          "name": "ra_lgb_wz",
+          "fit_rows": 1233187,
+          "gpu_family": false,
+          "median_seconds": 176.81834979042938,
+          "p90_seconds": 198.86559870838752
+        },
+        {
+          "scope": "meta-1-4-7-10/stopping-excluded-source/full",
+          "name": "nn3_wz",
+          "fit_rows": 1233187,
+          "gpu_family": true,
+          "median_seconds": 192.52232694877833,
+          "p90_seconds": 284.70361383709155
+        },
+        {
+          "scope": "meta-2-5-8-11",
+          "name": "ra_cb_wz_t7",
+          "fit_rows": 1386530,
+          "gpu_family": true,
+          "median_seconds": 2268.6840054826353,
+          "p90_seconds": 2364.9323723757116
+        },
+        {
+          "scope": "meta-2-5-8-11",
+          "name": "ra_lgb_pw_t7",
+          "fit_rows": 1386530,
+          "gpu_family": false,
+          "median_seconds": 2494.427630386524,
+          "p90_seconds": 2704.460937306116
+        },
+        {
+          "scope": "meta-2-5-8-11",
+          "name": "nn3_pw_t7",
+          "fit_rows": 1386530,
+          "gpu_family": true,
+          "median_seconds": 703.2737729181142,
+          "p90_seconds": 748.9865050976516
+        },
+        {
+          "scope": "meta-2-5-8-11",
+          "name": "mix_cb_wx_raw",
+          "fit_rows": 1402601,
+          "gpu_family": true,
+          "median_seconds": 497.25947237105623,
+          "p90_seconds": 613.9537067960908
+        },
+        {
+          "scope": "meta-2-5-8-11/full-source/group-1-6-10",
+          "name": "ra_cb_wz",
+          "fit_rows": 869858,
+          "gpu_family": true,
+          "median_seconds": 759.7219995757006,
+          "p90_seconds": 1091.923122748278
+        },
+        {
+          "scope": "meta-2-5-8-11/full-source/group-1-6-10",
+          "name": "ra_lgb_wz",
+          "fit_rows": 869858,
+          "gpu_family": false,
+          "median_seconds": 124.72305993495172,
+          "p90_seconds": 140.27461525403734
+        },
+        {
+          "scope": "meta-2-5-8-11/full-source/group-1-6-10",
+          "name": "nn3_wz",
+          "fit_rows": 869858,
+          "gpu_family": true,
+          "median_seconds": 135.80023652131462,
+          "p90_seconds": 200.8225160702349
+        },
+        {
+          "scope": "meta-2-5-8-11/full-source/group-3-7-12",
+          "name": "ra_cb_wz",
+          "fit_rows": 872360,
+          "gpu_family": true,
+          "median_seconds": 761.907211924082,
+          "p90_seconds": 1095.0638556645888
+        },
+        {
+          "scope": "meta-2-5-8-11/full-source/group-3-7-12",
+          "name": "ra_lgb_wz",
+          "fit_rows": 872360,
+          "gpu_family": false,
+          "median_seconds": 125.08180480590451,
+          "p90_seconds": 140.6780915540376
+        },
+        {
+          "scope": "meta-2-5-8-11/full-source/group-3-7-12",
+          "name": "nn3_wz",
+          "fit_rows": 872360,
+          "gpu_family": true,
+          "median_seconds": 136.19084302464773,
+          "p90_seconds": 201.40014820698335
+        },
+        {
+          "scope": "meta-2-5-8-11/full-source/group-4-9",
+          "name": "ra_cb_wz",
+          "fit_rows": 1030842,
+          "gpu_family": true,
+          "median_seconds": 900.3232084853095,
+          "p90_seconds": 1294.0045567208447
+        },
+        {
+          "scope": "meta-2-5-8-11/full-source/group-4-9",
+          "name": "ra_lgb_wz",
+          "fit_rows": 1030842,
+          "gpu_family": false,
+          "median_seconds": 147.80546773090035,
+          "p90_seconds": 166.23513830728967
+        },
+        {
+          "scope": "meta-2-5-8-11/full-source/group-4-9",
+          "name": "nn3_wz",
+          "fit_rows": 1030842,
+          "gpu_family": true,
+          "median_seconds": 160.93268949196883,
+          "p90_seconds": 237.98859596724188
+        },
+        {
+          "scope": "meta-2-5-8-11/full-source/full",
+          "name": "ra_cb_wz",
+          "fit_rows": 1386530,
+          "gpu_family": true,
+          "median_seconds": 1210.976209992546,
+          "p90_seconds": 1740.4957675668559
+        },
+        {
+          "scope": "meta-2-5-8-11/full-source/full",
+          "name": "ra_lgb_wz",
+          "fit_rows": 1386530,
+          "gpu_family": false,
+          "median_seconds": 198.8051662358783,
+          "p90_seconds": 223.5939225576823
+        },
+        {
+          "scope": "meta-2-5-8-11/full-source/full",
+          "name": "nn3_wz",
+          "fit_rows": 1386530,
+          "gpu_family": true,
+          "median_seconds": 216.46188451896558,
+          "p90_seconds": 320.1056301222301
+        },
+        {
+          "scope": "meta-2-5-8-11/stopping-excluded-source/group-1-6-10",
+          "name": "ra_cb_wz",
+          "fit_rows": 737478,
+          "gpu_family": true,
+          "median_seconds": 644.1031303995462,
+          "p90_seconds": 925.747973483206
+        },
+        {
+          "scope": "meta-2-5-8-11/stopping-excluded-source/group-1-6-10",
+          "name": "ra_lgb_wz",
+          "fit_rows": 737478,
+          "gpu_family": false,
+          "median_seconds": 105.74198638709804,
+          "p90_seconds": 118.92681645546395
+        },
+        {
+          "scope": "meta-2-5-8-11/stopping-excluded-source/group-1-6-10",
+          "name": "nn3_wz",
+          "fit_rows": 737478,
+          "gpu_family": true,
+          "median_seconds": 115.13337444647985,
+          "p90_seconds": 170.26018902676608
+        },
+        {
+          "scope": "meta-2-5-8-11/stopping-excluded-source/group-3-7-12",
+          "name": "ra_cb_wz",
+          "fit_rows": 872360,
+          "gpu_family": true,
+          "median_seconds": 761.907211924082,
+          "p90_seconds": 1095.0638556645888
+        },
+        {
+          "scope": "meta-2-5-8-11/stopping-excluded-source/group-3-7-12",
+          "name": "ra_lgb_wz",
+          "fit_rows": 872360,
+          "gpu_family": false,
+          "median_seconds": 125.08180480590451,
+          "p90_seconds": 140.6780915540376
+        },
+        {
+          "scope": "meta-2-5-8-11/stopping-excluded-source/group-3-7-12",
+          "name": "nn3_wz",
+          "fit_rows": 872360,
+          "gpu_family": true,
+          "median_seconds": 136.19084302464773,
+          "p90_seconds": 201.40014820698335
+        },
+        {
+          "scope": "meta-2-5-8-11/stopping-excluded-source/group-4-9",
+          "name": "ra_cb_wz",
+          "fit_rows": 898462,
+          "gpu_family": true,
+          "median_seconds": 784.7043393091551,
+          "p90_seconds": 1127.8294074557725
+        },
+        {
+          "scope": "meta-2-5-8-11/stopping-excluded-source/group-4-9",
+          "name": "ra_lgb_wz",
+          "fit_rows": 898462,
+          "gpu_family": false,
+          "median_seconds": 128.82439418304665,
+          "p90_seconds": 144.88733950871625
+        },
+        {
+          "scope": "meta-2-5-8-11/stopping-excluded-source/group-4-9",
+          "name": "nn3_wz",
+          "fit_rows": 898462,
+          "gpu_family": true,
+          "median_seconds": 140.26582741713403,
+          "p90_seconds": 207.42626892377308
+        },
+        {
+          "scope": "meta-2-5-8-11/stopping-excluded-source/full",
+          "name": "ra_cb_wz",
+          "fit_rows": 1254150,
+          "gpu_family": true,
+          "median_seconds": 1095.3573408163916,
+          "p90_seconds": 1574.3206183017837
+        },
+        {
+          "scope": "meta-2-5-8-11/stopping-excluded-source/full",
+          "name": "ra_lgb_wz",
+          "fit_rows": 1254150,
+          "gpu_family": false,
+          "median_seconds": 179.8240926880246,
+          "p90_seconds": 202.2461237591089
+        },
+        {
+          "scope": "meta-2-5-8-11/stopping-excluded-source/full",
+          "name": "nn3_wz",
+          "fit_rows": 1254150,
+          "gpu_family": true,
+          "median_seconds": 195.7950224441308,
+          "p90_seconds": 289.54330307876126
+        },
+        {
+          "scope": "meta-3-6-9-12",
+          "name": "ra_cb_wz_t7",
+          "fit_rows": 1373057,
+          "gpu_family": true,
+          "median_seconds": 2246.639059029354,
+          "p90_seconds": 2341.9521744333533
+        },
+        {
+          "scope": "meta-3-6-9-12",
+          "name": "ra_lgb_pw_t7",
+          "fit_rows": 1373057,
+          "gpu_family": false,
+          "median_seconds": 2470.1891188042305,
+          "p90_seconds": 2678.181518751649
+        },
+        {
+          "scope": "meta-3-6-9-12",
+          "name": "nn3_pw_t7",
+          "fit_rows": 1373057,
+          "gpu_family": true,
+          "median_seconds": 696.4400170365063,
+          "p90_seconds": 741.7085556964986
+        },
+        {
+          "scope": "meta-3-6-9-12",
+          "name": "mix_cb_wx_raw",
+          "fit_rows": 1387827,
+          "gpu_family": true,
+          "median_seconds": 492.0216952378516,
+          "p90_seconds": 607.4867557072171
+        },
+        {
+          "scope": "meta-3-6-9-12/full-source/group-1-5-10",
+          "name": "ra_cb_wz",
+          "fit_rows": 853428,
+          "gpu_family": true,
+          "median_seconds": 745.3722638107495,
+          "p90_seconds": 1071.2987255400508
+        },
+        {
+          "scope": "meta-3-6-9-12/full-source/group-1-5-10",
+          "name": "ra_lgb_wz",
+          "fit_rows": 853428,
+          "gpu_family": false,
+          "median_seconds": 122.36727327238006,
+          "p90_seconds": 137.6250886317337
+        },
+        {
+          "scope": "meta-3-6-9-12/full-source/group-1-5-10",
+          "name": "nn3_wz",
+          "fit_rows": 853428,
+          "gpu_family": true,
+          "median_seconds": 133.23522259255247,
+          "p90_seconds": 197.02935219862144
+        },
+        {
+          "scope": "meta-3-6-9-12/full-source/group-2-7-11",
+          "name": "ra_cb_wz",
+          "fit_rows": 882684,
+          "gpu_family": true,
+          "median_seconds": 770.9240513664042,
+          "p90_seconds": 1108.0234586334104
+        },
+        {
+          "scope": "meta-3-6-9-12/full-source/group-2-7-11",
+          "name": "ra_lgb_wz",
+          "fit_rows": 882684,
+          "gpu_family": false,
+          "median_seconds": 126.56209339412057,
+          "p90_seconds": 142.3429553914486
+        },
+        {
+          "scope": "meta-3-6-9-12/full-source/group-2-7-11",
+          "name": "nn3_wz",
+          "fit_rows": 882684,
+          "gpu_family": true,
+          "median_seconds": 137.8026022334451,
+          "p90_seconds": 203.78363109259124
+        },
+        {
+          "scope": "meta-3-6-9-12/full-source/group-4-8",
+          "name": "ra_cb_wz",
+          "fit_rows": 1010002,
+          "gpu_family": true,
+          "median_seconds": 882.1218394444343,
+          "p90_seconds": 1267.8443353076093
+        },
+        {
+          "scope": "meta-3-6-9-12/full-source/group-4-8",
+          "name": "ra_lgb_wz",
+          "fit_rows": 1010002,
+          "gpu_family": false,
+          "median_seconds": 144.81736097204498,
+          "p90_seconds": 162.87444842239566
+        },
+        {
+          "scope": "meta-3-6-9-12/full-source/group-4-8",
+          "name": "nn3_wz",
+          "fit_rows": 1010002,
+          "gpu_family": true,
+          "median_seconds": 157.67919647459794,
+          "p90_seconds": 233.17730350927323
+        },
+        {
+          "scope": "meta-3-6-9-12/full-source/full",
+          "name": "ra_cb_wz",
+          "fit_rows": 1373057,
+          "gpu_family": true,
+          "median_seconds": 1199.209077310794,
+          "p90_seconds": 1723.5832597405351
+        },
+        {
+          "scope": "meta-3-6-9-12/full-source/full",
+          "name": "ra_lgb_wz",
+          "fit_rows": 1373057,
+          "gpu_family": false,
+          "median_seconds": 196.8733638192728,
+          "p90_seconds": 221.42124622278897
+        },
+        {
+          "scope": "meta-3-6-9-12/full-source/full",
+          "name": "nn3_wz",
+          "fit_rows": 1373057,
+          "gpu_family": true,
+          "median_seconds": 214.35851065029775,
+          "p90_seconds": 316.99514340024297
+        },
+        {
+          "scope": "meta-3-6-9-12/stopping-excluded-source/group-1-5-10",
+          "name": "ra_cb_wz",
+          "fit_rows": 719580,
+          "gpu_family": true,
+          "median_seconds": 628.4712636484146,
+          "p90_seconds": 903.2808121178467
+        },
+        {
+          "scope": "meta-3-6-9-12/stopping-excluded-source/group-1-5-10",
+          "name": "ra_lgb_wz",
+          "fit_rows": 719580,
+          "gpu_family": false,
+          "median_seconds": 103.17571312558206,
+          "p90_seconds": 116.0405579353184
+        },
+        {
+          "scope": "meta-3-6-9-12/stopping-excluded-source/group-1-5-10",
+          "name": "nn3_wz",
+          "fit_rows": 719580,
+          "gpu_family": true,
+          "median_seconds": 112.33917972359578,
+          "p90_seconds": 166.12811069602122
+        },
+        {
+          "scope": "meta-3-6-9-12/stopping-excluded-source/group-2-7-11",
+          "name": "ra_cb_wz",
+          "fit_rows": 882684,
+          "gpu_family": true,
+          "median_seconds": 770.9240513664042,
+          "p90_seconds": 1108.0234586334104
+        },
+        {
+          "scope": "meta-3-6-9-12/stopping-excluded-source/group-2-7-11",
+          "name": "ra_lgb_wz",
+          "fit_rows": 882684,
+          "gpu_family": false,
+          "median_seconds": 126.56209339412057,
+          "p90_seconds": 142.3429553914486
+        },
+        {
+          "scope": "meta-3-6-9-12/stopping-excluded-source/group-2-7-11",
+          "name": "nn3_wz",
+          "fit_rows": 882684,
+          "gpu_family": true,
+          "median_seconds": 137.8026022334451,
+          "p90_seconds": 203.78363109259124
+        },
+        {
+          "scope": "meta-3-6-9-12/stopping-excluded-source/group-4-8",
+          "name": "ra_cb_wz",
+          "fit_rows": 876154,
+          "gpu_family": true,
+          "median_seconds": 765.2208392820993,
+          "p90_seconds": 1099.8264218854054
+        },
+        {
+          "scope": "meta-3-6-9-12/stopping-excluded-source/group-4-8",
+          "name": "ra_lgb_wz",
+          "fit_rows": 876154,
+          "gpu_family": false,
+          "median_seconds": 125.62580082524698,
+          "p90_seconds": 141.2899177259804
+        },
+        {
+          "scope": "meta-3-6-9-12/stopping-excluded-source/group-4-8",
+          "name": "nn3_wz",
+          "fit_rows": 876154,
+          "gpu_family": true,
+          "median_seconds": 136.78315360564127,
+          "p90_seconds": 202.27606200667304
+        },
+        {
+          "scope": "meta-3-6-9-12/stopping-excluded-source/full",
+          "name": "ra_cb_wz",
+          "fit_rows": 1239209,
+          "gpu_family": true,
+          "median_seconds": 1082.308077148459,
+          "p90_seconds": 1555.5653463183312
+        },
+        {
+          "scope": "meta-3-6-9-12/stopping-excluded-source/full",
+          "name": "ra_lgb_wz",
+          "fit_rows": 1239209,
+          "gpu_family": false,
+          "median_seconds": 177.6818036724748,
+          "p90_seconds": 199.8367155263737
+        },
+        {
+          "scope": "meta-3-6-9-12/stopping-excluded-source/full",
+          "name": "nn3_wz",
+          "fit_rows": 1239209,
+          "gpu_family": true,
+          "median_seconds": 193.46246778134108,
+          "p90_seconds": 286.09390189764275
+        },
+        {
+          "scope": "ranking/final-recording-B",
+          "name": "laneb",
+          "fit_rows": 22470,
+          "gpu_family": false,
+          "median_seconds": 49.018166344846726,
+          "p90_seconds": 49.018166344846726
+        }
+      ],
+      "method": "Each planned fit-row count times its family's observed seconds per fit row; median and 90th-percentile rate sensitivity.",
+      "limit": "Planning sensitivity, not a runtime interval or a guaranteed fit. Stopping budgets and query inference costs vary. Feature construction, residual fitting, validation and other CPU overhead are not priced."
+    },
+    "budget_snapshot": {
+      "limit_seconds": 158400,
+      "used_seconds": 69776.61946773226,
+      "completed_gpu_components": 138,
+      "accounting": "Saved GPU-family component wall time, including selection/refit/replay; conservative GPU-time proxy.",
+      "status": "within budget",
+      "block": {
+        "months": "2-3",
+        "used_seconds": 25584.800000000512,
+        "limit_seconds": 43200.0
+      }
+    },
+    "script_hash": "39bc5d100bc18a262a3a7f2ff68b2fa4400e2419e0fc9dafb8b18ffb3de2b015",
+    "remaining_work": [
+      "Finish and audit February/March, then assess whole-file, weather, signed-error and episode results.",
+      "Qualify and freeze the recipe against the declared gates; compare its validation output with the saved v53 artifact where supported.",
+      "Current training-file month parser rejects ranking.parquet; fix its input contract before ranking fitting.",
+      "Add the ranking entry point, explicit rank split, all-eligible-training scopes, immutable source manifest and bounded component accounting after confirmation source checks close.",
+      "Build and replay the full nested donor/member/meta/recording chain; preserve all completed confirmation proofs.",
+      "Assemble the actual template IDs, run the submission-file checks, and present the exact candidate hash for per-upload sign-off."
+    ]
   },
   "clean_champion_first_member": {
     "checked_utc": "2026-10-03T20:35:00.156426+00:00",
