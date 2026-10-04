@@ -39,7 +39,7 @@
 > Record: meta-2-5-9-12-assembly-audit.json. The reader does not reproduce fit/query
 > feature fingerprints or donor windows; the donor windows have separate proofs above.
 > This closes one inner table, while NNLS/recalibration/final B/evaluation remain pending.
-> Direct process, live job and log checks at 09:26 London on 4 October confirm the
+> Direct process, live job and log checks at 11:28 London on 4 October confirm the
 > controller and pipeline continue without a recorded error. Meta-3-6-10's tuned
 > CatBoost is saved with native replay and raw/floor parity PASS, covering 1,195,763
 > permitted Lane A rows over 211 days at budgets 1,667/3,476/5,982 and 2,040.7 seconds
@@ -75,13 +75,28 @@
 > `python analysis/champion_assembly_audit.py --meta-group 3 6 10`.
 > Record: meta-3-6-10-assembly-audit.json. This reader does not reproduce fit/query
 > feature fingerprints or donor windows; both second-meta donors have separate window
-> proofs above. Meta-4-8-11's tuned CatBoost is now selecting budgets, fitting
-> 1,199,500 permitted Lane A rows over 212 days. Its log advances without a recorded
-> error. Its donor chains and remaining members, whole-file NNLS, residual recalibration,
-> final recording B and outer evaluation remain pending. Two inner tables are checked.
+> proofs above. Meta-4-8-11's tuned CatBoost is now saved with native replay and
+> raw/floor parity PASS, fitting 1,199,500 permitted Lane A rows over 212 days at
+> budgets 2,293/2,458/5,845 and 2,043.2 seconds of component cost. Records:
+> 1-7/meta-4-8-11/ra_cb_wz_t7/complete.json and raw_predictions.json in the run.
+> Its full nested neighbour donor now has all twelve C/L/N components saved with
+> native replay PASS, covering group-2-6-12, group-3-9, group-5-10 and the full fit.
+> Actual cold-input bytes, ordered permitted/query scopes, stopping coverage, saved
+> prediction bytes, raw/floored blend arithmetic and PW window reconstruction pass:
+> `python analysis/champion_donor_audit.py --meta-group 4 8 11`.
+> meta-4-8-11-donor-audit.json records 4,416.0 seconds of total component wall time
+> and 3,944.5 seconds of GPU-family wall time. It fits 1,199,500 Lane A rows over
+> 212 days, excluding January/July and the inner April/August/November query labels
+> from every donor fit. Matching original missing windows reproduce; infinities fail.
+> The separate stopping-day donor has all three group-2-6-12 members saved with
+> native replay PASS. Group-3-9's original CatBoost is now refitting all 738,369 rows
+> over 129 days, with an advancing log and no recorded error. Its remaining scopes,
+> tuned L/N members, whole-file NNLS, residual recalibration, final recording B and
+> outer evaluation remain pending.
+> Two inner tables are checked.
 > The current controller-resume-1.err
 > is empty; controller.err retains the earlier failed controller attempt's traceback.
-> Budget.json records 33,653.8 seconds of completed
+> Budget.json records 40,569.1 seconds of completed
 > GPU-family component cost, within the declared allowance.
 > LightGBM and neural completion records cover every 1,723,531 permitted Lane A row over
 > 303 days. LightGBM selected budgets 217/6,312/7,991; the neural selected epoch 50, stopped

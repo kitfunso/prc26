@@ -11396,7 +11396,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-04T08:29:11.879756+00:00",
+  "recorded_utc": "2026-10-04T10:28:44.750646+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12025,13 +12025,13 @@
     "phase": "Full neighbour and meta reconstruction is training",
     "pid": 52408,
     "controller_pid": 59744,
-    "checked_utc": "2026-10-04T08:29:35.897768+00:00",
+    "checked_utc": "2026-10-04T10:29:12.990069+00:00",
     "active_component": {
-      "component": "1-7\\meta-4-8-11\\ra_cb_wz_t7",
-      "fit_rows": 1199500,
-      "fit_days": 212,
-      "stage": "budget selection",
-      "started_file_mtime": 1791101752.3268485
+      "component": "1-7\\donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-3-9\\ra_cb_wz",
+      "fit_rows": 738369,
+      "fit_days": 129,
+      "stage": "full refit",
+      "started_file_mtime": 1791109341.6833866
     },
     "completed_components": [
       {
@@ -12215,6 +12215,66 @@
         "checkpoint_replay": "PASS"
       },
       {
+        "component": "1-7\\donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\full\\nn3_wz",
+        "seconds": 184.84400000004098,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\full\\ra_cb_wz",
+        "seconds": 967.469000000041,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\full\\ra_lgb_wz",
+        "seconds": 156.01500000001397,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-2-6-12\\nn3_wz",
+        "seconds": 137.6720000000205,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-2-6-12\\ra_cb_wz",
+        "seconds": 948.6719999999041,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-2-6-12\\ra_lgb_wz",
+        "seconds": 104.96799999999348,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-3-9\\nn3_wz",
+        "seconds": 81.96799999999348,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-3-9\\ra_cb_wz",
+        "seconds": 745.844000000041,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-3-9\\ra_lgb_wz",
+        "seconds": 110.09400000004098,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-5-10\\nn3_wz",
+        "seconds": 100.14100000006147,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-5-10\\ra_cb_wz",
+        "seconds": 777.890000000014,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-5-10\\ra_lgb_wz",
+        "seconds": 100.42099999997299,
+        "checkpoint_replay": "PASS"
+      },
+      {
         "component": "1-7\\donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\full\\nn3_wz",
         "seconds": 213.14099999994505,
         "checkpoint_replay": "PASS"
@@ -12395,6 +12455,21 @@
         "checkpoint_replay": "PASS"
       },
       {
+        "component": "1-7\\donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-2-6-12\\nn3_wz",
+        "seconds": 112.625,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-2-6-12\\ra_cb_wz",
+        "seconds": 815.0320000000065,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-2-6-12\\ra_lgb_wz",
+        "seconds": 99.14099999994505,
+        "checkpoint_replay": "PASS"
+      },
+      {
         "component": "1-7\\meta-2-5-9-12\\mixtureB",
         "seconds": 486.98400000005495,
         "checkpoint_replay": "PASS"
@@ -12432,6 +12507,11 @@
       {
         "component": "1-7\\meta-3-6-10\\ra_lgb_pw_t7",
         "seconds": 2335.8429999999935,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\meta-4-8-11\\ra_cb_wz_t7",
+        "seconds": 2043.1560000000754,
         "checkpoint_replay": "PASS"
       },
       {
@@ -14542,6 +14622,268 @@
       },
       "limit": "Selected donor only. Remaining nested meta donor chains and full reference evaluation remain pending. Native checkpoint replay is retained from completion records; no new model fit or GPU replay.",
       "command": "python analysis/champion_donor_audit.py --selection-donor --meta-group 3 6 10",
+      "audit_code_hash": "cde8ccdbf875461bb78066e539a98465ffb2b1a427d60651bfdf2fe23878a250"
+    },
+    {
+      "checked_utc": "2026-10-04T10:28:06.181307+00:00",
+      "scope_checks": "PASS",
+      "prediction_lineage_checks": "PASS",
+      "window_reproduction": "PASS",
+      "cold_feature_hash": "120e19f81510f5773a8743d0513d97e3a65c9b43a7394a42356979a46bc3bd09",
+      "donor_path": "data\\runs\\clean-champion-20261003\\1-7\\donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da",
+      "fit_rows": 1199500,
+      "fit_days": 212,
+      "scopes": [
+        {
+          "scope": "group-2-6-12",
+          "fit_rows": 712210,
+          "fit_days": 123,
+          "query_rows": 487290,
+          "members": [
+            {
+              "member": "ra_cb_wz",
+              "seconds": 948.6719999999041,
+              "gpu_family": true,
+              "checkpoint_replay": "PASS",
+              "prediction_hash": "680883e9bb2d8d7627c2d57b5a4be1443004e3e2c43aac5052db93de36ae158c",
+              "model_hashes": {
+                "predictions.parquet": "22a3d3bbe44563b401eca65bd6cfde241c9d53f98adb299e3b2f3ab1a0414604",
+                "refit\\body.model": "76ab35a5d74fdabaef64bb5da443b241aa1f5a41f63366cff90cef0e322f02d7",
+                "refit\\gate.model": "a6c087aed92f6c79ba201db8266273c7786d03b802648e49d119fb18794e7d44",
+                "refit\\tail.model": "bc652ec85ef033ae89b31bad0cf1a6df6b2c375fc96ec92896ff72daddd0adfe",
+                "selection\\body.model": "92e94f7e1dfafe065e5c508573c78ccfc4bba19fa12938d8b9dc22042542a3db",
+                "selection\\gate.model": "6feec43e83ac95536ffa6324b42e3b51fd0f1e6a37de93f99e85cae45bcee39b",
+                "selection\\tail.model": "1fd3b7d641a75ddba0423e8c582ad51ea9f0c06bcdc6f48ce46db9fbd23575b4"
+              }
+            },
+            {
+              "member": "ra_lgb_wz",
+              "seconds": 104.96799999999348,
+              "gpu_family": false,
+              "checkpoint_replay": "PASS",
+              "prediction_hash": "4fab6cb30bc32f212fb3617f142162ec6e8dd26e4adc8f2366e69a91105b319d",
+              "model_hashes": {
+                "predictions.parquet": "13d04bda0554ef71d4265a5f7ca03416d6516714e838e538f13360267384e1bb",
+                "refit\\body.model": "07e661b8ad4ef38f8028cc3d6ee965b0a3eeef4b9050610e8f151737ea331fa5",
+                "refit\\gate.model": "3e99e2f88d19036c01ca43824c97637a018c5ed04ad1a332fd1b9e8b72cd95aa",
+                "refit\\tail.model": "194e3b2abb4b74e141427e356e096d4e3eea3d76384b24cd6e9feed6a1e87b0f",
+                "selection\\body.model": "84040ffa9eafdcf68ceeb8414cd4297a51abb8ada4a0d74982f081919240ace0",
+                "selection\\gate.model": "2906dbc3db0b6b9a92f122134de7340caf3d68e5b9eb2e9717aa9d3869ecd7bb",
+                "selection\\tail.model": "992ffbe2254eea94d43514edf6f74350bc0627227769d10cb4a23efe31f9b575"
+              }
+            },
+            {
+              "member": "nn3_wz",
+              "seconds": 137.6720000000205,
+              "gpu_family": true,
+              "checkpoint_replay": "PASS",
+              "prediction_hash": "d08920ba2663031b382480bca43d359da5080b60d59fe0b2df0ef17d7e9a3cf6",
+              "model_hashes": {
+                "predictions.parquet": "6055bddf43e8a873a0b4c4668aaf9fe02b3dce02953929fae33ea4d394420821",
+                "refit.pt": "d087810b92f794e3a906111ee666ab41f926052bd3c3a3b879d05fa7c277e50a",
+                "selection.pt": "744dd7679af225736ae8a53808279cc78a86d1c0ed84caa83f9709fc4e462b5a"
+              }
+            }
+          ],
+          "component_wall_seconds": 1191.311999999918,
+          "gpu_family_wall_seconds": 1086.3439999999246
+        },
+        {
+          "scope": "group-3-9",
+          "fit_rows": 854648,
+          "fit_days": 151,
+          "query_rows": 344852,
+          "members": [
+            {
+              "member": "ra_cb_wz",
+              "seconds": 745.844000000041,
+              "gpu_family": true,
+              "checkpoint_replay": "PASS",
+              "prediction_hash": "d060be42dcf3dec97156c69dc675274e4b5c7b6b41530b428fbdcabf901f87f5",
+              "model_hashes": {
+                "predictions.parquet": "b9be6fcefda9176b431e63475ef507b468909a7fe400d3c30d77060b008beae3",
+                "refit\\body.model": "54f6742222ceb86315d26d44e5caad37d0d3547d36fcf55686ae48ecb42ae897",
+                "refit\\gate.model": "e130c802a2ef5c018371977973432d2689d42a1acc6641f6b3910ae8e193c4ad",
+                "refit\\tail.model": "404731e132c62e6e59f2fcdb3e674e3ffa1924f4407927317e567febc3c27875",
+                "selection\\body.model": "593653cae02fbcf3b79be3a48419bdb15ae2140c529b28450f0b15c9967392d2",
+                "selection\\gate.model": "2ce005af27a77ebe72a96301a131f563176f3ca3cca8874ca79c5dcc041f2814",
+                "selection\\tail.model": "6c5156d9ee68b96bd76544a7d92e3d338a07eca02323b1fde2c74149d7a02e87"
+              }
+            },
+            {
+              "member": "ra_lgb_wz",
+              "seconds": 110.09400000004098,
+              "gpu_family": false,
+              "checkpoint_replay": "PASS",
+              "prediction_hash": "ccd421ba92a44ab973f9addc6179e8a4376ccaa15e0304d064b1928581ec6d3a",
+              "model_hashes": {
+                "predictions.parquet": "57b62a96313cd4c1dba5ce12e173db677562b215f4f23366da5fb1ddeeef8308",
+                "refit\\body.model": "8a27119d83383d576b377e175fe6dc3e439fecfe8883723494dfcaeeffc7c987",
+                "refit\\gate.model": "1f768bdf9cb305c7bee177f485e14bbbe7f3c6c11003c2acc064580e0b63730a",
+                "refit\\tail.model": "a6de688ca8c5025669c55955193c3ff3eb277c4dbd9e48a4f1b434d0ec954747",
+                "selection\\body.model": "bc2243b51614830852ca102563ae0f9bcfbfd32a12c31fccdf7e99c96bb213c4",
+                "selection\\gate.model": "6b88dbba5ee3bbe6e1a92cad5a59ceef849dd341ffa8658167754e0296ad5b8b",
+                "selection\\tail.model": "71041356f8940fc3b4ba2718ceab574a1e0de9299e1dcdc91b0fb0f0bb95040f"
+              }
+            },
+            {
+              "member": "nn3_wz",
+              "seconds": 81.96799999999348,
+              "gpu_family": true,
+              "checkpoint_replay": "PASS",
+              "prediction_hash": "ba2a8e0fb64a1b645f4b6103c865aa37efaebfe825e162d6f88547fef0af7155",
+              "model_hashes": {
+                "predictions.parquet": "de88752930a97a407ff412a3c24abca2875145f6bbed8a6a67b089a261dccd89",
+                "refit.pt": "074d320fcc0d967250e613084357561d0e3c0e06611c4cee974c2277a2e81c96",
+                "selection.pt": "ca154a9ea33f8f141b57ee4d8944a4784dbfb463b948811e5f35958d1effb45c"
+              }
+            }
+          ],
+          "component_wall_seconds": 937.9060000000754,
+          "gpu_family_wall_seconds": 827.8120000000345
+        },
+        {
+          "scope": "group-5-10",
+          "fit_rows": 832142,
+          "fit_days": 150,
+          "query_rows": 367358,
+          "members": [
+            {
+              "member": "ra_cb_wz",
+              "seconds": 777.890000000014,
+              "gpu_family": true,
+              "checkpoint_replay": "PASS",
+              "prediction_hash": "80f57c579bc791fb6775fbc5295498bc8382c810f54254626bd2235c0bf5a99e",
+              "model_hashes": {
+                "predictions.parquet": "ff8052a5a85d89e99086ea1167f24a4516407d19aa8c6a69e008065d74a6fb9b",
+                "refit\\body.model": "f30749aa9592d7b7c953c78aa32a4fa1f77b51aafc02ff67e479dfc2b901aa51",
+                "refit\\gate.model": "e63402fb97d9f50aff1facfe790a6b0bee307499c275e2d1f6c5e2bf3fa36488",
+                "refit\\tail.model": "ea4545b563a5500ea70ce0c4844dff3051cac939174ffcfe6ec36f32cc299957",
+                "selection\\body.model": "c5f7bd04c7fefa01b21a57cc08d8e18547e8af1a6f0b446886611a1ceef5aee6",
+                "selection\\gate.model": "09e42e61d9c9317db9167ba2089b0520739fbd659ff87ad44732de037f3f3a8f",
+                "selection\\tail.model": "5dd420b881cb65c7c69741d67f18ae1a33a0678225d2079549f8d5029c2cfcd4"
+              }
+            },
+            {
+              "member": "ra_lgb_wz",
+              "seconds": 100.42099999997299,
+              "gpu_family": false,
+              "checkpoint_replay": "PASS",
+              "prediction_hash": "7d33bd0f083379faf395bfcd2d678c1aa118193c76416705e54bf4627290242a",
+              "model_hashes": {
+                "predictions.parquet": "1db4236549b03604cfb9b2c80002753c5f001e7a7b1a45bbd340f8e5f8379b72",
+                "refit\\body.model": "cc51c3bad01e32ddb38bc15a0598125e1f3137aef7f8100a811e9d98cebbedfd",
+                "refit\\gate.model": "3e3f4236022bf48fbf2a2181b2930965a602a1ad2c35c097627bb5a3b4686cd4",
+                "refit\\tail.model": "06d35807dd601c0c97c2f4ce48e11545b44f8ee8ed8c309137e6666cb7779f51",
+                "selection\\body.model": "be4115ce8b2ed17ebc231b66c0c1fe6e9325e31eee1a2a966b72e8668c10377a",
+                "selection\\gate.model": "86f5ac6f6d6c78751ecc78302118b6828f9643d67954dc3bd5e878f18bfdf335",
+                "selection\\tail.model": "6bdb28e2edec0b1645a9c5f6385d2eadf1179c97c0c288ef3d58d241116f0520"
+              }
+            },
+            {
+              "member": "nn3_wz",
+              "seconds": 100.14100000006147,
+              "gpu_family": true,
+              "checkpoint_replay": "PASS",
+              "prediction_hash": "26f3651ccf2576279540a4e2bad33efc1931b0a6bcebc145c201d8d0f9ae2e45",
+              "model_hashes": {
+                "predictions.parquet": "7987ef9f0c4dd5d5c48e64f876236ea7da81ad3b2f50d482145a876d6dbd0be5",
+                "refit.pt": "7a141248d44e1ca2c7ddeef5c1ebcde6b254099c9a7358c0cbae6a5328aebffc",
+                "selection.pt": "b73d3979cb93f248878d64953981356332ac2b5ef5dfe3ff704e80e45b28756b"
+              }
+            }
+          ],
+          "component_wall_seconds": 978.4520000000484,
+          "gpu_family_wall_seconds": 878.0310000000754
+        },
+        {
+          "scope": "full",
+          "fit_rows": 1199500,
+          "fit_days": 212,
+          "query_rows": 863077,
+          "members": [
+            {
+              "member": "ra_cb_wz",
+              "seconds": 967.469000000041,
+              "gpu_family": true,
+              "checkpoint_replay": "PASS",
+              "prediction_hash": "8736cae6cde35680590f05a2f6a2b07f06491f9af9cdc757af654fa677c8b89e",
+              "model_hashes": {
+                "predictions.parquet": "8736cae6cde35680590f05a2f6a2b07f06491f9af9cdc757af654fa677c8b89e",
+                "refit\\body.model": "d1b2d5358645432f7de054cb7e9cc0f22e561c96681924e1c4781b5a9d8ee880",
+                "refit\\gate.model": "af8f14ee5dd05d94f351c1e783d295fc91d62a21c433eeed8aab994cc830729e",
+                "refit\\tail.model": "2e10aaf51c3da308d6af0217bb6818be76b59632567efb7ad045d0ee65a62ec6",
+                "selection\\body.model": "e02fbc57c9cdf3fbdc5a84264ce85418c4c92406b2a8860e40a0e109f17480b6",
+                "selection\\gate.model": "3b7f1fafeee48e3cd7dee0e8388831b956c5aa7707f340fd132a12f493286c36",
+                "selection\\tail.model": "4a754ed6f093a1c1fbf641853a8c0f4db049d6bc247b97e98717c51ef89c76ce"
+              }
+            },
+            {
+              "member": "ra_lgb_wz",
+              "seconds": 156.01500000001397,
+              "gpu_family": false,
+              "checkpoint_replay": "PASS",
+              "prediction_hash": "026deb2f481ce4f6e341b16803301252752c31b01c19e258512c8cbd5b15a5a9",
+              "model_hashes": {
+                "predictions.parquet": "026deb2f481ce4f6e341b16803301252752c31b01c19e258512c8cbd5b15a5a9",
+                "refit\\body.model": "8e805d78c20cc51ed40ac1295096a0bd60a7e1d44c81b5392baf753be985ad91",
+                "refit\\gate.model": "d7553a513c49f6f109e2e0d0107905a63a4c2941471c4bcbc3017fb70044135a",
+                "refit\\tail.model": "0af3256ab7b6e7cd5c7245702896ca7b3710fa27df7416b11aaf1e54b8cbfb81",
+                "selection\\body.model": "84f6f779be8297d094aff3210fa4cf0d9f8d3468f3cef6882d6d719f67fa176e",
+                "selection\\gate.model": "3de6119203802f10a174ee4271d6eb3cc5f3d9b5a583b1a33f5e22aa69244891",
+                "selection\\tail.model": "8a2b0daa4ddd5300fbe872eccd1a0d97e6808b82f64cf95ab7a7f8a4cffd1eec"
+              }
+            },
+            {
+              "member": "nn3_wz",
+              "seconds": 184.84400000004098,
+              "gpu_family": true,
+              "checkpoint_replay": "PASS",
+              "prediction_hash": "be4ed890f4242be0e08c532d12bbd36be05f6f66c6f72f0c1c4ec865f3902a15",
+              "model_hashes": {
+                "predictions.parquet": "be4ed890f4242be0e08c532d12bbd36be05f6f66c6f72f0c1c4ec865f3902a15",
+                "refit.pt": "4a64ccc26cd0678744a5395e74e498f2ede3c6056750247e8731780e746f1d61",
+                "selection.pt": "83c476cd80a87b9ffeb19717418e115aed7cae7058e75f16ef1d4c3c286fee74"
+              }
+            }
+          ],
+          "component_wall_seconds": 1308.328000000096,
+          "gpu_family_wall_seconds": 1152.313000000082
+        }
+      ],
+      "weights": {
+        "ra_cb_wz": 0.5223,
+        "ra_lgb_wz": 0.1564,
+        "nn3_wz": 0.3213
+      },
+      "donor_mode": "full_meta_training",
+      "excluded_meta_months": [
+        4,
+        8,
+        11
+      ],
+      "excluded_downstream_stopping": {},
+      "output_hash": "3e479b7792b8d4c6cc36f511db328b0fcc93a46c8d71f6d9fc5c9f4fce247e87",
+      "output_rows": 2085047,
+      "missing_window_counts": {
+        "pw_n": 0,
+        "pw_m": 887,
+        "pw_hi": 887,
+        "pr_m": 5667,
+        "pw30_m": 2469
+      },
+      "missing_window_rule": "The original features.per returns NaN for an empty window. Missing positions match the rebuilt features; infinities are rejected.",
+      "component_wall_seconds": 4415.998000000138,
+      "gpu_family_wall_seconds": 3944.5000000001164,
+      "accounting": "Saved selection/refit/replay component wall time; GPU-family subtotal is a conservative proxy, not GPU utilization.",
+      "stages": {
+        "audited_donor": "checked",
+        "reference_recipe": "partial: remaining members and nested meta fits pending",
+        "meta_and_evaluation": "pending",
+        "candidate_and_confirmation": "pending"
+      },
+      "limit": "Selected donor only. Remaining nested meta donor chains and full reference evaluation remain pending. Native checkpoint replay is retained from completion records; no new model fit or GPU replay.",
+      "command": "python analysis/champion_donor_audit.py --meta-group 4 8 11",
       "audit_code_hash": "cde8ccdbf875461bb78066e539a98465ffb2b1a427d60651bfdf2fe23878a250"
     }
   ],
