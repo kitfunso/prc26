@@ -39,7 +39,7 @@
 > Record: meta-2-5-9-12-assembly-audit.json. The reader does not reproduce fit/query
 > feature fingerprints or donor windows; the donor windows have separate proofs above.
 > This closes one inner table, while NNLS/recalibration/final B/evaluation remain pending.
-> Direct process, live job and log checks at 11:28 London on 4 October confirm the
+> Direct process, live job and log checks at 12:26 London on 4 October confirm the
 > controller and pipeline continue without a recorded error. Meta-3-6-10's tuned
 > CatBoost is saved with native replay and raw/floor parity PASS, covering 1,195,763
 > permitted Lane A rows over 211 days at budgets 1,667/3,476/5,982 and 2,040.7 seconds
@@ -88,15 +88,23 @@
 > and 3,944.5 seconds of GPU-family wall time. It fits 1,199,500 Lane A rows over
 > 212 days, excluding January/July and the inner April/August/November query labels
 > from every donor fit. Matching original missing windows reproduce; infinities fail.
-> The separate stopping-day donor has all three group-2-6-12 members saved with
-> native replay PASS. Group-3-9's original CatBoost is now refitting all 738,369 rows
-> over 129 days, with an advancing log and no recorded error. Its remaining scopes,
-> tuned L/N members, whole-file NNLS, residual recalibration, final recording B and
-> outer evaluation remain pending.
+> The separate stopping-day donor now has all twelve C/L/N components saved with
+> native replay PASS across the same three groups and its full fit. Actual cold-input
+> bytes, ordered permitted/query scopes, stopping coverage, saved prediction bytes,
+> raw/floored blend arithmetic and PW window reconstruction pass:
+> `python analysis/champion_donor_audit.py --selection-donor --meta-group 4 8 11`.
+> meta-4-8-11-selection-donor-audit.json records 3,915.5 seconds of component wall
+> time and 3,474.8 seconds of GPU-family wall time. It fits 1,083,221 rows over 190
+> days, excluding 116,279 downstream stopping rows over 22 days as well as January/July
+> and the inner April/August/November query labels. Both third-meta donors are checked
+> and priced. Its tuned LightGBM is now refitting all 1,199,500 permitted rows over
+> 212 days, with no recorded error. Its tuned neural and raw mixture-B members,
+> third complete-file assembly, whole-file NNLS, residual recalibration, final
+> recording B and outer evaluation remain pending.
 > Two inner tables are checked.
 > The current controller-resume-1.err
 > is empty; controller.err retains the earlier failed controller attempt's traceback.
-> Budget.json records 40,569.1 seconds of completed
+> Budget.json records 43,116.3 seconds of completed
 > GPU-family component cost, within the declared allowance.
 > LightGBM and neural completion records cover every 1,723,531 permitted Lane A row over
 > 303 days. LightGBM selected budgets 217/6,312/7,991; the neural selected epoch 50, stopped
@@ -128,7 +136,7 @@
 > 5,266.7 seconds of GPU-family wall time. Native replay PASS is retained from the saved
 > completion records; this read-only audit does not repeat a model fit or GPU replay.
 > Both GPU-family subtotals are conservative compute proxies, not measured GPU utilization.
-> Remaining nested meta donor costs and the full reference comparison are pending. This is component
+> All nested meta donor costs are now checked; the full reference comparison is pending. This is component
 > progress, not a full reference result or score gain. Verify the current active record
 > and actual processes.
 > It writes `data/runs/clean-champion-20261003/active.json` and the live HTML job record.
@@ -165,8 +173,8 @@
 > and 2,704.4 seconds of saved-component cost including the interrupted first attempt.
 > January/July Lane A member RMSE is 222.2729 s, versus AOBT-only 410.2841 s; this is a
 > reused member diagnostic, not an assembled whole-file ensemble or a new scorer result.
-> Both outer donor chains are checked and priced; nested meta donor costs, full comparison,
-> weather/episode checks and confirmation remain open.
+> Both outer donor chains and all nested meta donors are checked and priced; the full
+> comparison, weather/episode checks and confirmation remain open.
 > Full suite: 73 passed; current F lint passes. The baseline and its comparison remain
 > incomplete while the fits run. The controller currently covers January/July only, then
 > the main session must inspect results, price the chain, continue confirmation or declare
