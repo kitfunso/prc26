@@ -1,6 +1,6 @@
 # Hand-off, 2026-09-22
 
-> **Current campaign checkpoint, 4 October 2026, 15:44 London.** The full January/July
+> **Current campaign checkpoint, 4 October 2026, 16:20 London.** The full January/July
 > clean reference is now measured and checked. All three inner complete-file tables
 > pass native lineage, scopes, raw/floor arithmetic and identical original mixture B.
 > Command: `python analysis/champion_assembly_audit.py --meta-group 4 8 11`.
@@ -48,12 +48,24 @@
 > reproduce; infinities are rejected. Native replay is retained from completion records;
 > the read-only audit ran no new fit or GPU replay. This donor stage is checked;
 > remaining outer members, nested meta chains and full-block evaluation remain pending.
-> The separate downstream stopping-day-excluded donor has saved all three members
-> in group-4-8-11 and group-5-9-12 with checkpoint replay PASS. Group-6-10's CatBoost
-> and LightGBM are also saved with replay PASS. Its neural member is now selecting
-> training-only stopping budgets: 920,761 fit rows over 158 days, querying 364,401
-> rows. The full-scope refits, feature file and full donor audit remain pending.
-> Current error is null and the log advances. Current controller/pipeline command
+> The separate downstream stopping-day-excluded donor is also saved and checked:
+> `python analysis/champion_donor_audit.py --months 2-3 --selection-donor`.
+> Proof: 2-3/selection-donor-audit.json. All twelve C/L/N components have native replay
+> PASS. Actual cold bytes, ordered scopes, training-only stopping, source/configuration,
+> native model/prediction bytes, raw/floor arithmetic and neighbour feature reconstruction
+> pass. Every donor fit excludes the downstream member's 132,380 stopping rows over
+> 25 days as well as January/July and February/March labels. Full fit: 1,285,162 Lane A
+> rows over 219 days; ordered feature rows: 2,085,047. Output SHA:
+> 3621a1529ef74d7d1c166c1947598afe5f701186fc3af5b5ae223c2e097c2ea3.
+> Saved component wall cost: 3,404.891 seconds; GPU-family proxy: 2,922.797 seconds.
+> No new model fit or GPU replay ran in this read-only audit. Both outer donor chains
+> are checked and priced. The tuned LightGBM is now refitting every one of the
+> 1,417,542 permitted Lane A rows over 244 days, querying all 305,989 ordered
+> February/March Lane A IDs. Its completion/input proof, tuned neural, original mixture B,
+> nested meta stages and whole-file evaluation remain pending. Current error is null.
+> Its quiet fit shows real progress: CPU time increases, selection and refit native
+> artifacts have been written, and the active stage moved from selection to full refit.
+> Current controller/pipeline command
 > lines were checked directly; the serial pipeline continues without restarting fits.
 > Logs: pipeline-2-3.out/.err and controller-2-3.out/.err. Verify actual processes.
 > The pre-fit declaration is appended to CLEAN-CHAMPION-2026-10-03.html. Block cap:
@@ -76,7 +88,7 @@
 > `python analysis/champion_assembly_audit.py --months 2-3 --meta-group <group>`.
 > Close the whole block with `python analysis/champion_evaluation_audit.py --months 2-3`.
 > New component proofs export separately in the local status page. Budget.json now
-> records 51,579.4445 GPU-family seconds globally, with 7,387.625 in the confirmation
+> records 52,532.2255 GPU-family seconds globally, with 8,340.406 in the confirmation
 > block; both declared limits remain in force. Reprice from actual completed records.
 > The campaign remains OPEN. Inspect each completed block and continue the approved
 > work; a completed component, failed candidate or expected budget stop does not end it.
