@@ -11396,7 +11396,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-04T21:15:39.719826+00:00",
+  "recorded_utc": "2026-10-04T21:48:21.844658+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12025,13 +12025,13 @@
     "phase": "Full reference 2-3 is training",
     "pid": 78840,
     "controller_pid": 73236,
-    "checked_utc": "2026-10-04T21:16:03.034630+00:00",
+    "checked_utc": "2026-10-04T21:48:37.255909+00:00",
     "active_component": {
-      "component": "2-3\\meta-6-10\\ra_cb_wz_t7",
-      "fit_rows": 1053141,
-      "fit_days": 183,
+      "component": "2-3\\donors\\2303f7a58a7128f6108ba513a9ec4375392fdabf41065b33769abbddfb6a3873\\group-5-11\\ra_cb_wz",
+      "fit_rows": 708568,
+      "fit_days": 122,
       "stage": "budget selection",
-      "started_file_mtime": 1791148133.9997644
+      "started_file_mtime": 1791150510.858998
     },
     "completed_components": [
       {
@@ -12600,6 +12600,21 @@
         "checkpoint_replay": "PASS"
       },
       {
+        "component": "2-3\\donors\\2303f7a58a7128f6108ba513a9ec4375392fdabf41065b33769abbddfb6a3873\\group-4-9\\nn3_wz",
+        "seconds": 69.54700000002049,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\2303f7a58a7128f6108ba513a9ec4375392fdabf41065b33769abbddfb6a3873\\group-4-9\\ra_cb_wz",
+        "seconds": 488.969000000041,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\2303f7a58a7128f6108ba513a9ec4375392fdabf41065b33769abbddfb6a3873\\group-4-9\\ra_lgb_wz",
+        "seconds": 96.48499999998603,
+        "checkpoint_replay": "PASS"
+      },
+      {
         "component": "2-3\\donors\\315b31373a8256a8a60f4ccfc01503e70bf0f915af8c3ad735c7538ad6b145cf\\full\\nn3_wz",
         "seconds": 99.0,
         "checkpoint_replay": "PASS"
@@ -12997,6 +13012,11 @@
       {
         "component": "2-3\\meta-5-9-12\\ra_lgb_pw_t7",
         "seconds": 1233.9839999999385,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\meta-6-10\\ra_cb_wz_t7",
+        "seconds": 1689.8910000000615,
         "checkpoint_replay": "PASS"
       },
       {

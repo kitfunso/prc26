@@ -1,6 +1,6 @@
 # Hand-off, 2026-09-22
 
-> **Current campaign checkpoint, 4 October 2026, 22:14 London.** The full January/July
+> **Current campaign checkpoint, 4 October 2026, 22:47 London.** The full January/July
 > clean reference is now measured and checked. All three inner complete-file tables
 > pass native lineage, scopes, raw/floor arithmetic and identical original mixture B.
 > Command: `python analysis/champion_assembly_audit.py --meta-group 4 8 11`.
@@ -196,12 +196,24 @@
 > This assembly check does not reproduce fit/query feature fingerprints or donor
 > windows; both donor window proofs are already checked separately. Full NNLS,
 > residual recalibration, final recording-B override and whole-file errors remain pending.
-> The final inner group, meta-6-10, is now training its tuned CatBoost on a permitted
-> fit scope of 1,053,141 Lane A rows over 183 days, querying 364,401 inner Lane A rows.
-> Actual selection iterations advance; error is null. Controller/pipeline command
-> lines and logs were checked. Existing saved components and proofs are preserved.
-> Remaining inner tables and full-block evaluation remain pending. Existing proofs
-> are preserved; no serial fit was restarted.
+> The final inner group's tuned CatBoost, meta-6-10/ra_cb_wz_t7, is now saved with
+> native replay PASS. The assembly reader's native_record check passes actual fitting
+> source/configuration and all native model/prediction bytes. Regenerate from the repo:
+> `python -c 'from pathlib import Path; from analysis.champion_assembly_audit import native_record, read; from champion import configuration; p=Path("data/runs/clean-champion-20261003/2-3/meta-6-10/ra_cb_wz_t7"); print(native_record(p,read(p/"complete.json"),configuration("ra_cb_wz_t7")))'`.
+> It fits 1,053,141 Lane A rows over 183 days and queries 364,401 inner Lane A rows.
+> Saved selection/refit/replay wall cost: 1,689.891 seconds; budgets: 1,963/3,235/5,367.
+> Prediction SHA:
+> d0a87fab8cd70a09152836fc8396a550b057245e89b635e621e4175a3d100e67.
+> Its scope/raw-value checks remain pending until the complete third inner table.
+> No new fit or GPU replay ran in this native-only check. The final inner full original
+> neighbour donor is training under
+> 2303f7a58a7128f6108ba513a9ec4375392fdabf41065b33769abbddfb6a3873.
+> Its group-4-9 CatBoost and LightGBM are saved; neural budget selection advances,
+> fitting 697,453 Lane A rows over 123 days and querying 355,688 rows. Actual process
+> command lines, active state and job logs were checked; error is null. The donor's
+> completed scope/window/native-byte audit remains pending. Existing saved components
+> and proofs are preserved; no serial fit was restarted. The remaining final-inner
+> chain/table and full-block evaluation remain pending.
 > Current controller/pipeline command
 > lines were checked directly; the serial pipeline continues without restarting fits.
 > Logs: pipeline-2-3.out/.err and controller-2-3.out/.err. Verify actual processes.
@@ -225,7 +237,7 @@
 > `python analysis/champion_assembly_audit.py --months 2-3 --meta-group <group>`.
 > Close the whole block with `python analysis/champion_evaluation_audit.py --months 2-3`.
 > New component proofs export separately in the local status page. Budget.json now
-> records 66,781.2285 GPU-family seconds globally, with 22,589.409 in the confirmation
+> records 68,960.0885 GPU-family seconds globally, with 24,768.269 in the confirmation
 > block; both declared limits remain in force. Reprice from actual completed records.
 > The campaign remains OPEN. Inspect each completed block and continue the approved
 > work; a completed component, failed candidate or expected budget stop does not end it.
