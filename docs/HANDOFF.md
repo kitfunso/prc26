@@ -39,7 +39,7 @@
 > Record: meta-2-5-9-12-assembly-audit.json. The reader does not reproduce fit/query
 > feature fingerprints or donor windows; the donor windows have separate proofs above.
 > This closes one inner table, while NNLS/recalibration/final B/evaluation remain pending.
-> Direct process, live job and log checks at 08:28 London on 4 October confirm the
+> Direct process, live job and log checks at 09:26 London on 4 October confirm the
 > controller and pipeline continue without a recorded error. Meta-3-6-10's tuned
 > CatBoost is saved with native replay and raw/floor parity PASS, covering 1,195,763
 > permitted Lane A rows over 211 days at budgets 1,667/3,476/5,982 and 2,040.7 seconds
@@ -60,11 +60,28 @@
 > time and 3,761.9 seconds of GPU-family wall time. It fits 1,079,484 rows over 189 days,
 > excluding 116,279 downstream stopping rows over 22 days as well as January/July
 > and the inner March/June/October query labels. Both second-meta donors are checked
-> and priced. The tuned LightGBM is selecting budgets; the tuned neural, original
-> raw mixture B and whole-file inner assembly remain pending.
+> and priced. The tuned LightGBM is now saved with native replay PASS, covering
+> 1,195,763 permitted Lane A rows over 211 days at budgets 189/6,788/7,923 and
+> 2,335.8 CPU wall seconds. Its raw/floor parity now passes. The tuned neural is saved
+> with native replay and raw/floor parity PASS: selected epoch 56, selection stopped
+> at 71, all 1,195,763 permitted rows refitted at 56, at 646.8 GPU-family wall seconds.
+> Original raw mixture B is also saved with native replay PASS, fitting all 1,207,362
+> permitted rows and querying 5,498 Lane B rows, at 258.8 seconds of component cost.
+> The second inner table covers all 533,266 ordered rows in the complete March, June
+> and October files, including 527,768 Lane A and 5,498 Lane B rows. Actual cold bytes,
+> permitted/stopping/query scopes, native model and prediction byte hashes,
+> configurations, fitting source hashes, raw/floor parity, exact raw A columns and
+> identical raw mixture-B columns pass:
+> `python analysis/champion_assembly_audit.py --meta-group 3 6 10`.
+> Record: meta-3-6-10-assembly-audit.json. This reader does not reproduce fit/query
+> feature fingerprints or donor windows; both second-meta donors have separate window
+> proofs above. Meta-4-8-11's tuned CatBoost is now selecting budgets, fitting
+> 1,199,500 permitted Lane A rows over 212 days. Its log advances without a recorded
+> error. Its donor chains and remaining members, whole-file NNLS, residual recalibration,
+> final recording B and outer evaluation remain pending. Two inner tables are checked.
 > The current controller-resume-1.err
 > is empty; controller.err retains the earlier failed controller attempt's traceback.
-> Budget.json records 32,748.2 seconds of completed
+> Budget.json records 33,653.8 seconds of completed
 > GPU-family component cost, within the declared allowance.
 > LightGBM and neural completion records cover every 1,723,531 permitted Lane A row over
 > 303 days. LightGBM selected budgets 217/6,312/7,991; the neural selected epoch 50, stopped

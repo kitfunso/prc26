@@ -11396,7 +11396,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-04T07:28:28.586534+00:00",
+  "recorded_utc": "2026-10-04T08:29:11.879756+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12025,13 +12025,13 @@
     "phase": "Full neighbour and meta reconstruction is training",
     "pid": 52408,
     "controller_pid": 59744,
-    "checked_utc": "2026-10-04T07:29:00.989850+00:00",
+    "checked_utc": "2026-10-04T08:29:35.897768+00:00",
     "active_component": {
-      "component": "1-7\\meta-3-6-10\\ra_lgb_pw_t7",
-      "fit_rows": 1195763,
-      "fit_days": 211,
+      "component": "1-7\\meta-4-8-11\\ra_cb_wz_t7",
+      "fit_rows": 1199500,
+      "fit_days": 212,
       "stage": "budget selection",
-      "started_file_mtime": 1791098159.9198709
+      "started_file_mtime": 1791101752.3268485
     },
     "completed_components": [
       {
@@ -12415,8 +12415,23 @@
         "checkpoint_replay": "PASS"
       },
       {
+        "component": "1-7\\meta-3-6-10\\mixtureB",
+        "seconds": 258.81299999996554,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\meta-3-6-10\\nn3_pw_t7",
+        "seconds": 646.8120000000345,
+        "checkpoint_replay": "PASS"
+      },
+      {
         "component": "1-7\\meta-3-6-10\\ra_cb_wz_t7",
         "seconds": 2040.734000000055,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\meta-3-6-10\\ra_lgb_pw_t7",
+        "seconds": 2335.8429999999935,
         "checkpoint_replay": "PASS"
       },
       {
@@ -14559,6 +14574,35 @@
       ],
       "cold_input_hash": "120e19f81510f5773a8743d0513d97e3a65c9b43a7394a42356979a46bc3bd09",
       "output_hash": "d615670473f7a2a5dd00b3b732e06eef277bab152b01f12114ad2b5894ee2a3a",
+      "audit_code_hash": "763b0f6115495c059347f577312c519cb7cf49e9ec1790059d0812617fb12ac5",
+      "limit": "One inner raw prediction table checked. This audit does not reproduce fit/query feature fingerprints or donor windows. Donor window checks are recorded separately; full NNLS, residual recalibration, final recording-B override and whole-file errors remain pending."
+    },
+    {
+      "checked_utc": "2026-10-04T08:28:00.827733+00:00",
+      "meta_group": [
+        3,
+        6,
+        10
+      ],
+      "command": "python analysis/champion_assembly_audit.py --meta-group 3 6 10",
+      "scope_checks": "PASS",
+      "native_lineage_checks": "PASS",
+      "raw_floor_parity": "PASS",
+      "member_assembly": "PASS",
+      "laneB_parity": "PASS",
+      "fit_rows": 1207362,
+      "query_rows": 533266,
+      "laneA_rows": 527768,
+      "laneB_rows": 5498,
+      "fit_ids_hash": "8242b5b509d64ceef7502be9520cbc9d8b1f588506e7d5db919d7139970371f1",
+      "query_ids_hash": "b071d14b6a08f0d159957e3efcb34a23de6c68d0ae2336cf785f28847c7101fb",
+      "query_files": [
+        "training_2025-03-01_2025-04-01.parquet",
+        "training_2025-06-01_2025-07-01.parquet",
+        "training_2025-10-01_2025-11-01.parquet"
+      ],
+      "cold_input_hash": "120e19f81510f5773a8743d0513d97e3a65c9b43a7394a42356979a46bc3bd09",
+      "output_hash": "679c9606d43ec7adc59e250d50a8284060606afc35ff9511b19c14597a4ec6e3",
       "audit_code_hash": "763b0f6115495c059347f577312c519cb7cf49e9ec1790059d0812617fb12ac5",
       "limit": "One inner raw prediction table checked. This audit does not reproduce fit/query feature fingerprints or donor windows. Donor window checks are recorded separately; full NNLS, residual recalibration, final recording-B override and whole-file errors remain pending."
     }
