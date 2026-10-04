@@ -1,6 +1,6 @@
 # Hand-off, 2026-09-22
 
-> **Current campaign checkpoint, 4 October 2026, 23:44 London.** The full January/July
+> **Current campaign checkpoint, 5 October 2026, 00:46 London.** The full January/July
 > clean reference is now measured and checked. All three inner complete-file tables
 > pass native lineage, scopes, raw/floor arithmetic and identical original mixture B.
 > Command: `python analysis/champion_assembly_audit.py --meta-group 4 8 11`.
@@ -219,12 +219,32 @@
 > Saved selection/refit/replay wall cost: 3,047.313 seconds; GPU-family proxy:
 > 2,635.672 seconds. Matching original empty-window missing positions reproduce;
 > infinities are rejected. This read-only audit ran no new model fit or GPU replay.
-> Its separate stopping-day-excluded donor is now training under
-> 0a9b485225e2c6cb874d794fcc9879d2af47bd16ab503934497f31fcd8958aa2.
-> Group-4-9 C/L/N is saved; group-5-11 CatBoost budget selection advances, fitting
-> 608,756 Lane A rows over 103 days and querying 344,573 rows. Actual process command
-> lines, active state and logs were checked; error is null. Its completed donor audit,
-> remaining final-inner members/table and full-block evaluation remain pending.
+> Its separate stopping-day-excluded donor is now saved and checked:
+> `python analysis/champion_donor_audit.py --months 2-3 --selection-donor --meta-group 6 10`.
+> Proof: 2-3/meta-6-10-selection-donor-audit.json. All twelve C/L/N components retain
+> replay PASS across group-4-9, group-5-11, group-8-12 and full. Actual cold bytes,
+> fit/query/stopping scopes, all-row/day refit coverage, native model/prediction bytes,
+> source/configuration, raw/floor arithmetic and neighbour feature reconstruction pass.
+> Every fit excludes the downstream member's 99,812 stopping rows over 19 days, plus
+> January/July, February/March and inner June/October labels. Full fit: 953,329 Lane A
+> rows over 164 days; features cover all 2,085,047 ordered cold rows. Output SHA:
+> 4a0f2d0d9fcadc93e0b48177dcf78160a86f2c4c0222650a052ff832ed7ce708.
+> Saved selection/refit/replay wall cost: 2,871.608 seconds; GPU-family proxy:
+> 2,503.390 seconds. Original empty-window missing positions reproduce; infinities fail.
+> This read-only audit ran no model fit or GPU replay. Both final-inner donor chains
+> are checked and priced. The tuned meta-6-10 LightGBM is now saved with native replay
+> PASS: 1,572.985 seconds and budgets 189/6,123/7,996. It fits 1,053,141 Lane A rows
+> over 183 days and queries 364,401 rows. The assembly reader's native_record check
+> passes actual fitting source/configuration and native model/prediction bytes.
+> Command: the native_record regeneration above, with member ra_lgb_pw_t7.
+> Prediction SHA:
+> 0d511611e4443182d179656da8dec4eb4ff7ecaecc1b8f422e68b8d7a827664f.
+> Its scope/raw-value lineage closes with the complete third inner table, still pending.
+> The tuned neural is now training all 1,053,141 permitted Lane A rows over 183 days,
+> querying 364,401 rows, with training-only budget selection advancing. Original
+> mixture B, the third inner table and full-block evaluation remain pending.
+> Current process command lines, active state and logs were checked;
+> the serial pipeline continues with error null.
 > Existing saved components and proofs are preserved; no serial fit was restarted.
 > Current controller/pipeline command
 > lines were checked directly; the serial pipeline continues without restarting fits.
@@ -249,7 +269,7 @@
 > `python analysis/champion_assembly_audit.py --months 2-3 --meta-group <group>`.
 > Close the whole block with `python analysis/champion_evaluation_audit.py --months 2-3`.
 > New component proofs export separately in the local status page. Budget.json now
-> records 71,845.1195 GPU-family seconds globally, with 27,653.300 in the confirmation
+> records 73,610.1815 GPU-family seconds globally, with 29,418.362 in the confirmation
 > block; both declared limits remain in force. Reprice from actual completed records.
 > Final preparation now has a separate checked input and cost record. Command:
 > `python analysis/champion_preparation.py --output <local output directory>`.
