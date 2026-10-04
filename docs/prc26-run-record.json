@@ -11396,7 +11396,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-04T18:14:30.068445+00:00",
+  "recorded_utc": "2026-10-04T18:45:09.762188+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12025,13 +12025,13 @@
     "phase": "Full reference 2-3 is training",
     "pid": 78840,
     "controller_pid": 73236,
-    "checked_utc": "2026-10-04T18:14:53.971194+00:00",
+    "checked_utc": "2026-10-04T18:45:36.264876+00:00",
     "active_component": {
-      "component": "2-3\\meta-4-8-11\\ra_lgb_pw_t7",
-      "fit_rows": 893511,
-      "fit_days": 153,
-      "stage": "full refit",
-      "started_file_mtime": 1791137063.58752
+      "component": "2-3\\meta-5-9-12\\ra_cb_wz_t7",
+      "fit_rows": 888432,
+      "fit_days": 152,
+      "stage": "budget selection",
+      "started_file_mtime": 1791139203.2511518
     },
     "completed_components": [
       {
@@ -12840,8 +12840,23 @@
         "checkpoint_replay": "PASS"
       },
       {
+        "component": "2-3\\meta-4-8-11\\mixtureB",
+        "seconds": 370.76500000001397,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\meta-4-8-11\\nn3_pw_t7",
+        "seconds": 179.73499999998603,
+        "checkpoint_replay": "PASS"
+      },
+      {
         "component": "2-3\\meta-4-8-11\\ra_cb_wz_t7",
         "seconds": 1421.313000000082,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\meta-4-8-11\\ra_lgb_pw_t7",
+        "seconds": 1432.234000000055,
         "checkpoint_replay": "PASS"
       },
       {
@@ -16017,6 +16032,43 @@
         "replay_limit": "Native replay PASS retained from the completion record; no new model fit or GPU replay.",
         "command": "python analysis/champion_checkpoint_audit.py --months 2-3",
         "audit_code_hash": "4e8a060b1de8f9e6b54acd84700127f1752d4a4cd47d34a77608c8eb04dff4d2"
+      }
+    },
+    {
+      "block": "2-3",
+      "export": "prc26-2-3-meta-4-8-11-assembly-audit.json",
+      "audit": {
+        "checked_utc": "2026-10-04T18:43:50.994773+00:00",
+        "months": [
+          2,
+          3
+        ],
+        "meta_group": [
+          4,
+          8,
+          11
+        ],
+        "command": "python analysis/champion_assembly_audit.py --months 2-3 --meta-group 4 8 11",
+        "scope_checks": "PASS",
+        "native_lineage_checks": "PASS",
+        "raw_floor_parity": "PASS",
+        "member_assembly": "PASS",
+        "laneB_parity": "PASS",
+        "fit_rows": 903646,
+        "query_rows": 528801,
+        "laneA_rows": 524031,
+        "laneB_rows": 4770,
+        "fit_ids_hash": "d52da5179a6fc8afd8cce72d712741ee55400b32be9b083a2a68a66bf3778cce",
+        "query_ids_hash": "76998ec9cf506564f2ea4c3c1c6b73de1bd80bb2a5673024ae2b43fe31b6cc2a",
+        "query_files": [
+          "training_2025-04-01_2025-05-01.parquet",
+          "training_2025-08-01_2025-09-01.parquet",
+          "training_2025-11-01_2025-12-01.parquet"
+        ],
+        "cold_input_hash": "120e19f81510f5773a8743d0513d97e3a65c9b43a7394a42356979a46bc3bd09",
+        "output_hash": "cc140cf936eb227e312bbf079498daddcfc0532b2d54b9cced3ed0565d159838",
+        "audit_code_hash": "1f2abd4e966d9517787282e6b75aa71ac759644e3a3a9a53050cde4b09640c84",
+        "limit": "One inner raw prediction table checked. This audit does not reproduce fit/query feature fingerprints or donor windows. Donor window checks are recorded separately; full NNLS, residual recalibration, final recording-B override and whole-file errors remain pending."
       }
     },
     {

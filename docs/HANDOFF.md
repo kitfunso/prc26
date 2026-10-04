@@ -1,6 +1,6 @@
 # Hand-off, 2026-09-22
 
-> **Current campaign checkpoint, 4 October 2026, 19:14 London.** The full January/July
+> **Current campaign checkpoint, 4 October 2026, 19:44 London.** The full January/July
 > clean reference is now measured and checked. All three inner complete-file tables
 > pass native lineage, scopes, raw/floor arithmetic and identical original mixture B.
 > Command: `python analysis/champion_assembly_audit.py --meta-group 4 8 11`.
@@ -97,7 +97,7 @@
 > reader's native_record check passes actual source/configuration and all native model
 > and prediction bytes for this newly saved member. Prediction SHA:
 > f42d7f0f6e54ab75564d6f3d4ba5462daec435c4f18ba5c4a8fcf0959d8bd9f4.
-> Its full scope/raw-value checks close with the complete inner-table proof, still pending.
+> Its scope/raw-value checks now pass in the complete inner-table proof below.
 > This inner scope's full original neighbour donor is now saved and checked:
 > `python analysis/champion_donor_audit.py --months 2-3 --meta-group 4 8 11`.
 > Proof: 2-3/meta-4-8-11-donor-audit.json. All twelve C/L/N components have native
@@ -125,11 +125,28 @@
 > Saved selection/refit/replay wall cost: 2,928.891 seconds; GPU-family proxy:
 > 2,268.578 seconds. Original empty-window missing positions reproduce; infinities fail.
 > This read-only audit ran no new fit or GPU replay. Both first-inner donor chains
-> are checked and priced. The tuned inner LightGBM is now refitting on all 893,511
-> permitted Lane A rows over 153 days, querying 524,031 inner Lane A rows. Its process
-> CPU time advances and the current error is null. Its completion/native check and
-> the complete inner table remain pending, followed by the remaining nested chains
-> and whole-file evaluation. Existing proofs are preserved; no serial fit was restarted.
+> are checked and priced. The tuned inner LightGBM is now saved with native replay
+> PASS: 1,432.234 seconds and budgets 133/5,246/7,960. The tuned inner neural is also
+> saved with native replay PASS: 179.735 seconds, selection stopped at epoch 45 and
+> selected epoch 30, followed by exactly 30 all-row refit epochs. Both members fit
+> 893,511 Lane A rows over 153 days and query 524,031 inner Lane A rows. The original
+> inner mixture B is saved with native replay PASS: 370.765 seconds, budgets
+> 1,333/3,947. Its fit covers 903,646 all-lane rows; query covers 4,770 Lane B rows.
+> The first February/March inner raw table is now saved and checked:
+> `python analysis/champion_assembly_audit.py --months 2-3 --meta-group 4 8 11`.
+> Proof: 2-3/meta-4-8-11-assembly-audit.json. Actual complete April/August/November
+> files cover 528,801 query rows: 524,031 Lane A and 4,770 Lane B. Ordered fit/query
+> scopes, actual native model/prediction bytes, source/configuration, stopping coverage,
+> raw/floor parity, member assembly and identical original mixture B in all three
+> columns pass. Output SHA:
+> cc140cf936eb227e312bbf079498daddcfc0532b2d54b9cced3ed0565d159838.
+> This assembly check does not reproduce fit/query feature fingerprints or donor windows;
+> the two donor window proofs are already checked separately. Full NNLS, residual
+> recalibration, final recording-B override and whole-file errors remain pending.
+> The unchanged serial pipeline has begun meta-5-9-12's tuned CatBoost, selecting
+> budgets on 888,432 Lane A rows over 152 days, querying 529,110 inner Lane A rows.
+> Logs advance and error is null. Remaining inner tables and full-block evaluation
+> remain pending. Existing proofs are preserved; no serial fit was restarted.
 > Current controller/pipeline command
 > lines were checked directly; the serial pipeline continues without restarting fits.
 > Logs: pipeline-2-3.out/.err and controller-2-3.out/.err. Verify actual processes.
@@ -153,7 +170,7 @@
 > `python analysis/champion_assembly_audit.py --months 2-3 --meta-group <group>`.
 > Close the whole block with `python analysis/champion_evaluation_audit.py --months 2-3`.
 > New component proofs export separately in the local status page. Budget.json now
-> records 59,776.6485 GPU-family seconds globally, with 15,584.829 in the confirmation
+> records 60,327.1485 GPU-family seconds globally, with 16,135.329 in the confirmation
 > block; both declared limits remain in force. Reprice from actual completed records.
 > The campaign remains OPEN. Inspect each completed block and continue the approved
 > work; a completed component, failed candidate or expected budget stop does not end it.
