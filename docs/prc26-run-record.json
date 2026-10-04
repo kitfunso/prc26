@@ -11396,7 +11396,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-04T13:16:56.416162+00:00",
+  "recorded_utc": "2026-10-04T13:47:41.851550+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12025,13 +12025,13 @@
     "phase": "Full reference 2-3 is training",
     "pid": 78840,
     "controller_pid": 73236,
-    "checked_utc": "2026-10-04T13:17:24.006582+00:00",
+    "checked_utc": "2026-10-04T13:48:03.683064+00:00",
     "active_component": {
-      "component": "2-3\\donors\\a571fa3e9e2d173e0c918d68807630bd29efda5816fccd69050f57786f8cfeca\\group-5-9-12\\ra_lgb_wz",
-      "fit_rows": 888432,
-      "fit_days": 152,
-      "stage": "full refit",
-      "started_file_mtime": 1791119760.3859854
+      "component": "2-3\\donors\\a571fa3e9e2d173e0c918d68807630bd29efda5816fccd69050f57786f8cfeca\\full\\ra_cb_wz",
+      "fit_rows": 1417542,
+      "fit_days": 244,
+      "stage": "budget selection",
+      "started_file_mtime": 1791121143.1410756
     },
     "completed_components": [
       {
@@ -12615,8 +12615,33 @@
         "checkpoint_replay": "PASS"
       },
       {
+        "component": "2-3\\donors\\a571fa3e9e2d173e0c918d68807630bd29efda5816fccd69050f57786f8cfeca\\group-5-9-12\\nn3_wz",
+        "seconds": 106.68799999996554,
+        "checkpoint_replay": "PASS"
+      },
+      {
         "component": "2-3\\donors\\a571fa3e9e2d173e0c918d68807630bd29efda5816fccd69050f57786f8cfeca\\group-5-9-12\\ra_cb_wz",
         "seconds": 467.9679999999935,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\a571fa3e9e2d173e0c918d68807630bd29efda5816fccd69050f57786f8cfeca\\group-5-9-12\\ra_lgb_wz",
+        "seconds": 106.17199999990407,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\a571fa3e9e2d173e0c918d68807630bd29efda5816fccd69050f57786f8cfeca\\group-6-10\\nn3_wz",
+        "seconds": 163.8279999999795,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\a571fa3e9e2d173e0c918d68807630bd29efda5816fccd69050f57786f8cfeca\\group-6-10\\ra_cb_wz",
+        "seconds": 838.0620000000345,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\a571fa3e9e2d173e0c918d68807630bd29efda5816fccd69050f57786f8cfeca\\group-6-10\\ra_lgb_wz",
+        "seconds": 138.0,
         "checkpoint_replay": "PASS"
       },
       {

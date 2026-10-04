@@ -1,6 +1,6 @@
 # Hand-off, 2026-09-22
 
-> **Current campaign checkpoint, 4 October 2026, 14:15 London.** The full January/July
+> **Current campaign checkpoint, 4 October 2026, 14:47 London.** The full January/July
 > clean reference is now measured and checked. All three inner complete-file tables
 > pass native lineage, scopes, raw/floor arithmetic and identical original mixture B.
 > Command: `python analysis/champion_assembly_audit.py --meta-group 4 8 11`.
@@ -34,11 +34,13 @@
 > Proof: 2-3/first-member-audit.json. Budgets: 2,065/2,253/5,976; saved selection,
 > refit and replay wall cost: 1,838.516 seconds. Its Lane A RMSE is 203.3926 seconds,
 > a member diagnostic rather than a whole-file confirmation result or board gain.
-> January/July and February/March labels are excluded from all fits. The first original
-> donor scope group-4-8-11 has all three members saved with checkpoint replay PASS.
-> Their component wall costs are 559.047 CatBoost, 100.000 LightGBM and 103.422 neural
-> seconds. The next scope, group-5-9-12, is now refitting original CatBoost: 888,432
-> rows over 152 days, querying 529,110 rows. Current error is null and its log advances.
+> January/July and February/March labels are excluded from all fits. All three original
+> donor cross-fit scopes now have their C/L/N members saved with checkpoint replay
+> PASS: group-4-8-11, group-5-9-12 and group-6-10. Their respective component wall
+> costs are 762.469, 680.828 and 1,139.890 seconds, including CPU LightGBM work.
+> The full-scope original CatBoost is now selecting training-only stopping budgets:
+> 1,417,542 fit rows over 244 days, querying 645,035 rows. Current error is null and
+> its log advances. The full-scope LightGBM and neural members are still pending.
 > The full donor feature file is not written yet; its whole-chain scope/window audit
 > stays pending. Current controller/pipeline command lines were checked directly.
 > Logs: pipeline-2-3.out/.err and controller-2-3.out/.err. Verify actual processes.
@@ -62,7 +64,7 @@
 > `python analysis/champion_assembly_audit.py --months 2-3 --meta-group <group>`.
 > Close the whole block with `python analysis/champion_evaluation_audit.py --months 2-3`.
 > New component proofs export separately in the local status page. Budget.json now
-> records 46,692.8045 GPU-family seconds globally, with 2,500.985 in the confirmation
+> records 48,269.3505 GPU-family seconds globally, with 4,077.531 in the confirmation
 > block; both declared limits remain in force. Reprice from actual completed records.
 > The campaign remains OPEN. Inspect each completed block and continue the approved
 > work; a completed component, failed candidate or expected budget stop does not end it.
