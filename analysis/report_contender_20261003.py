@@ -36,12 +36,18 @@ def render_donor(audit: dict, selection: bool = False) -> str:
         return ""
     tag = "selection-donor" if selection else "first-donor"
     title = "Stopping-day neighbour donor" if selection else "First neighbour donor"
+    meta_group = audit.get("excluded_meta_months", ())
+    if meta_group:
+        tag = "meta-" + "-".join(map(str, meta_group)) + ("-selection" if selection else "") + "-donor"
+        title = "Nested " + ("stopping-day " if selection else "") + "neighbour donor: " + "/".join(map(str, meta_group))
     exclusion = audit.get("excluded_downstream_stopping", {})
     scope_note = (f"The downstream model's {exclusion['rows']:,} stopping rows over {exclusion['days']} days are excluded from every donor fit. "
-                  if selection else "The fit uses the full permitted outer-training scope. ")
+                  if selection else "The fit uses the full permitted training scope. ")
+    if meta_group:
+        scope_note += "The inner query months " + ", ".join(map(str, meta_group)) + " are excluded from every donor fit. "
     cost_rows = "".join(f"<tr><td>{html.escape(scope['scope'])}</td><td>{scope['fit_rows']:,}</td><td>{scope['query_rows']:,}</td><td>{scope['component_wall_seconds']/60:.1f}</td><td>{scope['gpu_family_wall_seconds']/60:.1f}</td></tr>"
                         for scope in audit["scopes"])
-    return f"""<section id="{tag}"><h2>{title}: saved and checked</h2><p>{scope_note}The original CatBoost, LightGBM and Huber neural blend has all three cross-fit groups and its full permitted-scope fit saved. Each native checkpoint passed prediction replay. The separate audit checks actual cold-input bytes, ordered permitted/query IDs, training-only stopping coverage, saved prediction bytes and the declared raw/floored arithmetic. January and July labels are excluded from donor fits. Its saved neighbour features reproduce from those actual predictions, including the original missing values for empty windows. Missing-value positions match; infinities are rejected.</p><p>Recorded component wall time: {audit['component_wall_seconds']/60:.1f} minutes. GPU-family subtotal: {audit['gpu_family_wall_seconds']/60:.1f} minutes. {html.escape(audit['accounting'])} These are completed outer-donor costs; nested meta donor chains are additional.</p><div class="scroll"><table><thead><tr><th>Scope</th><th>Fit rows</th><th>Query rows</th><th>Component minutes</th><th>GPU-family minutes</th></tr></thead><tbody>{cost_rows}</tbody></table></div><p>Stage 1 reference recipe: partial, this donor checked. Stage 2 meta/evaluation: pending. Stage 3 candidate/confirmation: pending. No whole-file reference comparison or new scorer gain yet. Native replay is retained from member completion records; this audit does not run a new model fit or GPU replay.</p><p><a href="prc26-{tag}-audit.json">Donor scope, arithmetic and cost record</a>. Regenerate with <code>{html.escape(audit['command'])}</code>.</p></section>"""
+    return f"""<section id="{tag}"><h2>{title}: saved and checked</h2><p>{scope_note}The original CatBoost, LightGBM and Huber neural blend has all three cross-fit groups and its full permitted-scope fit saved. Each native checkpoint passed prediction replay. The separate audit checks actual cold-input bytes, ordered permitted/query IDs, training-only stopping coverage, saved prediction bytes and the declared raw/floored arithmetic. January and July labels are excluded from donor fits. Its saved neighbour features reproduce from those actual predictions, including the original missing values for empty windows. Missing-value positions match; infinities are rejected.</p><p>Recorded component wall time: {audit['component_wall_seconds']/60:.1f} minutes. GPU-family subtotal: {audit['gpu_family_wall_seconds']/60:.1f} minutes. {html.escape(audit['accounting'])} This is one completed donor; the remaining donor chains add cost.</p><div class="scroll"><table><thead><tr><th>Scope</th><th>Fit rows</th><th>Query rows</th><th>Component minutes</th><th>GPU-family minutes</th></tr></thead><tbody>{cost_rows}</tbody></table></div><p>Stage 1 reference recipe: partial, this donor checked. Stage 2 meta/evaluation: pending. Stage 3 candidate/confirmation: pending. No whole-file reference comparison or new scorer gain yet. Native replay is retained from member completion records; this audit does not run a new model fit or GPU replay.</p><p><a href="prc26-{tag}-audit.json">Donor scope, arithmetic and cost record</a>. Regenerate with <code>{html.escape(audit['command'])}</code>.</p></section>"""
 
 
 def render_outer_members(members: tuple[dict, ...]) -> str:
@@ -117,6 +123,11 @@ def main() -> None:
     records["clean_champion_selection_donor"] = selection
     if selection:
         shutil.copy2(selection_path, OUT / "prc26-selection-donor-audit.json")
+    meta_donors = []
+    for path in sorted((ROOT / "data/runs/clean-champion-20261003").glob("meta-*-donor-audit.json")):
+        meta_donors.append(json.loads(path.read_text(encoding="utf-8")))
+        shutil.copy2(path, OUT / f"prc26-{path.name}")
+    records["clean_champion_meta_donors"] = meta_donors
     records["clean_champion_checks"] = {"full_suite_passed": 73, "full_suite_seconds": 57.17,
                                          "command": "python -m pytest tests/ -q", "full_model_comparison": "pending"}
     (OUT / "prc26-run-record.json").write_text(json.dumps(records, indent=2, allow_nan=False), encoding="utf-8")
@@ -139,6 +150,7 @@ def main() -> None:
             model_rows.append(f"<tr><td>{progress['months']} {name}</td><td>{info['refit']['fit_rows']:,} / {info['refit']['fit_days']}</td><td>{info['epochs']}</td><td>{metric['gain']:+.3f}</td><td>{info['selection_seconds']+info['refit_seconds']:.0f}s</td></tr>")
     checkpoint = records["champion_checkpoint"]
     donor_section = render_donor(donor) + render_donor(selection, selection=True)
+    donor_section += "".join(render_donor(audit, selection=audit["donor_mode"] == "downstream_stopping_excluded") for audit in meta_donors)
     outer_section = render_outer_members(tuple([first, *other_members])) if first else ""
     first_section = ""
     if first:

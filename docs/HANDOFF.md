@@ -11,10 +11,20 @@
 > its full-scope C/L/N members have checkpoint replay PASS. All three outer Lane A members
 > are now saved with checkpoint replay PASS. The original mixture-B donor is also saved
 > with replay PASS, at 841.0 seconds of component cost. The pipeline has written the
-> floored outer complete-file member table and started meta-2-5-9-12's tuned CatBoost
-> on 1,051,799 permitted Lane A rows over 183 days. Direct process, live job and log checks
-> at 02:08 London on 4 October confirm the controller and pipeline continue without a
-> recorded error. Budget.json records 15,032.3 seconds of completed
+> floored outer complete-file member table. Meta-2-5-9-12's tuned CatBoost is now saved
+> with checkpoint replay PASS, covering 1,051,799 permitted Lane A rows over 183 days
+> at selected budgets 1,453/1,595/5,461 and 1,468.9 seconds of component cost. Its nested
+> PW donor has saved all three members in group-3-8, group-4-10, group-6-11 and the
+> full scope with replay PASS. Its actual cold-input bytes, ordered scopes, stopping
+> coverage, saved prediction bytes and PW window reconstruction pass:
+> `python analysis/champion_donor_audit.py --meta-group 2 5 9 12`.
+> meta-2-5-9-12-donor-audit.json records 3,204.5 seconds of total component wall time
+> and 2,734.1 seconds of GPU-family wall time. January/July and the inner query months
+> are excluded from every fit. The reader also rejects undeclared inner query groups.
+> The separate stopping-day-excluded donor has all three saved members in group-3-8
+> and group-4-10; group-6-11's CatBoost is now in full refit. Direct process, live
+> job and log checks at 04:02 London on 4 October confirm the controller and pipeline
+> continue without a recorded error. Budget.json records 20,725.6 seconds of completed
 > GPU-family component cost, within the declared allowance.
 > LightGBM and neural completion records cover every 1,723,531 permitted Lane A row over
 > 303 days. LightGBM selected budgets 217/6,312/7,991; the neural selected epoch 50, stopped
@@ -46,7 +56,7 @@
 > 5,266.7 seconds of GPU-family wall time. Native replay PASS is retained from the saved
 > completion records; this read-only audit does not repeat a model fit or GPU replay.
 > Both GPU-family subtotals are conservative compute proxies, not measured GPU utilization.
-> Nested meta donor costs and the full reference comparison are pending. This is component
+> Remaining nested meta donor costs and the full reference comparison are pending. This is component
 > progress, not a full reference result or score gain. Verify the current active record
 > and actual processes.
 > It writes `data/runs/clean-champion-20261003/active.json` and the live HTML job record.
