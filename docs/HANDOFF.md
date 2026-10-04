@@ -1,6 +1,6 @@
 # Hand-off, 2026-09-22
 
-> **Current campaign checkpoint, 4 October 2026, 17:12 London.** The full January/July
+> **Current campaign checkpoint, 4 October 2026, 17:18 London.** The full January/July
 > clean reference is now measured and checked. All three inner complete-file tables
 > pass native lineage, scopes, raw/floor arithmetic and identical original mixture B.
 > Command: `python analysis/champion_assembly_audit.py --meta-group 4 8 11`.
@@ -90,13 +90,19 @@
 > at 409.344 seconds and selected budgets 2,161/3,041. It fits 1,432,447 permitted
 > all-lane rows over 244 days and queries 2,192 Lane B rows. Its full scope/native-byte
 > audit closes with the whole-block recording/evaluation proof; that remains pending.
-> The pipeline has advanced to meta-4-8-11's CatBoost full refit, fitting
+> The meta-4-8-11 tuned CatBoost is now saved with native replay PASS, fitting
 > 893,511 permitted Lane A rows over 153 days and querying 524,031 inner Lane A rows.
-> Its classifier and first regressor refits have finished their declared tree budgets;
-> the tail regressor's iteration logs continue advancing. Current error is null.
-> This member is not complete until native replay and the completion record pass.
-> No new full donor or complete inner table is available to audit yet. Nested meta
-> stages and whole-file evaluation remain pending. Existing proofs are preserved.
+> Saved selection/refit/replay wall cost: 1,421.313 seconds; budgets: 1,594/2,846/4,459.
+> Its completion record is meta-4-8-11/ra_cb_wz_t7/complete.json. The existing assembly
+> reader's native_record check passes actual source/configuration and all native model
+> and prediction bytes for this newly saved member. Prediction SHA:
+> f42d7f0f6e54ab75564d6f3d4ba5462daec435c4f18ba5c4a8fcf0959d8bd9f4.
+> Its full scope/raw-value checks close with the complete inner-table proof, still pending.
+> The pipeline has continued to this inner scope's original neighbour donor:
+> group-5-10/ra_cb_wz budget selection, fitting 526,153 rows over 91 days and querying
+> 367,358 donor rows. Current error is null. No new full donor or complete inner table
+> is available to audit yet. Nested meta stages and whole-file evaluation remain
+> pending. Existing proofs are preserved; the serial job was not restarted.
 > Current controller/pipeline command
 > lines were checked directly; the serial pipeline continues without restarting fits.
 > Logs: pipeline-2-3.out/.err and controller-2-3.out/.err. Verify actual processes.
@@ -120,7 +126,7 @@
 > `python analysis/champion_assembly_audit.py --months 2-3 --meta-group <group>`.
 > Close the whole block with `python analysis/champion_evaluation_audit.py --months 2-3`.
 > New component proofs export separately in the local status page. Budget.json now
-> records 53,593.3665 GPU-family seconds globally, with 9,401.547 in the confirmation
+> records 55,014.6795 GPU-family seconds globally, with 10,822.860 in the confirmation
 > block; both declared limits remain in force. Reprice from actual completed records.
 > The campaign remains OPEN. Inspect each completed block and continue the approved
 > work; a completed component, failed candidate or expected budget stop does not end it.

@@ -11396,7 +11396,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-04T16:14:23.854107+00:00",
+  "recorded_utc": "2026-10-04T16:20:04.328302+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12025,13 +12025,13 @@
     "phase": "Full reference 2-3 is training",
     "pid": 78840,
     "controller_pid": 73236,
-    "checked_utc": "2026-10-04T16:14:38.696720+00:00",
+    "checked_utc": "2026-10-04T16:20:25.540709+00:00",
     "active_component": {
-      "component": "2-3\\meta-4-8-11\\ra_cb_wz_t7",
-      "fit_rows": 893511,
-      "fit_days": 153,
-      "stage": "full refit",
-      "started_file_mtime": 1791129176.720813
+      "component": "2-3\\donors\\3fd8e035aedad090e55fd3716cb404e97e78e24df1aefe1e6d6f313daaf85b20\\group-5-10\\ra_cb_wz",
+      "fit_rows": 526153,
+      "fit_days": 91,
+      "stage": "budget selection",
+      "started_file_mtime": 1791130614.5390627
     },
     "completed_components": [
       {
@@ -12717,6 +12717,11 @@
       {
         "component": "2-3\\donors\\e2acebd793f4fa4a09e59da23982c43a8cc2c26c416c27f4db5b354f00de6b0e\\group-6-10\\ra_lgb_wz",
         "seconds": 119.84299999999348,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\meta-4-8-11\\ra_cb_wz_t7",
+        "seconds": 1421.313000000082,
         "checkpoint_replay": "PASS"
       },
       {
