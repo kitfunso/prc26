@@ -1,6 +1,6 @@
 # Hand-off, 2026-09-22
 
-> **Current campaign checkpoint, 4 October 2026, 17:18 London.** The full January/July
+> **Current campaign checkpoint, 4 October 2026, 17:42 London.** The full January/July
 > clean reference is now measured and checked. All three inner complete-file tables
 > pass native lineage, scopes, raw/floor arithmetic and identical original mixture B.
 > Command: `python analysis/champion_assembly_audit.py --meta-group 4 8 11`.
@@ -98,11 +98,18 @@
 > and prediction bytes for this newly saved member. Prediction SHA:
 > f42d7f0f6e54ab75564d6f3d4ba5462daec435c4f18ba5c4a8fcf0959d8bd9f4.
 > Its full scope/raw-value checks close with the complete inner-table proof, still pending.
-> The pipeline has continued to this inner scope's original neighbour donor:
-> group-5-10/ra_cb_wz budget selection, fitting 526,153 rows over 91 days and querying
-> 367,358 donor rows. Current error is null. No new full donor or complete inner table
-> is available to audit yet. Nested meta stages and whole-file evaluation remain
-> pending. Existing proofs are preserved; the serial job was not restarted.
+> This inner scope's original neighbour donor has advanced: group-5-10 now has all
+> three C/L/N members saved with native replay PASS, fitting 526,153 rows over 91 days
+> and querying 367,358 donor rows. Group-6-12's CatBoost is also saved with replay PASS.
+> Its LightGBM is now refitting 548,843 rows over 92 days, querying 344,668 donor rows.
+> Its quiet refit shows rising CPU time across live samples. Current error is null.
+> Four donor components have completion records; the whole
+> donor and complete inner table are unfinished. Their actual scope/native-byte/window
+> and raw-assembly checks remain pending until the matching artifacts are saved.
+> Use `python analysis/champion_donor_audit.py --months 2-3 --meta-group 4 8 11`
+> when this full donor finishes; add `--selection-donor` for its separate stopping donor.
+> Nested meta stages and whole-file evaluation remain pending. Existing proofs are
+> preserved; the serial job was not restarted.
 > Current controller/pipeline command
 > lines were checked directly; the serial pipeline continues without restarting fits.
 > Logs: pipeline-2-3.out/.err and controller-2-3.out/.err. Verify actual processes.
@@ -126,7 +133,7 @@
 > `python analysis/champion_assembly_audit.py --months 2-3 --meta-group <group>`.
 > Close the whole block with `python analysis/champion_evaluation_audit.py --months 2-3`.
 > New component proofs export separately in the local status page. Budget.json now
-> records 55,014.6795 GPU-family seconds globally, with 10,822.860 in the confirmation
+> records 56,246.4295 GPU-family seconds globally, with 12,054.610 in the confirmation
 > block; both declared limits remain in force. Reprice from actual completed records.
 > The campaign remains OPEN. Inspect each completed block and continue the approved
 > work; a completed component, failed candidate or expected budget stop does not end it.
