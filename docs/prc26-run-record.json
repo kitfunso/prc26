@@ -11396,7 +11396,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-04T15:54:24.245557+00:00",
+  "recorded_utc": "2026-10-04T16:14:23.854107+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12025,12 +12025,12 @@
     "phase": "Full reference 2-3 is training",
     "pid": 78840,
     "controller_pid": 73236,
-    "checked_utc": "2026-10-04T15:54:47.778408+00:00",
+    "checked_utc": "2026-10-04T16:14:38.696720+00:00",
     "active_component": {
       "component": "2-3\\meta-4-8-11\\ra_cb_wz_t7",
       "fit_rows": 893511,
       "fit_days": 153,
-      "stage": "budget selection",
+      "stage": "full refit",
       "started_file_mtime": 1791129176.720813
     },
     "completed_components": [

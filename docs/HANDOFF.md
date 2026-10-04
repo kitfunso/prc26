@@ -1,6 +1,6 @@
 # Hand-off, 2026-09-22
 
-> **Current campaign checkpoint, 4 October 2026, 16:53 London.** The full January/July
+> **Current campaign checkpoint, 4 October 2026, 17:12 London.** The full January/July
 > clean reference is now measured and checked. All three inner complete-file tables
 > pass native lineage, scopes, raw/floor arithmetic and identical original mixture B.
 > Command: `python analysis/champion_assembly_audit.py --meta-group 4 8 11`.
@@ -90,9 +90,13 @@
 > at 409.344 seconds and selected budgets 2,161/3,041. It fits 1,432,447 permitted
 > all-lane rows over 244 days and queries 2,192 Lane B rows. Its full scope/native-byte
 > audit closes with the whole-block recording/evaluation proof; that remains pending.
-> The pipeline has continued to meta-4-8-11's CatBoost budget selection, fitting
+> The pipeline has advanced to meta-4-8-11's CatBoost full refit, fitting
 > 893,511 permitted Lane A rows over 153 days and querying 524,031 inner Lane A rows.
-> Current error is null. Nested meta stages and whole-file evaluation remain pending.
+> Its classifier and first regressor refits have finished their declared tree budgets;
+> the tail regressor's iteration logs continue advancing. Current error is null.
+> This member is not complete until native replay and the completion record pass.
+> No new full donor or complete inner table is available to audit yet. Nested meta
+> stages and whole-file evaluation remain pending. Existing proofs are preserved.
 > Current controller/pipeline command
 > lines were checked directly; the serial pipeline continues without restarting fits.
 > Logs: pipeline-2-3.out/.err and controller-2-3.out/.err. Verify actual processes.
