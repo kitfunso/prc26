@@ -11396,7 +11396,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-04T17:17:21.191154+00:00",
+  "recorded_utc": "2026-10-04T17:47:25.149108+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12025,13 +12025,13 @@
     "phase": "Full reference 2-3 is training",
     "pid": 78840,
     "controller_pid": 73236,
-    "checked_utc": "2026-10-04T17:17:46.986030+00:00",
+    "checked_utc": "2026-10-04T17:47:44.090577+00:00",
     "active_component": {
-      "component": "2-3\\donors\\4965b69912607a21dc08eec688cd0c92db56343e6585ba585a23a7c7439a8c32\\group-5-10\\ra_cb_wz",
-      "fit_rows": 442418,
-      "fit_days": 75,
-      "stage": "budget selection",
-      "started_file_mtime": 1791134024.6008065
+      "component": "2-3\\donors\\4965b69912607a21dc08eec688cd0c92db56343e6585ba585a23a7c7439a8c32\\group-9\\ra_cb_wz",
+      "fit_rows": 628291,
+      "fit_days": 107,
+      "stage": "full refit",
+      "started_file_mtime": 1791135704.3934574
     },
     "completed_components": [
       {
@@ -12657,6 +12657,36 @@
       {
         "component": "2-3\\donors\\3fd8e035aedad090e55fd3716cb404e97e78e24df1aefe1e6d6f313daaf85b20\\group-9\\ra_lgb_wz",
         "seconds": 71.90599999995902,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\4965b69912607a21dc08eec688cd0c92db56343e6585ba585a23a7c7439a8c32\\group-5-10\\nn3_wz",
+        "seconds": 41.875,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\4965b69912607a21dc08eec688cd0c92db56343e6585ba585a23a7c7439a8c32\\group-5-10\\ra_cb_wz",
+        "seconds": 554.6089999999385,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\4965b69912607a21dc08eec688cd0c92db56343e6585ba585a23a7c7439a8c32\\group-5-10\\ra_lgb_wz",
+        "seconds": 58.70299999997951,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\4965b69912607a21dc08eec688cd0c92db56343e6585ba585a23a7c7439a8c32\\group-6-12\\nn3_wz",
+        "seconds": 68.5,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\4965b69912607a21dc08eec688cd0c92db56343e6585ba585a23a7c7439a8c32\\group-6-12\\ra_cb_wz",
+        "seconds": 437.594000000041,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\4965b69912607a21dc08eec688cd0c92db56343e6585ba585a23a7c7439a8c32\\group-6-12\\ra_lgb_wz",
+        "seconds": 429.18800000008196,
         "checkpoint_replay": "PASS"
       },
       {

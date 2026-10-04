@@ -1,6 +1,6 @@
 # Hand-off, 2026-09-22
 
-> **Current campaign checkpoint, 4 October 2026, 18:15 London.** The full January/July
+> **Current campaign checkpoint, 4 October 2026, 18:47 London.** The full January/July
 > clean reference is now measured and checked. All three inner complete-file tables
 > pass native lineage, scopes, raw/floor arithmetic and identical original mixture B.
 > Command: `python analysis/champion_assembly_audit.py --meta-group 4 8 11`.
@@ -113,8 +113,10 @@
 > infinities are rejected. This read-only audit ran no new fit or GPU replay.
 > The separate downstream stopping-day-excluded donor is now training under
 > 4965b69912607a21dc08eec688cd0c92db56343e6585ba585a23a7c7439a8c32.
-> Its group-5-10 CatBoost is selecting budgets on 442,418 rows over 75 days, querying
-> 367,358 donor rows. Current error is null and iteration logs advance. Audit it with
+> All six C/L/N components across group-5-10 and group-6-12 are saved with checkpoint
+> replay PASS. Group-9 CatBoost has advanced from budget selection to full refit on
+> 628,291 rows over 107 days, querying 181,485 donor rows. Current error is null and
+> iteration logs advance. The whole donor feature file is not yet saved. Audit it with
 > `python analysis/champion_donor_audit.py --months 2-3 --meta-group 4 8 11 --selection-donor`
 > after its whole feature file is saved. The complete inner table, remaining nested
 > chains and whole-file evaluation remain pending. Existing proofs are preserved;
@@ -142,7 +144,7 @@
 > `python analysis/champion_assembly_audit.py --months 2-3 --meta-group <group>`.
 > Close the whole block with `python analysis/champion_evaluation_audit.py --months 2-3`.
 > New component proofs export separately in the local status page. Budget.json now
-> records 57,508.0705 GPU-family seconds globally, with 13,316.251 in the confirmation
+> records 58,610.6485 GPU-family seconds globally, with 14,418.829 in the confirmation
 > block; both declared limits remain in force. Reprice from actual completed records.
 > The campaign remains OPEN. Inspect each completed block and continue the approved
 > work; a completed component, failed candidate or expected budget stop does not end it.
