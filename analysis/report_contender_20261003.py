@@ -44,6 +44,20 @@ def render_donor(audit: dict, selection: bool = False) -> str:
     return f"""<section id="{tag}"><h2>{title}: saved and checked</h2><p>{scope_note}The original CatBoost, LightGBM and Huber neural blend has all three cross-fit groups and its full permitted-scope fit saved. Each native checkpoint passed prediction replay. The separate audit checks actual cold-input bytes, ordered permitted/query IDs, training-only stopping coverage, saved prediction bytes and the declared raw/floored arithmetic. January and July labels are excluded from donor fits. Its saved neighbour features reproduce from those actual predictions, including the original missing values for empty windows. Missing-value positions match; infinities are rejected.</p><p>Recorded component wall time: {audit['component_wall_seconds']/60:.1f} minutes. GPU-family subtotal: {audit['gpu_family_wall_seconds']/60:.1f} minutes. {html.escape(audit['accounting'])} These are completed outer-donor costs; nested meta donor chains are additional.</p><div class="scroll"><table><thead><tr><th>Scope</th><th>Fit rows</th><th>Query rows</th><th>Component minutes</th><th>GPU-family minutes</th></tr></thead><tbody>{cost_rows}</tbody></table></div><p>Stage 1 reference recipe: partial, this donor checked. Stage 2 meta/evaluation: pending. Stage 3 candidate/confirmation: pending. No whole-file reference comparison or new scorer gain yet. Native replay is retained from member completion records; this audit does not run a new model fit or GPU replay.</p><p><a href="prc26-{tag}-audit.json">Donor scope, arithmetic and cost record</a>. Regenerate with <code>{html.escape(audit['command'])}</code>.</p></section>"""
 
 
+def render_outer_members(members: tuple[dict, ...]) -> str:
+    if len(members) != 3:
+        return ""
+    rows = []
+    for member in members:
+        budget = "/".join(map(str, member["iterations"])) if member["iterations"] else f"{member['epochs']} epochs"
+        rows.append(f"<tr><td>{html.escape(member['member'])}</td><td>{member['fit_rows']:,} / {member['fit_days']}</td><td>{html.escape(budget)}</td><td>{member['laneA_descriptive_errors']['rmse']:.3f}</td><td>{member['runtime_seconds']/60:.1f}</td></tr>")
+    return f"""<section id="outer-members"><h2>Outer Lane A members: saved and checked</h2>
+<p>The tuned CatBoost, LightGBM and Huber neural members are saved. Their ordered January/July Lane A prediction IDs, training-only stopping coverage, every-row/day refit coverage and finite nonnegative outputs pass. Each native checkpoint passed replay before completion. The new LightGBM and neural audits also check actual saved-model bytes, the declared configurations and fitting source hashes, and reproduce fit/query/stopping input fingerprints from the cold features and both checked neighbour donors. The scored champion and its frozen copy still match their recorded hashes.</p>
+<div class="scroll"><table><thead><tr><th>Member</th><th>Refit rows / days</th><th>Selected budget</th><th>Lane A RMSE, seconds</th><th>Component minutes</th></tr></thead><tbody>{''.join(rows)}</tbody></table></div>
+<p>These errors are descriptive member diagnostics on reused development files. The full recipe still requires nested meta fits, final Lane B assembly and whole-file evaluation. Stage 1 reference recipe: partial. Stage 2 whole-file evaluation: pending. Stage 3 candidate/confirmation: pending. No score improvement or promotion is established.</p>
+<p>Native replay evidence is retained from completion records; the audits do not run new fits or GPU replays. LightGBM cost is CPU wall time; CatBoost and neural wall time provide a conservative GPU-family cost proxy. <a href="prc26-ra_lgb_pw_t7-audit.json">LightGBM scope/input/cost record</a> · <a href="prc26-nn3_pw_t7-audit.json">Neural scope/input/cost record</a>. Regenerate with <code>python analysis/champion_checkpoint_audit.py --member ra_lgb_pw_t7</code> and <code>python analysis/champion_checkpoint_audit.py --member nn3_pw_t7</code>.</p></section>"""
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     template = OUT / "prc26-status-2026-10-03.html"
@@ -86,6 +100,13 @@ def main() -> None:
     records["clean_champion_first_member"] = first
     if first:
         shutil.copy2(first_path, OUT / "prc26-first-member-audit.json")
+    other_members = []
+    for name in ("ra_lgb_pw_t7", "nn3_pw_t7"):
+        path = ROOT / f"data/runs/clean-champion-20261003/{name}-audit.json"
+        if path.exists():
+            other_members.append(json.loads(path.read_text(encoding="utf-8")))
+            shutil.copy2(path, OUT / f"prc26-{name}-audit.json")
+    records["clean_champion_other_members"] = other_members
     donor_path = ROOT / "data/runs/clean-champion-20261003/first-donor-audit.json"
     donor = json.loads(donor_path.read_text(encoding="utf-8")) if donor_path.exists() else {}
     records["clean_champion_first_donor"] = donor
@@ -118,6 +139,7 @@ def main() -> None:
             model_rows.append(f"<tr><td>{progress['months']} {name}</td><td>{info['refit']['fit_rows']:,} / {info['refit']['fit_days']}</td><td>{info['epochs']}</td><td>{metric['gain']:+.3f}</td><td>{info['selection_seconds']+info['refit_seconds']:.0f}s</td></tr>")
     checkpoint = records["champion_checkpoint"]
     donor_section = render_donor(donor) + render_donor(selection, selection=True)
+    outer_section = render_outer_members(tuple([first, *other_members])) if first else ""
     first_section = ""
     if first:
         file_rows = "".join(f"<tr><td>{html.escape(name)}</td><td>{value['rows']:,}</td><td>{value['rmse']:.3f}</td><td>{value['aobt_only_rmse']:.3f}</td></tr>"
@@ -131,6 +153,7 @@ def main() -> None:
 <h1>{status}.</h1><p class="lead">The frozen champion remains the scored best. The full original neighbour-model and recalibration chain is the current research task. No new scorer gain is established. The earlier MSE lead remains rejected.</p>
 <section id="active-run"><h2>Current work</h2><p id="active-state">{html.escape(active.get('phase', 'No active job record yet.'))}</p><p id="active-detail" class="muted">Last job check: {html.escape(active.get('checked_utc', 'not recorded'))}</p><p>Implementation checks: done, with 73 full-suite tests and the source review. Full fitted reference: partial; see the live job state above. Complete comparison and error census: pending. Candidate preparation and submission: pending. The completed reference will be evaluated before choosing the next distinct score experiment. Checkpoints and predictions are saved after each verified component. A failed candidate moves the campaign to its next supported step.</p><p>The first fit saved its full classifier, then stopped because CatBoost returned no best-iteration value without a validation set. Both fitting paths now accept that result. Checked checkpoint recovery preserves the selected tree budgets, original scope and source hashes, completed classifier and spent compute. Native checkpoint reuse, both Windows path formats and changed-scope rejection pass. The completed fit's actual source specification remains preserved alongside the recorded compatibility entry for the path-check correction.</p><p>Follow-up checks in this chat are set for every half hour, with updates on meaningful results or failures. The local controller updates this page's job record while the fits run.</p></section>
 {first_section}
+{outer_section}
 {donor_section}
 <div class="cards"><div class="card"><strong>{board['us']['rank']} / {board['teams']}</strong><span>Live leaderboard rank</span></div><div class="card"><strong>{board['us']['score']:.2f} s</strong><span>Our scored champion</span></div><div class="card"><strong>{board['leader']['score']:.2f} s</strong><span>Current leader</span></div></div>
 <p class="muted">Live API snapshot: {board['fetched_utc']} UTC. <a href="https://prc-data-challenge-2026.netlify.app/">Official deadline</a>: 11 October 2026, 23:59:59 CET.</p>

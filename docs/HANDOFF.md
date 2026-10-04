@@ -8,12 +8,29 @@
 > donor's three cross-fit scopes, group-2-5-9-12, group-3-6-10 and group-4-8-11, and the
 > full-scope donor now have all three saved members each with checkpoint replay PASS.
 > The separate stopping-day-excluded donor is now saved: all three cross-fit groups and
-> its full-scope C/L/N members have checkpoint replay PASS. The downstream tuned LightGBM
-> is selecting its budget on 1,723,531 rows over 303 permitted days. Direct process and
-> log checks at 01:07 London on 4 October confirm both controller and pipeline alive.
-> LightGBM's selection gate and tail models are saved, process CPU time has increased,
-> and no error is recorded. Budget.json records 13,370.9 seconds of completed
+> its full-scope C/L/N members have checkpoint replay PASS. All three outer Lane A members
+> are now saved with checkpoint replay PASS. The original mixture-B donor is also saved
+> with replay PASS, at 841.0 seconds of component cost. The pipeline has written the
+> floored outer complete-file member table and started meta-2-5-9-12's tuned CatBoost
+> on 1,051,799 permitted Lane A rows over 183 days. Direct process, live job and log checks
+> at 02:08 London on 4 October confirm the controller and pipeline continue without a
+> recorded error. Budget.json records 15,032.3 seconds of completed
 > GPU-family component cost, within the declared allowance.
+> LightGBM and neural completion records cover every 1,723,531 permitted Lane A row over
+> 303 days. LightGBM selected budgets 217/6,312/7,991; the neural selected epoch 50, stopped
+> selection at 65 and refitted all rows at 50. Both new member audits pass actual model and
+> prediction byte hashes, configurations, fitting source hashes, cold input bytes,
+> ordered fit/query IDs, stopping coverage, complete refit coverage and finite nonnegative
+> output coverage. Their fit, query and selection feature fingerprints reproduce from the
+> cold features and the two checked outer PW files. Commands:
+> `python analysis/champion_checkpoint_audit.py --member ra_lgb_pw_t7` and
+> `python analysis/champion_checkpoint_audit.py --member nn3_pw_t7`.
+> Records: ra_lgb_pw_t7-audit.json and nn3_pw_t7-audit.json under the clean-champion run.
+> Their saved selection/refit/replay costs are 2,759.3 CPU wall seconds and 820.3 GPU-family
+> wall seconds respectively. The scored champion and its frozen copy still match their
+> recorded hashes. Native replay evidence is retained from completion records; these
+> audits perform no new model fit or GPU replay. Member errors are descriptive Lane A
+> diagnostics, not a whole-file ensemble comparison or scorer gain.
 > `python analysis/champion_donor_audit.py` passes actual cold-input bytes, permitted/query
 > IDs, stopping coverage, saved prediction hashes and reconstruction of the saved PW
 > features from raw cross-fit/floored full predictions, including matching empty-window
