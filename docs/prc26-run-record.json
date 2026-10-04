@@ -11396,7 +11396,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-04T18:45:09.762188+00:00",
+  "recorded_utc": "2026-10-04T19:14:40.622517+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12025,14 +12025,8 @@
     "phase": "Full reference 2-3 is training",
     "pid": 78840,
     "controller_pid": 73236,
-    "checked_utc": "2026-10-04T18:45:36.264876+00:00",
-    "active_component": {
-      "component": "2-3\\meta-5-9-12\\ra_cb_wz_t7",
-      "fit_rows": 888432,
-      "fit_days": 152,
-      "stage": "budget selection",
-      "started_file_mtime": 1791139203.2511518
-    },
+    "checked_utc": "2026-10-04T19:15:19.488899+00:00",
+    "active_component": null,
     "completed_components": [
       {
         "component": "1-7\\donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\full\\nn3_wz",
@@ -12600,6 +12594,16 @@
         "checkpoint_replay": "PASS"
       },
       {
+        "component": "2-3\\donors\\315b31373a8256a8a60f4ccfc01503e70bf0f915af8c3ad735c7538ad6b145cf\\group-4-10\\ra_cb_wz",
+        "seconds": 513.594000000041,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\315b31373a8256a8a60f4ccfc01503e70bf0f915af8c3ad735c7538ad6b145cf\\group-4-10\\ra_lgb_wz",
+        "seconds": 406.0779999999795,
+        "checkpoint_replay": "PASS"
+      },
+      {
         "component": "2-3\\donors\\3fd8e035aedad090e55fd3716cb404e97e78e24df1aefe1e6d6f313daaf85b20\\full\\nn3_wz",
         "seconds": 82.32799999997951,
         "checkpoint_replay": "PASS"
@@ -12857,6 +12861,11 @@
       {
         "component": "2-3\\meta-4-8-11\\ra_lgb_pw_t7",
         "seconds": 1432.234000000055,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\meta-5-9-12\\ra_cb_wz_t7",
+        "seconds": 1104.0470000000205,
         "checkpoint_replay": "PASS"
       },
       {
