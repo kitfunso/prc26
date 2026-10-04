@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 import mix
-from analysis.champion_donor_audit import input_rows, member_values, read
+from analysis.champion_donor_audit import BLOCKS, input_rows, member_values, proof_directory, read
 from campaign import file_hash, outer_masks
 from champion import configuration, ids_hash, write_record
 from champion_neighbours import file_month
@@ -80,16 +80,18 @@ def lane_b(path: Path, detail: dict, train: pd.DataFrame, query: pd.DataFrame, d
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--months", choices=BLOCKS, default="1-7")
     parser.add_argument("--meta-group", type=int, nargs="+", required=True)
     args = parser.parse_args()
     group = tuple(args.meta_group)
-    frame, fit_a, digest, _ = input_rows(False, group)
-    outer_fit, _ = outer_masks(frame, (1, 7))
+    months = tuple(int(value) for value in args.months.split("-"))
+    frame, fit_a, digest, _ = input_rows(False, group, months)
+    outer_fit, _ = outer_masks(frame, months)
     query_mask = outer_fit & file_month(frame).isin(group)
     fit_mask = outer_fit & ~file_month(frame).isin(group)
     train, query = frame[fit_mask], frame[query_mask]
     tag = "meta-" + "-".join(map(str, group))
-    directory = RUN / "1-7" / tag
+    directory = RUN / args.months / tag
     detail = read(directory / "members.json")
     values = pd.read_parquet(directory / "members.parquet")
     if (detail["prediction_mode"] != "raw OOF" or detail["fit_ids"] != ids_hash(train.id)
@@ -109,8 +111,8 @@ def main() -> None:
     raw_b = lane_b(directory / "mixtureB", detail["members"]["mixtureB"], train, query_b, digest)
     for name in MEMBERS:
         np.testing.assert_array_equal(values.loc[query.has_plan.values == 0, name].values, raw_b)
-    output = {"checked_utc": datetime.now(timezone.utc).isoformat(), "meta_group": group,
-              "command": f"python analysis/champion_assembly_audit.py --meta-group {' '.join(map(str, group))}",
+    output = {"checked_utc": datetime.now(timezone.utc).isoformat(), "months": months, "meta_group": group,
+              "command": f"python analysis/champion_assembly_audit.py --months {args.months} --meta-group {' '.join(map(str, group))}",
               "scope_checks": "PASS", "native_lineage_checks": "PASS", "raw_floor_parity": "PASS",
               "member_assembly": "PASS", "laneB_parity": "PASS", "fit_rows": len(train),
               "query_rows": len(query), "laneA_rows": len(query_a), "laneB_rows": len(query_b),
@@ -118,7 +120,7 @@ def main() -> None:
               "query_files": sorted(query.file.unique().tolist()), "cold_input_hash": digest,
               "output_hash": file_hash(directory / "members.parquet"), "audit_code_hash": file_hash(Path(__file__)),
               "limit": "One inner raw prediction table checked. This audit does not reproduce fit/query feature fingerprints or donor windows. Donor window checks are recorded separately; full NNLS, residual recalibration, final recording-B override and whole-file errors remain pending."}
-    write_record(RUN / f"{tag}-assembly-audit.json", output)
+    write_record(proof_directory(months) / f"{tag}-assembly-audit.json", output)
 
 
 if __name__ == "__main__":

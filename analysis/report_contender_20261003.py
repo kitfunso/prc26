@@ -79,6 +79,32 @@ def render_evaluation(audit: dict) -> str:
     return f"""<section id="reference-{tag}"><h2>Full reference {tag}: checked and measured</h2><p>Complete supplied files: {metric['n']:,} rows. Whole-file RMSE improves from {metric['control_rmse']:.3f} to {metric['candidate_rmse']:.3f} seconds, a gain of {metric['gain']:.3f}. Paired SSE gain: {metric['sse_gain']/1e9:.3f} billion seconds squared.</p><p>Calendar-day interval: [{metric['day_ci'][0]:.3f}, {metric['day_ci'][1]:.3f}]. Month-stratified five-day interval: [{metric['moving5_ci'][0]:.3f}, {metric['moving5_ci'][1]:.3f}]. Both use 2,000 paired resamples. Leave-largest-day SSE gain: {metric['leave_best_day_sse_gain']/1e6:.1f} million; leave-largest-five-day-episode: {metric['leave_best_5day_episode_sse_gain']/1e6:.1f} million. File/clock-month mismatches: {audit['file_clock_month_mismatches']}.</p><div class="scroll"><table><thead><tr><th>Slice</th><th>Rows</th><th>Control RMSE</th><th>Clean recipe RMSE</th><th>Gain, seconds</th></tr></thead><tbody>{''.join(rows)}</tbody></table></div><p>Actual complete-file coverage, cold labels, raw inner tables, whole-file NNLS normalization and applied six-decimal weights pass. The saved 300-tree residual model reproduces Lane A output. Final Lane B context reproduces from permitted history; training-only stopping, native model/prediction bytes, final recording replay and identical B values in control/recipe pass. Airport, signed-error, recording-class and schedule-gap slices are in the proof.</p><p>Saved component wall time: {costs['component_wall_seconds']/3600:.2f} hours. GPU-family subtotal: {costs['gpu_family_wall_seconds']/3600:.2f} hours. {html.escape(costs['accounting'])}</p><p>Stage 1 reference: checked for this block. Stage 2 complete-file evaluation: checked for this block. Stage 3 confirmation and final candidate: pending. {html.escape(audit['limit'])}</p><p><a href="prc26-{tag}-evaluation-audit.json">Full scope, replay, error and cost proof</a>. Regenerate with <code>{html.escape(audit['command'])}</code>.</p></section>"""
 
 
+def confirmation_proofs() -> tuple[dict, ...]:
+    proofs = []
+    run = ROOT / "data/runs/clean-champion-20261003"
+    for block in ("2-3", "9-10"):
+        for path in sorted((run / block).glob("*-audit.json")):
+            if path.name == "evaluation-audit.json":
+                continue
+            audit = json.loads(path.read_text(encoding="utf-8"))
+            if "-".join(map(str, audit["months"])) != block or audit["scope_checks"] != "PASS":
+                raise ValueError("confirmation proof block or scope did not pass")
+            export = f"prc26-{block}-{path.name}"
+            shutil.copy2(path, OUT / export)
+            proofs.append({"block": block, "export": export, "audit": audit})
+    return tuple(proofs)
+
+
+def render_confirmation(proof: dict) -> str:
+    audit, block = proof["audit"], proof["block"]
+    name = audit.get("member", audit.get("donor_mode", "inner complete-file assembly"))
+    rows = audit.get("query_rows", audit.get("laneA_descriptive_errors", {}).get("rows"))
+    coverage = f"Fit: {audit['fit_rows']:,} rows." + (f" Query: {rows:,} rows." if rows is not None else "")
+    seconds = audit.get("runtime_seconds", audit.get("component_wall_seconds"))
+    cost = f" Saved component wall time: {seconds/60:.1f} minutes." if seconds is not None else ""
+    return f"""<section id="confirmation-{block}-{html.escape(Path(proof['export']).stem)}"><h2>Confirmation {block}: {html.escape(name)} checked</h2><p>{coverage}{cost} Actual permitted/query/stopping scope and prediction coverage pass. Additional native, input, arithmetic and replay checks are recorded in this component's proof.</p><p>{html.escape(audit['limit'])} Reference construction for this block remains partial until its full evaluation passes. Candidate preparation remains pending.</p><p><a href="{html.escape(proof['export'])}">Saved confirmation component proof</a>. Regenerate with <code>{html.escape(audit['command'])}</code>.</p></section>"""
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     template = OUT / "prc26-status-2026-10-03.html"
@@ -148,6 +174,8 @@ def main() -> None:
         assemblies.append(json.loads(path.read_text(encoding="utf-8")))
         shutil.copy2(path, OUT / f"prc26-{path.name}")
     records["clean_champion_meta_assemblies"] = assemblies
+    confirmations = confirmation_proofs()
+    records["clean_champion_confirmation_components"] = confirmations
     evaluations = []
     for path in sorted((ROOT / "data/runs/clean-champion-20261003").glob("*/evaluation-audit.json")):
         audit = json.loads(path.read_text(encoding="utf-8"))
@@ -161,7 +189,8 @@ def main() -> None:
     records["clean_champion_checks"] = {"full_suite_passed": 73, "full_suite_seconds": 57.17,
                                          "command": "python -m pytest tests/ -q",
                                          "full_model_comparison": "checked for 1-7" if evaluations else "pending",
-                                         "confirmation": "pending", "block_budget_tests_passed": 4}
+                                         "confirmation": "pending", "block_budget_tests_passed": 4,
+                                         "audit_scope_tests_passed": 11}
     (OUT / "prc26-run-record.json").write_text(json.dumps(records, indent=2, allow_nan=False), encoding="utf-8")
     rows = []
     for name, metric in records["pooled"].items():
@@ -206,6 +235,7 @@ def main() -> None:
 {first_section}
 {outer_section}
 {''.join(render_evaluation(audit) for audit in evaluations)}
+{''.join(render_confirmation(proof) for proof in confirmations)}
 {('<section id="confirmation-allocation"><h2>Current confirmation allocation</h2><p>' + html.escape(allocation['purpose']) + '</p><p>February/March GPU-family limit: ' + str(allocation['gpu_family_limit_seconds']/3600) + ' hours, checked between saved components. Existing campaign limit: 44 hours. Measured January/July: 12.28 hours. Reserve for final preparation: 16 hours, a planning allowance. Remaining margin: about 3.72 hours. September/October remains unrun; this is reduced coverage, not full CV. Original method and seed stay fixed.</p></section>') if allocation else ''}
 {donor_section}
 {''.join(render_assembly(audit) for audit in assemblies)}

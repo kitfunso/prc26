@@ -17,13 +17,13 @@ sys.path.insert(0, str(ROOT))
 
 import laneb
 import recal
-from analysis.champion_donor_audit import read
+from analysis.champion_donor_audit import BLOCKS, proof_directory, read
 from analysis.champion_screen import OUT, inputs
 from analysis.contender_errors import error_rows
 from campaign import file_hash, outer_masks, paired_metrics
 from champion import frame_hash, ids_hash, write_record
 from champion_laneb import component_spec, replay_recording
-from champion_neighbours import file_month
+from champion_neighbours import file_month, month_groups
 from champion_pipeline import MEMBERS, recal_frame
 
 
@@ -52,10 +52,15 @@ def checked_rows(frame: pd.DataFrame, directory: Path, complete: dict, months: t
 
 def checked_meta(train: pd.DataFrame, rows: pd.DataFrame, directory: Path, complete: dict) -> dict:
     pieces, proofs = [], []
+    months = tuple(complete["months"])
+    require(complete["meta_groups"] == [list(group) for group in month_groups(train, pd.Index(train.id))],
+            "meta query groups differ from the declared complete-file recipe")
     for group in complete["meta_groups"]:
         tag = "meta-" + "-".join(map(str, group))
-        proof_path = OUT / f"{tag}-assembly-audit.json"
+        proof_path = proof_directory(months) / f"{tag}-assembly-audit.json"
         proof = read(proof_path)
+        require(tuple(proof.get("months", (1, 7))) == months and tuple(proof["meta_group"]) == tuple(group),
+                "inner assembly proof belongs to another outer block or group")
         path = directory / tag / "members.parquet"
         require(all(proof[key] == "PASS" for key in ("scope_checks", "native_lineage_checks", "raw_floor_parity", "member_assembly", "laneB_parity")), "inner assembly proof failed")
         require(proof["output_hash"] == file_hash(path), "checked inner assembly bytes changed")
@@ -142,7 +147,7 @@ def component_costs(directory: Path) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--months", default="1-7")
+    parser.add_argument("--months", choices=BLOCKS, default="1-7")
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     months = tuple(int(value) for value in args.months.split("-"))

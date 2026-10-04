@@ -1,6 +1,6 @@
 # Hand-off, 2026-09-22
 
-> **Current campaign checkpoint, 4 October 2026, 13:26 London.** The full January/July
+> **Current campaign checkpoint, 4 October 2026, 13:56 London.** The full January/July
 > clean reference is now measured and checked. All three inner complete-file tables
 > pass native lineage, scopes, raw/floor arithmetic and identical original mixture B.
 > Command: `python analysis/champion_assembly_audit.py --meta-group 4 8 11`.
@@ -25,9 +25,18 @@
 > seconds (12.28 hours). First-block reference/evaluation stages are checked;
 > remaining confirmation and actual candidate/ranking build remain open.
 > The unchanged recipe's February/March confirmation is now running: controller
-> PID 73236, pipeline PID 78840. Its first tuned CatBoost selects budgets on
-> 1,417,542 permitted Lane A rows over 244 days; January/July and February/March
-> labels are excluded from all fits. Current error is null and its log advances.
+> PID 73236, pipeline PID 78840. Its first tuned CatBoost is saved with native replay
+> PASS, fitting all 1,417,542 permitted Lane A rows over 244 days and querying every
+> ordered February/March Lane A ID, 305,989 rows. Actual cold bytes, feature/input
+> fingerprints, source/configuration, native model and prediction bytes, stopping
+> scopes, complete refit coverage and finite nonnegative outputs pass:
+> `python analysis/champion_checkpoint_audit.py --months 2-3`.
+> Proof: 2-3/first-member-audit.json. Budgets: 2,065/2,253/5,976; saved selection,
+> refit and replay wall cost: 1,838.516 seconds. Its Lane A RMSE is 203.3926 seconds,
+> a member diagnostic rather than a whole-file confirmation result or board gain.
+> January/July and February/March labels are excluded from all fits. The first original
+> donor scope group-4-8-11 is now fitting CatBoost: 893,511 rows over 153 days,
+> querying 524,031 rows. Current error is null and its log advances.
 > Logs: pipeline-2-3.out/.err and controller-2-3.out/.err. Verify actual processes.
 > The pre-fit declaration is appended to CLEAN-CHAMPION-2026-10-03.html. Block cap:
 > 12 GPU-family hours in 2-3/budget-limit.json; reserve 16 hours for final preparation.
@@ -36,9 +45,21 @@
 > budget tests pass. The controller accepts the declared block and preserves first-run
 > logs. Its first launch check matched its own shell command; filtering Python processes
 > corrected that check before any job started. No fitting recipe changed.
-> New confirmation scopes need block-aware donor/assembly proofs; do not apply the
-> January/July-only readers to a February/March table. Extend the audit scope when
-> its saved components become available, retaining existing first-block proofs.
+> Audit readers now accept `--months 2-3` and validate inner groups against that outer
+> scope. All new confirmation proofs go under 2-3/, retaining the existing first-block
+> paths and bytes. Donor and full-evaluation readers reject proofs from another block.
+> Donor checks now verify actual native artifact bytes, fitting source and configuration.
+> Eleven focused scope/native-byte tests and all four CLI entry points pass; current F
+> lint passes. No fitting module or recipe changed. These reader checks are complete;
+> actual later donor/inner/full evaluations remain pending until their artifacts finish.
+> Confirmation inner groups are 4/8/11, 5/9/12 and 6/10. When a donor finishes, run
+> `python analysis/champion_donor_audit.py --months 2-3` (add `--selection-donor` or
+> `--meta-group` for its declared scope). When an inner table finishes, run
+> `python analysis/champion_assembly_audit.py --months 2-3 --meta-group <group>`.
+> Close the whole block with `python analysis/champion_evaluation_audit.py --months 2-3`.
+> New component proofs export separately in the local status page. Budget.json now
+> records 46,030.3355 GPU-family seconds globally, with 1,838.516 in the confirmation
+> block; both declared limits remain in force. Reprice from actual completed records.
 > The campaign remains OPEN. Inspect each completed block and continue the approved
 > work; a completed component, failed candidate or expected budget stop does not end it.
 

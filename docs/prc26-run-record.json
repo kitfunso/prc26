@@ -11396,7 +11396,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-04T12:37:47.563804+00:00",
+  "recorded_utc": "2026-10-04T12:58:40.676268+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12025,13 +12025,13 @@
     "phase": "Full reference 2-3 is training",
     "pid": 78840,
     "controller_pid": 73236,
-    "checked_utc": "2026-10-04T12:38:12.096234+00:00",
+    "checked_utc": "2026-10-04T12:59:03.081287+00:00",
     "active_component": {
-      "component": "2-3\\outer\\ra_cb_wz_t7",
-      "fit_rows": 1417542,
-      "fit_days": 244,
+      "component": "2-3\\donors\\a571fa3e9e2d173e0c918d68807630bd29efda5816fccd69050f57786f8cfeca\\group-4-8-11\\ra_cb_wz",
+      "fit_rows": 893511,
+      "fit_days": 153,
       "stage": "budget selection",
-      "started_file_mtime": 1791116659.733603
+      "started_file_mtime": 1791118508.2315483
     },
     "completed_components": [
       {
@@ -12597,6 +12597,11 @@
       {
         "component": "1-7\\outer\\ra_lgb_pw_t7",
         "seconds": 2759.25,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\outer\\ra_cb_wz_t7",
+        "seconds": 1838.515999999945,
         "checkpoint_replay": "PASS"
       }
     ],
@@ -15311,6 +15316,184 @@
       "limit": "One inner raw prediction table checked. This audit does not reproduce fit/query feature fingerprints or donor windows. Donor window checks are recorded separately; full NNLS, residual recalibration, final recording-B override and whole-file errors remain pending."
     }
   ],
+  "clean_champion_confirmation_components": [
+    {
+      "block": "2-3",
+      "export": "prc26-2-3-first-member-audit.json",
+      "audit": {
+        "checked_utc": "2026-10-04T12:55:51.699499+00:00",
+        "months": [
+          2,
+          3
+        ],
+        "member": "ra_cb_wz_t7",
+        "scope_checks": "PASS",
+        "prediction_checks": "PASS",
+        "checkpoint_replay": "PASS",
+        "fit_rows": 1417542,
+        "fit_days": 244,
+        "iterations": [
+          2065,
+          2253,
+          5976
+        ],
+        "epochs": null,
+        "selection": null,
+        "refit": null,
+        "input_fingerprints": {
+          "checks": "PASS",
+          "fit_input_hash": "b4df3b58083118b023cdc3fcbdf888af68e8ab8c328ceb915f89e371ce01b157",
+          "query_input_hash": "8bcae4b4403d5472941e3d979cc628192e7ee00cf0b7db56d4d4f34047aef70f",
+          "selection_input_hash": "b4df3b58083118b023cdc3fcbdf888af68e8ab8c328ceb915f89e371ce01b157",
+          "full_donor": {},
+          "selection_donor": {}
+        },
+        "native_artifact_checks": "PASS",
+        "fit_files": [
+          "training_2025-04-01_2025-05-01.parquet",
+          "training_2025-05-01_2025-06-01.parquet",
+          "training_2025-06-01_2025-07-01.parquet",
+          "training_2025-08-01_2025-09-01.parquet",
+          "training_2025-09-01_2025-10-01.parquet",
+          "training_2025-10-01_2025-11-01.parquet",
+          "training_2025-11-01_2025-12-01.parquet",
+          "training_2025-12-01_2026-01-01.parquet"
+        ],
+        "query_files": [
+          "training_2025-02-01_2025-03-01.parquet",
+          "training_2025-03-01_2025-04-01.parquet"
+        ],
+        "runtime_seconds": 1838.515999999945,
+        "runtime_includes_prior_attempt": false,
+        "model_and_prediction_hashes": {
+          "predictions.parquet": "02c4e507a04a0a5fb153f143411cedb8330d47f0c6277dc42bbb025c062cd74e",
+          "refit\\body.model": "ec8a8c6f38df1ce850ba501cb1ebb5765177a612e12d3ae747e9eae8c9805630",
+          "refit\\gate.model": "5ca7679c2bb4e2e6610e1a4d0a87bbb360e35feb45904c1be06208dab7c0b686",
+          "refit\\tail.model": "1baa50896f33c74f235f3aa12e66f8f86fa1ecb93f2185549328a86ed8637b0f",
+          "selection\\body.model": "76f6aa811af2f78fb29c9b754ab41b404030e68ba343cdc89df777267d1f0b82",
+          "selection\\gate.model": "baf7f37583b2c3ae617552d3f808df894040f6dfaa7e986224ed9e9afb0ef7c5",
+          "selection\\tail.model": "70eeec0aa37904c7a64b6fe7734a7f03fd359d1c193e76f5daa634c6d1750ea8"
+        },
+        "champion_preserved": "PASS",
+        "budget_snapshot": {
+          "limit_seconds": 158400,
+          "used_seconds": 46030.3354677317,
+          "completed_gpu_components": 77,
+          "accounting": "Saved GPU-family component wall time, including selection/refit/replay; conservative GPU-time proxy.",
+          "status": "within budget",
+          "block": {
+            "months": "2-3",
+            "used_seconds": 1838.515999999945,
+            "limit_seconds": 43200.0
+          }
+        },
+        "laneA_descriptive_errors": {
+          "rows": 305989,
+          "rmse": 203.39262489551365,
+          "sse": 12658324263.57898,
+          "mean_signed_error": 5.633488678546177,
+          "aobt_only_rmse": 354.7685602059499
+        },
+        "by_file": {
+          "training_2025-02-01_2025-03-01.parquet": {
+            "rows": 142622,
+            "rmse": 217.1388839985734,
+            "sse": 6724526743.523978,
+            "mean_signed_error": 6.098350546307391,
+            "aobt_only_rmse": 365.93379178861744
+          },
+          "training_2025-03-01_2025-04-01.parquet": {
+            "rows": 163367,
+            "rmse": 190.58301554889255,
+            "sse": 5933797520.055,
+            "mean_signed_error": 5.227656844064061,
+            "aobt_only_rmse": 344.72559933887317
+          }
+        },
+        "by_airport": {
+          "EDDF": {
+            "rows": 32577,
+            "rmse": 147.72871875258906,
+            "sse": 710953096.8136603,
+            "mean_signed_error": -6.188534465140115,
+            "aobt_only_rmse": 227.25015287039417
+          },
+          "EDDM": {
+            "rows": 22836,
+            "rmse": 138.5221223608252,
+            "sse": 438185808.7621218,
+            "mean_signed_error": -8.563458179351485,
+            "aobt_only_rmse": 340.6567165213726
+          },
+          "EGLL": {
+            "rows": 37078,
+            "rmse": 207.5361477147515,
+            "sse": 1596995904.2097745,
+            "mean_signed_error": 1.0170913367259966,
+            "aobt_only_rmse": 353.8050395928785
+          },
+          "EHAM": {
+            "rows": 37562,
+            "rmse": 156.43408224015755,
+            "sse": 919203068.8063658,
+            "mean_signed_error": 3.4762551721460953,
+            "aobt_only_rmse": 266.32981236178745
+          },
+          "LEBL": {
+            "rows": 26204,
+            "rmse": 145.69440752491946,
+            "sse": 556228649.5033135,
+            "mean_signed_error": 9.350611820214036,
+            "aobt_only_rmse": 259.0366677320721
+          },
+          "LEMD": {
+            "rows": 32884,
+            "rmse": 166.68565623728148,
+            "sse": 913652607.3159055,
+            "mean_signed_error": 17.33803658610199,
+            "aobt_only_rmse": 268.3099481706054
+          },
+          "LFPG": {
+            "rows": 35918,
+            "rmse": 208.2954536645384,
+            "sse": 1558374122.9499514,
+            "mean_signed_error": -14.575846232762256,
+            "aobt_only_rmse": 319.1924025205296
+          },
+          "LIRF": {
+            "rows": 23130,
+            "rmse": 284.18510667491097,
+            "sse": 1868005974.4153605,
+            "mean_signed_error": 5.062160869114932,
+            "aobt_only_rmse": 445.19376574905505
+          },
+          "LSZH": {
+            "rows": 19233,
+            "rmse": 150.55320897178018,
+            "sse": 435940346.516796,
+            "mean_signed_error": -2.435694423880715,
+            "aobt_only_rmse": 243.00819319128493
+          },
+          "LTFM": {
+            "rows": 38567,
+            "rmse": 308.0911079417825,
+            "sse": 3660784684.285728,
+            "mean_signed_error": 41.247271601651306,
+            "aobt_only_rmse": 588.7590033064312
+          }
+        },
+        "stages": {
+          "reference_recipe": "partial: this Lane A member checked; Lane B and nested meta fits pending",
+          "meta_and_evaluation": "pending",
+          "candidate_and_confirmation": "pending"
+        },
+        "limit": "Lane A member diagnostic on reused block 2-3 files. No assembled whole-file ensemble, confirmation result, promotion evidence or new scorer gain.",
+        "replay_limit": "Native replay PASS retained from the completion record; no new model fit or GPU replay.",
+        "command": "python analysis/champion_checkpoint_audit.py --months 2-3",
+        "audit_code_hash": "4e8a060b1de8f9e6b54acd84700127f1752d4a4cd47d34a77608c8eb04dff4d2"
+      }
+    }
+  ],
   "clean_champion_evaluations": [
     {
       "checked_utc": "2026-10-04T12:07:41.369522+00:00",
@@ -16333,6 +16516,7 @@
     "command": "python -m pytest tests/ -q",
     "full_model_comparison": "checked for 1-7",
     "confirmation": "pending",
-    "block_budget_tests_passed": 4
+    "block_budget_tests_passed": 4,
+    "audit_scope_tests_passed": 11
   }
 }
