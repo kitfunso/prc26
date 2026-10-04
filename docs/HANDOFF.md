@@ -1,6 +1,6 @@
 # Hand-off, 2026-09-22
 
-> **Current campaign checkpoint, 4 October 2026, 15:18 London.** The full January/July
+> **Current campaign checkpoint, 4 October 2026, 15:44 London.** The full January/July
 > clean reference is now measured and checked. All three inner complete-file tables
 > pass native lineage, scopes, raw/floor arithmetic and identical original mixture B.
 > Command: `python analysis/champion_assembly_audit.py --meta-group 4 8 11`.
@@ -48,10 +48,12 @@
 > reproduce; infinities are rejected. Native replay is retained from completion records;
 > the read-only audit ran no new fit or GPU replay. This donor stage is checked;
 > remaining outer members, nested meta chains and full-block evaluation remain pending.
-> The separate downstream stopping-day-excluded donor has progressed to its next
-> group-5-9-12 CatBoost: 888,432 fit rows over 152 days, querying 396,730 rows. Its
-> feature file and full donor audit remain pending. Current error is null and the
-> log advances. Current controller/pipeline command
+> The separate downstream stopping-day-excluded donor has saved all three members
+> in group-4-8-11 and group-5-9-12 with checkpoint replay PASS. Group-6-10's CatBoost
+> and LightGBM are also saved with replay PASS. Its neural member is now selecting
+> training-only stopping budgets: 920,761 fit rows over 158 days, querying 364,401
+> rows. The full-scope refits, feature file and full donor audit remain pending.
+> Current error is null and the log advances. Current controller/pipeline command
 > lines were checked directly; the serial pipeline continues without restarting fits.
 > Logs: pipeline-2-3.out/.err and controller-2-3.out/.err. Verify actual processes.
 > The pre-fit declaration is appended to CLEAN-CHAMPION-2026-10-03.html. Block cap:
@@ -74,7 +76,7 @@
 > `python analysis/champion_assembly_audit.py --months 2-3 --meta-group <group>`.
 > Close the whole block with `python analysis/champion_evaluation_audit.py --months 2-3`.
 > New component proofs export separately in the local status page. Budget.json now
-> records 50,275.4905 GPU-family seconds globally, with 6,083.671 in the confirmation
+> records 51,579.4445 GPU-family seconds globally, with 7,387.625 in the confirmation
 > block; both declared limits remain in force. Reprice from actual completed records.
 > The campaign remains OPEN. Inspect each completed block and continue the approved
 > work; a completed component, failed candidate or expected budget stop does not end it.
