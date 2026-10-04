@@ -64,6 +64,11 @@ def render_outer_members(members: tuple[dict, ...]) -> str:
 <p>Native replay evidence is retained from completion records; the audits do not run new fits or GPU replays. LightGBM cost is CPU wall time; CatBoost and neural wall time provide a conservative GPU-family cost proxy. <a href="prc26-ra_lgb_pw_t7-audit.json">LightGBM scope/input/cost record</a> · <a href="prc26-nn3_pw_t7-audit.json">Neural scope/input/cost record</a>. Regenerate with <code>python analysis/champion_checkpoint_audit.py --member ra_lgb_pw_t7</code> and <code>python analysis/champion_checkpoint_audit.py --member nn3_pw_t7</code>.</p></section>"""
 
 
+def render_assembly(audit: dict) -> str:
+    tag = "meta-" + "-".join(map(str, audit["meta_group"]))
+    return f"""<section id="{tag}-assembly"><h2>Inner complete-file predictions: {'/'.join(map(str, audit['meta_group']))}</h2><p>All three tuned Lane A members and the original mixture-B donor are saved with native replay PASS. The assembled table covers every ordered ID in its {len(audit['query_files'])} supplied monthly files: {audit['query_rows']:,} rows, including {audit['laneA_rows']:,} Lane A and {audit['laneB_rows']:,} Lane B rows. Permitted/stopping/query scopes, actual native model and prediction bytes, configurations and fitting source hashes pass.</p><p>The actual raw Lane A predictions match their saved floored predictions after the declared floor. The assembled columns equal the raw values exactly. Lane B is identical in all three columns and equals its separately fitted raw mixture prediction. Negative raw values remain permitted until the later blend floor. The audit runs no model fit or GPU replay.</p><p>Stage 1 reference: partial. Stage 2: this inner assembly checked; remaining groups, whole-file NNLS, residual recalibration, final recording-B override and outer error analysis remain pending. Stage 3 candidate/confirmation: pending. {html.escape(audit['limit'])}</p><p><a href="prc26-{tag}-assembly-audit.json">Complete-file assembly proof</a>. Regenerate with <code>{html.escape(audit['command'])}</code>.</p></section>"""
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     template = OUT / "prc26-status-2026-10-03.html"
@@ -128,6 +133,11 @@ def main() -> None:
         meta_donors.append(json.loads(path.read_text(encoding="utf-8")))
         shutil.copy2(path, OUT / f"prc26-{path.name}")
     records["clean_champion_meta_donors"] = meta_donors
+    assemblies = []
+    for path in sorted((ROOT / "data/runs/clean-champion-20261003").glob("meta-*-assembly-audit.json")):
+        assemblies.append(json.loads(path.read_text(encoding="utf-8")))
+        shutil.copy2(path, OUT / f"prc26-{path.name}")
+    records["clean_champion_meta_assemblies"] = assemblies
     records["clean_champion_checks"] = {"full_suite_passed": 73, "full_suite_seconds": 57.17,
                                          "command": "python -m pytest tests/ -q", "full_model_comparison": "pending"}
     (OUT / "prc26-run-record.json").write_text(json.dumps(records, indent=2, allow_nan=False), encoding="utf-8")
@@ -167,6 +177,7 @@ def main() -> None:
 {first_section}
 {outer_section}
 {donor_section}
+{''.join(render_assembly(audit) for audit in assemblies)}
 <div class="cards"><div class="card"><strong>{board['us']['rank']} / {board['teams']}</strong><span>Live leaderboard rank</span></div><div class="card"><strong>{board['us']['score']:.2f} s</strong><span>Our scored champion</span></div><div class="card"><strong>{board['leader']['score']:.2f} s</strong><span>Current leader</span></div></div>
 <p class="muted">Live API snapshot: {board['fetched_utc']} UTC. <a href="https://prc-data-challenge-2026.netlify.app/">Official deadline</a>: 11 October 2026, 23:59:59 CET.</p>
 <section><h2>Decision so far</h2><p>Keep v53 as the fallback. Hierarchical/copy/date-shift alternatives lost on the winter screen. Weather normalization has a small pooled gain with an interval spanning zero. The signed-residual recipe harms whole-file and hot-weather performance. The sampled MSE network beats its Huber counterpart in both two-month blocks, but standalone networks trail the CPU tree.</p>

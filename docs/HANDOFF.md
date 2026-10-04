@@ -28,11 +28,21 @@
 > meta-2-5-9-12-selection-donor-audit.json records 3,645.2 seconds of component wall
 > time and 3,236.8 seconds of GPU-family wall time. It fits 950,561 rows over 164 days,
 > excluding 101,238 downstream stopping rows over 19 days as well as both query scopes.
-> Both first-meta donor chains are now checked and priced. The first-meta LightGBM
-> is in full refit; all three native refit head files are present, with component
-> completion still pending. Direct process, live job and log checks at 04:59 London
-> on 4 October confirm the controller and pipeline continue without a recorded error.
-> Budget.json records 22,472.1 seconds of completed
+> Both first-meta donor chains are now checked and priced. All three first-meta tuned
+> members and the original raw mixture-B donor are now saved with native replay PASS.
+> The first inner table covers all 678,561 ordered rows in the complete February, May,
+> September and December files, including 671,732 Lane A and 6,829 Lane B rows.
+> The assembly audit checks actual cold bytes, permitted/stopping/query scopes, native
+> model/prediction bytes, configurations, fitting source hashes, raw/floor parity,
+> exact raw member-column values and identical independently fitted raw mixture B.
+> Command: `python analysis/champion_assembly_audit.py --meta-group 2 5 9 12`.
+> Record: meta-2-5-9-12-assembly-audit.json. The reader does not reproduce fit/query
+> feature fingerprints or donor windows; the donor windows have separate proofs above.
+> This closes one inner table, while NNLS/recalibration/final B/evaluation remain pending.
+> Direct process, live job and log checks at 05:36 London on 4 October confirm the
+> controller and pipeline continue without a recorded error. Meta-3-6-10's tuned
+> CatBoost is selecting budgets on its permitted training scope.
+> Budget.json records 23,362.6 seconds of completed
 > GPU-family component cost, within the declared allowance.
 > LightGBM and neural completion records cover every 1,723,531 permitted Lane A row over
 > 303 days. LightGBM selected budgets 217/6,312/7,991; the neural selected epoch 50, stopped
