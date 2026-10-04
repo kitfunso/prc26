@@ -11396,7 +11396,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-04T12:58:40.676268+00:00",
+  "recorded_utc": "2026-10-04T13:16:56.416162+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12025,13 +12025,13 @@
     "phase": "Full reference 2-3 is training",
     "pid": 78840,
     "controller_pid": 73236,
-    "checked_utc": "2026-10-04T12:59:03.081287+00:00",
+    "checked_utc": "2026-10-04T13:17:24.006582+00:00",
     "active_component": {
-      "component": "2-3\\donors\\a571fa3e9e2d173e0c918d68807630bd29efda5816fccd69050f57786f8cfeca\\group-4-8-11\\ra_cb_wz",
-      "fit_rows": 893511,
-      "fit_days": 153,
-      "stage": "budget selection",
-      "started_file_mtime": 1791118508.2315483
+      "component": "2-3\\donors\\a571fa3e9e2d173e0c918d68807630bd29efda5816fccd69050f57786f8cfeca\\group-5-9-12\\ra_lgb_wz",
+      "fit_rows": 888432,
+      "fit_days": 152,
+      "stage": "full refit",
+      "started_file_mtime": 1791119760.3859854
     },
     "completed_components": [
       {
@@ -12597,6 +12597,26 @@
       {
         "component": "1-7\\outer\\ra_lgb_pw_t7",
         "seconds": 2759.25,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\a571fa3e9e2d173e0c918d68807630bd29efda5816fccd69050f57786f8cfeca\\group-4-8-11\\nn3_wz",
+        "seconds": 103.42200000002049,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\a571fa3e9e2d173e0c918d68807630bd29efda5816fccd69050f57786f8cfeca\\group-4-8-11\\ra_cb_wz",
+        "seconds": 559.0470000000205,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\a571fa3e9e2d173e0c918d68807630bd29efda5816fccd69050f57786f8cfeca\\group-4-8-11\\ra_lgb_wz",
+        "seconds": 100.0,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "2-3\\donors\\a571fa3e9e2d173e0c918d68807630bd29efda5816fccd69050f57786f8cfeca\\group-5-9-12\\ra_cb_wz",
+        "seconds": 467.9679999999935,
         "checkpoint_replay": "PASS"
       },
       {
