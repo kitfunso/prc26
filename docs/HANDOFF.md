@@ -21,10 +21,18 @@
 > meta-2-5-9-12-donor-audit.json records 3,204.5 seconds of total component wall time
 > and 2,734.1 seconds of GPU-family wall time. January/July and the inner query months
 > are excluded from every fit. The reader also rejects undeclared inner query groups.
-> The separate stopping-day-excluded donor has all three saved members in group-3-8
-> and group-4-10; group-6-11's CatBoost is now in full refit. Direct process, live
-> job and log checks at 04:02 London on 4 October confirm the controller and pipeline
-> continue without a recorded error. Budget.json records 20,725.6 seconds of completed
+> The separate stopping-day-excluded nested donor now has all twelve members saved
+> with replay PASS. Its actual scopes, cold inputs, stopping coverage, prediction bytes
+> and window reconstruction pass:
+> `python analysis/champion_donor_audit.py --selection-donor --meta-group 2 5 9 12`.
+> meta-2-5-9-12-selection-donor-audit.json records 3,645.2 seconds of component wall
+> time and 3,236.8 seconds of GPU-family wall time. It fits 950,561 rows over 164 days,
+> excluding 101,238 downstream stopping rows over 19 days as well as both query scopes.
+> Both first-meta donor chains are now checked and priced. The first-meta LightGBM
+> is in full refit; all three native refit head files are present, with component
+> completion still pending. Direct process, live job and log checks at 04:59 London
+> on 4 October confirm the controller and pipeline continue without a recorded error.
+> Budget.json records 22,472.1 seconds of completed
 > GPU-family component cost, within the declared allowance.
 > LightGBM and neural completion records cover every 1,723,531 permitted Lane A row over
 > 303 days. LightGBM selected budgets 217/6,312/7,991; the neural selected epoch 50, stopped
