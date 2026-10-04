@@ -39,10 +39,25 @@
 > Record: meta-2-5-9-12-assembly-audit.json. The reader does not reproduce fit/query
 > feature fingerprints or donor windows; the donor windows have separate proofs above.
 > This closes one inner table, while NNLS/recalibration/final B/evaluation remain pending.
-> Direct process, live job and log checks at 05:36 London on 4 October confirm the
+> Direct process, live job and log checks at 07:28 London on 4 October confirm the
 > controller and pipeline continue without a recorded error. Meta-3-6-10's tuned
-> CatBoost is selecting budgets on its permitted training scope.
-> Budget.json records 23,362.6 seconds of completed
+> CatBoost is saved with native replay and raw/floor parity PASS, covering 1,195,763
+> permitted Lane A rows over 211 days at budgets 1,667/3,476/5,982 and 2,040.7 seconds
+> of component cost. Its nested full donor now has all twelve C/L/N components saved
+> with native replay PASS, covering group-2-8-12, group-4-9, group-5-11 and the full fit.
+> Actual cold-input bytes, ordered permitted/query scopes, stopping coverage, saved
+> prediction bytes, raw/floored blend arithmetic and PW window reconstruction pass:
+> `python analysis/champion_donor_audit.py --meta-group 3 6 10`.
+> meta-3-6-10-donor-audit.json records 4,107.8 seconds of total component wall time
+> and 3,582.9 seconds of GPU-family wall time. It fits 1,195,763 Lane A rows over 211
+> days, excluding January/July and the inner March/June/October query files from every
+> donor fit. Empty-window missing positions reproduce; infinities are rejected.
+> The separate stopping-day donor has all three group-2-8-12 members saved with replay
+> PASS; group-4-9's CatBoost is in full refit and its training log advances. Its remaining
+> scopes, tuned L/N members and whole-file inner assembly remain pending.
+> The current controller-resume-1.err
+> is empty; controller.err retains the earlier failed controller attempt's traceback.
+> Budget.json records 29,618.2 seconds of completed
 > GPU-family component cost, within the declared allowance.
 > LightGBM and neural completion records cover every 1,723,531 permitted Lane A row over
 > 303 days. LightGBM selected budgets 217/6,312/7,991; the neural selected epoch 50, stopped
