@@ -1,5 +1,47 @@
 # Hand-off, 2026-09-22
 
+> **Current campaign checkpoint, 4 October 2026, 13:26 London.** The full January/July
+> clean reference is now measured and checked. All three inner complete-file tables
+> pass native lineage, scopes, raw/floor arithmetic and identical original mixture B.
+> Command: `python analysis/champion_assembly_audit.py --meta-group 4 8 11`.
+> The last table covers 528,801 rows: 524,031 Lane A and 4,770 Lane B, in complete
+> April/August/November files. Its output SHA is
+> 5dda261c746f2d82b1d1a930f7a1b7486a74ad227c23e58416c699fff509174c.
+> `python analysis/champion_evaluation_audit.py --months 1-7` passes actual cold bytes,
+> complete-file coverage, preserved labels, inner-table lineage, training-only NNLS
+> inputs and weight reproduction, 300-tree residual replay, recording-context
+> reproduction, stopping/history scopes, native final-B artifacts, recording replay
+> and B parity. Full proof: 1-7/evaluation-audit.json under the clean-champion run.
+> Whole-file RMSE: 309.1881 control to 304.2788 clean recipe, gain 4.9092 seconds;
+> paired day interval [3.3573, 6.7721], five-day [3.6247, 6.5968]. January and July
+> improve separately; all ten airport slices and the hot-weather slice improve.
+> Gain remains after removing the largest day or five-day episode. AOBT-copy/body
+> diagnostic slices lose; positive/negative tails gain. These label-based strata are
+> descriptive and cannot be ranking features. Final B is identical in both arms.
+> This compares the clean recipe with its scoped CatBoost control, not uploaded v53.
+> No new board gain or upload. Evaluation SHA:
+> f929e2fa89ab7fff2d965812657822784cd1d3b28aa0a7feb9bda7281e1c80d9.
+> Saved component wall cost: 57,554.9595 seconds; GPU-family proxy: 44,191.8195
+> seconds (12.28 hours). First-block reference/evaluation stages are checked;
+> remaining confirmation and actual candidate/ranking build remain open.
+> The unchanged recipe's February/March confirmation is now running: controller
+> PID 73236, pipeline PID 78840. Its first tuned CatBoost selects budgets on
+> 1,417,542 permitted Lane A rows over 244 days; January/July and February/March
+> labels are excluded from all fits. Current error is null and its log advances.
+> Logs: pipeline-2-3.out/.err and controller-2-3.out/.err. Verify actual processes.
+> The pre-fit declaration is appended to CLEAN-CHAMPION-2026-10-03.html. Block cap:
+> 12 GPU-family hours in 2-3/budget-limit.json; reserve 16 hours for final preparation.
+> September/October remains unrun and deferred: this is reduced confirmation coverage.
+> The global 44-hour and block cap are enforced at saved-component boundaries; four
+> budget tests pass. The controller accepts the declared block and preserves first-run
+> logs. Its first launch check matched its own shell command; filtering Python processes
+> corrected that check before any job started. No fitting recipe changed.
+> New confirmation scopes need block-aware donor/assembly proofs; do not apply the
+> January/July-only readers to a February/March table. Extend the audit scope when
+> its saved components become available, retaining existing first-block proofs.
+> The campaign remains OPEN. Inspect each completed block and continue the approved
+> work; a completed component, failed candidate or expected budget stop does not end it.
+
 > **Resumed score work — 2026-10-03.** Keith reiterated his instruction to keep improving
 > the score after the session stopped too early on the failed MSE lead. The task remains open.
 > The original tuned CatBoost January/July member completed with saved-model replay passing.

@@ -11396,7 +11396,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-04T11:30:42.250195+00:00",
+  "recorded_utc": "2026-10-04T12:37:47.563804+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12022,16 +12022,16 @@
   ],
   "clean_champion_active": {
     "status": "running",
-    "phase": "Full neighbour and meta reconstruction is training",
-    "pid": 52408,
-    "controller_pid": 59744,
-    "checked_utc": "2026-10-04T11:31:18.619879+00:00",
+    "phase": "Full reference 2-3 is training",
+    "pid": 78840,
+    "controller_pid": 73236,
+    "checked_utc": "2026-10-04T12:38:12.096234+00:00",
     "active_component": {
-      "component": "1-7\\meta-4-8-11\\ra_lgb_pw_t7",
-      "fit_rows": 1199500,
-      "fit_days": 212,
-      "stage": "full refit",
-      "started_file_mtime": 1791112272.6428514
+      "component": "2-3\\outer\\ra_cb_wz_t7",
+      "fit_rows": 1417542,
+      "fit_days": 244,
+      "stage": "budget selection",
+      "started_file_mtime": 1791116659.733603
     },
     "completed_components": [
       {
@@ -12555,8 +12555,28 @@
         "checkpoint_replay": "PASS"
       },
       {
+        "component": "1-7\\meta-4-8-11\\mixtureB",
+        "seconds": 429.625,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\meta-4-8-11\\nn3_pw_t7",
+        "seconds": 645.9060000000754,
+        "checkpoint_replay": "PASS"
+      },
+      {
         "component": "1-7\\meta-4-8-11\\ra_cb_wz_t7",
         "seconds": 2043.1560000000754,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\meta-4-8-11\\ra_lgb_pw_t7",
+        "seconds": 1984.390999999945,
+        "checkpoint_replay": "PASS"
+      },
+      {
+        "component": "1-7\\outer\\laneB",
+        "seconds": 37.296999999904074,
         "checkpoint_replay": "PASS"
       },
       {
@@ -12581,7 +12601,8 @@
       }
     ],
     "error": null,
-    "scope": "Full original C/L/N donor and meta chain; January/July first. No new scorer result yet."
+    "block": "2-3",
+    "scope": "Full original C/L/N donor and meta chain; block 2-3. January/July labels remain excluded. No new scorer result yet."
   },
   "clean_champion_first_member": {
     "checked_utc": "2026-10-03T20:35:00.156426+00:00",
@@ -15259,12 +15280,1059 @@
       "output_hash": "679c9606d43ec7adc59e250d50a8284060606afc35ff9511b19c14597a4ec6e3",
       "audit_code_hash": "763b0f6115495c059347f577312c519cb7cf49e9ec1790059d0812617fb12ac5",
       "limit": "One inner raw prediction table checked. This audit does not reproduce fit/query feature fingerprints or donor windows. Donor window checks are recorded separately; full NNLS, residual recalibration, final recording-B override and whole-file errors remain pending."
+    },
+    {
+      "checked_utc": "2026-10-04T12:06:31.259743+00:00",
+      "meta_group": [
+        4,
+        8,
+        11
+      ],
+      "command": "python analysis/champion_assembly_audit.py --meta-group 4 8 11",
+      "scope_checks": "PASS",
+      "native_lineage_checks": "PASS",
+      "raw_floor_parity": "PASS",
+      "member_assembly": "PASS",
+      "laneB_parity": "PASS",
+      "fit_rows": 1211827,
+      "query_rows": 528801,
+      "laneA_rows": 524031,
+      "laneB_rows": 4770,
+      "fit_ids_hash": "1af6e31128fedd6ca1c8c72d5a918a3b649d6625fc66dce5d5331c1598caf8e3",
+      "query_ids_hash": "76998ec9cf506564f2ea4c3c1c6b73de1bd80bb2a5673024ae2b43fe31b6cc2a",
+      "query_files": [
+        "training_2025-04-01_2025-05-01.parquet",
+        "training_2025-08-01_2025-09-01.parquet",
+        "training_2025-11-01_2025-12-01.parquet"
+      ],
+      "cold_input_hash": "120e19f81510f5773a8743d0513d97e3a65c9b43a7394a42356979a46bc3bd09",
+      "output_hash": "5dda261c746f2d82b1d1a930f7a1b7486a74ad227c23e58416c699fff509174c",
+      "audit_code_hash": "763b0f6115495c059347f577312c519cb7cf49e9ec1790059d0812617fb12ac5",
+      "limit": "One inner raw prediction table checked. This audit does not reproduce fit/query feature fingerprints or donor windows. Donor window checks are recorded separately; full NNLS, residual recalibration, final recording-B override and whole-file errors remain pending."
     }
   ],
+  "clean_champion_evaluations": [
+    {
+      "checked_utc": "2026-10-04T12:07:41.369522+00:00",
+      "months": [
+        1,
+        7
+      ],
+      "scope_checks": "PASS",
+      "meta_reproduction": "PASS",
+      "recording_context_reproduction": "PASS",
+      "recording_replay": "PASS",
+      "laneB_parity": "PASS",
+      "output_hash": "f929e2fa89ab7fff2d965812657822784cd1d3b28aa0a7feb9bda7281e1c80d9",
+      "query_files": [
+        "training_2025-01-01_2025-02-01.parquet",
+        "training_2025-07-01_2025-08-01.parquet"
+      ],
+      "meta": {
+        "assembly_proofs": [
+          {
+            "path": "data\\runs\\clean-champion-20261003\\meta-2-5-9-12-assembly-audit.json",
+            "sha256": "e22a455a9d1bfdbe79e301246d3fb02e353293b52ae5d9821b01100fbc91e7fe"
+          },
+          {
+            "path": "data\\runs\\clean-champion-20261003\\meta-3-6-10-assembly-audit.json",
+            "sha256": "e0d4dbebca21b5afa27888f58d4c6e7dd93f405392742281f710220dfea4db10"
+          },
+          {
+            "path": "data\\runs\\clean-champion-20261003\\meta-4-8-11-assembly-audit.json",
+            "sha256": "eee672795eded72e6328d0bc114de128597a474a281da3737243554938b04081"
+          }
+        ],
+        "exact_weights": {
+          "ra_cb_wz_t7": 0.38975537672364136,
+          "ra_lgb_pw_t7": 0.16450325288404838,
+          "nn3_pw_t7": 0.44574137039231027
+        },
+        "applied_weights": {
+          "ra_cb_wz_t7": 0.389755,
+          "ra_lgb_pw_t7": 0.164503,
+          "nn3_pw_t7": 0.445741
+        },
+        "meta_input_hash": "587547f790063b906176f23645b1fe3c5e9134e4b02d5c2ce9e1cb8a92bd6bce",
+        "recalibration_model_hash": "b4c9246a947d22c07f389af910ce921f199e5ab01e4ec47e4ea31c941316a1af"
+      },
+      "recording": {
+        "history_fit_ids": "c62a8b03fdac476106328e6f7d41a9604b2c94a98ca90b3cdcb8bb197d6af99c",
+        "stopping_history_ids": "2e02fb7f8f80dfa59c6f59f928c39c5ebcb33f88d85c835945042b85005fdda1",
+        "stopping_ids": "28bdb7491c508fe0f19e244ce97c8e506038c69dba09be63cdfb75a885c4a4e7",
+        "query_ids": "14bd2573c4c15276d09b4e6d31ea94d3079b8d578a7f88449a426d7eefcc33f4",
+        "prediction_hash": "1d305edccf448cf9461a20b9747f8f15ef3f1b5f40505ea5874146577399a2e4"
+      },
+      "metrics": {
+        "n": 344419,
+        "control_rmse": 309.18807069640656,
+        "candidate_rmse": 304.2788232893626,
+        "gain": 4.909247407043949,
+        "sse_gain": 1037273186.8186473,
+        "day_ci": [
+          3.357269585349937,
+          6.772054844514526
+        ],
+        "moving5_ci": [
+          3.6247486758003475,
+          6.596839732380226
+        ],
+        "top_gain": {
+          "1": 43995015.118194185,
+          "10": 118232115.56543958,
+          "50": 291041876.32091284
+        },
+        "leave_best_day_sse_gain": 945193433.7517103,
+        "leave_best_5day_episode_sse_gain": 837167973.3022752,
+        "by_month": {
+          "1": {
+            "n": 153706,
+            "gain": 2.9437466559356267,
+            "sse_gain": 303515367.40140533
+          },
+          "7": {
+            "n": 190713,
+            "gain": 6.833555624845701,
+            "sse_gain": 733757819.417242
+          }
+        }
+      },
+      "errors": {
+        "slices": {
+          "lane": {
+            "A": {
+              "n": 339046,
+              "control_rmse": 222.27294348949155,
+              "candidate_rmse": 215.2809179529786,
+              "gain": 6.992025536512955,
+              "sse_gain": 1037273186.8186474
+            },
+            "B": {
+              "n": 5373,
+              "control_rmse": 1735.0492669877278,
+              "candidate_rmse": 1735.0492669877278,
+              "gain": 0.0,
+              "sse_gain": 0.0
+            }
+          },
+          "apt": {
+            "EDDF": {
+              "n": 36830,
+              "control_rmse": 180.1408824793363,
+              "candidate_rmse": 176.29135712311316,
+              "gain": 3.849525356223154,
+              "sse_gain": 50534256.79212499
+            },
+            "EDDM": {
+              "n": 27091,
+              "control_rmse": 172.25711368029963,
+              "candidate_rmse": 169.4877477547042,
+              "gain": 2.769365925595423,
+              "sse_gain": 25639371.419926643
+            },
+            "EGLL": {
+              "n": 40210,
+              "control_rmse": 258.8496286647363,
+              "candidate_rmse": 252.1159387534362,
+              "gain": 6.733689911300104,
+              "sse_gain": 138349891.0279522
+            },
+            "EHAM": {
+              "n": 40949,
+              "control_rmse": 182.75065588383146,
+              "candidate_rmse": 176.91732920815033,
+              "gain": 5.833326675681121,
+              "sse_gain": 85913493.82140374
+            },
+            "LEBL": {
+              "n": 28986,
+              "control_rmse": 218.3366498370309,
+              "candidate_rmse": 215.61205181460747,
+              "gain": 2.724598022423436,
+              "sse_gain": 34271184.75540376
+            },
+            "LEMD": {
+              "n": 35328,
+              "control_rmse": 172.0540668732571,
+              "candidate_rmse": 168.82232930565496,
+              "gain": 3.2317375676021527,
+              "sse_gain": 38918139.30259204
+            },
+            "LFPG": {
+              "n": 39612,
+              "control_rmse": 569.2555456150956,
+              "candidate_rmse": 565.1731915130575,
+              "gain": 4.082354102038039,
+              "sse_gain": 183448710.09370422
+            },
+            "LIRF": {
+              "n": 26528,
+              "control_rmse": 546.7277570354479,
+              "candidate_rmse": 539.2742382773719,
+              "gain": 7.453518758076029,
+              "sse_gain": 214731857.46417332
+            },
+            "LSZH": {
+              "n": 22346,
+              "control_rmse": 194.46902094433622,
+              "candidate_rmse": 189.9564655479255,
+              "gain": 4.5125553964107326,
+              "sse_gain": 38764529.169988275
+            },
+            "LTFM": {
+              "n": 46539,
+              "control_rmse": 246.42777728408373,
+              "candidate_rmse": 236.33753075174775,
+              "gain": 10.090246532335982,
+              "sse_gain": 226701752.9713788
+            }
+          },
+          "month": {
+            "1": {
+              "n": 153706,
+              "control_rmse": 336.8690769524917,
+              "candidate_rmse": 333.9253302965561,
+              "gain": 2.94374665593557,
+              "sse_gain": 303515367.4014034
+            },
+            "7": {
+              "n": 190713,
+              "control_rmse": 284.9280017561804,
+              "candidate_rmse": 278.0944461313347,
+              "gain": 6.833555624845701,
+              "sse_gain": 733757819.417242
+            }
+          },
+          "hot": {
+            "False": {
+              "n": 336866,
+              "control_rmse": 305.65144306916494,
+              "candidate_rmse": 301.09782126315844,
+              "gain": 4.553621806006504,
+              "sse_gain": 930729321.9485397
+            },
+            "True": {
+              "n": 7553,
+              "control_rmse": 438.83794451218256,
+              "candidate_rmse": 422.46014777836115,
+              "gain": 16.377796733821413,
+              "sse_gain": 106543864.8701067
+            }
+          },
+          "recording_class": {
+            "aobt_copy": {
+              "n": 65663,
+              "control_rmse": 128.64840937550656,
+              "candidate_rmse": 133.59008553035503,
+              "gain": -4.941676154848466,
+              "sse_gain": -85092531.80185413
+            },
+            "day_shift": {
+              "n": 6,
+              "control_rmse": 34630.26380240743,
+              "candidate_rmse": 34630.26380240743,
+              "gain": 0.0,
+              "sse_gain": 0.0
+            },
+            "eobt_copy": {
+              "n": 30322,
+              "control_rmse": 205.1280437725722,
+              "candidate_rmse": 200.28084228963004,
+              "gain": 4.847201482942154,
+              "sse_gain": 59585718.34585619
+            },
+            "near_copy": {
+              "n": 39,
+              "control_rmse": 4690.402142983019,
+              "candidate_rmse": 4690.402142983019,
+              "gain": 0.0,
+              "sse_gain": 0.0
+            },
+            "other": {
+              "n": 242946,
+              "control_rmse": 276.7332496530047,
+              "candidate_rmse": 270.47512792693726,
+              "gain": 6.258121726067429,
+              "sse_gain": 831967759.8314896
+            },
+            "schedule_copy": {
+              "n": 5443,
+              "control_rmse": 846.9336128133406,
+              "candidate_rmse": 821.5176255800013,
+              "gain": 25.41598723333925,
+              "sse_gain": 230812240.4431548
+            }
+          },
+          "signed_residual": {
+            "body": {
+              "n": 313148,
+              "control_rmse": 165.51945640302293,
+              "candidate_rmse": 166.39112596908853,
+              "gain": -0.8716695660656057,
+              "sse_gain": -90598837.40597057
+            },
+            "negative_tail": {
+              "n": 11000,
+              "control_rmse": 322.01571212798154,
+              "candidate_rmse": 298.03632797569526,
+              "gain": 23.979384152286286,
+              "sse_gain": 163553126.70460355
+            },
+            "no_aobt": {
+              "n": 5373,
+              "control_rmse": 1735.0492669877278,
+              "candidate_rmse": 1735.0492669877278,
+              "gain": 0.0,
+              "sse_gain": 0.0
+            },
+            "positive_tail": {
+              "n": 14898,
+              "control_rmse": 686.9710773127886,
+              "candidate_rmse": 638.1231727781477,
+              "gain": 48.84790453464086,
+              "sse_gain": 964318897.5200148
+            }
+          },
+          "gap": {
+            "under_1h": {
+              "n": 302023,
+              "control_rmse": 265.9506658643503,
+              "candidate_rmse": 262.98864002522936,
+              "gain": 2.9620258391209404,
+              "sse_gain": 473189066.02773666
+            },
+            "1_to_4h": {
+              "n": 41013,
+              "control_rmse": 474.0738648895083,
+              "candidate_rmse": 460.0991729555519,
+              "gain": 13.974691933956365,
+              "sse_gain": 535415709.23802567
+            },
+            "4_to_16h": {
+              "n": 1316,
+              "control_rmse": 1196.0189955510716,
+              "candidate_rmse": 1178.1998302890145,
+              "gain": 17.81916526205714,
+              "sse_gain": 55675482.47572565
+            },
+            "over_16h": {
+              "n": 67,
+              "control_rmse": 2630.204270185082,
+              "candidate_rmse": 2705.746683207528,
+              "gain": -75.542413022446,
+              "sse_gain": -27007070.92284286
+            }
+          }
+        }
+      },
+      "file_clock_month_mismatches": 0,
+      "costs": {
+        "components": [
+          {
+            "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\full\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 155.09299999999348,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\full\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 751.625,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\full\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 143.25,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\group-3-8\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 87.84399999992456,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\group-3-8\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 635.0310000000754,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\group-3-8\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 80.67199999990407,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\group-4-10\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 96.76600000006147,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\group-4-10\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 670.6089999999385,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\group-4-10\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 90.29700000002049,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\group-6-11\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 121.29700000002049,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\group-6-11\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 718.484999999986,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\168e7452f8d5234f1ccf83abc7f699001a5d9889716a9e7881426480ffb41c57\\group-6-11\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 94.18799999996554,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\full\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 115.46900000004098,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\full\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 941.109000000055,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\full\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 130.5,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\group-2-8-12\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 82.92200000002049,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\group-2-8-12\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 549.0629999999655,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\group-2-8-12\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 99.95299999997951,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\group-4-9\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 99.375,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\group-4-9\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 940.655999999959,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\group-4-9\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 85.54700000002049,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\group-5-11\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 87.45299999997951,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\group-5-11\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 945.890000000014,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\1c1b565a92c5733df03881a5cd5794515f25a91cf152ee837d6812b9f129bc2d\\group-5-11\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 78.07799999997951,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\full\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 216.34400000004098,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\full\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 963.125,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\full\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 144.375,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\group-2-8-12\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 95.10900000005495,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\group-2-8-12\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 458.905999999959,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\group-2-8-12\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 104.03099999995902,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\group-4-9\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 137.67199999990407,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\group-4-9\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 854.25,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\group-4-9\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 161.28099999995902,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\group-5-11\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 106.59299999999348,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\group-5-11\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 750.875,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\42924f957b4431c6d6b8e7e350fa76e181a6d08b512f1a15b63f61ac477510c5\\group-5-11\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 115.25,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\full\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 184.84400000004098,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\full\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 967.469000000041,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\full\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 156.01500000001397,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-2-6-12\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 137.6720000000205,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-2-6-12\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 948.6719999999041,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-2-6-12\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 104.96799999999348,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-3-9\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 81.96799999999348,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-3-9\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 745.844000000041,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-3-9\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 110.09400000004098,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-5-10\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 100.14100000006147,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-5-10\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 777.890000000014,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\42e6b45e1364ef50d5156404a0c82a2363ea3a967a52cb40f4bde07682e5c4da\\group-5-10\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 100.42099999997299,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\full\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 213.14099999994505,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\full\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 1342.5929999999935,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\full\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 225.5470000000205,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\group-2-5-9\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 238.875,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\group-2-5-9\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 657.140999999945,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\group-2-5-9\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 154.98399999993853,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\group-3-6-10\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 409.59399999992456,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\group-3-6-10\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 826.015999999945,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\group-3-6-10\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 150.5779999999795,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\group-4-8-11\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 266.780999999959,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\group-4-8-11\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 1312.5779999999795,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\5aea5b63c3179bac1350448a87bae831259d951ff942ad0198a8b06f191dac65\\group-4-8-11\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 178.18799999996554,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\full\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 508.76500000001397,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\full\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 1588.454000000027,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\full\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 279.64100000006147,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-2-5-9-12\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 243.26599999994505,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-2-5-9-12\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 722.6410000000615,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-2-5-9-12\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 143.78099999995902,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-3-6-10\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 258.2970000000205,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-3-6-10\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 995.640999999945,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-3-6-10\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 176.78099999995902,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-4-8-11\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 222.59400000004098,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-4-8-11\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 860.125,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\8825bfda2f31172375bcc4995babb04189fa665b4cf2244e80a87dee4f7bcf84\\group-4-8-11\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 182.39099999994505,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\full\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 208.375,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\full\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 598.2179999999935,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\full\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 155.454000000027,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\group-3-8\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 60.60900000005495,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\group-3-8\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 407.56200000003446,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\group-3-8\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 74.93799999996554,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\group-4-10\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 78.76500000001397,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\group-4-10\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 606.4679999999935,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\group-4-10\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 137.75,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\group-6-11\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 121.92099999997299,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\group-6-11\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 652.1560000000754,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\9c2ab6569fb3ad5988eaa50c6cb1c0c9f5e09a9ab1a119443b428954c79a90ae\\group-6-11\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 102.31200000003446,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\full\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 134.64000000001397,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\full\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 860.030999999959,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\full\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 156.01600000006147,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-2-6-12\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 112.625,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-2-6-12\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 815.0320000000065,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-2-6-12\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 99.14099999994505,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-3-9\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 53.54700000002049,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-3-9\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 715.484999999986,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-3-9\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 100.23399999993853,
+            "gpu_family": false
+          },
+          {
+            "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-5-10\\nn3_wz",
+            "name": "nn3_wz",
+            "seconds": 89.0,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-5-10\\ra_cb_wz",
+            "name": "ra_cb_wz",
+            "seconds": 694.4689999999246,
+            "gpu_family": true
+          },
+          {
+            "path": "donors\\ba5267960eab1f777a13313a871b5f5445a0953d1c6009e14a925d5011ca56c9\\group-5-10\\ra_lgb_wz",
+            "name": "ra_lgb_wz",
+            "seconds": 85.28100000007544,
+            "gpu_family": false
+          },
+          {
+            "path": "meta-2-5-9-12\\mixtureB",
+            "name": "mix_cb_wx_raw",
+            "seconds": 486.98400000005495,
+            "gpu_family": true
+          },
+          {
+            "path": "meta-2-5-9-12\\nn3_pw_t7",
+            "name": "nn3_pw_t7",
+            "seconds": 403.5929999999935,
+            "gpu_family": true
+          },
+          {
+            "path": "meta-2-5-9-12\\ra_cb_wz_t7",
+            "name": "ra_cb_wz_t7",
+            "seconds": 1468.9379999999655,
+            "gpu_family": true
+          },
+          {
+            "path": "meta-2-5-9-12\\ra_lgb_pw_t7",
+            "name": "ra_lgb_pw_t7",
+            "seconds": 2044.4220000000205,
+            "gpu_family": false
+          },
+          {
+            "path": "meta-3-6-10\\mixtureB",
+            "name": "mix_cb_wx_raw",
+            "seconds": 258.81299999996554,
+            "gpu_family": true
+          },
+          {
+            "path": "meta-3-6-10\\nn3_pw_t7",
+            "name": "nn3_pw_t7",
+            "seconds": 646.8120000000345,
+            "gpu_family": true
+          },
+          {
+            "path": "meta-3-6-10\\ra_cb_wz_t7",
+            "name": "ra_cb_wz_t7",
+            "seconds": 2040.734000000055,
+            "gpu_family": true
+          },
+          {
+            "path": "meta-3-6-10\\ra_lgb_pw_t7",
+            "name": "ra_lgb_pw_t7",
+            "seconds": 2335.8429999999935,
+            "gpu_family": false
+          },
+          {
+            "path": "meta-4-8-11\\mixtureB",
+            "name": "mix_cb_wx_raw",
+            "seconds": 429.625,
+            "gpu_family": true
+          },
+          {
+            "path": "meta-4-8-11\\nn3_pw_t7",
+            "name": "nn3_pw_t7",
+            "seconds": 645.9060000000754,
+            "gpu_family": true
+          },
+          {
+            "path": "meta-4-8-11\\ra_cb_wz_t7",
+            "name": "ra_cb_wz_t7",
+            "seconds": 2043.1560000000754,
+            "gpu_family": true
+          },
+          {
+            "path": "meta-4-8-11\\ra_lgb_pw_t7",
+            "name": "ra_lgb_pw_t7",
+            "seconds": 1984.390999999945,
+            "gpu_family": false
+          },
+          {
+            "path": "outer\\laneB",
+            "name": "laneb",
+            "seconds": 37.296999999904074,
+            "gpu_family": false
+          },
+          {
+            "path": "outer\\mixtureB",
+            "name": "mix_cb_wx",
+            "seconds": 841.0320000000065,
+            "gpu_family": true
+          },
+          {
+            "path": "outer\\nn3_pw_t7",
+            "name": "nn3_pw_t7",
+            "seconds": 820.3280000000959,
+            "gpu_family": true
+          },
+          {
+            "path": "outer\\ra_cb_wz_t7",
+            "name": "ra_cb_wz_t7",
+            "seconds": 2704.432467731531,
+            "gpu_family": true
+          },
+          {
+            "path": "outer\\ra_lgb_pw_t7",
+            "name": "ra_lgb_pw_t7",
+            "seconds": 2759.25,
+            "gpu_family": false
+          }
+        ],
+        "component_wall_seconds": 57554.9594677313,
+        "gpu_family_wall_seconds": 44191.81946773175,
+        "accounting": "Saved component selection/refit/replay wall times. GPU-family subtotal is a conservative proxy; CPU work and concurrent stages are not GPU utilization."
+      },
+      "audit_code_hash": "9db2f40c998c7e318cb5919c0f72d30d37c1ab1932d59d84e0b970115f95ff88",
+      "pipeline_code_hash": "14baef6d7476842fee45fdfc2415404e0838b2551b4e61f07b8bb8dbc8eceaa4",
+      "stages": {
+        "reference_recipe": "checked for this block",
+        "meta_and_evaluation": "checked for this block",
+        "candidate_and_confirmation": "pending"
+      },
+      "limit": "Reused development files. Clean recipe versus its scoped CatBoost control, not uploaded v53 or a measured board gain. Saved scopes and recipe inputs are checked; this audit does not rerun model fitting or establish an untouched test.",
+      "command": "python analysis/champion_evaluation_audit.py --months 1-7"
+    }
+  ],
+  "clean_champion_confirmation_allocation": {
+    "gpu_family_limit_seconds": 43200,
+    "declared_utc": "2026-10-04T12:22:00Z",
+    "purpose": "February/March confirmation of the unchanged clean reference recipe. Reserve 16 GPU-family hours for final preparation; September/October remains unrun. Stop at saved-component boundaries."
+  },
   "clean_champion_checks": {
     "full_suite_passed": 73,
     "full_suite_seconds": 57.17,
     "command": "python -m pytest tests/ -q",
-    "full_model_comparison": "pending"
+    "full_model_comparison": "checked for 1-7",
+    "confirmation": "pending",
+    "block_budget_tests_passed": 4
   }
 }
