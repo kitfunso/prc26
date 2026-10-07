@@ -11,15 +11,15 @@
 > remains a planning allowance. September/October remains deferred; this is reduced
 > confirmation coverage, with reused development data.
 >
-> Three fixed original-member CP4 comparisons are measured and REJECT in
+> All four fixed original-member CP4 comparisons are measured and REJECT in
 > `data/runs/clean-champion-20261003/meta-assessment.json`: global simplex,
-> weather-cell simplex and context residual. No retuning follows. The historical
+> weather-cell simplex, context residual and capacity simplex. No retuning follows. The historical
 > January/July validation-cache comparison gives only an uncertain 0.596-second
 > gain against the legacy proxy, with January/episode failures; the 4.909-second
 > single-C comparison does not establish that gain over the scored v53 recipe.
 > See `historical-reference-comparison.json`; this is not a ranking-label comparison.
 >
-> The next fixed source check is prospectively declared in
+> The completed fixed source check was prospectively declared in
 > [META-CAPACITY-2026-10-05.html](META-CAPACITY-2026-10-05.html). It reuses saved
 > selection checkpoints on their common stopping rows; no member/donor training.
 > This deliberately carries stopping-selection and late-year coverage bias.
@@ -28,13 +28,13 @@
 > the root fix verifies them plus Git syntax and the already checked recovery.
 > No new source exception is introduced. The failed check's logs remain `capacity.out/.err`.
 > Retry driver: `analysis/champion_meta_capacity.py`; logs `capacity-retry1.out/.err`.
-> Verify its actual command line, latest logs and `meta-capacity/` records before
-> assuming it remains alive. Limits: 30-minute whole stage and 15-minute neural
+> The retry finished and its actual artifacts pass `meta-completion-audit.json`.
+> Limits: 30-minute whole stage and 15-minute neural
 > GPU inference, checked between components. Qualification and final preparation
 > continue after this experiment; a rejection does not end the campaign.
 >
-> Preparation cold-input and full-chain price checks are complete. A stronger recipe,
-> fitted ranking candidate and upload remain pending. Keep the actual scored champion,
+> Preparation cold-input and full-chain price checks are complete. No stronger recipe
+> or new ranking fit qualified. The exact scored fallback is file-validated. Keep the actual scored champion,
 > 8 October recipe freeze and submission buffer. No upload, paid service, publication,
 > schedule change or outward message is authorized by this checkpoint.
 > The heartbeat prompt now follows actual records instead of claiming February/March
@@ -54,6 +54,16 @@
 > a new fit, score improvement or upload. The campaign remains OPEN through recipe
 > freeze and final release/write-up readiness; no further undeclared search starts.
 > Full suite: 98 passed in 78.63 seconds. Changed-module F lint passes.
+
+> **Local release evidence is packaged and byte-checked.** The checkpoint is local
+> commit `4b5556d5942d092924395096261dd70587f1d74b`. The delivered
+> `outputs/prc26-local-readiness-20261007.zip` contains the exact fallback file,
+> exported proofs, reports, plans and source snapshots. Every archived file hash
+> and ZIP integrity check passes; receipt: `preparation/local-readiness.json`.
+> The package is a checkpoint snapshot, not a full native-model/data reproduction:
+> fitted components and training data remain in the project, and historical v53
+> model lineage remains partial. Future recipe freeze and scheduled publication
+> remain open with existing authority unchanged. No upload, push or publication.
 
 > **Current campaign checkpoint, 5 October 2026, 00:46 London.** The full January/July
 > clean reference is now measured and checked. All three inner complete-file tables
