@@ -675,3 +675,32 @@ checks pass; actual saved candidate/model bytes and full failure/repair/retry
 exposure are checked separately in meta-completion-audit.json. No cap is bypassed.
 Preserve exact v53 through recipe freeze. An exact local fallback copy passes its
 actual file/template/hash checks; this is not an improved model or new upload.
+
+### Missing-plan residual continuation, declared 2026-10-07
+
+Keith requested “continue please, make submissions if you need”. This authorizes
+genuine qualified submissions within the campaign; all scientific, compute and
+actual-file gates remain. Publication, push, schedule changes and paid work remain
+under their existing authority.
+
+[LANEB-RESIDUAL-2026-10-07.html](LANEB-RESIDUAL-2026-10-07.html) prospectively
+declares one fixed CP1-B-residual recipe and one explicit exception to CP1's original
+three-recipe cap. Reconstruct original scoped inner Lane B recording predictions
+using saved checked mixture donors, then fit a fixed continuous squared-error
+correction on those out-of-file predictions. Lane A stays unchanged. No retuning,
+flight-string override, probability grid or restart of rejected recipes follows.
+The screen has a 30-minute whole CPU wall cap, including failure/repair/retry cost,
+and zero GPU work. Both reused outer blocks must pass the existing complete-file,
+paired-interval, weather and episode gates. A survivor requires prospectively
+priced confirmation and an actual validated ranking file before submission. Keep
+the 44-hour allowance, 16-hour reserve, 8 October freeze and exact scored v53.
+
+The fixed screen is now complete and REJECT. Pooled clean gain is 0.7298 seconds,
+below the original floor, and January loses 0.1695 seconds. Winter improves over
+clean but retains scoped-control/weather failures. Actual saved native/context,
+candidate and donor bytes, scope/input coverage and independent replay close in
+`laneb-residual/completion-audit.json`. The audit-reader schema repair preserves
+all fit artifacts and rejects missing/extra candidate columns. Its failed attempt
+is accounted separately; screen plus closure costs 117.698 CPU seconds, zero GPU.
+No retuning, further confirmation, ranking build or submission follows for this
+recipe. The scored champion is retained; planned freeze and release checks remain.

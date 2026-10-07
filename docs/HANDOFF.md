@@ -1,5 +1,46 @@
 # Hand-off, 2026-09-22
 
+> **7 October missing-plan continuation result: REJECT.** The one fixed
+> CP1-B-residual screen is complete on both reused development blocks. Pooled
+> whole-file gain against clean is 0.7298 seconds, below the 1.5-second floor;
+> January loses 0.1695 seconds. February/March improves 1.2799 seconds against
+> clean but still loses to scoped CatBoost and retains its weather failure.
+> The saved candidate/native/context/donor bytes and independent replay pass
+> `laneb-residual/completion-audit.json`. An audit-reader schema assumption was
+> repaired at its source; every retained reference column is checked and missing
+> or unexpected candidate columns are rejected. The first failed reader and its
+> runtime remain recorded. Whole screen and closure cost: 117.698 CPU seconds;
+> zero GPU work. Six original inner B reconstructions and both residual fits
+> remain saved. The recipe is not retuned, confirmed, ranked or uploaded.
+>
+> Full suite: 101 passed; four focused tests pass after the reader repair.
+> Preserve all old references/proofs, rejected recipes, exact scored v53 and the
+> sealed package. No PRC fitting job remains alive at this completion check.
+> Recipe freeze and release checks stay open. Keith's qualified-submission
+> authority below persists; a rejection does not alone close the campaign.
+> Local report: `outputs/prc26-laneb-residual-result.html`.
+
+> **7 October renewed score work and submission authority.** Keith requested
+> “continue please, make submissions if you need”. Genuine qualified submissions
+> within this campaign are now authorized; the existing scientific, compute,
+> confirmation and actual-file gates remain. Publication, push, schedule changes,
+> paid work and outward messages retain their existing restrictions.
+>
+> One distinct fixed CP1-B-residual experiment is declared and reviewed before
+> fitting in [LANEB-RESIDUAL-2026-10-07.html](LANEB-RESIDUAL-2026-10-07.html).
+> It reconstructs original scoped inner recording B from saved raw mixture donors
+> read-only, then learns a continuous residual correction with fixed half shrinkage.
+> Use each inner query's scoped history. Lane A is unchanged. The screen's whole
+> CPU cap is 30 minutes including failures, repairs and retries; zero GPU work.
+> No recipe variants or retuning follow. Driver: `analysis/champion_laneb_residual.py`;
+> artifacts: `laneb-residual/`; named logs: `laneb-residual.out/.err` under the clean run.
+> PID 72768 was verified at launch; always check actual command lines and logs.
+> Focused scope/feature/target tests and F lint pass before fitting. Both reused
+> development blocks must pass all gates; then price and declare confirmation
+> before actual ranking preparation. Preserve every reference/rejected component,
+> exact scored v53 and the sealed local-readiness package. The latest live board
+> read is recorded in `data/board.json`; no new upload occurred at this checkpoint.
+
 > **Current campaign checkpoint, 7 October 2026.** Both complete clean-reference
 > blocks are finished. January/July passes with a 4.909-second gain against its
 > scoped CatBoost control. February/March loses 1.598 seconds, with winter weather
