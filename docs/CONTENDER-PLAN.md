@@ -1,5 +1,14 @@
 # First-place campaign plan — 2 October 2026
 
+**7 October execution checkpoint:** complete January/July and February/March clean
+references pass their construction/replay/file audits, but winter promotion fails.
+Four separately declared original-member CP4 follow-ups are measured and rejected.
+The exact scored v53 fallback copy passes actual file/template/hash checks. No
+stronger ranking candidate or scored improvement is established. Preserve v53
+through the existing recipe freeze; final release/write-up readiness continues.
+Current evidence is in HANDOFF.md and STATUS-2026-10-03.html. The initial-screen
+status below is historical; it does not describe an active fitting process.
+
 Status: **initial screens measured; full-data MSE lead rejected**. The 2026-10-03 continuation
 implemented cold monthly inputs, nested CPU neighbour donors, training-only
 stopping and full supplied-row neural refits. CP1/CP2 initial screens and a

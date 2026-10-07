@@ -80,11 +80,12 @@ def paired_metrics(rows: pd.DataFrame, p0: np.ndarray, p1: np.ndarray) -> dict:
     d = pd.DataFrame({"day": rows["day"].values, "month": rows["month"].values,
                       "e0": e0, "e1": e1, "n": 1})
     g = d.groupby(["month", "day"]).sum()
+    calendar = d.groupby("day")[["e0", "e1", "n"]].sum()
     rng = np.random.default_rng(0)
     draws, blocks = [], []
     for _ in range(2000):
-        ix = rng.integers(len(g), size=len(g))
-        b = g.iloc[ix].sum()
+        ix = rng.integers(len(calendar), size=len(calendar))
+        b = calendar.iloc[ix].sum()
         draws.append(np.sqrt(b.e0 / b.n) - np.sqrt(b.e1 / b.n))
         sampled = []
         for _, m in g.groupby(level=0, sort=True):
@@ -93,7 +94,7 @@ def paired_metrics(rows: pd.DataFrame, p0: np.ndarray, p1: np.ndarray) -> dict:
             sampled.append(m.iloc[ix].sum())
         b = pd.DataFrame(sampled).sum()
         blocks.append(np.sqrt(b.e0 / b.n) - np.sqrt(b.e1 / b.n))
-    day_gain = g.e0 - g.e1
+    day_gain = calendar.e0 - calendar.e1
     daily = pd.Series(day_gain.values, index=pd.to_datetime(day_gain.index.get_level_values("day")))
     episode = daily.reindex(pd.date_range(daily.index.min(), daily.index.max()), fill_value=0).rolling(5, min_periods=1).sum().max()
     return {"n": len(y), "control_rmse": float(np.sqrt(e0.mean())), "candidate_rmse": float(np.sqrt(e1.mean())),

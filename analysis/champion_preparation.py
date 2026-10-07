@@ -71,29 +71,37 @@ def ranking_inputs() -> tuple[pd.DataFrame, pd.DataFrame, dict]:
 
 
 def observed_rates() -> tuple[dict, dict]:
-    block = RUN / "1-7"
-    proof = read(block / "evaluation-audit.json")
     rates = defaultdict(list)
     observations = []
-    for component in proof["costs"]["components"]:
-        path = (block / component["path"] / "complete.json").resolve()
-        if not path.is_relative_to(block.resolve()):
-            raise ValueError("cost record points outside its measured block")
-        saved = read(path)
-        started = read(path.with_name("started.json"))
-        if started["specification"] != saved["specification"]:
-            raise ValueError(f"saved cost scope changed: {path}")
-        if saved["runtime_seconds"] != component["seconds"] or saved["checkpoint_replay"] != "PASS":
-            raise ValueError(f"saved cost disagrees with measured proof: {path}")
-        rates[component["name"]].append(component["seconds"] / started["fit_rows"])
-        observations.append({**component, "fit_rows": started["fit_rows"], "fit_days": started["fit_days"],
-                             "record_hash": file_hash(path), "start_record_hash": file_hash(path.with_name("started.json"))})
+    proofs = {}
+    for tag in ("1-7", "2-3"):
+        block = RUN / tag
+        proof_path = block / "evaluation-audit.json"
+        if not proof_path.exists():
+            continue
+        proof = read(proof_path)
+        if proof["scope_checks"] != "PASS":
+            raise ValueError("cost source has no passing scope proof")
+        proofs[tag] = {"hash": file_hash(proof_path), **{key: proof["costs"][key] for key in ("component_wall_seconds", "gpu_family_wall_seconds")}}
+        for component in proof["costs"]["components"]:
+            path = (block / component["path"] / "complete.json").resolve()
+            if not path.is_relative_to(block.resolve()):
+                raise ValueError("cost record points outside its measured block")
+            saved = read(path)
+            started = read(path.with_name("started.json"))
+            if started["specification"] != saved["specification"]:
+                raise ValueError(f"saved cost scope changed: {path}")
+            if saved["runtime_seconds"] != component["seconds"] or saved["checkpoint_replay"] != "PASS":
+                raise ValueError(f"saved cost disagrees with measured proof: {path}")
+            rates[component["name"]].append(component["seconds"] / started["fit_rows"])
+            observations.append({**component, "block": tag, "fit_rows": started["fit_rows"], "fit_days": started["fit_days"],
+                                 "record_hash": file_hash(path), "start_record_hash": file_hash(path.with_name("started.json"))})
     seconds = sum(item["seconds"] for item in observations)
     gpu = sum(item["seconds"] for item in observations if item["gpu_family"])
-    if not math.isclose(seconds, proof["costs"]["component_wall_seconds"]) or not math.isclose(gpu, proof["costs"]["gpu_family_wall_seconds"]):
+    if not math.isclose(seconds, sum(p["component_wall_seconds"] for p in proofs.values())) or not math.isclose(gpu, sum(p["gpu_family_wall_seconds"] for p in proofs.values())):
         raise ValueError("saved component cost totals changed")
     return {name: {"n": len(values), "median": float(np.median(values)), "p90": float(np.quantile(values, .9))}
-            for name, values in rates.items()}, {"proof_hash": file_hash(block / "evaluation-audit.json"),
+            for name, values in rates.items()}, {"proofs": proofs,
                                               "component_wall_seconds": seconds, "gpu_family_wall_seconds": gpu,
                                               "observations": observations}
 
@@ -141,10 +149,10 @@ def write_html(record: dict, path: Path) -> None:
     gaps = "".join(f"<li>{html.escape(gap)}</li>" for gap in record["remaining_work"])
     path.write_text(f"""<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PRC26 final preparation</title><link rel="icon" href="data:,"><style>body{{max-width:960px;margin:36px auto;padding:0 22px;background:#f4f1e8;color:#192a30;font:17px/1.6 system-ui}}h1,h2{{line-height:1.25}}section{{border-top:1px solid #bdc8c4;padding:16px 0}}table{{border-collapse:collapse;width:100%}}td,th{{text-align:left;padding:8px;border-bottom:1px solid #bdc8c4}}code{{overflow-wrap:anywhere;font-size:14px}}a{{color:#164f46}}</style>
-<h1>Prepare the final ranking build</h1><p>Checked {html.escape(record['checked_utc'])}. Preparation only: the unchanged February/March confirmation continues. Recipe selection, model fitting and candidate assembly remain pending.</p>
+<h1>Prepare the final ranking build</h1><p>Checked {html.escape(record['checked_utc'])}. Both reference blocks are measured and the unchanged recipe failed winter promotion. The four fixed original-member follow-ups are rejected. The exact scored fallback file is validated separately; no stronger recipe or new fitted ranking candidate is ready.</p>
 <section><h2>Ranking inputs: checked for preparation</h2><p>Existing cold ranking features, actual ranking bytes and weather bytes match their recorded sources. Ranking targets and departure off-block labels are hidden. Training/ranking IDs are unique and disjoint. Ranking IDs cover the submission template.</p><p>Training departures: {inputs['training_rows']:,}. Ranking departures: {inputs['ranking_rows']:,}, including {inputs['ranking_laneA_rows']:,} Lane A and {inputs['ranking_laneB_rows']:,} Lane B. Template ordering matches: {inputs['template_order_matches']}.</p><p>{html.escape(inputs['limit'])} {html.escape(inputs['split_metadata'])}</p></section>
-<section><h2>Complete-chain planning price</h2><p>Measured January/July GPU-family component cost: {record['observed']['gpu_family_wall_seconds']/3600:.2f} hours. Prospective all-training recipe: {costs['component_count']} saved components, with inner groups {html.escape(str(record['meta_groups']))}.</p><p>GPU-family planning estimate: {costs['gpu_median_seconds']/3600:.2f} hours at median observed rates; {costs['gpu_p90_seconds']/3600:.2f} hours at each family's 90th-percentile rate. All component wall work: {costs['all_median_seconds']/3600:.2f} / {costs['all_p90_seconds']/3600:.2f} hours. The declared final-preparation planning reserve is 16 GPU-family hours.</p><p>{html.escape(costs['method'])} {html.escape(costs['limit'])}</p><table><thead><tr><th>Family</th><th>Planned fits</th><th>Measured rate samples</th></tr></thead><tbody>{rows}</tbody></table></section>
-<section><h2>Budget and remaining work</h2><p>Saved GPU-family cost at this snapshot: {budget['used_seconds']/3600:.2f} hours globally; {budget['block']['used_seconds']/3600:.2f} of 12 hours in February/March. Reprice after the whole confirmation closes. No allocation is expanded by this report.</p><ol>{gaps}</ol><p>Reference/evaluation: checked for January/July. Confirmation: partial. Preparation inputs and planning price: checked. Ranking driver, fitted candidate, file/replay checks and upload: pending.</p></section>
+<section><h2>Complete-chain planning price</h2><p>Measured completed-reference GPU-family component cost: {record['observed']['gpu_family_wall_seconds']/3600:.2f} hours. Prospective all-training recipe: {costs['component_count']} saved components, with inner groups {html.escape(str(record['meta_groups']))}.</p><p>GPU-family planning estimate: {costs['gpu_median_seconds']/3600:.2f} hours at median observed rates; {costs['gpu_p90_seconds']/3600:.2f} hours at each family's 90th-percentile rate. All component wall work: {costs['all_median_seconds']/3600:.2f} / {costs['all_p90_seconds']/3600:.2f} hours. The declared final-preparation planning reserve is 16 GPU-family hours.</p><p>{html.escape(costs['method'])} {html.escape(costs['limit'])}</p><table><thead><tr><th>Family</th><th>Planned fits</th><th>Measured rate samples</th></tr></thead><tbody>{rows}</tbody></table></section>
+<section><h2>Budget and remaining work</h2><p>Saved GPU-family cost at this snapshot: {budget['used_seconds']/3600:.2f} hours globally; {budget['block']['used_seconds']/3600:.2f} of 12 hours in February/March. The complete audit includes all original mixture-B components; its full subtotal governs planning. No allocation is expanded by this report.</p><ol>{gaps}</ol><p>Reference/evaluation: checked for January/July. Confirmation: measured for both declared blocks, with winter gate failure. Preparation inputs and planning price: checked. Ranking driver, fitted candidate, file/replay checks and upload: pending.</p></section>
 <section><h2>Reproduce</h2><p><code>python analysis/champion_preparation.py --output &lt;local output directory&gt;</code></p><p><a href="prc26-final-preparation-2026-10-04.json">Input hashes, component costs and planning record</a>. This build uses the unchanged method only to price a possible final fit; it does not declare a new experiment, select a recipe or authorize an upload.</p></section></html>""", encoding="utf-8")
 
 
@@ -165,8 +173,9 @@ def main() -> None:
     record = {"checked_utc": datetime.now(timezone.utc).isoformat(), "inputs": input_record,
               "observed": observed, "meta_groups": groups, "pricing": pricing(plans, rates),
               "budget_snapshot": read(RUN / "budget.json"), "script_hash": file_hash(Path(__file__)),
-              "remaining_work": ["Finish and audit February/March, then assess whole-file, weather, signed-error and episode results.",
-                                 "Qualify and freeze the recipe against the declared gates; compare its validation output with the saved v53 artifact where supported.",
+              "remaining_work": ["Both reference blocks and four fixed CP4 follow-ups are measured and fail promotion. Preserve v53 through recipe freeze; no rejected recipe is retuned.",
+                                 "Exact fallback file/template/byte checks pass in fallback-readiness.json. Keep its immutable copy and complete local release/write-up readiness without upload or publication.",
+                                 "A stronger recipe still requires the declared qualification gates and supported historical comparison before a new ranking build.",
                                  month_support,
                                  "Add the ranking entry point, explicit rank split, all-eligible-training scopes, immutable source manifest and bounded component accounting after confirmation source checks close.",
                                  "Build and replay the full nested donor/member/meta/recording chain; preserve all completed confirmation proofs.",

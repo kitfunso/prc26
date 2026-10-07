@@ -9,6 +9,19 @@ import campaign
 import mechanisms
 
 
+def test_calendar_day_is_not_split_by_supplied_file_month() -> None:
+    rows = pd.DataFrame({"day": pd.to_datetime(["2025-02-28", "2025-02-28", "2025-03-01"]),
+                         "month": [2, 3, 3], "y": [10., 20., 30.]})
+    base, candidate = np.zeros(3), np.array([1., 2., 3.])
+    observed = campaign.paired_metrics(rows, base, candidate)
+    regrouped = campaign.paired_metrics(rows.assign(month=3), base, candidate)
+    assert observed["day_ci"] == regrouped["day_ci"]
+    assert observed["leave_best_day_sse_gain"] == pytest.approx(95.)
+    assert observed["leave_best_5day_episode_sse_gain"] == pytest.approx(0.)
+    assert observed["by_month"]["2"]["n"] == 1
+    assert observed["by_month"]["3"]["n"] == 2
+
+
 def test_departure_fields_hidden_but_arrival_fields_retained(monkeypatch: pytest.MonkeyPatch) -> None:
     raw = pd.DataFrame({"PHASE_mvt": ["DEP", "ARR"], "TAXITIME_SEC_mvt": [100., 200.],
                         "BLOCK_TIME_UTC_mvt": pd.to_datetime(["2025-01-01", "2025-01-02"], utc=True),

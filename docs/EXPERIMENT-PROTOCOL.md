@@ -620,3 +620,58 @@ row reports cover the recorded files. Missing diagnostic stamps export as JSON
 null; no target-derived diagnostic enters features or a new promotion rule.
 Final full suite: 62 passed in 46.53 s; F lint passes. No board gain or new upload.
 Complete clean-v53 and original fitted-checkpoint lineage remain partial.
+
+### CP4 original-member continuation, declared 2026-10-05
+
+The complete original reference now passes scope, replay, complete-file, Lane B,
+error and cost audits in January/July and February/March. Its winter confirmation
+loses to scoped CatBoost. Preserve the proofs and actual scored champion.
+
+Two new inexpensive meta recipes were declared before fitting in
+[META-WEATHER-2026-10-05.html](META-WEATHER-2026-10-05.html): global simplex and a
+fixed weather-cell simplex with half shrinkage. The engineering review revisions
+were applied. Both finish inside the 45-minute CPU cap with no GPU fits; neither
+passes the promotion gate. No threshold or shrinkage tuning follows.
+
+One explicit exception to CP4's original three-method cap permits a fourth method
+overall, including the clean control. No follow-up variant or retuning is allowed.
+One additional, distinct CP4 feature-availability recipe is declared before its
+fit in [META-CONTEXT-2026-10-05.html](META-CONTEXT-2026-10-05.html). Keep original
+weights, model parameters and fitted member/donor artifacts. Append existing
+weather and member disagreement to the fixed residual stage. Cap this at 15 CPU
+minutes and zero GPU fits. Three new inexpensive meta verdict lanes are now
+declared. No broad search or extra substantive member recipe is opened.
+
+Both blocks are adaptively reused development data. The existing whole-file,
+paired interval, weather, episode and sign-off gates remain. A passing screen
+needs explicit remaining confirmation coverage or compute limitations before a
+final build. A rejection does not end the approved campaign.
+
+### CP4 saved-selection source check, declared before replay
+
+[META-CAPACITY-2026-10-05.html](META-CAPACITY-2026-10-05.html) declares one
+additional fixed recipe, CP4-capacity-simplex, a fifth method overall including
+clean and an explicit prospective exception to the original cap. Estimate one
+global simplex vector on the saved outer members' common stopping rows. No
+member/donor training, parameter search or retuning. The original raw inner
+tables still fit the unchanged residual stage. Stopping selection, late-year
+coverage and fit-size effects are confounded. Both outer files remain excluded.
+
+The 7 October input review clarifies intentional stopping-query overlap and the
+previously checked January/July C recovery provenance before any new replay.
+Only that exact original specification, native hashes and recorded source
+compatibility are accepted; the metric-only repair requires unchanged syntax
+outside paired_metrics. Limits: 30 minutes whole-stage wall time and 15 minutes
+neural GPU inference, checked between components. Preserve the 44-hour allowance,
+16-hour preparation reserve, recipe freeze and upload sign-off. A surviving
+development comparison still requires remaining confirmation to be declared.
+
+All four fixed original-member follow-ups are now measured and REJECT. The
+capacity-source comparison completes January/July and February/March, with
+313.047 seconds successful stage wall time, 6.218 seconds neural GPU inference
+and zero training. Its -0.2074-second pooled gain against clean fails the gain,
+interval, block, weather and episode requirements. Original native/input/replay
+checks pass; actual saved candidate/model bytes and full failure/repair/retry
+exposure are checked separately in meta-completion-audit.json. No cap is bypassed.
+Preserve exact v53 through recipe freeze. An exact local fallback copy passes its
+actual file/template/hash checks; this is not an improved model or new upload.
