@@ -1,5 +1,24 @@
 # Hand-off, 2026-09-22
 
+> **8 October London recipe freeze: complete.** No improved recipe qualified.
+> Retain exact scored v53 as both primary and fallback. Original, frozen and
+> delivered artifact bytes, the prior validator/template/manifest contract,
+> both reference proof/prediction hashes, fixed-meta completion receipt,
+> missing-plan result/source snapshots and sealed-package hash match their
+> checked receipts. No fit, native-audit rerun, package rebuild or duplicate
+> submission occurred. Receipt: `preparation/recipe-freeze-20261008.json`;
+> report: [RECIPE-FREEZE-2026-10-08.html](RECIPE-FREEZE-2026-10-08.html).
+>
+> Recipe comparison, artifact preservation and recipe freeze are done. Extra
+> confirmation remains partial; September/October full reference is deferred.
+> New ranking fitting and duplicate upload are skipped because no improved
+> recipe qualified. Local evidence package is complete and unchanged;
+> historical native-model lineage remains partial. Final release-readiness
+> and code-eligibility checks remain open. Keep the submission buffer and
+> existing publication schedule, without executing publication or pushing.
+> Qualified-submission authority persists. No new search, refit or retuning
+> follows freeze. The campaign is OPEN; older pending-freeze entries are history.
+
 > **7 October missing-plan continuation result: REJECT.** The one fixed
 > CP1-B-residual screen is complete on both reused development blocks. Pooled
 > whole-file gain against clean is 0.7298 seconds, below the 1.5-second floor;

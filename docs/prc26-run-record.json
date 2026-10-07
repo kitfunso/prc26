@@ -9822,8 +9822,8 @@
     "upload": "None attempted; no candidate has passed the complete promotion gate. Per-upload sign-off remains required."
   },
   "leaderboard": {
-    "fetched_utc": "2026-10-07 22:13",
-    "submissions": 4894,
+    "fetched_utc": "2026-10-07 22:28",
+    "submissions": 4896,
     "teams": 237,
     "leader": {
       "rank": 1,
@@ -10311,24 +10311,24 @@
       },
       {
         "rank": 68,
+        "team": "gentle-octopus",
+        "score": 274.0711,
+        "subs": 10,
+        "at": "2026-10-07T22:26"
+      },
+      {
+        "rank": 69,
         "team": "generous-quilt",
         "score": 274.6438,
         "subs": 26,
         "at": "2026-09-18T00:01"
       },
       {
-        "rank": 69,
+        "rank": 70,
         "team": "joyous-pencil",
         "score": 274.8444,
         "subs": 11,
         "at": "2026-09-09T16:27"
-      },
-      {
-        "rank": 70,
-        "team": "gentle-octopus",
-        "score": 275.0342,
-        "subs": 9,
-        "at": "2026-10-07T09:45"
       },
       {
         "rank": 71,
@@ -10416,31 +10416,31 @@
       },
       {
         "rank": 83,
+        "team": "zany-xylophone",
+        "score": 280.1508,
+        "subs": 41,
+        "at": "2026-10-07T22:24"
+      },
+      {
+        "rank": 84,
         "team": "dynamic-hamburger",
         "score": 281.0709,
         "subs": 31,
         "at": "2026-09-29T13:30"
       },
       {
-        "rank": 84,
+        "rank": 85,
         "team": "happy-lantern",
         "score": 281.2917,
         "subs": 87,
         "at": "2026-10-07T20:55"
       },
       {
-        "rank": 85,
+        "rank": 86,
         "team": "fearless-starfish",
         "score": 281.989,
         "subs": 5,
         "at": "2026-10-05T13:40"
-      },
-      {
-        "rank": 86,
-        "team": "zany-xylophone",
-        "score": 282.0712,
-        "subs": 40,
-        "at": "2026-10-07T20:57"
       },
       {
         "rank": 87,
@@ -11501,7 +11501,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-07T22:27:22.893350+00:00",
+  "recorded_utc": "2026-10-07T23:09:53.457803+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12127,10 +12127,10 @@
   ],
   "clean_champion_active": {
     "status": "complete",
-    "phase": "CP1-B-residual completes both development blocks and is REJECT: pooled clean gain 0.7298 seconds is below the floor; January loses and winter still fails scoped-control/weather gates. Actual saved input/native/candidate bytes and replay pass after the audit-reader schema repair. No refit or upload. Exact scored champion and sealed package remain preserved; campaign continues through the planned recipe freeze and release checks.",
+    "phase": "The planned 8 October London recipe freeze is complete. Retain exact scored v53 as primary and fallback; no improved recipe qualified. Current champion, template, validator, manifest, reference proof/prediction and sealed-package hashes match their checked receipts. No new fit, native-audit rerun or duplicate upload. Campaign remains open for final release-readiness checks; historical model lineage stays partial.",
     "pid": null,
     "controller_pid": null,
-    "checked_utc": "2026-10-07T22:26:14+00:00",
+    "checked_utc": "2026-10-07T23:06:21+00:00",
     "active_component": null,
     "completed_components": [
       {
@@ -13265,10 +13265,10 @@
       }
     ],
     "error": null,
-    "block": "laneb-residual",
+    "block": "recipe-freeze",
     "scope": "Each clean outer block retains its permitted label scope; inner recording reconstruction also excludes its monthly query group. No query labels enter history, stopping or residual fitting. New qualified submissions are authorized by Keith's 7 October request.",
     "campaign_status": "OPEN",
-    "headline": "Missing-plan correction rejected; scored champion retained",
+    "headline": "Recipe frozen: retain scored v53",
     "process_check": {},
     "logs": [
       "laneb-residual.out",
@@ -13292,7 +13292,9 @@
       "CP4-capacity-simplex": "REJECT"
     },
     "fallback_path": "preparation/fallback-readiness.json",
-    "next_stage": "Preserve the exact scored artifact through the planned 8 October recipe freeze and release checks. No supported improved candidate qualified. Do not retune CP1-B-residual or the rejected CP4 recipes. A different improved recipe requires its own prospective declaration and compute support. Keith's submission authority stands for any actual qualified validated candidate; no duplicate fallback upload or undeclared search.",
+    "next_stage": "Keep the frozen artifact and immutable freeze receipt. Continue planned final read-only artifact/code eligibility and release-readiness verification; no new search, model refit, retuning or unchanged-file upload. Qualified-submission authority stands; publication, push, schedule changes, outward messages and paid work are not authorized.",
+    "recipe_freeze_status": "FROZEN",
+    "recipe_freeze_path": "preparation/recipe-freeze-20261008.json",
     "laneb_residual_verdict": "REJECT",
     "laneb_residual_audit": "laneb-residual/completion-audit.json",
     "local_readiness_path": "preparation/local-readiness.json"
@@ -34310,6 +34312,142 @@
     "package_path": "C:\\Users\\skf_s\\Documents\\Codex\\2026-10-03\\can-x20\\outputs\\prc26-local-readiness-20261007.zip",
     "package_hash": "308d0ed01ddf528eca83f87cc91619f01593086b852867775cf9664fcf7a1293",
     "package_byte_checks": "PASS"
+  },
+  "recipe_freeze": {
+    "checked_utc": "2026-10-07T23:06:21.526552+00:00",
+    "planned_london_date": "2026-10-08",
+    "status": "FROZEN",
+    "selection": "Retain the exact scored v53 artifact; no improved recipe qualified.",
+    "primary_and_fallback": {
+      "path": "C:\\Users\\skf_s\\Documents\\Codex\\2026-10-03\\can-x20\\outputs\\merry-octopus_v53.parquet",
+      "sha256": "9cea4874f05d436b39d82ff58e06e18864f0142661c8ffbdf3b3fbeb27b287b1",
+      "rows": 344841,
+      "same_scored_artifact": true
+    },
+    "preservation": {
+      "champion": [
+        {
+          "path": "C:\\Users\\skf_s\\Documents\\Codex\\2026-10-03\\can-x20\\outputs\\merry-octopus_v53.parquet",
+          "sha256": "9cea4874f05d436b39d82ff58e06e18864f0142661c8ffbdf3b3fbeb27b287b1",
+          "check": "PASS"
+        },
+        {
+          "path": "C:\\Users\\skf_s\\prc26\\data\\merry-octopus_v53.parquet",
+          "sha256": "9cea4874f05d436b39d82ff58e06e18864f0142661c8ffbdf3b3fbeb27b287b1",
+          "check": "PASS"
+        },
+        {
+          "path": "C:\\Users\\skf_s\\prc26\\data\\runs\\cp0-laneb-scope-20261003\\champion_v53.parquet",
+          "sha256": "9cea4874f05d436b39d82ff58e06e18864f0142661c8ffbdf3b3fbeb27b287b1",
+          "check": "PASS"
+        }
+      ],
+      "contracts": {
+        "manifest": {
+          "path": "C:\\Users\\skf_s\\prc26\\data\\runs\\cp0-laneb-scope-20261003\\manifest.json",
+          "sha256": "83da7f20ba2bad9c9789c8aebd505c8e7f0f39d5489fa44c81df36a133f2b433",
+          "check": "PASS"
+        },
+        "validator": {
+          "path": "C:\\Users\\skf_s\\prc26\\board.py",
+          "sha256": "88800cf9fb56b70c22adacd2dac534c9caccf9fe5807aeabe722b0c3f1a3fd67",
+          "check": "PASS"
+        },
+        "template": {
+          "path": "C:\\Users\\skf_s\\prc26\\data\\submitting.parquet",
+          "sha256": "0d383408ed5ac27bfcfd12d6b961cee77c8a6364b10dad9fe3ec81115c79652b",
+          "check": "PASS"
+        }
+      },
+      "references": {
+        "1-7": {
+          "proof": {
+            "path": "C:\\Users\\skf_s\\prc26\\data\\runs\\clean-champion-20261003\\1-7\\evaluation-audit.json",
+            "sha256": "3e292f7035d50861cd94174f9eaaa1f7adc0af67bcce749b9914fe8c86bf627a",
+            "check": "PASS"
+          },
+          "prediction": {
+            "path": "C:\\Users\\skf_s\\prc26\\data\\runs\\clean-champion-20261003\\1-7\\evaluation.parquet",
+            "sha256": "f929e2fa89ab7fff2d965812657822784cd1d3b28aa0a7feb9bda7281e1c80d9",
+            "check": "PASS"
+          }
+        },
+        "2-3": {
+          "proof": {
+            "path": "C:\\Users\\skf_s\\prc26\\data\\runs\\clean-champion-20261003\\2-3\\evaluation-audit.json",
+            "sha256": "f95acabbc545bd3d5478dd99eec67491faa5bc210c787261704ac93f044e5a83",
+            "check": "PASS"
+          },
+          "prediction": {
+            "path": "C:\\Users\\skf_s\\prc26\\data\\runs\\clean-champion-20261003\\2-3\\evaluation.parquet",
+            "sha256": "7c474d2df957721f30845d2f68f8a107d6a0ad3aded7c3fbb1ac18e5f7e40741",
+            "check": "PASS"
+          }
+        }
+      },
+      "package": {
+        "path": "C:\\Users\\skf_s\\Documents\\Codex\\2026-10-03\\can-x20\\outputs\\prc26-local-readiness-20261007.zip",
+        "sha256": "308d0ed01ddf528eca83f87cc91619f01593086b852867775cf9664fcf7a1293",
+        "check": "PASS"
+      },
+      "package_rebuilt": false,
+      "native_audits_rerun": false,
+      "file_contract": "Prior passing validator, template and candidate bytes are identical."
+    },
+    "closed_recipes": {
+      "verdicts": {
+        "CP4-global-simplex": "REJECT",
+        "CP4-weather-simplex": "REJECT",
+        "CP4-context-residual": "REJECT",
+        "CP4-capacity-simplex": "REJECT",
+        "CP1-B-residual": "REJECT"
+      },
+      "meta_receipt": {
+        "path": "C:\\Users\\skf_s\\prc26\\data\\runs\\clean-champion-20261003\\meta-completion-audit.json",
+        "sha256": "292e1e665e7cf5dd536648972c74631da3f2ffe3d7a754eed668844b7062035a",
+        "check": "PASS"
+      },
+      "missing_plan_receipt": {
+        "path": "C:\\Users\\skf_s\\prc26\\data\\runs\\clean-champion-20261003\\laneb-residual\\completion-audit.json",
+        "sha256": "71d0e9f387983d069e4bfda27388e6c57647a42565ddc6af5c52b361ef3dc401"
+      },
+      "missing_plan_source_commit": "e9181f73934800fbc9ab4f879a2975fd66b21875",
+      "retuning": "NONE"
+    },
+    "prior_receipts": {
+      "fallback": "68bc18a5e52cd6f225789efcfea650f53ead1a0ebb719dd1227f795cfc073bff",
+      "local_readiness": "55b019fbcee6277206148b37556d18edc6fe38a7e3a8d182f65a41ebe41a0693",
+      "preparation": "a7c64ac2fc9c388d6b400e20963c2b678b87c77f9b73c62aed269a046e6f3bb6"
+    },
+    "source_checkpoint": "e9181f73934800fbc9ab4f879a2975fd66b21875",
+    "driver_hash": "85ffe4b248c7c2c8abb2bc35387f32bb18719aed29a2d55638e5ffb46eda5a78",
+    "method": {
+      "description": "Existing v53 blend, recalibration and established recording-B output; no recipe change.",
+      "recorded_build_arguments": "ra_cb_wz_t7:0.442565 ra_lgb_pw_t7:0.168605 nn3_pw_t7:0.388830",
+      "lineage": "prediction artifacts preserved; original model/checkpoint lineage incomplete"
+    },
+    "budget": {
+      "reconstruction_allowance_hours": 44,
+      "final_preparation_planning_reserve_hours": 16,
+      "additional_gpu_seconds": 0,
+      "full_september_october_reference": "DEFERRED"
+    },
+    "stages": {
+      "recipe_comparison": "DONE: declared comparisons have no qualifying survivor",
+      "artifact_and_proof_preservation": "DONE: current bytes match checked receipts",
+      "recipe_freeze": "DONE: exact scored v53 selected",
+      "additional_confirmation": "PARTIAL: reduced reused development coverage; September/October deferred",
+      "new_ranking_fit": "SKIPPED: no improved recipe qualified",
+      "duplicate_upload": "SKIPPED: the identical artifact is already scored",
+      "local_evidence_package": "DONE: sealed checkpoint package retained without rebuilding",
+      "historical_model_lineage": "PARTIAL: original fitted-model lineage remains incomplete",
+      "future_release_readiness": "PENDING: final read-only verification, code eligibility and existing schedule outcome"
+    },
+    "authority": "Qualified submissions are authorized. No publication, push, schedule change, outward message or paid service is authorized.",
+    "next_stage": "Keep the frozen artifact; continue planned release checks. No new search, refit, retuning or duplicate upload.",
+    "campaign_status": "OPEN",
+    "new_upload": false,
+    "command": "python work/prc26-recipe-freeze.py (one checkpoint; later checks read its receipt)"
   },
   "final_preparation": {
     "checked_utc": "2026-10-07T21:10:45.134593+00:00",

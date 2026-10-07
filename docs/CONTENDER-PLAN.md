@@ -1,5 +1,14 @@
 # First-place campaign plan — 2 October 2026
 
+**8 October London recipe freeze:** no improved recipe qualified. Exact scored
+v53 is the retained primary and fallback. Current artifact, contract, reference
+proof/prediction and sealed-package bytes match the existing checked receipts.
+No model fit, native-audit rerun, package rebuild or duplicate upload follows.
+See [RECIPE-FREEZE-2026-10-08.html](RECIPE-FREEZE-2026-10-08.html). Final release
+verification and code eligibility remain open; historical fitted-model lineage
+and additional confirmation remain partial. Earlier checkpoint entries below
+retain their recorded stage and do not reopen the frozen recipe.
+
 **7 October execution checkpoint:** complete January/July and February/March clean
 references pass their construction/replay/file audits, but winter promotion fails.
 Four separately declared original-member CP4 follow-ups are measured and rejected.

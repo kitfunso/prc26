@@ -704,3 +704,19 @@ all fit artifacts and rejects missing/extra candidate columns. Its failed attemp
 is accounted separately; screen plus closure costs 117.698 CPU seconds, zero GPU.
 No retuning, further confirmation, ranking build or submission follows for this
 recipe. The scored champion is retained; planned freeze and release checks remain.
+
+### Recipe freeze, 8 October London
+
+The planned freeze is complete. No improved recipe qualified; retain exact
+scored v53 as primary and fallback. Current original/frozen/delivered artifact,
+template/validator/manifest, full reference proof/prediction and sealed-package
+hashes match the checked receipts. Fixed-meta completion and missing-plan
+result/source evidence are retained. No recipe change, fit, native-audit rerun,
+package rebuild or duplicate upload occurred. Freeze receipt:
+`preparation/recipe-freeze-20261008.json`; local report:
+[RECIPE-FREEZE-2026-10-08.html](RECIPE-FREEZE-2026-10-08.html).
+
+Final release verification and code eligibility remain open. Additional
+confirmation and historical native-model lineage remain partial. Keep all
+budget limits, reduced-coverage wording, submission buffer and authority
+boundaries. No new search, retuning or refit follows this freeze.
