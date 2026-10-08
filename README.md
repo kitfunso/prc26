@@ -1,11 +1,30 @@
 # PRC Data Challenge 2026: taxi-out time, team merry-octopus
 
 
-Current recorded champion: **v53, 270.43 s**. The next-step campaign plan is
+Current recorded champion: **v53, 270.43 s**. The campaign plan is
 [PLAN.md](PLAN.md) and [docs/CONTENDER-PLAN.md](docs/CONTENDER-PLAN.md).
 The October 2 review identified validation isolation and final-NN-fit issues; prospective work
 is declared in [protocol amendment v9](docs/EXPERIMENT-PROTOCOL.md#amendment-v9--2026-10-02-first-place-campaign-and-validation-corrections).
 The reproduction history below describes existing recipes, not a newly measured contender.
+
+The 8 October recipe freeze retains exact scored v53. Both complete clean reference
+blocks passed construction audits, but winter promotion failed. The four fixed CP4
+alternatives and the separately declared Lane B residual correction were rejected.
+No improved recipe qualified; no new fitting or retuning follows the freeze.
+
+On 8 October the frozen file was designated as `merry-octopus_final.parquet`, as
+required by the [official final-submission rule](https://prc-data-challenge-2026.netlify.app/ranking.html#final-submission).
+Its SHA-256 is `9cea4874f05d436b39d82ff58e06e18864f0142661c8ffbdf3b3fbeb27b287b1`.
+Template validation and complete stored-body byte readback pass. The final scorer
+result is pending; this designation does not establish a new score improvement.
+The [official deadline](https://prc-data-challenge-2026.netlify.app/) is now
+14 October 2026 at 10:00 UTC (11:00 London). The existing publication schedule remains.
+See [release readiness](docs/RELEASE-READINESS-2026-10-08.html) for stage checks and gaps.
+
+Public code eligibility remains pending. The private `campaign2` release branch
+lacks the checked local campaign commits. Historical native-model lineage is partial:
+the preserved prediction files reproduce the exact scored artifact, while the
+recipe commands below do not establish bit-identical historical model refits.
 
 Predict `TAXITIME_SEC_mvt` (takeoff minus off-block, seconds) for departures at ten European airports.
 Scored by RMSE on January and July 2026. Licence: GPLv3 (`LICENSE`).
@@ -41,6 +60,12 @@ Weather (`WX`): IEM ASOS METAR archive, one CSV per airport under `data/weather/
 present-weather codes, a 3 h thunderstorm count and the age of the observation. Precipitation (`p01i`) is 0 on
 every European row, so it is dropped. No ADS-B.
 
+Source access: [IEM ASOS/METAR downloads](https://mesonet.agron.iastate.edu/request/download.phtml).
+The [IEM usage policy](https://mesonet.agron.iastate.edu/disclaimer.php) places its
+materials in the public domain and permits lawful reuse. Credit: Iowa Environmental
+Mesonet, Iowa State University. Challenge inputs are obtained through the
+[challenge data instructions](https://prc-data-challenge-2026.netlify.app/data.html).
+
 As-of rule: a feature may use any movement in the same file, before or after the takeoff (the rules allow it;
 `dep_after` and `arr_off` look forward).
 
@@ -57,10 +82,13 @@ Historical evaluation uses January and July 2025 plus five month-pair folds over
 Jan/July has been read repeatedly and is not an untouched model-choice test. The October 2 audit found
 held-out-label dependencies in copy history and multi-stage caches, plus scored-fold early stopping
 in development CV. [CP0](docs/CONTENDER-PLAN.md#3-cp0--establish-a-trustworthy-comparison)
-defines the corrections; its clean scores are pending. Every result reports per lane and month.
+defines the corrections. The complete January/July and February/March references are
+audited; winter promotion fails. September/October full reference remains deferred.
+This is reduced coverage using adaptively reused development data, rather than fresh
+confirmation. Every result reports per lane and month.
 Predictions are floored at 0. Board uploads are logged in `LEDGER.md` with expected and actual scores.
 
-## Reproduce the current build (v28 base; v53 is the file of record)
+## Historical recipe commands (v28 base; frozen v53 is the file of record)
 
 The lane A blend is 0.5223 * CatBoost residual lane-A model with arrival recorder-mode and window-state features (`ra_cb_wz`)
 + 0.1564 * the LightGBM version (`ra_lgb_wz`) + 0.3213 * the MLP version (`nn3_wz`). Lane A is v25's design
@@ -169,7 +197,7 @@ pip install -r requirements.txt            # Python 3.12, CUDA GPU for CatBoost
 python weather.py fetch 2026-09-05         # data/weather/2026-09-05/<ICAO>.csv
 python data.py && python features.py       # caches under data/cache/, incl. ARR (arrival recorder-mode) and WZ (window-state) features
 python regime.py                           # disruption-day map -> docs/REGIME.md + data/cache/regime.parquet; blend.py and recal.py slice every result by it
-python -m pytest tests/ -q                 # 11 tests: label timing, feature leakage, reproducibility
+python -m pytest tests/ -q                 # label timing, scope, features, coverage and submission guards
 python mix.py cv mix_cb_wx                 # lane-B donor: CV + holdout line in docs/RESULTS.md, iteration counts at the end
 python mix.py fit mix_cb_wx 2309 3779      # -> data/mix_cb_wx_rank.parquet
 python lanea.py cv ra_cb mix_cb_wx         # residual lane A, lane B copied from the donor

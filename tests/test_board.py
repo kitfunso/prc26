@@ -83,11 +83,56 @@ def test_invalid_name_or_file_blocks_s3() -> None:
 def test_valid_upload_and_readback() -> None:
     payload, s3 = b"mock parquet", MagicMock()
     s3.head_object.return_value = {"ContentLength": len(payload), "ETag": '"' + hashlib.md5(payload).hexdigest() + '"'}
+    s3.get_object.return_value["Body"].read.return_value = payload
     with patch.object(board, "check"), patch.object(board, "_s3", return_value=s3), \
             patch.object(board.Path, "read_bytes", return_value=payload):
         board.upload("merry-octopus_v63.parquet")
     s3.put_object.assert_called_once_with(Bucket=board.BUCKET, Key="merry-octopus_v63.parquet", Body=payload)
     s3.head_object.assert_called_once_with(Bucket=board.BUCKET, Key="merry-octopus_v63.parquet")
+    s3.get_object.assert_called_once_with(Bucket=board.BUCKET, Key="merry-octopus_v63.parquet")
+
+
+@pytest.mark.parametrize("name", ("merry-octopus_v53.parquet", "other_final.parquet", "merry-octopus_final_v2.parquet"))
+def test_final_mode_rejects_other_names_before_s3(name: str) -> None:
+    with patch.object(board, "check") as validate, patch.object(board, "_s3") as s3, pytest.raises(ValueError):
+        board.upload(name, final=True)
+    validate.assert_not_called()
+    s3.assert_not_called()
+
+
+def test_regular_upload_rejects_final_name() -> None:
+    with patch.object(board, "check") as validate, patch.object(board, "_s3") as s3, pytest.raises(ValueError):
+        board.upload("merry-octopus_final.parquet")
+    validate.assert_not_called()
+    s3.assert_not_called()
+
+
+def test_final_upload_validates_and_prevents_overwrite() -> None:
+    payload, s3 = b"mock parquet", MagicMock()
+    s3.head_object.return_value = {"ContentLength": len(payload), "ETag": '"' + hashlib.md5(payload).hexdigest() + '"'}
+    s3.get_object.return_value["Body"].read.return_value = payload
+    with patch.object(board, "check") as validate, patch.object(board, "_s3", return_value=s3), \
+            patch.object(board.Path, "read_bytes", return_value=payload):
+        board.upload("merry-octopus_final.parquet", final=True)
+    validate.assert_called_once_with("merry-octopus_final.parquet")
+    s3.put_object.assert_called_once_with(Bucket=board.BUCKET, Key="merry-octopus_final.parquet",
+                                          Body=payload, IfNoneMatch="*")
+
+
+def test_invalid_final_file_blocks_s3() -> None:
+    with patch.object(board, "check", side_effect=ValueError("invalid")), patch.object(board, "_s3") as s3, \
+            pytest.raises(ValueError):
+        board.upload("merry-octopus_final.parquet", final=True)
+    s3.assert_not_called()
+
+
+def test_changed_download_fails_even_with_matching_head() -> None:
+    payload, s3 = b"mock parquet", MagicMock()
+    s3.head_object.return_value = {"ContentLength": len(payload), "ETag": '"' + hashlib.md5(payload).hexdigest() + '"'}
+    s3.get_object.return_value["Body"].read.return_value = b"other bytes!"
+    with patch.object(board, "check"), patch.object(board, "_s3", return_value=s3), \
+            patch.object(board.Path, "read_bytes", return_value=payload), pytest.raises(RuntimeError, match="downloaded"):
+        board.upload("merry-octopus_final.parquet", final=True)
 
 
 @pytest.mark.parametrize("head", ({"ContentLength": 0, "ETag": '"bad"'}, {"ContentLength": 12, "ETag": '"bad"'}))

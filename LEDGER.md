@@ -4,6 +4,15 @@ Best file per team counts. Scorer cap: 5 files a day, reset 00:00 UTC (checked 2
 Probing the scorer to resolve labels is banned: "We will monitor submissions for attempts to learn from or exploit the ranking process." Every upload must be a genuine prediction.
 Upload rule: expected board gain > ~3 s over the current best, holdout CI excludes zero, `python board.py check` passes.
 
+**8 October required final designation:** `merry-octopus_final.parquet` was created
+once under Keith's existing submission authority, following the official unique
+final-filename rule. It contains exactly the frozen scored v53 bytes, SHA-256
+`9cea4874f05d436b39d82ff58e06e18864f0142661c8ffbdf3b3fbeb27b287b1`.
+Template checks and full stored-body byte readback pass. Final scorer result is
+pending. No expected improvement, new recipe or regular versioned duplicate is
+claimed. Immutable receipt: `data/runs/clean-champion-20261003/preparation/final-designation-20261008.json`.
+Do not repeat the designation. Prior versioned results below remain historical.
+
 | file | date (UTC) | config | holdout Jan+Jul 2025 (A / B / all) | expected board | actual board | note |
 |---|---|---|---|---|---|---|
 | v18 (campaign 1) | 2026-09-10 | v1 blend | ~230 / ~1808 / n.a. | n.a. | 294.9917 | baseline carried over |

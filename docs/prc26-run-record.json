@@ -11501,7 +11501,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-07T23:09:53.457803+00:00",
+  "recorded_utc": "2026-10-08T20:32:48.985189+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12117,20 +12117,20 @@
     "analysis\\ranking_support.py": "3979476d9a0040753c76df8ad6d882af2ea25bf7610bf3f538abfd0fb462131b",
     "analysis\\validate_neural_artifacts.py": "c3f474d4edd8d438f7c15b18b5c3124018f0191c8f4110003e0e0b465045f5c4",
     "analysis\\contender_errors.py": "2f40da5ea60b2fc9a4b3406d5eb210a75dc4d57a766858c749da82daef328882",
-    "board.py": "88800cf9fb56b70c22adacd2dac534c9caccf9fe5807aeabe722b0c3f1a3fd67"
+    "board.py": "18c2c8e325d38156e7e808ca48520e071dc7b17c599848af9cffab87c2098ed7"
   },
   "limits": [
     "Existing splits reused; no fresh 2026 labels.",
     "CPU control/proxy donor differs from clean-v53.",
     "Original champion fitted-checkpoint lineage incomplete.",
-    "No candidate uploaded; no board gain established."
+    "Required frozen final designation stored; no improved recipe or board gain established."
   ],
   "clean_champion_active": {
     "status": "complete",
-    "phase": "The planned 8 October London recipe freeze is complete. Retain exact scored v53 as primary and fallback; no improved recipe qualified. Current champion, template, validator, manifest, reference proof/prediction and sealed-package hashes match their checked receipts. No new fit, native-audit rerun or duplicate upload. Campaign remains open for final release-readiness checks; historical model lineage stays partial.",
+    "phase": "Required unique final designation of exact scored v53 is stored and byte-checked. Final scorer: PENDING. No improved recipe qualified. The official deadline is extended to 14 October, 10:00 UTC. Recipe freeze and existing publication schedule remain. The checked local release update needs push authority; historical native-model lineage remains partial.",
     "pid": null,
     "controller_pid": null,
-    "checked_utc": "2026-10-07T23:06:21+00:00",
+    "checked_utc": "2026-10-08T20:32:48.264220+00:00",
     "active_component": null,
     "completed_components": [
       {
@@ -13265,10 +13265,10 @@
       }
     ],
     "error": null,
-    "block": "recipe-freeze",
+    "block": "release-readiness",
     "scope": "Each clean outer block retains its permitted label scope; inner recording reconstruction also excludes its monthly query group. No query labels enter history, stopping or residual fitting. New qualified submissions are authorized by Keith's 7 October request.",
     "campaign_status": "OPEN",
-    "headline": "Recipe frozen: retain scored v53",
+    "headline": "Frozen v53 designated final; release checks open",
     "process_check": {},
     "logs": [
       "laneb-residual.out",
@@ -13292,12 +13292,19 @@
       "CP4-capacity-simplex": "REJECT"
     },
     "fallback_path": "preparation/fallback-readiness.json",
-    "next_stage": "Keep the frozen artifact and immutable freeze receipt. Continue planned final read-only artifact/code eligibility and release-readiness verification; no new search, model refit, retuning or unchanged-file upload. Qualified-submission authority stands; publication, push, schedule changes, outward messages and paid work are not authorized.",
+    "next_stage": "Inspect the named final scorer result at a due check without reuploading. Obtain authority for the reviewed private campaign2 update, then verify the existing publication event. No search, refit, retuning, package rebuild, regular duplicate, publication execution or schedule change.",
     "recipe_freeze_status": "FROZEN",
     "recipe_freeze_path": "preparation/recipe-freeze-20261008.json",
     "laneb_residual_verdict": "REJECT",
     "laneb_residual_audit": "laneb-residual/completion-audit.json",
-    "local_readiness_path": "preparation/local-readiness.json"
+    "local_readiness_path": "preparation/local-readiness.json",
+    "final_submission_status": "STORED_BYTE_VERIFIED",
+    "final_scorer_status": "PENDING",
+    "deadline_utc": "2026-10-14T10:00:00+00:00",
+    "publication_visibility": "private",
+    "publication_campaign2_sha": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
+    "release_readiness_path": "preparation/release-readiness-20261008.json",
+    "final_designation_path": "preparation/final-designation-20261008.json"
   },
   "laneb_residual": {
     "recipe": "CP1-B-residual",
@@ -34180,16 +34187,18 @@
     "command": "python <chat>/work/prc26-champion-reference-comparison.py"
   },
   "latest_validation": {
+    "date": "2026-10-08",
     "command": "python -m pytest -q",
-    "passed": 101,
-    "seconds": 39.22,
-    "scope": "Full suite before the audit-reader repair; four focused tests pass after the repair, including exact candidate-schema and retained-label rejection.",
-    "focused_command": "python -m pytest tests/test_champion_laneb_residual.py -q",
-    "focused_passed": 4,
-    "focused_seconds": 3.25,
-    "actual_artifact_closure": "laneb-residual/completion-audit.json",
-    "lint": "F lint passes for the new driver, audit and focused tests. Final report-producer lint is checked at the continuation checkpoint.",
-    "original_reference_proofs_preserved": true
+    "passed": 109,
+    "seconds": 48.4,
+    "focused_command": "python -m pytest tests/test_board.py -q",
+    "focused_passed": 33,
+    "optimized_command": "python -O -m pytest tests/test_board.py -q",
+    "optimized_passed": 33,
+    "actual_final_file_checks": "PASS under normal and optimized Python; identical frozen v53 bytes",
+    "lint_command": "python -m ruff check --select F board.py tests/test_board.py analysis/release_readiness_20261008.py analysis/report_contender_20261003.py",
+    "F_lint": "PASS",
+    "scope": "Final filename contract, overwrite prevention, invalid-file rejection before S3 and complete stored-body readback; existing model recipe and check function unchanged."
   },
   "fallback_readiness": {
     "checked_utc": "2026-10-07T21:07:13.915555+00:00",
@@ -34448,6 +34457,151 @@
     "campaign_status": "OPEN",
     "new_upload": false,
     "command": "python work/prc26-recipe-freeze.py (one checkpoint; later checks read its receipt)"
+  },
+  "release_readiness": {
+    "checked_utc": "2026-10-08T20:32:48.264220+00:00",
+    "campaign_status": "OPEN",
+    "deadline_utc": "2026-10-14T10:00:00+00:00",
+    "deadline_london": "2026-10-14T11:00:00+01:00",
+    "official_sources": {
+      "timeline": "https://prc-data-challenge-2026.netlify.app/",
+      "submission": "https://prc-data-challenge-2026.netlify.app/ranking.html",
+      "eligibility": "https://prc-data-challenge-2026.netlify.app/eligibility.html",
+      "weather_usage": "https://mesonet.agron.iastate.edu/disclaimer.php"
+    },
+    "final": {
+      "artifact_sha256": "9cea4874f05d436b39d82ff58e06e18864f0142661c8ffbdf3b3fbeb27b287b1",
+      "rows": 344841,
+      "bytes": 4709690,
+      "path": "C:\\Users\\skf_s\\Documents\\Codex\\2026-10-03\\can-x20\\outputs\\merry-octopus_final.parquet",
+      "remote_key": "merry-octopus_final.parquet",
+      "downloaded_bytes": "PASS",
+      "file_template_checks": "PASS",
+      "result": null,
+      "scorer_status": "PENDING",
+      "designation_receipt_sha256": "b5f95acf7ea625a709d6f58b98f2ac8af20b4ad37ee409c75b1ebd7c1d193400",
+      "score_improvement": false
+    },
+    "preservation": {
+      "checks": [
+        {
+          "path": "C:\\Users\\skf_s\\Documents\\Codex\\2026-10-03\\can-x20\\outputs\\merry-octopus_v53.parquet",
+          "sha256": "9cea4874f05d436b39d82ff58e06e18864f0142661c8ffbdf3b3fbeb27b287b1",
+          "check": "PASS"
+        },
+        {
+          "path": "C:\\Users\\skf_s\\prc26\\data\\merry-octopus_v53.parquet",
+          "sha256": "9cea4874f05d436b39d82ff58e06e18864f0142661c8ffbdf3b3fbeb27b287b1",
+          "check": "PASS"
+        },
+        {
+          "path": "C:\\Users\\skf_s\\prc26\\data\\runs\\cp0-laneb-scope-20261003\\champion_v53.parquet",
+          "sha256": "9cea4874f05d436b39d82ff58e06e18864f0142661c8ffbdf3b3fbeb27b287b1",
+          "check": "PASS"
+        },
+        {
+          "path": "C:\\Users\\skf_s\\Documents\\Codex\\2026-10-03\\can-x20\\outputs\\prc26-local-readiness-20261007.zip",
+          "sha256": "308d0ed01ddf528eca83f87cc91619f01593086b852867775cf9664fcf7a1293",
+          "check": "PASS"
+        },
+        {
+          "path": "C:\\Users\\skf_s\\prc26\\data\\runs\\clean-champion-20261003\\1-7\\evaluation-audit.json",
+          "sha256": "3e292f7035d50861cd94174f9eaaa1f7adc0af67bcce749b9914fe8c86bf627a",
+          "check": "PASS"
+        },
+        {
+          "path": "C:\\Users\\skf_s\\prc26\\data\\runs\\clean-champion-20261003\\1-7\\evaluation.parquet",
+          "sha256": "f929e2fa89ab7fff2d965812657822784cd1d3b28aa0a7feb9bda7281e1c80d9",
+          "check": "PASS"
+        },
+        {
+          "path": "C:\\Users\\skf_s\\prc26\\data\\runs\\clean-champion-20261003\\2-3\\evaluation-audit.json",
+          "sha256": "f95acabbc545bd3d5478dd99eec67491faa5bc210c787261704ac93f044e5a83",
+          "check": "PASS"
+        },
+        {
+          "path": "C:\\Users\\skf_s\\prc26\\data\\runs\\clean-champion-20261003\\2-3\\evaluation.parquet",
+          "sha256": "7c474d2df957721f30845d2f68f8a107d6a0ad3aded7c3fbb1ac18e5f7e40741",
+          "check": "PASS"
+        }
+      ],
+      "freeze_receipt_sha256": "90387ce0ffcd02847f67ea65067b5b37cddab9a7157285acddc5eb3aea9f241d",
+      "local_readiness_receipt_sha256": "55b019fbcee6277206148b37556d18edc6fe38a7e3a8d182f65a41ebe41a0693",
+      "package_rebuilt": false,
+      "native_audits_rerun": false,
+      "model_fit": false
+    },
+    "publication_preflight": {
+      "task": {
+        "Name": "prc26-public-20261011",
+        "State": "Ready",
+        "Enabled": true,
+        "action": {
+          "Execute": "C:\\Users\\skf_s\\prc26\\data\\go-public.cmd",
+          "Arguments": null,
+          "WorkingDirectory": null
+        },
+        "trigger_start": "2026-10-11T22:30:00+01:00",
+        "logon_type": "Interactive",
+        "run_level": "Limited",
+        "settings": {
+          "StopIfGoingOnBatteries": true,
+          "StartWhenAvailable": true,
+          "DisallowStartIfOnBatteries": true
+        },
+        "NextRun": "2026-10-11T22:30:00.0000000+01:00",
+        "LastRun": "1932-04-22T11:30:14.0000000+01:00",
+        "LastResult": 267011
+      },
+      "action_sha256": "50153cdaaf44628656dcf64aec1a28c3292543ba503b2b3a2f91238e192bcdad",
+      "action_executed": false,
+      "schedule_changed": false,
+      "repository": {
+        "visibility": "private",
+        "default_branch": "master",
+        "license": "GPL-3.0",
+        "admin": true,
+        "remote_campaign2_sha": "9d0bc36bb8813b82f917f78e3810348fb70561f1"
+      },
+      "local_source_head": "6567a126cef4aca622708539a61c85d6ce1b6c89",
+      "local_branch": "codex/validation-scope-20261003",
+      "local_commits_ahead": 46,
+      "remote_is_ancestor": true,
+      "proposed_push_after_authority": "git push origin HEAD:campaign2",
+      "push_performed": false,
+      "release_gap": "Release branch lacks checked local work."
+    },
+    "validation": {
+      "date": "2026-10-08",
+      "command": "python -m pytest -q",
+      "passed": 109,
+      "seconds": 48.4,
+      "focused_command": "python -m pytest tests/test_board.py -q",
+      "focused_passed": 33,
+      "optimized_command": "python -O -m pytest tests/test_board.py -q",
+      "optimized_passed": 33,
+      "actual_final_file_checks": "PASS under normal and optimized Python; identical frozen v53 bytes",
+      "lint_command": "python -m ruff check --select F board.py tests/test_board.py analysis/release_readiness_20261008.py analysis/report_contender_20261003.py",
+      "F_lint": "PASS",
+      "scope": "Final filename contract, overwrite prevention, invalid-file rejection before S3 and complete stored-body readback; existing model recipe and check function unchanged."
+    },
+    "historical_native_model_lineage": "PARTIAL",
+    "stages": {
+      "Recipe comparison": "DONE: no declared recipe qualifies; rejected artifacts retained",
+      "Reduced confirmation": "PARTIAL: September/October deferred; reused development data",
+      "Recipe freeze": "DONE: immutable receipt and exact scored v53 selection",
+      "New ranking fit": "SKIPPED: no improved recipe qualified",
+      "Regular duplicate upload": "SKIPPED: no scorer probe or new version of unchanged v53",
+      "Required unique final designation": "DONE: actual file/template and stored-body byte checks",
+      "Final scorer readback": "PENDING: result object absent",
+      "Local evidence package": "DONE: preserved sealed package; no rebuild",
+      "Historical fitted-model lineage": "PARTIAL: original native lineage incomplete",
+      "Release command validation": "DONE: 109 full-suite tests; optimized board tests and F lint pass",
+      "Private release branch update": "PENDING: reviewed local commits require push authority",
+      "Existing publication-task preflight": "DONE: read-only actual task/action/repository checks",
+      "Public code and scheduled outcome": "PENDING: verify after the existing event"
+    },
+    "command": "python analysis/release_readiness_20261008.py (read-only remote/task checks; writes local evidence)"
   },
   "final_preparation": {
     "checked_utc": "2026-10-07T21:10:45.134593+00:00",

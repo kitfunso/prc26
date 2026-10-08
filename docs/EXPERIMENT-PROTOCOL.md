@@ -720,3 +720,31 @@ Final release verification and code eligibility remain open. Additional
 confirmation and historical native-model lineage remain partial. Keep all
 budget limits, reduced-coverage wording, submission buffer and authority
 boundaries. No new search, retuning or refit follows this freeze.
+
+### Required final designation and release preflight, 8 October
+
+The official timeline now closes on 14 October 2026 at 10:00 UTC, 11:00 London:
+[timeline](https://prc-data-challenge-2026.netlify.app/). The extension does not
+reopen the frozen recipe, rejected experiments or compute allocations.
+
+The [final-submission rule](https://prc-data-challenge-2026.netlify.app/ranking.html#final-submission)
+requires `merry-octopus_final.parquet`. The absent final object was created once
+using the exact selected v53 bytes under Keith's existing submission authority.
+This is the required final designation, with no regular versioned duplicate,
+new recipe, scorer probe or improvement claim. Local template checks pass under
+normal and optimized Python; stored-body readback matches every byte. Final
+scoring is pending. Keep the immutable receipt at
+`preparation/final-designation-20261008.json`; never repeat the upload.
+
+The final command's strict filename/conditional-creation/readback contract is
+fixed in `board.py`. Its parquet validator function is unchanged from the sealed
+version. The sealed old validator, freeze receipt, package and reference proofs
+remain intact; new command bytes are recorded separately. Full suite: 109 passed;
+33 board tests pass under normal and optimized Python; F lint passes.
+
+The existing publication-task preflight is read-only. Repository visibility,
+default branch and scheduled action were not changed. The private release branch
+is behind the checked local campaign work; pushing that concrete reviewed change
+needs authority. Source-code eligibility and scheduled outcome remain pending;
+historical native-model lineage remains partial. Report:
+[RELEASE-READINESS-2026-10-08.html](RELEASE-READINESS-2026-10-08.html).

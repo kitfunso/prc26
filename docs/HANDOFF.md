@@ -1,5 +1,32 @@
 # Hand-off, 2026-09-22
 
+> **8 October final designation and release preflight.** No improved recipe
+> qualified. The official deadline is now 14 October at 10:00 UTC, 11:00 London.
+> The official final-filename rule requires `merry-octopus_final.parquet`.
+> That absent object was created once under Keith's existing submission authority,
+> using exactly the frozen scored v53 bytes. Actual template checks under normal
+> and optimized Python, conditional creation and complete downloaded-body byte
+> readback pass. Final scorer result is pending. This is a final designation,
+> without a regular version duplicate, recipe change, probe or improvement claim.
+> Immutable receipt: `preparation/final-designation-20261008.json`. Never reupload.
+>
+> `board.py final FILE` now enforces the exact final name and prevents overwrite.
+> The parquet validator function is unchanged from the sealed old source.
+> Current command bytes are recorded separately; preserve the immutable freeze
+> receipt, old validator snapshot, sealed package, references and rejected artifacts.
+> Full suite: 109 passed; 33 board tests pass normally and under optimized Python;
+> F lint passes. No model fit, native audit or package rebuild occurred.
+>
+> The read-only task/repository preflight finds private `campaign2` behind the
+> checked local campaign work. A normal push of the concrete reviewed changes
+> needs authority; no push/publication occurred. Keep the existing 11 October
+> publication schedule. Report: [RELEASE-READINESS-2026-10-08.html](RELEASE-READINESS-2026-10-08.html);
+> current record: `preparation/release-readiness-20261008.json`. Final-result readback,
+> branch update, public-code eligibility and actual scheduled outcome remain open.
+> Historical native-model lineage and confirmation coverage remain partial.
+> The extended deadline does not reopen recipes or compute. Current entries below
+> describe their dated checkpoint. Campaign remains OPEN.
+
 > **8 October London recipe freeze: complete.** No improved recipe qualified.
 > Retain exact scored v53 as both primary and fallback. Original, frozen and
 > delivered artifact bytes, the prior validator/template/manifest contract,

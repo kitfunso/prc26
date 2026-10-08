@@ -1,17 +1,26 @@
 # PRC 2026 taxi-out — current campaign plan
 
-Updated 2 October 2026. Active branch: `campaign2`.
+Updated 8 October 2026. Local branch: `codex/validation-scope-20261003`.
+The intended release branch remains `campaign2`; its checked local update needs push authority.
 Latest recorded champion: **v53, 270.43 s**, `data/merry-octopus_v53.parquet`.
-The official deadline is **11 October 2026, 23:59:59 CET**.
+The [official deadline](https://prc-data-challenge-2026.netlify.app/) is now
+**14 October 2026, 10:00 UTC (11:00 London)**.
 
-The next objective is a serious first-place challenge through better recording-mechanism predictions
+Recipe freeze is complete. No improved recipe qualified. The required unique
+`merry-octopus_final.parquet` designation contains the exact scored v53 bytes;
+stored-body/template checks pass, and its final scorer result is pending.
+No new fit, search or retuning follows the extension. Release and public-code
+eligibility remain open; keep the existing 11 October publication schedule.
+[Release readiness](docs/RELEASE-READINESS-2026-10-08.html) records the concrete gates.
+
+The original objective was a serious first-place challenge through better recording-mechanism predictions
 and transferable Lane A gains. Matching the September 23 leader's 235.3074 s would require roughly
 **24.3% less SSE**; refresh the live leaderboard before execution. That score is a historical
 benchmark, not a verified current first-place target.
 
-## Execute this plan
+## Recorded experiment plan
 
-The detailed queue, hypotheses, acceptance tests, budgets and dates are in
+The completed queue, hypotheses, acceptance tests, budgets and dates are in
 [docs/CONTENDER-PLAN.md](docs/CONTENDER-PLAN.md). Experiment declarations and submission authority
 are in [docs/EXPERIMENT-PROTOCOL.md](docs/EXPERIMENT-PROTOCOL.md), amendment v9.
 
@@ -30,15 +39,16 @@ and global OOF caches are not sufficient isolation for later pipeline stages. Th
 reserves the last 10% of fit days without an all-data gradient refit. These findings do not establish
 a measured ranking gain from their repair.
 
-## Dates and compute
+## Original dates and retained compute limits
 
 - 2–3 October: validation, champion lineage and runtime pricing.
 - 3–5 October: recording-mechanism CPU screen.
 - 5–7 October: disruption screen, NN correction and at most two expensive survivors.
 - 8 October: freeze the recipe.
-- 9 October: full-data fit and assembled-file verification.
-- 10 October: substantive signed-off upload(s) and release rehearsal.
-- 11 October: final verification before the official deadline.
+- 9 October full-data fit: skipped because no stronger recipe qualified.
+- 8 October: frozen-file final designation and read-only release preflight completed.
+- 11 October: existing publication event, then actual outcome verification.
+- 14 October, 10:00 UTC: extended official final-submission deadline.
 
 Limit initial model recipes to eight including the control; avoid another broad 200-trial search
 or blend grid. Price runtime first. Use one GPU job at a time and respect the standing instruction
@@ -56,10 +66,12 @@ to wait for unrelated `fifty` jobs. No GPU is exposed to the reviewing workspace
 - Jan/July 2025 is a repeatedly studied historical stress set, not an untouched model-choice holdout.
 - Compare whole-file pooled SSE/RMSE, with per-month/lane results and paired calendar-day/episode checks.
 - The existing submission floor is 1.5 s all-row gain, target about 3 s, paired interval excluding zero,
-  plus explicit Keith sign-off for each upload. These are budget rules, not guaranteed transfer laws.
+  with Keith's 7 October qualified-submission authority. These are budget rules, not guaranteed transfer laws.
 - Five files per day is the published scorer cap, not a target. Avoid scorer probes.
 - Inspect the actual candidate artifact, exact IDs and unchanged lanes; preserve v53 as fallback.
 - Record every run and upload. Final code and documented external sources must satisfy eligibility.
+- The mandatory final designation preserves the frozen selection. Never repeat its upload,
+  submit a rejected recipe or use a scorer probe. Publication and push retain their authority bounds.
 
 [README.md](README.md) contains historical reproduction instructions.
 [LEDGER.md](LEDGER.md) is the measured score record.

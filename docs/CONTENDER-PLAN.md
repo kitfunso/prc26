@@ -1,5 +1,13 @@
 # First-place campaign plan — 2 October 2026
 
+**8 October release checkpoint:** the official deadline is extended to 14 October
+at 10:00 UTC, 11:00 London. The required unique final filename now holds the frozen
+v53 bytes; actual template and downloaded-byte checks pass. Final scoring is pending.
+No improved recipe qualified and no fitting/search resumes. The unchanged publication
+task targets a private `campaign2` branch that lacks the checked local work.
+The prepared release update needs push authority; the existing schedule remains.
+See [RELEASE-READINESS-2026-10-08.html](RELEASE-READINESS-2026-10-08.html).
+
 **8 October London recipe freeze:** no improved recipe qualified. Exact scored
 v53 is the retained primary and fallback. Current artifact, contract, reference
 proof/prediction and sealed-package bytes match the existing checked receipts.

@@ -3,6 +3,7 @@
 python board.py lb            -> data/board.json + per-team bests
 python board.py check FILE    -> row set matches the template, no NaN, no negatives
 python board.py upload FILE   -> put to the team bucket (name must be merry-octopus_vN.parquet), verify bytes
+python board.py final FILE    -> designate merry-octopus_final.parquet once, verify bytes
 python board.py status        -> every file in the bucket with its scorer result
 """
 from __future__ import annotations
@@ -88,15 +89,22 @@ def _s3():
                         region_name="us-east-1", config=Config(s3={"addressing_style": "path"}))
 
 
-def upload(path: str) -> None:
-    if not re.fullmatch(rf"{US}_v\d+\.parquet", Path(path).name):
+def upload(path: str, *, final: bool = False) -> None:
+    key = Path(path).name
+    if final:
+        if key != f"{US}_final.parquet":
+            raise ValueError("final name must be merry-octopus_final.parquet")
+    elif not re.fullmatch(rf"{US}_v\d+\.parquet", key):
         raise ValueError("name must be merry-octopus_vN.parquet")
     check(path)
-    data, s3, key = Path(path).read_bytes(), _s3(), Path(path).name
-    s3.put_object(Bucket=BUCKET, Key=key, Body=data)
+    data, s3 = Path(path).read_bytes(), _s3()
+    options = {"IfNoneMatch": "*"} if final else {}
+    s3.put_object(Bucket=BUCKET, Key=key, Body=data, **options)
     head = s3.head_object(Bucket=BUCKET, Key=key)
     if head["ContentLength"] != len(data) or head["ETag"].strip('"') != hashlib.md5(data).hexdigest():
         raise RuntimeError("stored bytes differ")
+    if s3.get_object(Bucket=BUCKET, Key=key)["Body"].read() != data:
+        raise RuntimeError("downloaded bytes differ")
     print("uploaded", key, len(data), "bytes")
 
 
@@ -112,4 +120,5 @@ def status() -> None:
 
 
 if __name__ == "__main__":
-    {"lb": lb, "check": lambda: check(sys.argv[2]), "upload": lambda: upload(sys.argv[2]), "status": status}[sys.argv[1]]()
+    {"lb": lb, "check": lambda: check(sys.argv[2]), "upload": lambda: upload(sys.argv[2]),
+     "final": lambda: upload(sys.argv[2], final=True), "status": status}[sys.argv[1]]()
