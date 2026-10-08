@@ -21,8 +21,9 @@ The [official deadline](https://prc-data-challenge-2026.netlify.app/) is now
 14 October 2026 at 10:00 UTC (11:00 London). The existing publication schedule remains.
 See [release readiness](docs/RELEASE-READINESS-2026-10-08.html) for stage checks and gaps.
 
-Public code eligibility remains pending. The private `campaign2` release branch
-lacks the checked local campaign commits. Historical native-model lineage is partial:
+The checked campaign source has been pushed to the private `campaign2` release
+branch under Keith's 8 October continuation approval. Public code eligibility
+remains pending until scheduled publication is verified. Historical native-model lineage is partial:
 the preserved prediction files reproduce the exact scored artifact, while the
 recipe commands below do not establish bit-identical historical model refits.
 

@@ -1,7 +1,7 @@
 # PRC 2026 taxi-out — current campaign plan
 
 Updated 8 October 2026. Local branch: `codex/validation-scope-20261003`.
-The intended release branch remains `campaign2`; its checked local update needs push authority.
+The checked source is synchronized to private `campaign2` under Keith's continuation approval.
 Latest recorded champion: **v53, 270.43 s**, `data/merry-octopus_v53.parquet`.
 The [official deadline](https://prc-data-challenge-2026.netlify.app/) is now
 **14 October 2026, 10:00 UTC (11:00 London)**.

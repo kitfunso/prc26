@@ -1,5 +1,12 @@
 # Board ledger
 
+**8 October private release update:** Keith's direct continuation approves the
+prepared normal push to private `campaign2`. Live branch/source equality passes;
+visibility remains private and the existing publication task stays unchanged.
+Final scoring remains pending. Receipt:
+`data/runs/clean-champion-20261003/preparation/release-branch-update-20261008.json`.
+No new submission or score improvement follows this source update.
+
 Best file per team counts. Scorer cap: 5 files a day, reset 00:00 UTC (checked 2026-09-17 against the ranking page). Board baseline: `data/archive-v1/merry-octopus_v18.parquet` = 294.9917.
 Probing the scorer to resolve labels is banned: "We will monitor submissions for attempts to learn from or exploit the ranking process." Every upload must be a genuine prediction.
 Upload rule: expected board gain > ~3 s over the current best, holdout CI excludes zero, `python board.py check` passes.

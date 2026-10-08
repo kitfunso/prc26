@@ -748,3 +748,15 @@ is behind the checked local campaign work; pushing that concrete reviewed change
 needs authority. Source-code eligibility and scheduled outcome remain pending;
 historical native-model lineage remains partial. Report:
 [RELEASE-READINESS-2026-10-08.html](RELEASE-READINESS-2026-10-08.html).
+
+### Private release source synchronization, 8 October
+
+Keith's direct “continue” follows the concrete private-branch push request and
+authorizes that normal update. `git push origin HEAD:campaign2` succeeds; live
+branch readback matches the checked source commit. The repository remains private
+with default `master`; the existing publication task, action and schedule remain
+unchanged. No publication execution or new submission follows this update.
+Release completion is derived from actual remote/local commit equality, rather
+than a fixed approval-pending message. Final scoring and the actual scheduled
+publication outcome remain pending. Every freeze/package/reference receipt and
+rejected artifact is preserved. The campaign remains open.

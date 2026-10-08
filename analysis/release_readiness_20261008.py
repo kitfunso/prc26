@@ -63,6 +63,7 @@ def publication_preflight() -> dict:
                            'admin': repo['permissions'].get('admin'), 'remote_campaign2_sha': remote_sha},
             'local_source_head': head, 'local_branch': command(('git', 'branch', '--show-current')),
             'local_commits_ahead': ahead,
+            'release_branch_status': 'VERIFIED' if ahead == 0 else 'PENDING',
             'remote_is_ancestor': True, 'proposed_push_after_authority': 'git push origin HEAD:campaign2',
             'push_performed': False, 'release_gap': 'Release branch lacks checked local work.' if ahead else 'Release branch contains the local checkpoint.'}
 
@@ -112,6 +113,7 @@ def render(record: dict) -> str:
     rows = ''.join(f'<tr><td>{html.escape(stage)}</td><td>{html.escape(state)}</td></tr>'
                    for stage, state in record['stages'].items())
     task = release['task']
+    branch_state = record['stages']['Private release branch update']
     result = json.dumps(final['result'], indent=2) if final['result'] else 'No final scorer result exists yet.'
     return f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PRC26 final designation and release readiness</title><link rel="icon" href="data:,"><style>
@@ -125,10 +127,10 @@ def render(record: dict) -> str:
 <pre>{html.escape(result)}</pre><p><a href="prc26-final-designation-20261008.json">Immutable upload and preservation receipt</a>.</p></section>
 <section><h2>Deadline and frozen recipe</h2><p>The <a href="https://prc-data-challenge-2026.netlify.app/">official timeline</a> now ends on 14 October 2026 at 10:00 UTC, 11:00 London. The 8 October recipe freeze remains complete. Both clean reference blocks and all rejected recipes remain closed; no new search, fitting or retuning follows the extension.</p>
 <p>Original, frozen and delivered champion files, both reference proofs/predictions, immutable freeze receipt and sealed local-readiness package retain their checked hashes. No package rebuild or native audit rerun occurred. The reconstruction allowance and final-preparation planning reserve remain unchanged.</p></section>
-<section class="notice"><h2>Release branch requires a decision</h2><p>The repository remains <strong>{html.escape(release['repository']['visibility'])}</strong>, with default branch <code>{release['repository']['default_branch']}</code>. The existing publication task will switch to <code>campaign2</code> and then make the repository public. That branch currently lacks {release['local_commits_ahead']} checked local commits.</p>
-<p>Remote campaign2: <code>{release['repository']['remote_campaign2_sha']}</code>. Local checkpoint before this release change: <code>{release['local_source_head']}</code>. The remote commit is an ancestor, so the prepared update can use a normal push after authority: <code>{release['proposed_push_after_authority']}</code>. No push or publication occurred.</p>
+<section class="notice"><h2>Release branch: {html.escape(release['release_branch_status'])}</h2><p>The repository remains <strong>{html.escape(release['repository']['visibility'])}</strong>, with default branch <code>{release['repository']['default_branch']}</code>. The existing publication task will switch to <code>campaign2</code> and then make the repository public. {html.escape(release['release_gap'])}</p>
+<p>Remote campaign2: <code>{release['repository']['remote_campaign2_sha']}</code>. Checked local source commit: <code>{release['local_source_head']}</code>. {html.escape(branch_state)}. This verification reads the remote and task without executing publication.</p>
 <p>The task <code>{task['Name']}</code> is {task['State']}; next run {html.escape(task['NextRun'])}. The reviewed action remains <code>data/go-public.cmd</code>. It needs interactive login and AC power. Its visibility-changing command was not executed and its schedule was not changed. Actual publication/default-branch outcome remains a future check.</p></section>
-<section><h2>Code, data and reproduction eligibility</h2><p>The <a href="https://prc-data-challenge-2026.netlify.app/eligibility.html">award rules</a> require public GPLv3 code, documented usable external data and sufficient reproduction instructions. Local source carries GPLv3. Public code eligibility is pending the release branch update and scheduled publication.</p>
+<section><h2>Code, data and reproduction eligibility</h2><p>The <a href="https://prc-data-challenge-2026.netlify.app/eligibility.html">award rules</a> require public GPLv3 code, documented usable external data and sufficient reproduction instructions. Local source carries GPLv3. Public code eligibility remains pending until actual publication is verified.</p>
 <p>External weather is the Iowa Environmental Mesonet ASOS/METAR archive, fetched by <code>weather.py</code> for the ten listed airport stations. IEM's <a href="https://mesonet.agron.iastate.edu/disclaimer.php">usage policy</a> places its materials in the public domain and permits lawful reuse. README documents the source, fetch command, date range and as-of feature construction. Challenge input files remain obtained through the challenge data process.</p>
 <p>Exact scored-file and prediction lineage is preserved. Historical native-model/checkpoint lineage remains partial, and GPU refits need not be bit-identical. The recipe history documents the original method; corrected clean reconstruction is separately audited. This checkpoint does not claim complete historical fitted-model reproduction or a fresh validation result.</p></section>
 <section><h2>Stage closures</h2><table><thead><tr><th>Stage</th><th>Check and status</th></tr></thead><tbody>{rows}</tbody></table>
@@ -142,7 +144,8 @@ def update_active(record: dict) -> None:
     release = record['publication_preflight']['repository']
     changes = {'final_submission_status': 'STORED_BYTE_VERIFIED',
                'final_scorer_status': record['final']['scorer_status'], 'deadline_utc': record['deadline_utc'],
-               'publication_visibility': release['visibility'], 'publication_campaign2_sha': release['remote_campaign2_sha']}
+               'publication_visibility': release['visibility'], 'publication_campaign2_sha': release['remote_campaign2_sha'],
+               'release_branch_status': record['publication_preflight']['release_branch_status']}
     if all(active.get(key) == value for key, value in changes.items()):
         return
     active.update(changes, checked_utc=record['checked_utc'], block='release-readiness',
@@ -150,9 +153,9 @@ def update_active(record: dict) -> None:
                   phase='Required unique final designation of exact scored v53 is stored and byte-checked. '
                         f"Final scorer: {record['final']['scorer_status']}. No improved recipe qualified. "
                         'The official deadline is extended to 14 October, 10:00 UTC. Recipe freeze and existing publication schedule remain. '
-                        'The checked local release update needs push authority; historical native-model lineage remains partial.',
+                        f"{record['publication_preflight']['release_gap']} Historical native-model lineage remains partial.",
                   next_stage='Inspect the named final scorer result at a due check without reuploading. '
-                             'Obtain authority for the reviewed private campaign2 update, then verify the existing publication event. '
+                             'Verify the release branch and actual outcome after the existing publication event. '
                              'No search, refit, retuning, package rebuild, regular duplicate, publication execution or schedule change.',
                   release_readiness_path='preparation/release-readiness-20261008.json',
                   final_designation_path='preparation/final-designation-20261008.json')
@@ -183,7 +186,9 @@ def main() -> None:
                          'Local evidence package': 'DONE: preserved sealed package; no rebuild',
                          'Historical fitted-model lineage': 'PARTIAL: original native lineage incomplete',
                          'Release command validation': f"DONE: {tests['passed']} full-suite tests; optimized board tests and F lint pass",
-                         'Private release branch update': 'PENDING: reviewed local commits require push authority',
+                         'Private release branch update': ('DONE: remote campaign2 equals the checked local source commit'
+                                                          if publication['release_branch_status'] == 'VERIFIED'
+                                                          else 'PENDING: remote campaign2 lacks local commits'),
                          'Existing publication-task preflight': 'DONE: read-only actual task/action/repository checks',
                          'Public code and scheduled outcome': 'PENDING: verify after the existing event'},
               'command': 'python analysis/release_readiness_20261008.py (read-only remote/task checks; writes local evidence)'}

@@ -11501,7 +11501,7 @@
       }
     ]
   },
-  "recorded_utc": "2026-10-08T20:32:48.985189+00:00",
+  "recorded_utc": "2026-10-08T22:22:13.909976+00:00",
   "launch_base_commit": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
   "implementation_checkpoints": {
     "validation": "1f2f3cb",
@@ -12127,10 +12127,10 @@
   ],
   "clean_champion_active": {
     "status": "complete",
-    "phase": "Required unique final designation of exact scored v53 is stored and byte-checked. Final scorer: PENDING. No improved recipe qualified. The official deadline is extended to 14 October, 10:00 UTC. Recipe freeze and existing publication schedule remain. The checked local release update needs push authority; historical native-model lineage remains partial.",
+    "phase": "Required unique final designation of exact scored v53 is stored and byte-checked. Final scorer: PENDING. No improved recipe qualified. The official deadline is extended to 14 October, 10:00 UTC. Recipe freeze and existing publication schedule remain. Release branch contains the local checkpoint. Historical native-model lineage remains partial.",
     "pid": null,
     "controller_pid": null,
-    "checked_utc": "2026-10-08T20:32:48.264220+00:00",
+    "checked_utc": "2026-10-08T22:21:38.466466+00:00",
     "active_component": null,
     "completed_components": [
       {
@@ -13292,7 +13292,7 @@
       "CP4-capacity-simplex": "REJECT"
     },
     "fallback_path": "preparation/fallback-readiness.json",
-    "next_stage": "Inspect the named final scorer result at a due check without reuploading. Obtain authority for the reviewed private campaign2 update, then verify the existing publication event. No search, refit, retuning, package rebuild, regular duplicate, publication execution or schedule change.",
+    "next_stage": "Inspect the named final scorer result at a due check without reuploading. Verify the release branch and actual outcome after the existing publication event. No search, refit, retuning, package rebuild, regular duplicate, publication execution or schedule change.",
     "recipe_freeze_status": "FROZEN",
     "recipe_freeze_path": "preparation/recipe-freeze-20261008.json",
     "laneb_residual_verdict": "REJECT",
@@ -13302,9 +13302,10 @@
     "final_scorer_status": "PENDING",
     "deadline_utc": "2026-10-14T10:00:00+00:00",
     "publication_visibility": "private",
-    "publication_campaign2_sha": "9d0bc36bb8813b82f917f78e3810348fb70561f1",
+    "publication_campaign2_sha": "e9c76cd5dd0543fac326f1685fe9b99f646ba3fc",
     "release_readiness_path": "preparation/release-readiness-20261008.json",
-    "final_designation_path": "preparation/final-designation-20261008.json"
+    "final_designation_path": "preparation/final-designation-20261008.json",
+    "release_branch_status": "VERIFIED"
   },
   "laneb_residual": {
     "recipe": "CP1-B-residual",
@@ -34459,7 +34460,7 @@
     "command": "python work/prc26-recipe-freeze.py (one checkpoint; later checks read its receipt)"
   },
   "release_readiness": {
-    "checked_utc": "2026-10-08T20:32:48.264220+00:00",
+    "checked_utc": "2026-10-08T22:21:38.466466+00:00",
     "campaign_status": "OPEN",
     "deadline_utc": "2026-10-14T10:00:00+00:00",
     "deadline_london": "2026-10-14T11:00:00+01:00",
@@ -34561,15 +34562,16 @@
         "default_branch": "master",
         "license": "GPL-3.0",
         "admin": true,
-        "remote_campaign2_sha": "9d0bc36bb8813b82f917f78e3810348fb70561f1"
+        "remote_campaign2_sha": "e9c76cd5dd0543fac326f1685fe9b99f646ba3fc"
       },
-      "local_source_head": "6567a126cef4aca622708539a61c85d6ce1b6c89",
+      "local_source_head": "e9c76cd5dd0543fac326f1685fe9b99f646ba3fc",
       "local_branch": "codex/validation-scope-20261003",
-      "local_commits_ahead": 46,
+      "local_commits_ahead": 0,
+      "release_branch_status": "VERIFIED",
       "remote_is_ancestor": true,
       "proposed_push_after_authority": "git push origin HEAD:campaign2",
       "push_performed": false,
-      "release_gap": "Release branch lacks checked local work."
+      "release_gap": "Release branch contains the local checkpoint."
     },
     "validation": {
       "date": "2026-10-08",
@@ -34597,7 +34599,7 @@
       "Local evidence package": "DONE: preserved sealed package; no rebuild",
       "Historical fitted-model lineage": "PARTIAL: original native lineage incomplete",
       "Release command validation": "DONE: 109 full-suite tests; optimized board tests and F lint pass",
-      "Private release branch update": "PENDING: reviewed local commits require push authority",
+      "Private release branch update": "DONE: remote campaign2 equals the checked local source commit",
       "Existing publication-task preflight": "DONE: read-only actual task/action/repository checks",
       "Public code and scheduled outcome": "PENDING: verify after the existing event"
     },

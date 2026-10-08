@@ -1,5 +1,21 @@
 # Hand-off, 2026-09-22
 
+> **8 October private release branch update: complete.** Keith's direct
+> “continue” follows the concrete request to push the reviewed private release
+> update and supplies that authority. Normal `git push origin HEAD:campaign2`
+> succeeds; the remote branch contains the checked release source. Read-only
+> verification confirms the repository remains private with default `master`,
+> and the existing 11 October publication task/action remains unchanged.
+> The final scorer result remains absent/PENDING; never repeat the final upload.
+> Release/status producers now derive branch completion from actual remote/local
+> commit equality. Report rendering and changed-source lint close that update.
+> Evidence: `preparation/release-branch-update-20261008.json` and
+> `preparation/release-readiness-20261008.json`. Recipe freeze, sealed package,
+> reference proofs and rejected artifacts remain unchanged. Historical native
+> lineage and confirmation stay partial. Public eligibility and actual scheduled
+> outcome remain pending; campaign OPEN. No publication execution, schedule
+> change, outward message or paid service is authorized.
+
 > **8 October final designation and release preflight.** No improved recipe
 > qualified. The official deadline is now 14 October at 10:00 UTC, 11:00 London.
 > The official final-filename rule requires `merry-octopus_final.parquet`.
