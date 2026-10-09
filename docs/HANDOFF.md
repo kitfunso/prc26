@@ -1,5 +1,35 @@
 # Hand-off, 2026-09-22
 
+> **9 October final scoring and coverage: FAILED checks.** The exact named result
+> changed to `Failed` at 16:29:08 UTC, with `FileNotFoundError` for
+> `s3://prc-2026-datasets/dev_sub_template.parquet`. Read-only HEAD returns 404;
+> the dataset template family contains `submitting.parquet` and
+> `final_submitting.parquet`. Stored final bytes still match the immutable v53
+> designation. Separately, the live final template has 670,790 IDs, including
+> 325,949 additional IDs absent from the 344,841-row stored final. Its last
+> modification precedes the upload. The earlier readiness check used the original
+> ranking template and missed the expanded final population. The official data
+> page says the final datasets add February and June. This is a final-coverage
+> failure, independent of the remote scorer's missing dependency; its internal
+> routing cause is unconfirmed. Do not treat storage/original-template checks as
+> final eligibility or require the old ranking score for a future expanded file.
+>
+> Exact result bytes, live templates, official page and prior status records are
+> preserved in `preparation/final-scorer-incident-20261009/`; the exclusive
+> incident receipt is `preparation/final-scorer-incident-20261009.json`.
+> Local release reporting now records a failed result without accepting it as a
+> score; strict successful-score identity, row, score and stored-byte checks stay.
+> Reporting checks: 118 suite tests pass; 9 focused checks pass normally and
+> under optimized Python; F lint passes. One initial suite collection failure
+> came from the archived source copy sharing a test module name. `pytest.ini`
+> now selects the live `tests` directory; archived source bytes remain intact.
+> [Evidence and prepared organizer report](FINAL-SCORER-INCIDENT-2026-10-09.html).
+> The report is unsent; organizer-contact authority is being requested once.
+> Organizer clarification and a separate replacement decision are required.
+> Never overwrite or reupload the final object under the existing authority.
+> No fitting, retuning, native audit, package rebuild or schedule change occurred.
+> Recipe freeze and all rejected artifacts remain preserved; campaign OPEN.
+
 > **8 October private release branch update: complete.** Keith's direct
 > “continue” follows the concrete request to push the reviewed private release
 > update and supplies that authority. Normal `git push origin HEAD:campaign2`

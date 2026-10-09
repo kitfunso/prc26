@@ -15,8 +15,12 @@ No improved recipe qualified; no new fitting or retuning follows the freeze.
 On 8 October the frozen file was designated as `merry-octopus_final.parquet`, as
 required by the [official final-submission rule](https://prc-data-challenge-2026.netlify.app/ranking.html#final-submission).
 Its SHA-256 is `9cea4874f05d436b39d82ff58e06e18864f0142661c8ffbdf3b3fbeb27b287b1`.
-Template validation and complete stored-body byte readback pass. The final scorer
-result is pending; this designation does not establish a new score improvement.
+Original-template validation and complete stored-body byte readback pass. On
+9 October the final scorer returned a missing official-template error. The live
+final template also contains additional IDs absent from the designated file;
+the earlier readiness check missed this expanded population. Final eligibility
+is unresolved. See the [incident and unsent organizer report](docs/FINAL-SCORER-INCIDENT-2026-10-09.html).
+No overwrite, reupload or new fitting follows without clarification and authority.
 The [official deadline](https://prc-data-challenge-2026.netlify.app/) is now
 14 October 2026 at 10:00 UTC (11:00 London). The existing publication schedule remains.
 See [release readiness](docs/RELEASE-READINESS-2026-10-08.html) for stage checks and gaps.

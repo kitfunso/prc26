@@ -760,3 +760,29 @@ Release completion is derived from actual remote/local commit equality, rather
 than a fixed approval-pending message. Final scoring and the actual scheduled
 publication outcome remain pending. Every freeze/package/reference receipt and
 rejected artifact is preserved. The campaign remains open.
+
+### Final scorer failure and expanded final population, 9 October
+
+The named final result reports `Failed` / `FileNotFoundError` for the official
+`dev_sub_template.parquet` path. Read-only dataset HEAD returns 404. The precise
+internal scorer routing cause remains unconfirmed. Original result bytes and
+metadata are preserved; this failure is not a prediction score or model regression.
+
+Independently, the live `final_submitting.parquet` contains 670,790 unique IDs,
+including 325,949 IDs beyond the original 344,841-row template. It was last
+modified before the existing final designation. The official data page now read
+explains that the final datasets add February and June. The earlier final-readiness
+check used the original ranking template and missed this expanded population.
+The uploaded bytes still match v53 exactly, but that does not close final coverage.
+
+Keep the immutable designation, freeze, sealed package and every scientific
+artifact. No validator bypass, overwrite, reupload, new fit or recipe change is
+authorized by this diagnosis. Local release reporting preserves the failure while
+retaining strict successful-result checks. Organizer clarification of the scorer
+dependency, required final population and permitted replacement is needed before
+any corrected final-file plan. The organizer report is prepared locally and
+unsent, awaiting Keith's outward-message authority. Evidence:
+`preparation/final-scorer-incident-20261009.json` and
+[FINAL-SCORER-INCIDENT-2026-10-09.html](FINAL-SCORER-INCIDENT-2026-10-09.html).
+Final scoring and coverage are failed checks; campaign OPEN. Budget reserves,
+recipe freeze and the existing publication schedule remain unchanged.
