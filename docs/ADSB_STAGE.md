@@ -75,3 +75,8 @@ ground points before pushback still hold the inbound flight's callsign and the c
 the aircraft by the departure's callsign on its climb-out inside the airport cut, then reads that aircraft's ground
 track. It lifts the 2026-01-15 match share from 63.6 % to 67.8 % and the gate from +12.44 s to +13.10 s
 [+10.53, +16.64] (holdout 291.89, lane A 197.74), most at EGLL and EDDF.
+
+Round of 10 October, Jan+Feb+Jun+Jul 2025 training days (364,558 matched rows): June adds nothing over three months
+(+12.95 s against +13.10 s). A stage of its own for LIRF, trained on the June and July LIRF rows, still loses (LIRF
+lane A 421.4 to 427.5, lane B worse), so LIRF stays uncorrected. With pass 3 matching more LFPG departures,
+correcting LFPG now helps (+13.02 s; LFPG matched lane A 267.2 to 252.8), so only LIRF is skipped from here.
