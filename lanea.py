@@ -5,14 +5,17 @@ from __future__ import annotations
 import json
 import sys
 import time
+import logging
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 from data import CACHE, rmse
+from checkpoints import tree_prediction
 from features import ARR, CAT, DAY, NUM, OCC, PW, SNOW, WX, WZ, build, with_pw
 from mix import CLF_CB, CLF_LGB, fit_clf
-from train import BASE, FOLDS, HOLDOUT, LGB, RESULTS, fit_predict, report
+from train import BASE, FOLDS, HOLDOUT, LGB, RESULTS, fit_predict, report, stopping_split
 
 TAIL = 600.0
 REG = {**BASE, "thread_count": 8, "gpu_ram_part": 0.5}
@@ -46,20 +49,41 @@ def _c(d: pd.DataFrame) -> pd.DataFrame:
     return d.assign(y=d["y"] - d["z_aobt"])
 
 
-def predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame | None = None, iters: tuple[int, ...] | None = None) -> tuple[np.ndarray, tuple[int, ...]]:
+def predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame | None = None, iters: tuple[int, ...] | None = None,
+            model_dir: Path | None = None, resume: bool = False) -> tuple[np.ndarray, tuple[int, ...]]:
+    if resume and (va is not None or iters is None or model_dir is None):
+        raise ValueError("checkpoint reuse requires a fixed-budget refit and verified model directory")
     tr, va = _c(tr), _c(va) if va is not None else None
     t = (tr["y"].abs() > TAIL).values
     tv = (va["y"].abs() > TAIL).values if va is not None else None
     it = iters or (None, None, None)
-    P, i0 = fit_clf(cfg, tr, t.astype(int), te, va, tv.astype(int) if va is not None else None, it[0])
-    ct, i1 = fit_predict(cfg["reg"], tr[t], te, va[tv] if va is not None else None, it[1])
-    cb, i2 = fit_predict(cfg["reg"], tr[~t], te, va[~tv] if va is not None else None, it[2])
+    paths = [model_dir / head if model_dir else None for head in ("gate.model", "tail.model", "body.model")]
+    outputs = []
+    for index, path in enumerate(paths):
+        if resume and path.exists():
+            logging.info("Reuse saved %s with %s trees", path, it[index])
+            prediction = tree_prediction(cfg if index == 0 else cfg["reg"], te, path, index == 0, it[index])
+            outputs.append((prediction, it[index]))
+        elif index == 0:
+            outputs.append(fit_clf(cfg, tr, t.astype(int), te, va, tv.astype(int) if va is not None else None,
+                                   it[0], model_path=path))
+        else:
+            mask = t if index == 1 else ~t
+            validation = va[tv if index == 1 else ~tv] if va is not None else None
+            outputs.append(fit_predict(cfg["reg"], tr[mask], te, validation, it[index], model_path=path))
+    (P, i0), (ct, i1), (cb, i2) = outputs
     return P[:, 1] * ct + (1 - P[:, 1]) * cb + te["z_aobt"].values, (i0, i1, i2)
 
 
 def _merge_b(a: pd.DataFrame, donor: pd.DataFrame, rows: pd.DataFrame, col: str) -> pd.DataFrame:
     b = donor[donor["id"].isin(rows["id"][rows["has_plan"] == 0])]
     return pd.concat([a, b[["id", col]]], ignore_index=True)
+
+
+def outer_predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame) -> tuple[np.ndarray, tuple[int, ...]]:
+    inner, stop = stopping_split(tr)
+    _, iterations = predict(cfg, inner, stop, stop)
+    return predict(cfg, tr, te, iters=iterations)
 
 
 def cv(name: str, donor: str) -> None:
@@ -72,7 +96,7 @@ def cv(name: str, donor: str) -> None:
     oof, its, t0 = np.full(len(ta), np.nan), [], time.time()
     for i, months in enumerate(FOLDS):
         va = ta["month"].isin(months).values
-        p, it = predict(cfg, ta[~va], ta[va], ta[va])
+        p, it = outer_predict(cfg, ta[~va], ta[va])
         oof[va] = p; its.append(it)
         print(f"fold {i} {months}: {rmse(ta['y'].values[va], p):.2f} at {it} iters, {time.time() - t0:.0f}s", flush=True)
     it = tuple(int(np.mean([x[j] for x in its]) * 1.1) for j in range(3))

@@ -1,0 +1,18 @@
+{
+  "freeze_receipt": "data/runs/clean-champion-20261003/preparation/recipe-freeze-20261008.json",
+  "report": "RECIPE-FREEZE-2026-10-08.html",
+  "planned_london_date": "2026-10-08",
+  "checked_utc": "2026-10-07T23:06:21.526552+00:00",
+  "status": "FROZEN",
+  "selection": "Exact scored v53; no improved recipe qualified",
+  "artifact_sha256": "9cea4874f05d436b39d82ff58e06e18864f0142661c8ffbdf3b3fbeb27b287b1",
+  "source_checkpoint": "e9181f73934800fbc9ab4f879a2975fd66b21875",
+  "checks": "Current original/frozen/delivered artifact, validator/template/manifest, reference proof/prediction and sealed-package bytes match checked receipts; fixed-meta and missing-plan evidence retained.",
+  "native_audits_rerun": false,
+  "package_rebuilt": false,
+  "new_upload": false,
+  "historical_fitted_model_lineage": "PARTIAL",
+  "additional_confirmation": "PARTIAL",
+  "future_release_readiness": "PENDING",
+  "campaign_status": "OPEN"
+}

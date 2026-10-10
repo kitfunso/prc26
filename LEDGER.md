@@ -1,8 +1,33 @@
 # Board ledger
 
+**8 October private release update:** Keith's direct continuation approves the
+prepared normal push to private `campaign2`. Live branch/source equality passes;
+visibility remains private and the existing publication task stays unchanged.
+Final scoring remains pending. Receipt:
+`data/runs/clean-champion-20261003/preparation/release-branch-update-20261008.json`.
+No new submission or score improvement follows this source update.
+
 Best file per team counts. Scorer cap: 5 files a day, reset 00:00 UTC (checked 2026-09-17 against the ranking page). Board baseline: `data/archive-v1/merry-octopus_v18.parquet` = 294.9917.
 Probing the scorer to resolve labels is banned: "We will monitor submissions for attempts to learn from or exploit the ranking process." Every upload must be a genuine prediction.
 Upload rule: expected board gain > ~3 s over the current best, holdout CI excludes zero, `python board.py check` passes.
+
+**8 October required final designation:** `merry-octopus_final.parquet` was created
+once under Keith's existing submission authority, following the official unique
+final-filename rule. It contains exactly the frozen scored v53 bytes, SHA-256
+`9cea4874f05d436b39d82ff58e06e18864f0142661c8ffbdf3b3fbeb27b287b1`.
+Template checks and full stored-body byte readback pass. Final scorer result is
+pending. No expected improvement, new recipe or regular versioned duplicate is
+claimed. Immutable receipt: `data/runs/clean-champion-20261003/preparation/final-designation-20261008.json`.
+Do not repeat the designation. Prior versioned results below remain historical.
+
+**10 October final replaced (Keith: "decide what's best for us, drive it", "just submit whenever we have a working model"):**
+the 9 October `Failed` result was the scorer outage the organisers fixed that day, and the stored file lacked
+the 325,949 February and June rows of `final_submitting.parquet`. The organisers allow changes until the
+14 October 10:00 UTC deadline. Branch `final-febjun` (v53 code at `a3503dc` plus `scripts/final_*`) refits the
+v53 recipe on `final_ranking.parquet`; January and July keep scored v53 moved by the organisers' takeoff
+re-jitter, February and June take the refit. A working file (LightGBM member for Feb+Jun, sha256 `132e6098...`)
+went first, then the full v53 file, sha256 `1c3830a45b5ab1cb15d079b0bfd47d2c3b85f46b2b5ba52d0db2e693832c19ca`,
+670,790 rows. Scorer: `Succeeded`, `used_pairs` 670,790, test set `final_submitting.parquet`. The final ranking is blind.
 
 | file | date (UTC) | config | holdout Jan+Jul 2025 (A / B / all) | expected board | actual board | note |
 |---|---|---|---|---|---|---|

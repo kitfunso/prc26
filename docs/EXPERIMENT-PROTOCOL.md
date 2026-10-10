@@ -450,3 +450,339 @@ python -c "import numpy as np;P=[('v22',11.54,310.891,292.887),('v23',1.66,292.8
   unchanged; the rule covers v35 only.
 - v8 2026-09-23: section 4 records v35's gate (all rows +0.051 [-0.454, +0.398]) and the slot it takes under the v7
   rule, on 2026-09-24. Sections 0, 3 and 8 are unchanged.
+
+## Amendment v9 — 2026-10-02: first-place campaign and validation corrections
+
+Keith requested a next-step plan to seriously challenge first place and to commit/push it.
+The current execution queue is [CONTENDER-PLAN.md](CONTENDER-PLAN.md), CP0–CP5.
+This is a prospective declaration. No new model recipe or competition submission is recorded
+as executed by this amendment.
+
+### Correctness findings and interpretation
+
+- `laneb.copy_hist()` builds airline/flight copy history from all training months before outer
+  exclusion. January/July held-out labels can enter each other's features despite `HIST_GAP=3`.
+  A five-row synthetic hidden-label mutation changed `h_al`/`h_flt` from 0.5 to 0.0.
+  Fix permitted source-label scopes and cross-fit training aggregates before interpreting a new gain.
+- Development tree folds are also early-stopping evaluation sets. Global donor OOF caches and
+  non-holdout recalibration OOF outputs do not isolate all outer evaluation labels.
+  Rebuild the entire feature/model/meta pipeline within outer training scopes.
+- The tuning judge groups were not scored by the search objective, but their labels participate in
+  fits used while searching other groups. Treat their old results as development evidence,
+  not independent nested evaluation of the complete selection process.
+- `nn.fit()` does not subsequently train gradients on the final 10% of fit days; `nn.train()`
+  returns stopping epoch rather than best-weight epoch. CP3 declares the corrective comparison.
+- Near-zero day-mean residuals and linear day-level correlations do not close all conditional
+  row-level interactions. The earlier state-oracle gain is a result for that model/feature experiment,
+  not an information-theoretic ceiling on Lane A.
+- Repeated historical holdout and leaderboard use remains adaptive evidence. Repairing code does
+  not create an untouched test. Bootstrap intervals do not quantify year-transfer or selection bias.
+
+Earlier measured scores and nulls remain in the ledger. New CP2 hypotheses must differ explicitly
+from prior snow/ATFM/DST tests; B1's failed flight-string override remains closed.
+
+### Prospective experiment register
+
+| ID | Hypothesis/implementation | Initial variant cap | Gate/status |
+| --- | --- | ---: | --- |
+| CP0 | Fit-scope isolation, ranking-like masking, stopping separation, immutable champion and actual-file gates | Correctness/control work | PLANNED; passing mutation/provenance tests and clean baseline required |
+| CP1 | Calibrated hierarchical physical/copy/date-shift probabilities predict high-cost outcomes | 3 | PLANNED; whole-file SSE, calibration, sparse-cell and episode confirmation |
+| CP2 | Conditional disruption/recorder-state features improve individual flights within days | 2 | PLANNED; outer/episode confirmation and no clear hot-slice harm |
+| CP3 | True all-data NN fit and bounded Huber/MSE comparison improve ensemble prediction | 2 | PLANNED; complete fit coverage, best-epoch bookkeeping and seed/ensemble evidence |
+| CP4 | Nested meta-fitting selects a small robust survivor ensemble | 3 inexpensive meta-recipes | PLANNED; outer-only evaluation and frozen lineage |
+| CP5 | Full fit and actual-file validation deliver the selected recipe reliably | 1 primary, at most 1 justified alternative | PLANNED; existing Stage-6 sign-off and exact candidate hash |
+
+Maximum eight initial substantive model recipes including the control. At most two receive expensive
+confirmation. Before any run, record the exact variants, scopes, parameters, metric, stress slices,
+budget and stop rule. Adding variants after a result requires a dated declaration before their run.
+
+### Governing rules for CP0–CP5
+
+Primary statistic is paired pooled **whole-file SSE gain**, with pooled RMSE and per-month/lane
+reports. The implementation of `train.boot_delta` resamples calendar days; preserve day-level
+dependence and add month-stratified multi-day-block sensitivity when appropriate. Use at least
+2,000 resamples for these prospective comparisons, without claiming selection-bias correction.
+
+Retain section 3's 1.5 s submission floor, approximately 3 s target, paired interval excluding zero,
+hot-regime review and explicit sign-off. The historical transfer floor is a campaign budget heuristic,
+not a universal estimate of zero expected gain below 1.5 s. No automatic submission authorization
+follows from this plan or from a passing local gate.
+
+Require label-scope isolation and validation of the actual assembled candidate. CP1 changes Lane B
+only after its own confirmation; otherwise Lane B must match the declared control exactly.
+v42–v51's donor assembly error is already fixed but motivates the file-level gate.
+
+The published scorer cap is five files per day. Keep a buffer, prefer October 10 for final uploads,
+and preserve the actual v53 file. The official deadline remains October 11, 23:59:59 CET.
+Respect the standing GPU wait rule and the already approved local publication schedule.
+
+### CP0 Lane B repair diagnostic — declared 2026-10-03
+
+Scope: isolate `laneb.copy_hist` source labels and Lane B stopping budgets. This is
+correctness work within CP0; the complete multi-stage CP0 baseline remains outstanding.
+The local branch is `codex/validation-scope-20261003`, based on the October 2 plan.
+
+Run `python analysis/laneb_scope_diagnostic.py`.
+Two fixed-budget arms compare legacy all-training-month history with history restricted
+to development months. Both fit the same Lane B training rows at 117 classifier and
+238 tau iterations, the historical `docs/LANEB_RUN.md` budgets. January/July 2025 are
+the diagnostic evaluation rows; their labels never feed corrected history.
+No parameters or variants are selected from this comparison.
+
+Keep the existing donor and v53 Lane A holdout predictions fixed. Report Lane B and
+whole-file SSE/RMSE, each evaluation month, history changes, and 2,000 paired calendar-day
+bootstrap resamples. Treat the result as a diagnostic correction on reused data, not
+fresh confirmation or a completely isolated champion evaluation: donor and Lane A
+caches still have the previously identified validation limitations.
+
+Checks: mutate excluded departure labels and require identical corrected history;
+verify real Lane B inner stopping excludes outer IDs; freeze v53 bytes and validate
+template IDs, predictions and Lane B parity. Preserve large outputs under
+`data/runs/cp0-laneb-scope-20261003/`; no existing caches or scored files are overwritten.
+Budget: two fixed-budget CPU fits and one training-only iteration-selection check;
+no GPU training, tuning or scorer upload. Stop on failed scope/assembly checks.
+
+Measured checkpoint: 22 local tests passed, including nine focused scope tests;
+real-data hidden-label mutation and champion schema/ID/Lane B parity checks passed.
+All 5,373 held-out Lane B rows have changed history. At fixed historical budgets,
+legacy-history Lane B RMSE is 1735.6383 and corrected history is 1732.6492 s.
+Keeping v53 Lane A fixed gives whole-file 304.8745 versus 304.6092 s, gain
+0.2653 [0.0258, 0.5974] from 2,000 calendar-day bootstrap resamples; SSE improves
+55.70 million seconds². Dropping the largest-gain day leaves 29.33 million seconds².
+The training-only stopping check selects 93 classifier and 314 tau iterations.
+Verdict: correctness repair checked; small diagnostic gain, below the submission
+floor. Complete clean-v53 remains unfinished. No model promotion or scorer upload.
+See [STATUS-2026-10-03.html](STATUS-2026-10-03.html) and the isolated manifest.
+
+### Contender continuation register — 2026-10-03
+
+Exact prospective declarations and construction limits live in
+[CONTENDER-RUN-2026-10-03.md](CONTENDER-RUN-2026-10-03.md). Isolated artifacts:
+`data/runs/contender-20261003/`. Eight initial recipes include the CPU control.
+This control/proxy donor is not a reconstructed clean-v53. Both development
+blocks are reused; they are not newly untouched tests.
+
+Measured complete-file screens: CP1 hierarchy and calibration reverse in
+winter; explicit outcomes lose in both blocks. CP2 normalized weather gains
+0.1656 seconds pooled, uncertain and below floor; signed recorder experts
+lose 1.8903 seconds in winter with clear hot-slice harm, so stop that recipe.
+Sampled MSE improves over corrected sampled Huber in both two-month blocks,
+but both standalone networks trail the CPU tree. Nested sampled simplex blend
+gains 1.1697 seconds pooled, below floor; winter uncertainty and weather harm
+prevent promotion. Fixed and shrunk meta methods do not clear the gate either.
+
+Checks: 35 tests pass, F lint passes, real Lane B excluded-label mutation,
+missing-query-target inference, inner stopping calls and control reproduction
+pass. Cold January independent rebuild and departure label/block mutation agree
+exactly. Whole-file membership follows supplied file month, including UTC
+boundary cases. Construction interruptions are recorded separately in the HTML.
+
+After Keith requested continued work, the missing full-capacity CP3 comparison
+was declared before running: original Huber/MSE recipes on every permitted
+outer day, original 150-epoch cap and patience, seed zero, nested proxy donor,
+inner budget selection and all-row refit. Outputs have a separate neural-full
+directory and stage runtimes/checkpoints. No sampled model has been promoted;
+no upload or additional architecture search. Full comparison and subsequent
+confirmation remain pending at this checkpoint.
+
+Additional checked evidence: full suite 61 passed in 65.38 s, followed by two
+focused meta-input checks. Submission validation now uses explicit exceptions;
+26 guard tests pass under optimized Python, and the preserved champion passes
+the actual-file check in both modes. No S3 upload was attempted. Read-only
+publication preflight inspected task/script/settings and authenticated repo
+access, without executing the script's visibility-changing commands.
+
+Cold ranking-support audit uses 120,000 matched airport/month rows, five-day
+calendar blocks and a fixed diagnostic classifier. Year-separation AUC is
+.8073, January .6466 and July .9222. Matched training has no rows with at least
+15 snow reports per day; ranking has 8,028, versus 6,107 across all 2025.
+Reporting counts are not elapsed exposure. This is a transfer/support warning,
+not a predictive gain or a weighting experiment. Weather hashes/spans, range
+coverage and classifier scopes are saved under the isolated run directory.
+
+First full Huber member: selected epoch 67, stopped at 82, then refit every
+1,417,542 permitted Lane A rows across 244 days. Full checkpoint encoder,
+target scaling, donor-source hashes and actual-file/Lane B parity pass.
+Whole-file February/March gain over the CPU control is -2.0572 s, uncertain.
+Both first-block losses are now complete. MSE uses best epoch 69, stopping 84,
+and the same complete refit rows/days. It loses to full Huber by 1.8848 s,
+calendar-day interval [-3.0016, -0.8151], five-day [-2.8262, -1.0511], with losses
+in February and March. The declared clear-reversal rule stops the job before
+completing its second block. The conditional full MSE meta check fails its
+prerequisite and is skipped. This is one full block, not complete confirmation.
+
+Actual-file checkpoint prediction replays, category/numeric encoder and target
+scale coverage, nested donor hashes and unchanged Lane B pass for both models.
+Both full networks improve ordinary rows but materially harm winter weather
+versus the CPU control; hot-slice intervals are recorded in artifact_checks.json.
+Descriptive airport, recording-class, signed-residual, schedule-gap and influential
+row reports cover the recorded files. Missing diagnostic stamps export as JSON
+null; no target-derived diagnostic enters features or a new promotion rule.
+Final full suite: 62 passed in 46.53 s; F lint passes. No board gain or new upload.
+Complete clean-v53 and original fitted-checkpoint lineage remain partial.
+
+### CP4 original-member continuation, declared 2026-10-05
+
+The complete original reference now passes scope, replay, complete-file, Lane B,
+error and cost audits in January/July and February/March. Its winter confirmation
+loses to scoped CatBoost. Preserve the proofs and actual scored champion.
+
+Two new inexpensive meta recipes were declared before fitting in
+[META-WEATHER-2026-10-05.html](META-WEATHER-2026-10-05.html): global simplex and a
+fixed weather-cell simplex with half shrinkage. The engineering review revisions
+were applied. Both finish inside the 45-minute CPU cap with no GPU fits; neither
+passes the promotion gate. No threshold or shrinkage tuning follows.
+
+One explicit exception to CP4's original three-method cap permits a fourth method
+overall, including the clean control. No follow-up variant or retuning is allowed.
+One additional, distinct CP4 feature-availability recipe is declared before its
+fit in [META-CONTEXT-2026-10-05.html](META-CONTEXT-2026-10-05.html). Keep original
+weights, model parameters and fitted member/donor artifacts. Append existing
+weather and member disagreement to the fixed residual stage. Cap this at 15 CPU
+minutes and zero GPU fits. Three new inexpensive meta verdict lanes are now
+declared. No broad search or extra substantive member recipe is opened.
+
+Both blocks are adaptively reused development data. The existing whole-file,
+paired interval, weather, episode and sign-off gates remain. A passing screen
+needs explicit remaining confirmation coverage or compute limitations before a
+final build. A rejection does not end the approved campaign.
+
+### CP4 saved-selection source check, declared before replay
+
+[META-CAPACITY-2026-10-05.html](META-CAPACITY-2026-10-05.html) declares one
+additional fixed recipe, CP4-capacity-simplex, a fifth method overall including
+clean and an explicit prospective exception to the original cap. Estimate one
+global simplex vector on the saved outer members' common stopping rows. No
+member/donor training, parameter search or retuning. The original raw inner
+tables still fit the unchanged residual stage. Stopping selection, late-year
+coverage and fit-size effects are confounded. Both outer files remain excluded.
+
+The 7 October input review clarifies intentional stopping-query overlap and the
+previously checked January/July C recovery provenance before any new replay.
+Only that exact original specification, native hashes and recorded source
+compatibility are accepted; the metric-only repair requires unchanged syntax
+outside paired_metrics. Limits: 30 minutes whole-stage wall time and 15 minutes
+neural GPU inference, checked between components. Preserve the 44-hour allowance,
+16-hour preparation reserve, recipe freeze and upload sign-off. A surviving
+development comparison still requires remaining confirmation to be declared.
+
+All four fixed original-member follow-ups are now measured and REJECT. The
+capacity-source comparison completes January/July and February/March, with
+313.047 seconds successful stage wall time, 6.218 seconds neural GPU inference
+and zero training. Its -0.2074-second pooled gain against clean fails the gain,
+interval, block, weather and episode requirements. Original native/input/replay
+checks pass; actual saved candidate/model bytes and full failure/repair/retry
+exposure are checked separately in meta-completion-audit.json. No cap is bypassed.
+Preserve exact v53 through recipe freeze. An exact local fallback copy passes its
+actual file/template/hash checks; this is not an improved model or new upload.
+
+### Missing-plan residual continuation, declared 2026-10-07
+
+Keith requested “continue please, make submissions if you need”. This authorizes
+genuine qualified submissions within the campaign; all scientific, compute and
+actual-file gates remain. Publication, push, schedule changes and paid work remain
+under their existing authority.
+
+[LANEB-RESIDUAL-2026-10-07.html](LANEB-RESIDUAL-2026-10-07.html) prospectively
+declares one fixed CP1-B-residual recipe and one explicit exception to CP1's original
+three-recipe cap. Reconstruct original scoped inner Lane B recording predictions
+using saved checked mixture donors, then fit a fixed continuous squared-error
+correction on those out-of-file predictions. Lane A stays unchanged. No retuning,
+flight-string override, probability grid or restart of rejected recipes follows.
+The screen has a 30-minute whole CPU wall cap, including failure/repair/retry cost,
+and zero GPU work. Both reused outer blocks must pass the existing complete-file,
+paired-interval, weather and episode gates. A survivor requires prospectively
+priced confirmation and an actual validated ranking file before submission. Keep
+the 44-hour allowance, 16-hour reserve, 8 October freeze and exact scored v53.
+
+The fixed screen is now complete and REJECT. Pooled clean gain is 0.7298 seconds,
+below the original floor, and January loses 0.1695 seconds. Winter improves over
+clean but retains scoped-control/weather failures. Actual saved native/context,
+candidate and donor bytes, scope/input coverage and independent replay close in
+`laneb-residual/completion-audit.json`. The audit-reader schema repair preserves
+all fit artifacts and rejects missing/extra candidate columns. Its failed attempt
+is accounted separately; screen plus closure costs 117.698 CPU seconds, zero GPU.
+No retuning, further confirmation, ranking build or submission follows for this
+recipe. The scored champion is retained; planned freeze and release checks remain.
+
+### Recipe freeze, 8 October London
+
+The planned freeze is complete. No improved recipe qualified; retain exact
+scored v53 as primary and fallback. Current original/frozen/delivered artifact,
+template/validator/manifest, full reference proof/prediction and sealed-package
+hashes match the checked receipts. Fixed-meta completion and missing-plan
+result/source evidence are retained. No recipe change, fit, native-audit rerun,
+package rebuild or duplicate upload occurred. Freeze receipt:
+`preparation/recipe-freeze-20261008.json`; local report:
+[RECIPE-FREEZE-2026-10-08.html](RECIPE-FREEZE-2026-10-08.html).
+
+Final release verification and code eligibility remain open. Additional
+confirmation and historical native-model lineage remain partial. Keep all
+budget limits, reduced-coverage wording, submission buffer and authority
+boundaries. No new search, retuning or refit follows this freeze.
+
+### Required final designation and release preflight, 8 October
+
+The official timeline now closes on 14 October 2026 at 10:00 UTC, 11:00 London:
+[timeline](https://prc-data-challenge-2026.netlify.app/). The extension does not
+reopen the frozen recipe, rejected experiments or compute allocations.
+
+The [final-submission rule](https://prc-data-challenge-2026.netlify.app/ranking.html#final-submission)
+requires `merry-octopus_final.parquet`. The absent final object was created once
+using the exact selected v53 bytes under Keith's existing submission authority.
+This is the required final designation, with no regular versioned duplicate,
+new recipe, scorer probe or improvement claim. Local template checks pass under
+normal and optimized Python; stored-body readback matches every byte. Final
+scoring is pending. Keep the immutable receipt at
+`preparation/final-designation-20261008.json`; never repeat the upload.
+
+The final command's strict filename/conditional-creation/readback contract is
+fixed in `board.py`. Its parquet validator function is unchanged from the sealed
+version. The sealed old validator, freeze receipt, package and reference proofs
+remain intact; new command bytes are recorded separately. Full suite: 109 passed;
+33 board tests pass under normal and optimized Python; F lint passes.
+
+The existing publication-task preflight is read-only. Repository visibility,
+default branch and scheduled action were not changed. The private release branch
+is behind the checked local campaign work; pushing that concrete reviewed change
+needs authority. Source-code eligibility and scheduled outcome remain pending;
+historical native-model lineage remains partial. Report:
+[RELEASE-READINESS-2026-10-08.html](RELEASE-READINESS-2026-10-08.html).
+
+### Private release source synchronization, 8 October
+
+Keith's direct “continue” follows the concrete private-branch push request and
+authorizes that normal update. `git push origin HEAD:campaign2` succeeds; live
+branch readback matches the checked source commit. The repository remains private
+with default `master`; the existing publication task, action and schedule remain
+unchanged. No publication execution or new submission follows this update.
+Release completion is derived from actual remote/local commit equality, rather
+than a fixed approval-pending message. Final scoring and the actual scheduled
+publication outcome remain pending. Every freeze/package/reference receipt and
+rejected artifact is preserved. The campaign remains open.
+
+### Final scorer failure and expanded final population, 9 October
+
+The named final result reports `Failed` / `FileNotFoundError` for the official
+`dev_sub_template.parquet` path. Read-only dataset HEAD returns 404. The precise
+internal scorer routing cause remains unconfirmed. Original result bytes and
+metadata are preserved; this failure is not a prediction score or model regression.
+
+Independently, the live `final_submitting.parquet` contains 670,790 unique IDs,
+including 325,949 IDs beyond the original 344,841-row template. It was last
+modified before the existing final designation. The official data page now read
+explains that the final datasets add February and June. The earlier final-readiness
+check used the original ranking template and missed this expanded population.
+The uploaded bytes still match v53 exactly, but that does not close final coverage.
+
+Keep the immutable designation, freeze, sealed package and every scientific
+artifact. No validator bypass, overwrite, reupload, new fit or recipe change is
+authorized by this diagnosis. Local release reporting preserves the failure while
+retaining strict successful-result checks. Organizer clarification of the scorer
+dependency, required final population and permitted replacement is needed before
+any corrected final-file plan. The organizer report is prepared locally and
+unsent, awaiting Keith's outward-message authority. Evidence:
+`preparation/final-scorer-incident-20261009.json` and
+[FINAL-SCORER-INCIDENT-2026-10-09.html](FINAL-SCORER-INCIDENT-2026-10-09.html).
+Final scoring and coverage are failed checks; campaign OPEN. Budget reserves,
+recipe freeze and the existing publication schedule remain unchanged.

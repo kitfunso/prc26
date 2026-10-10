@@ -53,7 +53,7 @@ def test_feature_density_matches_between_train_and_rank(feat):
 def test_z_aobt_path_does_not_reference_block_time():
     """features.py build() derives z_aobt (and the other z_* stamps) from the flight-plan columns only; read the
     exact source block that assigns them and confirm BLOCK_TIME_UTC_mvt never appears in it."""
-    src = inspect.getsource(features.build)
+    src = inspect.getsource(features.build_frame)
     block = src[src.index("for k, c in"):src.index('f["z_anchor"]')]
     assert "AOBT_3_flt" in block, "expected the z_* loop to build z_aobt from AOBT_3_flt; build() source shape changed"
     assert "BLOCK_TIME_UTC_mvt" not in block, "z_aobt must never reference BLOCK_TIME_UTC_mvt: it is blanked on rank rows"

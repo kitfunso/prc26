@@ -3,6 +3,7 @@ Lane B rows come from a donor. `python nn.py cv NAME DONOR` / `python nn.py fit 
 from __future__ import annotations
 
 import json
+import logging
 import os
 import sys
 import time
@@ -73,7 +74,10 @@ class Net(nn.Module):
 def _batches(n: int, size: int, g: torch.Generator | None = None):
     idx = torch.randperm(n, generator=g) if g is not None else torch.arange(n)
     for i in range(0, n, size):
-        yield idx[i:i + size]
+        stop = n if g is not None and n - (i + size) == 1 else i + size
+        yield idx[i:stop]
+        if stop >= n:
+            break
 
 
 @torch.no_grad()
@@ -82,43 +86,68 @@ def _infer(model: Net, ci: torch.Tensor, xn: torch.Tensor) -> np.ndarray:
     return torch.cat([model(ci[b].to(DEV), xn[b].to(DEV)).cpu() for b in _batches(len(ci), 16384)]).numpy()
 
 
-def train(cfg: dict, fit: pd.DataFrame) -> tuple[Net, Enc, float, float, int]:
-    """Early stopping on the last 10% of fit days, so the validation window stays forward in time."""
+def _training_data(cfg: dict, fit: pd.DataFrame, epochs: int | None) -> tuple[pd.DataFrame, pd.DataFrame, Enc, torch.Tensor, torch.Tensor, np.ndarray]:
+    days = np.sort(fit["day"].unique())
+    if epochs is None:
+        if len(days) < 2:
+            raise ValueError("epoch selection needs at least two training days")
+        cut = days[min(len(days) - 1, int(len(days) * (1 - VAL_FRAC)))]
+        tr, va = fit[fit["day"].values < cut], fit[fit["day"].values >= cut]
+    else:
+        if epochs < 1:
+            raise ValueError("epoch budget must be positive")
+        tr, va = fit, fit.iloc[:0]
+    enc = Enc(tr, cfg["cat"], cfg["num"])
+    ci, xn = enc(tr)
+    return tr, va, enc, ci, xn, (tr["y"] - tr["z_aobt"]).values
+
+
+def train(cfg: dict, fit: pd.DataFrame, epochs: int | None = None) -> tuple[Net, Enc, float, float, int]:
+    """Select epochs inside training days, or fit every supplied row at a fixed budget."""
     cell = cfg["cell"]
     torch.manual_seed(cell["seed"])
-    days = np.sort(fit["day"].unique()); cut = days[int(len(days) * (1 - VAL_FRAC))]
-    tr, va = fit[fit["day"].values < cut], fit[fit["day"].values >= cut]
-    enc = Enc(tr, cfg["cat"], cfg["num"])
-    ci, xn = enc(tr); vci, vxn = enc(va)
-    c = (tr["y"] - tr["z_aobt"]).values
-    mu, sd = float(c.mean()), float(c.std())
+    tr, va, enc, ci, xn, c = _training_data(cfg, fit, epochs)
+    if len(va):
+        vci, vxn = enc(va)
+    mu, sd = float(c.mean()), max(float(c.std()), 1e-6)
     y = torch.from_numpy(((c - mu) / sd).astype(np.float32))
     vy = (va["y"] - va["z_aobt"]).values
     model = Net(enc, xn.shape[1], cell).to(DEV)
     opt = torch.optim.AdamW(model.parameters(), lr=cell["lr"], weight_decay=cell["weight_decay"])
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=cell["t_max"])
     g = torch.Generator().manual_seed(cell["seed"])
-    best, state, bad, ep = np.inf, None, 0, 0
-    for ep in range(1, cell["max_epochs"] + 1):
+    best, state, bad, ep, best_ep = np.inf, None, 0, 0, 0
+    for ep in range(1, (epochs or cell["max_epochs"]) + 1):
         model.train()
         for b in _batches(len(ci), cell["batch"], g):
             opt.zero_grad(set_to_none=True)
-            nn.functional.huber_loss(model(ci[b].to(DEV), xn[b].to(DEV)), y[b].to(DEV), delta=cell["huber"]).backward()
+            pred, target = model(ci[b].to(DEV), xn[b].to(DEV)), y[b].to(DEV)
+            loss = nn.functional.mse_loss(pred, target) if cell.get("loss") == "mse" else nn.functional.huber_loss(pred, target, delta=cell["huber"])
+            loss.backward()
             opt.step()
         sched.step()
+        if cell.get("progress") and ep % 5 == 0:
+            logging.info("NN %s epoch %s/%s, %s fit rows", cell.get("loss", "huber"), ep, epochs or cell["max_epochs"], len(tr))
+        if epochs is not None:
+            best_ep = ep
+            continue
         v = rmse(vy, _infer(model, vci, vxn) * sd + mu)
         if v < best - 1e-4:
-            best, bad, state = v, 0, {k: t.detach().clone() for k, t in model.state_dict().items()}
+            best, bad, state, best_ep = v, 0, {k: t.detach().clone() for k, t in model.state_dict().items()}, ep
         else:
             bad += 1
             if bad >= cell["patience"]:
                 break
-    model.load_state_dict(state)
-    return model, enc, mu, sd, ep
+    if state is not None:
+        model.load_state_dict(state)
+    model.run_info = {"best_epoch": best_ep, "stopping_epoch": ep, "fit_rows": len(tr), "fit_days": len(tr["day"].unique()),
+                      "mode": "all_rows" if epochs is not None else "selection"}
+    return model, enc, mu, sd, best_ep
 
 
-def predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame) -> tuple[np.ndarray, int]:
-    model, enc, mu, sd, ep = train(cfg, tr)
+def predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, epochs: int | None = None) -> tuple[np.ndarray, int]:
+    ep = epochs if epochs is not None else train(cfg, tr)[4]
+    model, enc, mu, sd, ep = train(cfg, tr, epochs=ep)
     ci, xn = enc(te)
     return _infer(model, ci, xn) * sd + mu + te["z_aobt"].values, ep
 

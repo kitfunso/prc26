@@ -3,6 +3,7 @@
 python board.py lb            -> data/board.json + per-team bests
 python board.py check FILE    -> row set matches the template, no NaN, no negatives
 python board.py upload FILE   -> put to the team bucket (name must be merry-octopus_vN.parquet), verify bytes
+python board.py final FILE    -> designate merry-octopus_final.parquet once, verify bytes
 python board.py status        -> every file in the bucket with its scorer result
 """
 from __future__ import annotations
@@ -50,33 +51,60 @@ def lb() -> None:
 
 def check(path: str) -> pd.DataFrame:
     sub, tpl = pd.read_parquet(path), pd.read_parquet("data/submitting.parquet")
-    assert list(sub.columns) == list(tpl.columns), (list(sub.columns), list(tpl.columns))
-    assert len(sub) == len(tpl) and set(sub["MVT_ID_mvt"]) == set(tpl["MVT_ID_mvt"]), "row set differs from the template"
-    assert sub["MVT_ID_mvt"].is_unique, "duplicate ids"
-    p = sub["TAXITIME_SEC_mvt"].to_numpy(dtype=float)
-    assert np.isfinite(p).all() and (p >= 0).all(), "NaN or negative predictions"
+    columns = ["MVT_ID_mvt", "TAXITIME_SEC_mvt"]
+    if list(tpl.columns) != columns or tpl.empty or tpl[columns[0]].isna().any() or not tpl[columns[0]].is_unique:
+        raise ValueError("template must have the expected columns and nonempty, unique, non-null IDs")
+    if list(sub.columns) != columns:
+        raise ValueError(f"submission columns must be {columns}")
+    if sub[columns[0]].isna().any() or not sub[columns[0]].is_unique:
+        raise ValueError("submission IDs must be unique and non-null")
+    if len(sub) != len(tpl) or set(sub[columns[0]]) != set(tpl[columns[0]]):
+        raise ValueError("row set differs from the template")
+    predictions = sub[columns[1]]
+    if (not pd.api.types.is_numeric_dtype(predictions.dtype) or pd.api.types.is_bool_dtype(predictions.dtype)
+            or pd.api.types.is_complex_dtype(predictions.dtype)):
+        raise ValueError("predictions must have a real numeric dtype")
+    p = predictions.to_numpy(dtype=float, na_value=np.nan)
+    if not np.isfinite(p).all() or (p < 0).any():
+        raise ValueError("predictions must be finite and nonnegative")
     print(f"{path}: {len(sub)} rows ok, mean {p.mean():.1f}, p50 {np.median(p):.0f}, max {p.max():.0f}, sha256 {hashlib.sha256(Path(path).read_bytes()).hexdigest()[:16]}")
     return sub
 
 
 def _s3():
+    env = dict(os.environ)
+    path = Path(".env")
+    if path.exists():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if not line.strip() or line.lstrip().startswith("#"):
+                continue
+            k, sep, v = line.partition("=")
+            if sep and k.strip():
+                env.setdefault(k.strip(), v.strip())
+    if not env.get("PRC_KEY", "").strip() or not env.get("PRC_SECRET", "").strip():
+        raise ValueError("PRC_KEY and PRC_SECRET must be set in the environment or .env")
     import boto3
     from botocore.config import Config
-    env = dict(os.environ)
-    for line in Path(".env").read_text(encoding="utf-8").splitlines():
-        k, _, v = line.partition("=")
-        env.setdefault(k.strip(), v.strip())
     return boto3.client("s3", endpoint_url=ENDPOINT, aws_access_key_id=env["PRC_KEY"], aws_secret_access_key=env["PRC_SECRET"],
                         region_name="us-east-1", config=Config(s3={"addressing_style": "path"}))
 
 
-def upload(path: str) -> None:
-    assert re.fullmatch(rf"{US}_v\d+\.parquet", Path(path).name), "name must be merry-octopus_vN.parquet"
+def upload(path: str, *, final: bool = False) -> None:
+    key = Path(path).name
+    if final:
+        if key != f"{US}_final.parquet":
+            raise ValueError("final name must be merry-octopus_final.parquet")
+    elif not re.fullmatch(rf"{US}_v\d+\.parquet", key):
+        raise ValueError("name must be merry-octopus_vN.parquet")
     check(path)
-    data, s3, key = Path(path).read_bytes(), _s3(), Path(path).name
-    s3.put_object(Bucket=BUCKET, Key=key, Body=data)
+    data, s3 = Path(path).read_bytes(), _s3()
+    options = {"IfNoneMatch": "*"} if final else {}
+    s3.put_object(Bucket=BUCKET, Key=key, Body=data, **options)
     head = s3.head_object(Bucket=BUCKET, Key=key)
-    assert head["ContentLength"] == len(data) and head["ETag"].strip('"') == hashlib.md5(data).hexdigest(), "stored bytes differ"
+    if head["ContentLength"] != len(data) or head["ETag"].strip('"') != hashlib.md5(data).hexdigest():
+        raise RuntimeError("stored bytes differ")
+    if s3.get_object(Bucket=BUCKET, Key=key)["Body"].read() != data:
+        raise RuntimeError("downloaded bytes differ")
     print("uploaded", key, len(data), "bytes")
 
 
@@ -92,4 +120,5 @@ def status() -> None:
 
 
 if __name__ == "__main__":
-    {"lb": lb, "check": lambda: check(sys.argv[2]), "upload": lambda: upload(sys.argv[2]), "status": status}[sys.argv[1]]()
+    {"lb": lb, "check": lambda: check(sys.argv[2]), "upload": lambda: upload(sys.argv[2]),
+     "final": lambda: upload(sys.argv[2], final=True), "status": status}[sys.argv[1]]()

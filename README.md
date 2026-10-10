@@ -1,5 +1,37 @@
 # PRC Data Challenge 2026: taxi-out time, team merry-octopus
 
+
+Current recorded champion: **v53, 270.43 s**. The campaign plan is
+[PLAN.md](PLAN.md) and [docs/CONTENDER-PLAN.md](docs/CONTENDER-PLAN.md).
+The October 2 review identified validation isolation and final-NN-fit issues; prospective work
+is declared in [protocol amendment v9](docs/EXPERIMENT-PROTOCOL.md#amendment-v9--2026-10-02-first-place-campaign-and-validation-corrections).
+The reproduction history below describes existing recipes, not a newly measured contender.
+
+The 8 October recipe freeze retains exact scored v53. Both complete clean reference
+blocks passed construction audits, but winter promotion failed. The four fixed CP4
+alternatives and the separately declared Lane B residual correction were rejected.
+No improved recipe qualified; no new fitting or retuning follows the freeze.
+
+On 8 October the frozen file was designated as `merry-octopus_final.parquet`, as
+required by the [official final-submission rule](https://prc-data-challenge-2026.netlify.app/ranking.html#final-submission).
+The final population adds February and June 2026 (670,790 rows in `final_submitting.parquet`),
+so on 10 October the final file was rebuilt and replaced. Branch `final-febjun` holds the v53 code
+plus `scripts/final_chain.sh` (the v53 recipe refit on `final_ranking.parquet`, stage by stage),
+`scripts/final_assemble.py` (January and July keep scored v53, moved by each row's takeoff re-jitter
+between the two ranking files; February and June take the refit; template checks) and
+`scripts/final_upload.py`. Stored final SHA-256:
+`1c3830a45b5ab1cb15d079b0bfd47d2c3b85f46b2b5ba52d0db2e693832c19ca`; scorer `Succeeded` on all
+670,790 rows. The 9 October [incident](docs/FINAL-SCORER-INCIDENT-2026-10-09.html) was a scorer
+outage plus the missing months, both closed. The [official deadline](https://prc-data-challenge-2026.netlify.app/)
+for the final file and the repository is 14 October 2026 at 10:00 UTC.
+See [release readiness](docs/RELEASE-READINESS-2026-10-08.html) for stage checks and gaps.
+
+The checked campaign source has been pushed to the private `campaign2` release
+branch under Keith's 8 October continuation approval. Public code eligibility
+remains pending until scheduled publication is verified. Historical native-model lineage is partial:
+the preserved prediction files reproduce the exact scored artifact, while the
+recipe commands below do not establish bit-identical historical model refits.
+
 Predict `TAXITIME_SEC_mvt` (takeoff minus off-block, seconds) for departures at ten European airports.
 Scored by RMSE on January and July 2026. Licence: GPLv3 (`LICENSE`).
 
@@ -51,6 +83,12 @@ python adsb_stage.py gate skip=LFPG,LIRF
 python adsb_stage.py apply rank data/merry-octopus_v53.parquet data/merry-octopus_v65.parquet skip=LFPG,LIRF
 ```
 
+Source access: [IEM ASOS/METAR downloads](https://mesonet.agron.iastate.edu/request/download.phtml).
+The [IEM usage policy](https://mesonet.agron.iastate.edu/disclaimer.php) places its
+materials in the public domain and permits lawful reuse. Credit: Iowa Environmental
+Mesonet, Iowa State University. Challenge inputs are obtained through the
+[challenge data instructions](https://prc-data-challenge-2026.netlify.app/data.html).
+
 As-of rule: a feature may use any movement in the same file, before or after the takeoff (the rules allow it;
 `dep_after` and `arr_off` look forward).
 
@@ -63,11 +101,17 @@ and overrides the stamp probabilities on those rows (`bclf` in `mix.py`). It hel
 
 ## Validation (`train.py`, `mix.py`)
 
-Holdout = January and July 2025, never used for model choice. CV = five folds over the other ten months,
-by month pair. Every result line reports per lane (A = has a flight plan, B = no plan) and per month.
-Predictions are floored at 0. Board uploads are logged in `LEDGER.md` with the expected and actual score.
+Historical evaluation uses January and July 2025 plus five month-pair folds over the other ten months.
+Jan/July has been read repeatedly and is not an untouched model-choice test. The October 2 audit found
+held-out-label dependencies in copy history and multi-stage caches, plus scored-fold early stopping
+in development CV. [CP0](docs/CONTENDER-PLAN.md#3-cp0--establish-a-trustworthy-comparison)
+defines the corrections. The complete January/July and February/March references are
+audited; winter promotion fails. September/October full reference remains deferred.
+This is reduced coverage using adaptively reused development data, rather than fresh
+confirmation. Every result reports per lane and month.
+Predictions are floored at 0. Board uploads are logged in `LEDGER.md` with expected and actual scores.
 
-## Reproduce the current build (v28 base; v53 is the file of record)
+## Historical recipe commands (v28 base; frozen v53 is the file of record)
 
 The lane A blend is 0.5223 * CatBoost residual lane-A model with arrival recorder-mode and window-state features (`ra_cb_wz`)
 + 0.1564 * the LightGBM version (`ra_lgb_wz`) + 0.3213 * the MLP version (`nn3_wz`). Lane A is v25's design
@@ -176,7 +220,7 @@ pip install -r requirements.txt            # Python 3.12, CUDA GPU for CatBoost
 python weather.py fetch 2026-09-05         # data/weather/2026-09-05/<ICAO>.csv
 python data.py && python features.py       # caches under data/cache/, incl. ARR (arrival recorder-mode) and WZ (window-state) features
 python regime.py                           # disruption-day map -> docs/REGIME.md + data/cache/regime.parquet; blend.py and recal.py slice every result by it
-python -m pytest tests/ -q                 # 11 tests: label timing, feature leakage, reproducibility
+python -m pytest tests/ -q                 # label timing, scope, features, coverage and submission guards
 python mix.py cv mix_cb_wx                 # lane-B donor: CV + holdout line in docs/RESULTS.md, iteration counts at the end
 python mix.py fit mix_cb_wx 2309 3779      # -> data/mix_cb_wx_rank.parquet
 python lanea.py cv ra_cb mix_cb_wx         # residual lane A, lane B copied from the donor

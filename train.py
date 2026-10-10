@@ -39,6 +39,20 @@ CONFIGS: dict[str, dict] = {
 RESULTS = Path("docs/RESULTS.md")
 
 
+def stopping_split(rows: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    days = np.sort(rows["day"].unique())
+    if len(days) < 2:
+        raise ValueError("stopping selection needs at least two training days")
+    stop = rows["day"].isin(days[-max(1, int(np.ceil(len(days) * 0.1))):])
+    return rows[~stop], rows[stop]
+
+
+def outer_predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame) -> tuple[np.ndarray, int]:
+    inner, stop = stopping_split(tr)
+    _, iterations = fit_predict(cfg, inner, stop, stop)
+    return fit_predict(cfg, tr, te, iters=iterations)
+
+
 def boot_delta(y: np.ndarray, p0: np.ndarray, p1: np.ndarray, day: np.ndarray, n: int = 400, seed: int = 0) -> tuple[float, float, float]:
     """Paired day-block bootstrap of RMSE(p0) - RMSE(p1): positive means p1 is better. Returns point, lo, hi."""
     rng = np.random.default_rng(seed)
@@ -51,7 +65,22 @@ def boot_delta(y: np.ndarray, p0: np.ndarray, p1: np.ndarray, day: np.ndarray, n
     return float(rmse(y, p0) - rmse(y, p1)), float(np.percentile(d, 2.5)), float(np.percentile(d, 97.5))
 
 
-def fit_predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame | None = None, iters: int | None = None) -> tuple[np.ndarray, int]:
+def save_model(model: object, path: Path | None, family: str) -> None:
+    if path is None:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f"{path.stem}.tmp{path.suffix}")
+    if family == "lgb":
+        model.booster_.save_model(str(temporary))
+    elif family in ("cb", "xgb"):
+        model.save_model(str(temporary))
+    else:
+        raise ValueError(f"model persistence is unsupported for {family}")
+    temporary.replace(path)
+
+
+def fit_predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame | None = None, iters: int | None = None,
+                model_path: Path | None = None) -> tuple[np.ndarray, int]:
     cols = cfg["cat"] + cfg["num"]
     params = dict(cfg["params"])
     w = cfg["weight"](tr) if "weight" in cfg else None
@@ -61,12 +90,14 @@ def fit_predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame 
         m = lgb.LGBMRegressor(**{**params, "n_estimators": n})
         m.fit(tr[cols], tr["y"], sample_weight=w, eval_set=[(va[cols], va["y"])] if va is not None else None,
               callbacks=[lgb.early_stopping(200, verbose=False)] if va is not None else None, categorical_feature=cfg["cat"])
+        save_model(m, model_path, fam)
         return m.predict(te[cols]), (m.best_iteration_ or n) if va is not None else n
     if fam == "xgb":
         n = iters or params.pop("n_estimators")
         m = xgb.XGBRegressor(**{**params, "n_estimators": n}, early_stopping_rounds=200 if va is not None else None)
         m.fit(tr[cols], tr["y"], sample_weight=w, eval_set=[(va[cols], va["y"])] if va is not None else None, verbose=False)
-        return m.predict(te[cols]), (m.best_iteration or n) if va is not None else n
+        save_model(m, model_path, fam)
+        return m.predict(te[cols]), (m.best_iteration + 1) if va is not None else n
     if fam == "ridge":
         pre = ColumnTransformer(
             [("n", Pipeline([("i", SimpleImputer(strategy="median")), ("s", StandardScaler())]), cfg["num"]),
@@ -81,7 +112,9 @@ def fit_predict(cfg: dict, tr: pd.DataFrame, te: pd.DataFrame, va: pd.DataFrame 
     m = CatBoostRegressor(**params)
     pool = Pool(tr[cols], tr["y"], cat_features=cfg["cat"], weight=w)
     m.fit(pool, eval_set=Pool(va[cols], va["y"], cat_features=cfg["cat"]) if va is not None else None, use_best_model=va is not None)
-    return m.predict(Pool(te[cols], cat_features=cfg["cat"])), m.get_best_iteration() or params["iterations"]
+    save_model(m, model_path, "cb")
+    best = m.get_best_iteration()
+    return m.predict(Pool(te[cols], cat_features=cfg["cat"])), best + 1 if best is not None and best >= 0 else params["iterations"]
 
 
 def report(y: pd.Series, p: np.ndarray, f: pd.DataFrame) -> dict[str, float]:
@@ -102,7 +135,7 @@ def cv(name: str) -> None:
     oof, iters, t0 = np.full(len(tr), np.nan), [], time.time()
     for i, months in enumerate(FOLDS):
         va = tr["month"].isin(months).values
-        p, it = fit_predict(cfg, tr[~va], tr[va], tr[va])
+        p, it = outer_predict(cfg, tr[~va], tr[va])
         oof[va] = p; iters.append(it)
         print(f"fold {i} {months}: {rmse(tr['y'].values[va], p):.2f} at {it} iters, {time.time() - t0:.0f}s", flush=True)
     cv_all = report(tr["y"].values, oof, tr)
