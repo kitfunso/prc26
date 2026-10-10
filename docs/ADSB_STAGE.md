@@ -56,3 +56,8 @@ stays uncorrected too.
 
 Coverage is higher in 2026 than in the training year: 63.5 % of January 2026 departures match, with EDDM at 97 %,
 LEMD at 96 % and EGLL at 78 % (2025: 62 %, 14 % and 34 %).
+
+Transfer to airports the training year barely covers: without the airport column the stage gains +10.93 s
+[+8.73, +14.00]. Fitted with each airport left out of its own training (`gate noapt loao`), it still gains +9.15 s
+[+7.27, +11.73], and every corrected airport improves (LEMD 196.3 to 150.2, EGLL 221.7 to 192.2, EDDF 169.6 to
+131.0). The stage carries across airports, so the higher 2026 coverage at EDDM, LEMD and EGLL is safe to correct.
