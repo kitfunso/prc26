@@ -32,7 +32,24 @@ Weather (`WX`): IEM ASOS METAR archive, one CSV per airport under `data/weather/
 `python weather.py fetch 2026-09-05` (stations EDDF EDDM EGLL EHAM LEBL LEMD LFPG LIRF LSZH LTFM, UTC,
 2024-12-31 to the pull date; the shipped pull ends 2026-08-01, and later rows touch no anchor). Joined as-of the estimated off-block: wind, gust, visibility, temperature, ceiling,
 present-weather codes, a 3 h thunderstorm count and the age of the observation. Precipitation (`p01i`) is 0 on
-every European row, so it is dropped. No ADS-B.
+every European row, so it is dropped. The base model reads no ADS-B; from v64 a separate ADS-B stage corrects it
+(next section).
+
+## ADS-B pushback stage (v64 on, `docs/ADSB_STAGE.md`)
+
+Data declared: open ADS-B traces from adsb.lol (`adsblol/globe_history_2025` and `_2026` on GitHub, Open Database
+License 1.0), used under the organisers' 18 September 2026 ruling that open trajectory data may be used to extract
+off-block times when declared. No OpenSky state vectors are used. Each departure is matched to its own ground track,
+which gives candidate pushback clocks; a LightGBM stage fitted on the 2025 residual of the base model moves each
+matched prediction, with LFPG and LIRF left uncorrected. Holdout Jan+Jul 2025: 304.99 to 293.64 all rows, +11.35 s
+[+9.08, +14.56]. Board: v65 244.8633 against v53 270.43. Rebuild:
+
+```
+python adsb_fetch.py                 # download and cut the days, about 2 to 3 GB each, deleted after the cut
+python adsb_events.py train          # 2025 matches; then: adsb_events.py rank data/ranking.parquet
+python adsb_stage.py gate skip=LFPG,LIRF
+python adsb_stage.py apply rank data/merry-octopus_v53.parquet data/merry-octopus_v65.parquet skip=LFPG,LIRF
+```
 
 As-of rule: a feature may use any movement in the same file, before or after the takeoff (the rules allow it;
 `dep_after` and `arr_off` look forward).
