@@ -7,8 +7,9 @@ Open ADS-B traces from the adsb.lol `globe_history_2025` and `globe_history_2026
 18 September 2026 that open trajectory data may be used to extract off-block times when it is declared; this file is
 that declaration. No OpenSky state-vector data is used (ruled inadmissible on 3 September 2026).
 
-Days pulled: every day of January, February, June and July 2026 (the final file's months) and of January, February,
-June and July 2025 that the archive publishes (June 2025 has 20 days). `python adsb_fetch.py` streams each day's split
+Days pulled: every day of January, February, June and July 2026 (the final file's months) and every day of 2025 that
+the archive publishes (June 2025 has 20 days). The 2025 days are the stage's training set, since every 2025 departure
+has a label and an out-of-sample v53 prediction. `python adsb_fetch.py` streams each day's split
 tar, keeps the points within 8 km of one of the ten airports and under 3,000 ft above it, writes
 `data/adsb/pts/YYYY-MM-DD.parquet` (about 17 MB a day) and deletes the raw archive (about 3.2 GB a day).
 

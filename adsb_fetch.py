@@ -44,7 +44,10 @@ def tag(d):
 def assets(d):
     out = subprocess.run(["gh", "api", f"repos/adsblol/globe_history_{d.year}/releases/tags/{tag(d)}",
                           "--jq", '.assets[] | "\\(.name) \\(.size)"'], capture_output=True, text=True, check=True).stdout
-    return [(n, int(s)) for n, s in (l.split() for l in out.splitlines()) if ".tar." in n]
+    parts = [(n, int(s)) for n, s in (l.split() for l in out.splitlines()) if ".tar." in n or n.endswith(".tar")]
+    if not parts:  # some days ship as one .tar, others split; neither found means no data, not an empty day
+        raise RuntimeError(f"{d} has no tar asset")
+    return sorted(parts)
 
 
 def download(d):
