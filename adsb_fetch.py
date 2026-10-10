@@ -3,7 +3,7 @@
 python adsb_fetch.py [N_DL] [N_EX]   downloads every day in DAYS not yet cut, keeps points within RADIUS_KM of an airport
 and below ALT_FT above it, writes data/adsb/pts/YYYY-MM-DD.parquet and deletes the raw archive.
 """
-import gzip, io, json, os, subprocess, sys, tarfile, time
+import gzip, io, json, os, re, subprocess, sys, tarfile, time
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from datetime import date, timedelta
 import numpy as np, pandas as pd
@@ -87,6 +87,48 @@ class Concat(io.RawIOBase):
         return True
 
 
+def _tenths(lo, hi):
+    """Every one-decimal prefix a number in [lo, hi] is written with, as JSON writes it (truncated toward zero)."""
+    return sorted({("-" if v < 0 else "") + f"{int(abs(v) * 10) / 10:.1f}" for v in np.arange(lo, hi + 0.005, 0.005)})
+
+
+# Coarse box: a degree of latitude is 111 km, so 0.1 deg clears RADIUS_KM. The byte pattern finds a trace point
+# "[t,lat,lon" inside some box without parsing the JSON, which is most of the cost on a global archive.
+NEAR = re.compile(b"|".join(
+    b",(?:" + b"|".join(re.escape(s.encode()) for s in _tenths(la - 0.1, la + 0.1)) + rb")\d*,(?:" +
+    b"|".join(re.escape(s.encode()) for s in _tenths(lo - 0.15, lo + 0.15)) + b")" for la, lo in zip(LAT, LON)))
+
+
+def near_points(tr):
+    """(lat, lon, [(index, alt, callsign)]) for the trace points inside RADIUS_KM and under ALT_FT of an airport."""
+    lat = np.array([p[1] if p[1] is not None else np.nan for p in tr], dtype=float)
+    lon = np.array([p[2] if p[2] is not None else np.nan for p in tr], dtype=float)
+    near = (np.abs(lat[:, None] - LAT) < 0.1) & (np.abs(lon[:, None] - LON) < 0.15)
+    cand = np.where(near.any(1))[0]
+    if not len(cand):
+        return lat, lon, []
+    la, lo = np.radians(lat[cand])[:, None], np.radians(lon[cand])[:, None]
+    h = np.sin((np.radians(LAT) - la) / 2) ** 2 + np.cos(la) * np.cos(np.radians(LAT)) * np.sin((np.radians(LON) - lo) / 2) ** 2
+    km = 12742.0 * np.arcsin(np.sqrt(h))
+    j = km.argmin(1)
+    ok = km[np.arange(len(cand)), j] <= RADIUS_KM
+    cand, j = cand[ok], j[ok]
+    last, ci, keep = None, 0, []
+    for i, p in enumerate(tr):  # callsign rides in the occasional details dict, so carry it forward
+        if ci >= len(cand):
+            break
+        det = p[8] if len(p) > 8 else None
+        if isinstance(det, dict) and det.get("flight"):
+            last = det["flight"].strip()
+        if i == cand[ci]:
+            a = p[3]
+            alt = np.nan if a == "ground" or a is None else float(a)
+            if a == "ground" or (alt == alt and alt - ELEV[j[ci]] < ALT_FT):
+                keep.append((i, alt, last))
+            ci += 1
+    return lat, lon, keep
+
+
 def cut(d, paths):
     tf = tarfile.open(fileobj=io.BufferedReader(Concat(paths), 8 << 20), mode="r|")
     cols = {k: [] for k in ("icao", "r", "t", "ts", "lat", "lon", "alt", "gs", "trk", "flags", "src", "cs")}
@@ -96,41 +138,17 @@ def cut(d, paths):
             continue
         n_files += 1
         try:
-            obj = json.loads(gzip.decompress(tf.extractfile(m).read()))
+            raw = gzip.decompress(tf.extractfile(m).read())
+            if not NEAR.search(raw):
+                continue
+            obj = json.loads(raw)
         except (OSError, ValueError) as e:
             log(f"{d} skip {m.name}: {e}")
             continue
         tr = obj.get("trace") or []
         if not tr:
             continue
-        lat = np.array([p[1] if p[1] is not None else np.nan for p in tr], dtype=float)
-        lon = np.array([p[2] if p[2] is not None else np.nan for p in tr], dtype=float)
-        # Coarse box first: a degree of latitude is 111 km, so 0.1 deg clears RADIUS_KM.
-        near = (np.abs(lat[:, None] - LAT) < 0.1) & (np.abs(lon[:, None] - LON) < 0.15)
-        cand = np.where(near.any(1))[0]
-        if not len(cand):
-            continue
-        la, lo = np.radians(lat[cand])[:, None], np.radians(lon[cand])[:, None]
-        h = np.sin((np.radians(LAT) - la) / 2) ** 2 + np.cos(la) * np.cos(np.radians(LAT)) * np.sin((np.radians(LON) - lo) / 2) ** 2
-        km = 12742.0 * np.arcsin(np.sqrt(h))
-        j = km.argmin(1)
-        ok = km[np.arange(len(cand)), j] <= RADIUS_KM
-        cand, j = cand[ok], j[ok]
-        if not len(cand):
-            continue
-        cs, last = [], None
-        ci = 0
-        keep = []
-        for i, p in enumerate(tr):  # callsign rides in the occasional details dict, so carry it forward
-            det = p[8] if len(p) > 8 else None
-            if isinstance(det, dict) and det.get("flight"):
-                last = det["flight"].strip()
-            if ci < len(cand) and i == cand[ci]:
-                a = p[3]
-                alt = np.nan if a == "ground" or a is None else float(a)
-                if a == "ground" or (alt == alt and alt - ELEV[j[ci]] < ALT_FT):
-                    keep.append((i, alt, last))
-                ci += 1
+        lat, lon, keep = near_points(tr)
         if not keep:
             continue
         base = float(obj.get("timestamp", 0.0))

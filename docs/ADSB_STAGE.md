@@ -39,4 +39,20 @@ plan window (`|BLOCK - LOBT| <= 3,606 s` on every 2025 departure that has a LOBT
 
 ## Results
 
-Filled in from the runs below.
+Gate, 10 October 2026, `python adsb_stage.py gate skip=LFPG,LIRF`, trained on the January and July 2025 ADS-B days
+only (each month corrected by a stage fitted on the other): 168,725 of 344,419 holdout departures matched (49 %).
+
+| | v53 | v53 + stage |
+|---|---|---|
+| holdout, all rows | 304.99 | 293.64 |
+| lane A | 216.06 | 200.24 |
+| lane B | 1736.89 | 1731.20 |
+
+Paired day-block bootstrap against v53, all rows: +11.35 s [+9.08, +14.56]. Matched lane A rows by airport, RMSE
+before and after: EDDF 169.6 to 118.7, EDDM 162.3 to 89.8, EGLL 221.7 to 184.2, EHAM 160.3 to 112.0, LEBL 212.7 to
+185.1, LEMD 196.3 to 152.8, LSZH 159.1 to 104.8. LIRF lane A got worse with the stage (419.2 to 439.0): many LIRF
+labels copy the schedule, which no pushback clock sees, so LIRF stays uncorrected. LFPG has almost no coverage and
+stays uncorrected too.
+
+Coverage is higher in 2026 than in the training year: 63.5 % of January 2026 departures match, with EDDM at 97 %,
+LEMD at 96 % and EGLL at 78 % (2025: 62 %, 14 % and 34 %).
