@@ -1,7 +1,8 @@
 # PRC Data Challenge 2026: taxi-out time, team merry-octopus
 
 
-Current recorded champion: **v53, 270.43 s**. The campaign plan is
+Current recorded champion: **v67, 243.5516 s**: frozen v53 (270.43 s) corrected by the ADS-B pushback stage of
+10 October ([section below](#ads-b-pushback-stage-v64-on-docsadsb_stagemd), `LEDGER.md`). The campaign plan is
 [PLAN.md](PLAN.md) and [docs/CONTENDER-PLAN.md](docs/CONTENDER-PLAN.md).
 The October 2 review identified validation isolation and final-NN-fit issues; prospective work
 is declared in [protocol amendment v9](docs/EXPERIMENT-PROTOCOL.md#amendment-v9--2026-10-02-first-place-campaign-and-validation-corrections).
@@ -10,7 +11,9 @@ The reproduction history below describes existing recipes, not a newly measured 
 The 8 October recipe freeze retains exact scored v53. Both complete clean reference
 blocks passed construction audits, but winter promotion failed. The four fixed CP4
 alternatives and the separately declared Lane B residual correction were rejected.
-No improved recipe qualified; no new fitting or retuning follows the freeze.
+No improved recipe qualified; no new fitting or retuning follows the freeze. On 10 October a new source of
+information, each departure's own pushback read from open ADS-B traces, was added as a separate stage on top of the
+frozen v53 file; v53 itself is unchanged.
 
 On 8 October the frozen file was designated as `merry-octopus_final.parquet`, as
 required by the [official final-submission rule](https://prc-data-challenge-2026.netlify.app/ranking.html#final-submission).
@@ -19,9 +22,9 @@ so on 10 October the final file was rebuilt and replaced. Branch `final-febjun` 
 plus `scripts/final_chain.sh` (the v53 recipe refit on `final_ranking.parquet`, stage by stage),
 `scripts/final_assemble.py` (January and July keep scored v53, moved by each row's takeoff re-jitter
 between the two ranking files; February and June take the refit; template checks) and
-`scripts/final_upload.py`. Stored final SHA-256:
-`1c3830a45b5ab1cb15d079b0bfd47d2c3b85f46b2b5ba52d0db2e693832c19ca`; scorer `Succeeded` on all
-670,790 rows. The 9 October [incident](docs/FINAL-SCORER-INCIDENT-2026-10-09.html) was a scorer
+`scripts/final_upload.py`. That v53 final (SHA-256 `1c3830a45b5ab1cb...`) was then replaced by the same file
+corrected with the ADS-B stage (`adsb_stage.py apply final`); the stored file's SHA-256 and the scorer result are in
+`LEDGER.md`. The 9 October [incident](docs/FINAL-SCORER-INCIDENT-2026-10-09.html) was a scorer
 outage plus the missing months, both closed. The [official deadline](https://prc-data-challenge-2026.netlify.app/)
 for the final file and the repository is 14 October 2026 at 10:00 UTC.
 See [release readiness](docs/RELEASE-READINESS-2026-10-08.html) for stage checks and gaps.
@@ -73,14 +76,15 @@ Data declared: open ADS-B traces from adsb.lol (`adsblol/globe_history_2025` and
 License 1.0), used under the organisers' 18 September 2026 ruling that open trajectory data may be used to extract
 off-block times when declared. No OpenSky state vectors are used. Each departure is matched to its own ground track,
 which gives candidate pushback clocks; a LightGBM stage fitted on the 2025 residual of the base model moves each
-matched prediction, with LFPG and LIRF left uncorrected. Holdout Jan+Jul 2025: 304.99 to 293.64 all rows, +11.35 s
-[+9.08, +14.56]. Board: v65 244.8633 against v53 270.43. Rebuild:
+matched prediction, with LIRF left uncorrected (its labels often copy the schedule, which no pushback clock sees).
+Holdout Jan+Jul 2025, each month corrected by a stage trained on the other 2025 months: 304.99 to 291.97 all rows,
++13.02 s [+10.43, +16.61]. Board: v67 243.5516 against v53 270.43. Rebuild:
 
 ```
-python adsb_fetch.py                 # download and cut the days, about 2 to 3 GB each, deleted after the cut
+python adsb_fetch.py                 # download and cut the days, about 2 to 3.5 GB each, deleted after the cut
 python adsb_events.py train          # 2025 matches; then: adsb_events.py rank data/ranking.parquet
-python adsb_stage.py gate skip=LFPG,LIRF
-python adsb_stage.py apply rank data/merry-octopus_v53.parquet data/merry-octopus_v65.parquet skip=LFPG,LIRF
+python adsb_stage.py gate skip=LIRF
+python adsb_stage.py apply rank data/merry-octopus_v53.parquet data/merry-octopus_v68.parquet skip=LIRF
 ```
 
 Source access: [IEM ASOS/METAR downloads](https://mesonet.agron.iastate.edu/request/download.phtml).
