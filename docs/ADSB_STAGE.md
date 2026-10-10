@@ -80,3 +80,7 @@ Round of 10 October, Jan+Feb+Jun+Jul 2025 training days (364,558 matched rows): 
 (+12.95 s against +13.10 s). A stage of its own for LIRF, trained on the June and July LIRF rows, still loses (LIRF
 lane A 421.4 to 427.5, lane B worse), so LIRF stays uncorrected. With pass 3 matching more LFPG departures,
 correcting LFPG now helps (+13.02 s; LFPG matched lane A 267.2 to 252.8), so only LIRF is skipped from here.
+
+Coverage in the final file's new months: 2026-02-10 matches 61.6 % of departures, close to January, but EDDF falls
+to 11 to 39 % across February (2026-02-03 has 4,170 EDDF ground points against 42,768 on 2026-01-28), as a receiver
+near Frankfurt appears to drop out. Those EDDF rows keep v53.
