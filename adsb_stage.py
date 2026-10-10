@@ -15,7 +15,7 @@ ADSB = os.path.join(ROOT, "data", "adsb")
 CLOCKS = ["first", "move", "lastfar", "lv5", "lv10", "lv20", "big_lv"]
 RAW = ["dwell0", "lastfar_len", "nstop", "stop_tot", "path_m", "gap_max", "npts", "gs_first", "d_roll_first", "land_gap",
        "seg_start_is_land", "dt_to", "cs_ok", "t_ok", "n_cand", "gs_roll", "big_len", "big_end", "big_droll",
-       "mpass", "tail_gap"]
+       "mpass", "tail_gap", "prev_gap", "prev_d"]
 PLAN = ["z_sched", "z_aobt", "z_eobt"]
 APTS = ["EDDF", "EDDM", "EGLL", "EHAM", "LEBL", "LEMD", "LFPG", "LIRF", "LSZH", "LTFM"]
 PARAMS = dict(objective="regression", learning_rate=0.03, num_leaves=31, min_data_in_leaf=200, feature_fraction=0.8,

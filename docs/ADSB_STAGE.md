@@ -61,3 +61,11 @@ Transfer to airports the training year barely covers: without the airport column
 [+8.73, +14.00]. Fitted with each airport left out of its own training (`gate noapt loao`), it still gains +9.15 s
 [+7.27, +11.73], and every corrected airport improves (LEMD 196.3 to 150.2, EGLL 221.7 to 192.2, EDDF 169.6 to
 131.0). The stage carries across airports, so the higher 2026 coverage at EDDM, LEMD and EGLL is safe to correct.
+
+More training months help. With February 2025 added to January and July, the gate gives +12.33 s [+9.87, +15.78]
+(holdout 292.65, lane A 198.86; EDDM matched rows 89.8 to 79.0, EGLL 184.2 to 174.0), so the stage trains on every
+2025 day the archive publishes.
+
+Neighbours (`adsb_nb.py`): a second layer that reads the first layer's corrections of matched departures at the same
+airport within 30 and 60 min, nested-cross-fitted on the same three months, adds nothing: +12.30 s against +12.33 s
+for the first layer alone. It is not used.

@@ -70,6 +70,11 @@ def clocks(p, k, t_air, t_land):
     t, sx, sy = ts[seg], x[seg], y[seg]
     if len(t) < 2:
         return None
+    # The point before the segment is often where the inbound flight parked before the transponder went off; how far
+    # the first outbound point lies from it says how far the pushback had gone before the aircraft reappeared.
+    pv = lo - 1
+    prev = pv >= 0 and p.icao.values[pv] == p.icao.values[k] and p.apt.values[pv] == p.apt.values[k] and gr[pv] \
+        and ts[lo] - ts[pv] < 12 * 3600
     d0 = np.hypot(sx - sx[0], sy - sy[0])
     moved = np.where(d0 > 2 * STILL_M)[0]
     t_move = t[moved[0]] if len(moved) else np.nan
@@ -98,6 +103,7 @@ def clocks(p, k, t_air, t_land):
         "gs_first": gs[lo], "d_roll_first": np.hypot(sx[0] - sx[r0], sy[0] - sy[r0]),
         "land_gap": (t[0] - t_land) if t_land == t_land else np.nan, "seg_start_is_land": float(t_land == t_land and t[0] - t_land < 120),
         "tail_gap": t_air - t[-1], "x0": sx[0], "y0": sy[0],
+        "prev_gap": ts[lo] - ts[pv] if prev else np.nan, "prev_d": np.hypot(x[lo] - x[pv], y[lo] - y[pv]) if prev else np.nan,
     }
 
 
