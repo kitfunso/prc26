@@ -129,9 +129,9 @@ def separate(flags):
 
 
 def keep(apt, has_plan, flags):
-    """laneA: lane A rows only; skip=X,Y: leave those airports uncorrected."""
-    skip = next((f[5:].split(",") for f in flags if f.startswith("skip=")), [])
-    k = ~np.isin(apt, skip)
+    """laneA: lane A rows only; skip=X,Y: leave those airports uncorrected; skipB=X,Y: leave only their lane B rows."""
+    arg = lambda key: next((f[len(key):].split(",") for f in flags if f.startswith(key)), [])
+    k = ~np.isin(apt, arg("skip=")) & ~(np.isin(apt, arg("skipB=")) & (has_plan == 0))
     return k & (has_plan == 1) if "laneA" in flags else k
 
 

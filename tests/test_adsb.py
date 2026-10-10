@@ -42,6 +42,8 @@ def test_flags_parse():
     assert S.separate(("skip=LIRF", "sep=LIRF,EGLL")) == ["LIRF", "EGLL"]
     k = S.keep(np.array(["LIRF", "EDDF", "EDDF"]), np.array([1, 1, 0]), ("skip=LIRF", "laneA"))
     assert k.tolist() == [False, True, False]
+    k = S.keep(np.array(["LIRF", "LIRF", "EDDF"]), np.array([1, 0, 0]), ("skipB=LIRF",))
+    assert k.tolist() == [True, False, True]
 
 
 def test_clocks_read_the_stand_dwell_and_the_leave_time():

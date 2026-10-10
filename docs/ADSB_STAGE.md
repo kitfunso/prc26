@@ -84,3 +84,21 @@ correcting LFPG now helps (+13.02 s; LFPG matched lane A 267.2 to 252.8), so onl
 Coverage in the final file's new months: 2026-02-10 matches 61.6 % of departures, close to January, but EDDF falls
 to 11 to 39 % across February (2026-02-03 has 4,170 EDDF ground points against 42,768 on 2026-01-28), as a receiver
 near Frankfurt appears to drop out. Those EDDF rows keep v53.
+
+Checks of 10 October, afternoon:
+
+- LIRF lane B only (`skipB=LIRF`): the pooled stage now improves LIRF lane A on the holdout (428.8 to 418.5, all from
+  July, since January 2025 has no LIRF matches), and LIRF lane B, whose labels run to 88,000 s, stays uncorrected.
+  The gate rises from +13.02 to +13.18 s, but paired against `skip=LIRF` it is +0.17 s [-0.19, +0.72], with 15 of 31
+  days gaining. Not adopted; it is retested on the late-2025 training months. Skipping every lane B row (`laneA`)
+  scores +12.64 s, so the stage helps lane B elsewhere.
+- OPDI (EUROCONTROL's open flight events, from OpenSky) as a second pushback source: its ground events cover the same
+  airports as adsb.lol and miss the same ones. For 10 to 19 January 2026 it has 1,517 runway entries at LFPG, 781 at
+  LIRF and 25 at LTFM, and its EDDF stand exits fall from about 500 a day to 1 or 2 from 5 February, the same day as
+  adsb.lol's. It adds nothing, so it is not used.
+- The 2026 ranking set matches 63.3 % of departures. LIRF has almost no ground points in July 2026 (0 to 44 on 7 of 8
+  sampled days, against 9,000 to 16,000 in January) and LEMD about half, so those gaps are receivers, not matching.
+- The largest remaining holdout errors are labels, not clocks: two LFPG lane B rows (84,240 s and 58,206 s, no plan
+  and no feature near either value) hold 32 % of the holdout squared error. Among matched lane A rows outside LIRF
+  missed by more than 600 s, 109 have an ADS-B clock within 120 s of the label, 385 a plan stamp within 60 s, and 621
+  neither. LEBL plan-copy rates do not depend on the airline (12 to 18 % EOBT copies for every large airline).
