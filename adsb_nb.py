@@ -124,7 +124,8 @@ def apply(src, base, out, *flags):
     bst = s1.fit(x, (m.y - m.p).values)
     ev = pd.read_parquet(os.path.join(ADSB, f"ev_{src}.parquet"))
     sub = pd.read_parquet(base)
-    f = pd.read_parquet(os.path.join(ROOT, "data", "cache", "feat.parquet"), columns=["id", "apt", "has_plan", "z_lobt", "mod", "day"])
+    f = pd.read_parquet(os.path.join(ROOT, "data", "cache", "feat.parquet"),
+                        columns=["id", "apt", "has_plan", "z_lobt", "mod", "day"] + s1.PLAN)
     r = sub.merge(f, left_on="MVT_ID_mvt", right_on="id")
     r = r[r.day.isin(set(ev.day))].reset_index(drop=True)  # layer 2 runs on ADS-B days only, as it was trained
     r["p"] = r.TAXITIME_SEC_mvt.values
