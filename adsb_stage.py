@@ -118,6 +118,25 @@ def gate(*flags):
     pd.DataFrame({"id": h.id, "p": pn}).to_parquet(os.path.join(ADSB, f"gate_holdout{tag}.parquet"), index=False)
 
 
+def tune(*sets):
+    """Each SET (k=v,k=v; rounds=N allowed) fits on the Jan+Jul 2025 days and is scored on every other labelled month,
+    so settings are chosen away from the holdout the gate reads."""
+    global ROUNDS
+    m, x = train_rows()
+    tr = m.month.isin([1, 7]).values
+    va = ~tr & ~m.apt.isin(["LFPG", "LIRF"]).values  # scored where the stage is applied
+    y, p = m.y.values[va], m.p.values[va]
+    base = dict(PARAMS), ROUNDS
+    for s in ("",) + sets:
+        kv = dict(t.split("=") for t in s.split(",") if t)
+        ROUNDS = int(kv.pop("rounds", base[1]))
+        PARAMS.clear(); PARAMS.update(base[0], **{k: type(base[0].get(k, 1.0))(v) for k, v in kv.items()})
+        q = p + fit(x[tr], (m.y - m.p).values[tr]).predict(x[va])
+        print(f"{s or 'default':40s} rounds {ROUNDS}: matched RMSE {np.sqrt(((y - p) ** 2).mean()):.2f} -> "
+              f"{np.sqrt(((y - q) ** 2).mean()):.2f} on {va.sum()} rows, months {sorted(set(m.month[va]))}")
+    PARAMS.clear(); PARAMS.update(base[0]); ROUNDS = base[1]
+
+
 def keep(apt, has_plan, flags):
     """laneA: lane A rows only; skip=X,Y: leave those airports uncorrected."""
     skip = next((f[5:].split(",") for f in flags if f.startswith("skip=")), [])
@@ -152,4 +171,4 @@ def apply(src, base, out, *flags):
 
 
 if __name__ == "__main__":
-    {"gate": gate, "apply": apply}[sys.argv[1]](*sys.argv[2:])
+    {"gate": gate, "apply": apply, "tune": tune}[sys.argv[1]](*sys.argv[2:])
