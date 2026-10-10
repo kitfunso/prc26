@@ -14,15 +14,16 @@ No improved recipe qualified; no new fitting or retuning follows the freeze.
 
 On 8 October the frozen file was designated as `merry-octopus_final.parquet`, as
 required by the [official final-submission rule](https://prc-data-challenge-2026.netlify.app/ranking.html#final-submission).
-Its SHA-256 is `9cea4874f05d436b39d82ff58e06e18864f0142661c8ffbdf3b3fbeb27b287b1`.
-Original-template validation and complete stored-body byte readback pass. On
-9 October the final scorer returned a missing official-template error. The live
-final template also contains additional IDs absent from the designated file;
-the earlier readiness check missed this expanded population. Final eligibility
-is unresolved. See the [incident and unsent organizer report](docs/FINAL-SCORER-INCIDENT-2026-10-09.html).
-No overwrite, reupload or new fitting follows without clarification and authority.
-The [official deadline](https://prc-data-challenge-2026.netlify.app/) is now
-14 October 2026 at 10:00 UTC (11:00 London). The existing publication schedule remains.
+The final population adds February and June 2026 (670,790 rows in `final_submitting.parquet`),
+so on 10 October the final file was rebuilt and replaced. Branch `final-febjun` holds the v53 code
+plus `scripts/final_chain.sh` (the v53 recipe refit on `final_ranking.parquet`, stage by stage),
+`scripts/final_assemble.py` (January and July keep scored v53, moved by each row's takeoff re-jitter
+between the two ranking files; February and June take the refit; template checks) and
+`scripts/final_upload.py`. Stored final SHA-256:
+`1c3830a45b5ab1cb15d079b0bfd47d2c3b85f46b2b5ba52d0db2e693832c19ca`; scorer `Succeeded` on all
+670,790 rows. The 9 October [incident](docs/FINAL-SCORER-INCIDENT-2026-10-09.html) was a scorer
+outage plus the missing months, both closed. The [official deadline](https://prc-data-challenge-2026.netlify.app/)
+for the final file and the repository is 14 October 2026 at 10:00 UTC.
 See [release readiness](docs/RELEASE-READINESS-2026-10-08.html) for stage checks and gaps.
 
 The checked campaign source has been pushed to the private `campaign2` release

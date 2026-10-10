@@ -20,6 +20,15 @@ pending. No expected improvement, new recipe or regular versioned duplicate is
 claimed. Immutable receipt: `data/runs/clean-champion-20261003/preparation/final-designation-20261008.json`.
 Do not repeat the designation. Prior versioned results below remain historical.
 
+**10 October final replaced (Keith: "decide what's best for us, drive it", "just submit whenever we have a working model"):**
+the 9 October `Failed` result was the scorer outage the organisers fixed that day, and the stored file lacked
+the 325,949 February and June rows of `final_submitting.parquet`. The organisers allow changes until the
+14 October 10:00 UTC deadline. Branch `final-febjun` (v53 code at `a3503dc` plus `scripts/final_*`) refits the
+v53 recipe on `final_ranking.parquet`; January and July keep scored v53 moved by the organisers' takeoff
+re-jitter, February and June take the refit. A working file (LightGBM member for Feb+Jun, sha256 `132e6098...`)
+went first, then the full v53 file, sha256 `1c3830a45b5ab1cb15d079b0bfd47d2c3b85f46b2b5ba52d0db2e693832c19ca`,
+670,790 rows. Scorer: `Succeeded`, `used_pairs` 670,790, test set `final_submitting.parquet`. The final ranking is blind.
+
 | file | date (UTC) | config | holdout Jan+Jul 2025 (A / B / all) | expected board | actual board | note |
 |---|---|---|---|---|---|---|
 | v18 (campaign 1) | 2026-09-10 | v1 blend | ~230 / ~1808 / n.a. | n.a. | 294.9917 | baseline carried over |
