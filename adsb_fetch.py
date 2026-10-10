@@ -24,11 +24,11 @@ def months(y, ms):
     return [date(y, m, 1) + timedelta(d) for m in ms for d in range(31) if (date(y, m, 1) + timedelta(d)).month == m]
 
 
-# Four labelled days first to build the detector on; the 2025 holdout months come before July 2026 so the gate can run
-# while the rest of the board months download. Late 2025 leads the extra training months: its coverage is nearest 2026's.
+# Labelled days come before the unlabelled months they correct, so model work runs while the rest downloads. Late
+# 2025 leads the extra training months: its coverage is nearest 2026's.
 DEV = [date(2025, 1, 15), date(2025, 7, 15), date(2025, 1, 16), date(2025, 7, 16)]
-DAYS = DEV + [d for d in months(2026, [1]) + months(2025, [1, 7]) + months(2026, [7, 2, 6]) + months(2025, [2, 6])
-              + months(2025, [12, 11, 10, 9, 8, 5, 4, 3])
+DAYS = DEV + [d for d in months(2026, [1]) + months(2025, [1, 7]) + months(2026, [7]) + months(2025, [2, 6])
+              + months(2026, [2, 6]) + months(2025, [12, 11, 10, 9, 8, 5, 4, 3])
               if d not in DEV]
 
 
