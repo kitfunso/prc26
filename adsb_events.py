@@ -163,6 +163,24 @@ def day_events(src, path, day):
             continue
         c.update(MVT_ID_mvt=r.MVT_ID_mvt, adep=r.ADEP_mvt, stand=r.STAND_mvt, mpass=2, dt_to=np.nan, cs_ok=1, t_ok=int(r.t == r.AIRCRAFT_TYPE_mvt), gs_roll=r.gs, n_cand=1, icao=r.icao)
         rows.append(c)
+    # Third pass: a trace carries the callsign forward from where it is first broadcast, often after take-off, so the
+    # ground points still hold the inbound flight's callsign. Find the aircraft by its callsign on the climb-out,
+    # then read its own ground track.
+    done = {c["MVT_ID_mvt"] for c in rows}
+    um = d[~d.MVT_ID_mvt.isin(done) & d.CALLSIGN_flt.notna()]
+    a = p[~p.ground].merge(um[["MVT_ID_mvt", "CALLSIGN_flt", "ADEP_mvt", "mvt"]], left_on=["cs", "apt"],
+                           right_on=["CALLSIGN_flt", "ADEP_mvt"])
+    a = a[(a.ts >= a.mvt - 300) & (a.ts <= a.mvt + 1800)].sort_values("ts").drop_duplicates("MVT_ID_mvt")
+    g = p[p.ground].assign(pos=lambda z: z.index)
+    g = g.merge(a[["MVT_ID_mvt", "icao", "apt"]], on=["icao", "apt"]).merge(
+        um[["MVT_ID_mvt", "ADEP_mvt", "AIRCRAFT_TYPE_mvt", "STAND_mvt", "mvt"]], on="MVT_ID_mvt")
+    g = g[(g.ts >= g.mvt - 3600) & (g.ts <= g.mvt + 60)]
+    for r in g.sort_values("ts").drop_duplicates("MVT_ID_mvt", keep="last").itertuples(index=False):
+        c = clocks(p, r.pos, r.mvt, land(r.icao, r.apt, r.mvt))
+        if c is None:
+            continue
+        c.update(MVT_ID_mvt=r.MVT_ID_mvt, adep=r.ADEP_mvt, stand=r.STAND_mvt, mpass=3, dt_to=np.nan, cs_ok=0, t_ok=int(r.t == r.AIRCRAFT_TYPE_mvt), gs_roll=r.gs, n_cand=1, icao=r.icao)
+        rows.append(c)
     return pd.DataFrame(rows), len(d)
 
 

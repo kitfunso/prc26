@@ -69,3 +69,9 @@ More training months help. With February 2025 added to January and July, the gat
 Neighbours (`adsb_nb.py`): a second layer that reads the first layer's corrections of matched departures at the same
 airport within 30 and 60 min, nested-cross-fitted on the same three months, adds nothing: +12.30 s against +12.33 s
 for the first layer alone. It is not used.
+
+Third match pass: a trace carries its callsign forward from where it is first broadcast, often after take-off, so the
+ground points before pushback still hold the inbound flight's callsign and the callsign pass misses them. Pass 3 finds
+the aircraft by the departure's callsign on its climb-out inside the airport cut, then reads that aircraft's ground
+track. It lifts the 2026-01-15 match share from 63.6 % to 67.8 % and the gate from +12.44 s to +13.10 s
+[+10.53, +16.64] (holdout 291.89, lane A 197.74), most at EGLL and EDDF.
