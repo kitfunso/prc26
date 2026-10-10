@@ -42,22 +42,30 @@ def tag(d):
 
 
 def assets(d):
-    out = subprocess.run(["gh", "api", f"repos/adsblol/globe_history_{d.year}/releases/tags/{tag(d)}",
-                          "--jq", '.assets[] | "\\(.name) \\(.size)"'], capture_output=True, text=True, check=True).stdout
-    parts = [(n, int(s)) for n, s in (l.split() for l in out.splitlines()) if ".tar." in n or n.endswith(".tar")]
-    if not parts:  # some days ship as one .tar, others split; neither found means no data, not an empty day
+    """(tag, [(name, size)]) of the day's fuller release. Some days exist only as a `tmp` release, and some regular
+    releases are truncated next to their `tmp` twin (2025-06-11: 0.7 GB against 3.5 GB)."""
+    best = (None, [])
+    for t in (tag(d), tag(d) + "tmp"):
+        r = subprocess.run(["gh", "api", f"repos/adsblol/globe_history_{d.year}/releases/tags/{t}",
+                            "--jq", '.assets[] | "\\(.name) \\(.size)"'], capture_output=True, text=True)
+        if r.returncode:
+            continue
+        parts = sorted((n, int(s)) for n, s in (l.split() for l in r.stdout.splitlines()) if ".tar." in n or n.endswith(".tar"))
+        if sum(s for _, s in parts) > sum(s for _, s in best[1]):
+            best = (t, parts)
+    if not best[1]:  # some days ship as one .tar, others split; neither found means no data, not an empty day
         raise RuntimeError(f"{d} has no tar asset")
-    return sorted(parts)
+    return best
 
 
 def download(d):
-    parts = assets(d)
+    t, parts = assets(d)
     procs = []
     for name, size in parts:
         p = os.path.join(RAW, name)
         if os.path.exists(p) and os.path.getsize(p) == size:
             continue
-        url = f"https://github.com/adsblol/globe_history_{d.year}/releases/download/{tag(d)}/{name}"
+        url = f"https://github.com/adsblol/globe_history_{d.year}/releases/download/{t}/{name}"
         # A stalled connection never errors, so a speed floor turns it into a timeout that --retry resumes.
         procs.append(subprocess.Popen(["curl", "-sfL", "--retry", "20", "--retry-all-errors", "--speed-limit", "200000",
                                        "--speed-time", "45", "-C", "-", "-o", p, url]))
