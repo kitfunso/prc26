@@ -93,6 +93,10 @@ def gate(*flags):
             continue
         bst = fit(x[tr], (m.y - m.p).values[tr])
         corr.loc[m.id.values[te]] = bst.predict(x[te])
+        for s in separate(flags):
+            ts, tt = tr & (m.apt == s).values, te & (m.apt == s).values
+            if tt.any():
+                corr.loc[m.id.values[tt]] = fit(x[ts], (m.y - m.p).values[ts]).predict(x[tt]) if ts.any() else 0.0
         print(f"month {mo} {a or ''}: trained on {tr.sum()} rows, corrected {te.sum()}")
     c = h.id.map(corr).fillna(0.0).values
     c = np.where(keep(h.apt.values, h.has_plan.values, flags), c, 0.0)
@@ -137,6 +141,12 @@ def tune(*sets):
     PARAMS.clear(); PARAMS.update(base[0]); ROUNDS = base[1]
 
 
+def separate(flags):
+    """sep=X,Y: those airports get a stage fitted on their own rows only, where the pooled one learns the wrong lesson
+    (LIRF labels often copy the schedule, which the pushback clock never sees)."""
+    return next((f[4:].split(",") for f in flags if f.startswith("sep=")), [])
+
+
 def keep(apt, has_plan, flags):
     """laneA: lane A rows only; skip=X,Y: leave those airports uncorrected."""
     skip = next((f[5:].split(",") for f in flags if f.startswith("skip=")), [])
@@ -159,7 +169,12 @@ def apply(src, base, out, *flags):
     feat = pd.read_parquet(os.path.join(ROOT, "data", "cache", "feat.parquet"), columns=["id", "apt", "has_plan", "z_lobt"] + PLAN)
     e = ev.merge(s, on="MVT_ID_mvt").merge(feat, left_on="MVT_ID_mvt", right_on="id")
     xe = frame(e, e.TAXITIME_SEC_mvt.values, e.apt.values, e.has_plan.values)
-    c = np.where(keep(e.apt.values, e.has_plan.values, flags), bst.predict(xe), 0.0)
+    c = bst.predict(xe)
+    for s in separate(flags):
+        k = e.apt.values == s
+        if k.any():
+            c[k] = fit(x[(m.apt == s).values], (m.y - m.p).values[(m.apt == s).values]).predict(xe[k])
+    c = np.where(keep(e.apt.values, e.has_plan.values, flags), c, 0.0)
     pn = finish(e.TAXITIME_SEC_mvt.values + c, e.z_lobt.values)
     new = s.set_index("MVT_ID_mvt").TAXITIME_SEC_mvt.copy()
     new.loc[e.MVT_ID_mvt.values] = pn
