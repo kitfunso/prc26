@@ -102,3 +102,16 @@ Checks of 10 October, afternoon:
   and no feature near either value) hold 32 % of the holdout squared error. Among matched lane A rows outside LIRF
   missed by more than 600 s, 109 have an ADS-B clock within 120 s of the label, 385 a plan stamp within 60 s, and 621
   neither. LEBL plan-copy rates do not depend on the airline (12 to 18 % EOBT copies for every large airline).
+
+Rounds of 10 and 11 October, late-2025 training months. Two rules were set before the runs: more training days are
+adopted unless the paired holdout says they are clearly worse, and `skipB=LIRF` needs a paired interval against
+`skip=LIRF` that excludes zero.
+
+- Nov+Dec 2025 added (596,342 matched rows, v69 recipe): `skip=LIRF` +13.56 s [+10.91, +17.21] against the base;
+  `skipB=LIRF` against `skip=LIRF` +0.32 s [-0.01, +0.86]. Not adopted. v69 was built and not uploaded.
+- Every 2025 month (1,219,616 matched departures over 363 days; 2025-12-31 has no release, 2025-10-15 failed to
+  decompress): against v69, `skip=LIRF` +0.25 s [+0.14, +0.38]. `skipB=LIRF` against `skip=LIRF` +0.53 s
+  [+0.18, +1.08], all from July (January 2025 has no LIRF matches), so LIRF lane A is now corrected. Gate against
+  the base +14.33 s [+11.44, +18.18]; holdout 290.65 all, lane A 195.87, lane B 1730.42. This is v70.
+- v70 on the board: 241.4228 against v68's 243.0747. It corrects 8,415 LIRF lane A rows, which v68 left alone, and
+  no LIRF lane B row.
