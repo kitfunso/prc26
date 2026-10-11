@@ -27,13 +27,14 @@ PARAMS = dict(objective="regression", learning_rate=0.03, num_leaves=31, min_dat
 ROUNDS = 600
 
 
-OPT = {"apt": True, "clip": 0.0, "rec": False, "cr": False, "cr3": False, "cb": False}
+OPT = {"apt": True, "clip": 0.0, "rec": False, "cr": False, "cr3": False, "crh": False, "cb": False, "cbo": False}
 STANDS = None
 CR_PRIOR = 50  # rows of the airport-wide rate added to each stand's or operator's count, fixed before the gate ran
 
 
 def plan_cols():
-    cols = PLAN + (STAMPS + REC if OPT["rec"] else []) + (["z_lobt", "operator"] if OPT["cr"] or OPT["cb"] else [])
+    cols = PLAN + (STAMPS + REC if OPT["rec"] else []) + (["z_lobt", "operator"] if OPT["cr"] or OPT["cb"] else []) \
+        + (["hour"] if OPT["crh"] else [])
     return list(dict.fromkeys(cols))
 
 
@@ -42,8 +43,10 @@ def set_opts(flags):
     OPT["clip"] = next((float(f[4:]) for f in flags if f.startswith("clip")), 0.0)
     OPT["rec"] = "rec" in flags
     OPT["cr3"] = "cr3" in flags
-    OPT["cr"] = "cr" in flags or OPT["cr3"]
-    OPT["cb"] = "cb" in flags
+    OPT["crh"] = "crh" in flags
+    OPT["cr"] = "cr" in flags or OPT["cr3"] or OPT["crh"]
+    OPT["cbo"] = "cbo" in flags
+    OPT["cb"] = "cb" in flags or OPT["cbo"]
 
 
 def copy_flags(m):
@@ -77,17 +80,21 @@ def smoothed(src, dst, v, k, lomo):
 
 
 def copy_rates(src, dst, lomo):
-    """Smoothed copy share per (airport, stand) and (airport, operator)."""
+    """Smoothed copy share per (airport, stand) and (airport, operator); crh adds (airport, hour), as hand-entered
+    off-blocks may cluster in some shifts."""
+    keys = ("stand", "operator") + (("hour",) if OPT["crh"] else ())
     return {f"cr_{k}{name}": smoothed(src, dst, flag.astype(float), k, lomo)
-            for name, flag in copy_flags(src).items() for k in ("stand", "operator")}
+            for name, flag in copy_flags(src).items() for k in keys}
 
 
 def clock_bias(src, dst, lomo):
     """Per stand, the mean gap between the label and two pushback clocks on rows whose label is not a stamp copy:
-    some stands record off-block well before or after the aircraft first moves."""
+    some stands record off-block well before or after the aircraft first moves. cbo adds the same per operator, whose
+    crews switch the transponder on at different points of the pushback."""
     real = ~copy_flags(src)[""]
-    return {f"cb_{c}": smoothed(src, dst, np.where(real, np.clip((src.y - src[c]).values, -900, 900), np.nan), "stand", lomo)
-            for c in ("first", "lv10")}
+    keys = {"stand": ""} | ({"operator": "_operator"} if OPT["cbo"] else {})
+    return {f"cb_{c}{tag}": smoothed(src, dst, np.where(real, np.clip((src.y - src[c]).values, -900, 900), np.nan), k, lomo)
+            for c in ("first", "lv10") for k, tag in keys.items()}
 
 
 def key_cols(src, dst, lomo):
@@ -159,7 +166,8 @@ def gate(*flags):
     """Flags: noapt (no airport column), clipN (train on the residual clipped at +-N s), loao (each airport corrected by a
     stage that never saw it, the test for airports 2025 does not cover), rec (the LOBT and IOBT stamps and the base's
     stamp-recording columns), cr (each stand's and operator's rate of labels that copy a plan stamp), cr3 (that rate
-    split by stamp), cb (each stand's mean label minus clock on rows that copy no stamp)."""
+    split by stamp), crh (the rate per hour too), cb (each stand's mean label minus clock on rows that copy no stamp),
+    cbo (cb per operator too)."""
     sys.path.insert(0, ROOT)
     from train import boot_delta
     set_opts(flags)

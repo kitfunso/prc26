@@ -143,3 +143,13 @@ adopted unless the paired holdout says they are clearly worse, and `skipB=LIRF` 
   the base +15.07 s [+12.05, +19.09]; holdout 289.92, lane A 194.84. Stand keys with 50 or more clean training rows
   cover 96.8 % of matched 2026 rows, against 98.9 % in the holdout. This is v72, board 240.8664 against v71's
   241.0532.
+- `cbo`, the same clock bias per operator on top of v72: +0.02 s [-0.05, +0.10] against v72. Null; the stand
+  carries what the operator knows.
+- `crh`, the copy rate per (airport, hour) on top of v72 (hourly rates are stable across months, correlation 0.64
+  to 0.87 at 7 of 8 airports, but span less than the stand rates, 24 to 35 % at LIRF): +0.00 s [-0.07, +0.08]
+  against v72. Null. With `cbo` that is two null rounds in a row, so the per-key statistics are closed. The neighbour layer already read matched neighbours for unmatched departures and
+  was null, so that route stays closed.
+- Error left after v72 on the holdout: unmatched lane B at LFPG holds 36 % of the squared error (871 rows) and LIRF
+  lane B 15 %; unmatched lane A at LTFM 8.2 % and LFPG 7.1 %, where adsb.lol has no traces. Matched lane A rows missed
+  by more than 600 s hold 9.9 % (1,938 rows; 892 at LIRF, 530 at LEBL): 5.4 % on labels within 60 s of a plan stamp,
+  4.1 % on labels near neither a stamp nor a clock, 0.4 % near a clock.

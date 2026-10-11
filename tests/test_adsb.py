@@ -59,6 +59,9 @@ def test_copy_rates_leave_the_rows_own_month_out():
         S.set_opts(("cr3",))
         r = S.copy_rates(src, src.iloc[:1], False)
         assert S.OPT["cr"] and np.allclose(r["cr_stand_eobt"], [(1 + 25) / 52]) and np.allclose(r["cr_stand_sched"], [0.0])
+        S.set_opts(("crh",))
+        r = S.copy_rates(src.assign(hour=[7, 9]), src.iloc[:1].assign(hour=7), False)
+        assert S.OPT["cr"] and "hour" in S.plan_cols() and np.allclose(r["cr_hour"], [(1 + 25) / 51])
     finally:
         S.set_opts(())
 
@@ -68,7 +71,13 @@ def test_clock_bias_skips_stamp_copies_and_missing_clocks():
                         "z_eobt": [1000.0, 5000.0, 5000.0], "z_sched": 5000.0, "z_lobt": np.nan,
                         "lv10": [500.0, 600.0, np.nan], "first": [400.0, 500.0, 300.0]})
     cb = S.clock_bias(src, src.iloc[:1], False)  # row 0 copies its EOBT, so only rows 1 and 2 count
-    assert np.allclose(cb["cb_lv10"], [300.0]) and np.allclose(cb["cb_first"], [450.0])
+    assert np.allclose(cb["cb_lv10"], [300.0]) and np.allclose(cb["cb_first"], [450.0]) and len(cb) == 2
+    try:
+        S.set_opts(("cbo",))
+        cb = S.clock_bias(src.assign(operator=["a", "b", "b"]), src.iloc[:1].assign(operator="b"), False)
+        assert S.OPT["cb"] and np.allclose(cb["cb_first_operator"], [450.0]) and np.allclose(cb["cb_lv10"], [300.0])
+    finally:
+        S.set_opts(())
 
 
 def test_rec_adds_the_other_stamps_and_the_recording_columns():
