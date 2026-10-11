@@ -27,13 +27,13 @@ PARAMS = dict(objective="regression", learning_rate=0.03, num_leaves=31, min_dat
 ROUNDS = 600
 
 
-OPT = {"apt": True, "clip": 0.0, "rec": False, "cr": False, "cr3": False}
+OPT = {"apt": True, "clip": 0.0, "rec": False, "cr": False, "cr3": False, "cb": False}
 STANDS = None
 CR_PRIOR = 50  # rows of the airport-wide rate added to each stand's or operator's count, fixed before the gate ran
 
 
 def plan_cols():
-    cols = PLAN + (STAMPS + REC if OPT["rec"] else []) + (["z_lobt", "operator"] if OPT["cr"] else [])
+    cols = PLAN + (STAMPS + REC if OPT["rec"] else []) + (["z_lobt", "operator"] if OPT["cr"] or OPT["cb"] else [])
     return list(dict.fromkeys(cols))
 
 
@@ -43,6 +43,7 @@ def set_opts(flags):
     OPT["rec"] = "rec" in flags
     OPT["cr3"] = "cr3" in flags
     OPT["cr"] = "cr" in flags or OPT["cr3"]
+    OPT["cb"] = "cb" in flags
 
 
 def copy_flags(m):
@@ -56,37 +57,52 @@ def copy_flags(m):
     return out
 
 
+def smoothed(src, dst, v, k, lomo):
+    """Mean of v per (airport, k) over the src rows where v is set, shrunk toward the airport mean by CR_PRIOR rows,
+    for dst rows. lomo leaves each dst row's own month out, so training rows see their key as an unseen month does."""
+    ok = ~np.isnan(v)
+    key = lambda d: d.adep.astype(str).str.cat(d[k].astype(str), sep="|").values
+    prior = pd.Series(v[ok]).groupby(src.adep.astype(str).values[ok]).mean()
+    p = pd.Series(dst.adep.astype(str).values).map(prior).values
+    g = pd.DataFrame({"key": key(src)[ok], "month": src.month.values[ok], "v": v[ok]})
+    tot = g.groupby("key").v.agg(["sum", "size"])
+    s = pd.Series(key(dst)).map(tot["sum"]).fillna(0).values
+    n = pd.Series(key(dst)).map(tot["size"]).fillna(0).values
+    if lomo:
+        mon = g.groupby(["key", "month"]).v.agg(["sum", "size"])
+        idx = pd.MultiIndex.from_arrays([key(dst), dst.month.values])
+        s = s - mon["sum"].reindex(idx).fillna(0).values
+        n = n - mon["size"].reindex(idx).fillna(0).values
+    return (s + CR_PRIOR * p) / (n + CR_PRIOR)
+
+
 def copy_rates(src, dst, lomo):
-    """Smoothed copy share per (airport, stand) and (airport, operator) from labelled src rows, for dst rows. lomo
-    leaves each dst row's own month out, so training rows see their key the way an unseen 2026 month does."""
-    key = lambda d, k: d.adep.astype(str).str.cat(d[k].astype(str), sep="|").values
-    out = {}
-    for name, flag in copy_flags(src).items():
-        c = flag.astype(float)
-        prior = pd.Series(c).groupby(src.adep.astype(str).values).mean()
-        p = pd.Series(dst.adep.astype(str).values).map(prior).values
-        for k in ("stand", "operator"):
-            g = pd.DataFrame({"key": key(src, k), "month": src.month.values, "c": c})
-            tot = g.groupby("key").c.agg(["sum", "size"])
-            s = pd.Series(key(dst, k)).map(tot["sum"]).fillna(0).values
-            n = pd.Series(key(dst, k)).map(tot["size"]).fillna(0).values
-            if lomo:
-                mon = g.groupby(["key", "month"]).c.agg(["sum", "size"])
-                idx = pd.MultiIndex.from_arrays([key(dst, k), dst.month.values])
-                s = s - mon["sum"].reindex(idx).fillna(0).values
-                n = n - mon["size"].reindex(idx).fillna(0).values
-            out[f"cr_{k}{name}"] = (s + CR_PRIOR * p) / (n + CR_PRIOR)
-    return out
+    """Smoothed copy share per (airport, stand) and (airport, operator)."""
+    return {f"cr_{k}{name}": smoothed(src, dst, flag.astype(float), k, lomo)
+            for name, flag in copy_flags(src).items() for k in ("stand", "operator")}
+
+
+def clock_bias(src, dst, lomo):
+    """Per stand, the mean gap between the label and two pushback clocks on rows whose label is not a stamp copy:
+    some stands record off-block well before or after the aircraft first moves."""
+    real = ~copy_flags(src)[""]
+    return {f"cb_{c}": smoothed(src, dst, np.where(real, np.clip((src.y - src[c]).values, -900, 900), np.nan), "stand", lomo)
+            for c in ("first", "lv10")}
+
+
+def key_cols(src, dst, lomo):
+    out = copy_rates(src, dst, lomo) if OPT["cr"] else {}
+    return {**out, **(clock_bias(src, dst, lomo) if OPT["cb"] else {})}
 
 
 def with_rates(x, m, tr, te):
-    """x with the copy-rate columns: training rows leave-one-month-out within tr, te rows from every tr row."""
-    if not OPT["cr"]:
+    """x with the per-key columns: training rows leave-one-month-out within tr, te rows from every tr row."""
+    if not (OPT["cr"] or OPT["cb"]):
         return x
     x = x.copy()
-    for col, v in copy_rates(m[tr], m[tr], True).items():
+    for col, v in key_cols(m[tr], m[tr], True).items():
         x.loc[tr, col] = v
-    for col, v in copy_rates(m[tr], m[te], False).items():
+    for col, v in key_cols(m[tr], m[te], False).items():
         x.loc[te, col] = v
     return x
 
@@ -142,7 +158,8 @@ def train_rows():
 def gate(*flags):
     """Flags: noapt (no airport column), clipN (train on the residual clipped at +-N s), loao (each airport corrected by a
     stage that never saw it, the test for airports 2025 does not cover), rec (the LOBT and IOBT stamps and the base's
-    stamp-recording columns), cr (each stand's and operator's rate of labels that copy a plan stamp)."""
+    stamp-recording columns), cr (each stand's and operator's rate of labels that copy a plan stamp), cr3 (that rate
+    split by stamp), cb (each stand's mean label minus clock on rows that copy no stamp)."""
     sys.path.insert(0, ROOT)
     from train import boot_delta
     set_opts(flags)
@@ -210,8 +227,7 @@ def finish(p, z):
 def apply(src, base, out, *flags):
     set_opts(flags)
     m, x = train_rows()
-    if OPT["cr"]:
-        x = x.assign(**copy_rates(m, m, True))
+    x = x.assign(**key_cols(m, m, True))
     bst = fit(x, (m.y - m.p).values)
     ev = pd.read_parquet(os.path.join(ADSB, f"ev_{src}.parquet"))
     s = pd.read_parquet(base)
@@ -219,8 +235,7 @@ def apply(src, base, out, *flags):
     feat = pd.read_parquet(os.path.join(ROOT, "data", "cache", "feat.parquet"), columns=cols)
     e = ev.merge(s, on="MVT_ID_mvt").merge(feat, left_on="MVT_ID_mvt", right_on="id")
     xe = frame(e, e.TAXITIME_SEC_mvt.values, e.apt.values, e.has_plan.values)
-    if OPT["cr"]:
-        xe = xe.assign(**copy_rates(m, e, False))
+    xe = xe.assign(**key_cols(m, e, False))
     c = bst.predict(xe)
     for s in separate(flags):
         k = e.apt.values == s

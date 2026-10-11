@@ -133,4 +133,13 @@ adopted unless the paired holdout says they are clearly worse, and `skipB=LIRF` 
   2026 month does. Against v70's stage: +0.53 s [+0.40, +0.70], January +0.37, July +0.69, gains at 8 airports.
   Gate against the base +14.86 s [+11.90, +18.85]; holdout 290.13, lane A 195.12. Keys with 50 or more training rows
   cover 97.0 % (stand) and 97.8 % (operator) of matched 2026 rows, against 99.1 % and 98.6 % in the holdout. This is
-  v71.
+  v71, board 241.0532 against v70's 241.4228.
+- `cr3`, the copy rate split by stamp (EOBT, schedule, LOBT) on top of `cr`: +0.04 s [-0.04, +0.11] against v71.
+  Null.
+- `cb`, clock bias per stand: the smoothed mean of the label minus the `first` and `lv10` clocks (clipped to
+  ±900 s) over the stand's rows that do not copy a stamp, with the same 50-row airport prior and month left out as
+  `cr`. It tells the stage how long a stand's pushback runs before the feeders see it. On top of `cr`, against v71:
+  +0.21 s [+0.12, +0.31], January +0.14, July +0.28, gains at 8 of 9 matched airports (LFPG -0.4M SSE). Gate against
+  the base +15.07 s [+12.05, +19.09]; holdout 289.92, lane A 194.84. Stand keys with 50 or more clean training rows
+  cover 96.8 % of matched 2026 rows, against 98.9 % in the holdout. This is v72, board 240.8664 against v71's
+  241.0532.

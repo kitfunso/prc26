@@ -1,7 +1,7 @@
 # PRC Data Challenge 2026: taxi-out time, team merry-octopus
 
 
-Current recorded champion: **v71, 241.0532 s**: frozen v53 (270.43 s) corrected by the ADS-B pushback stage of
+Current recorded champion: **v72, 240.8664 s**: frozen v53 (270.43 s) corrected by the ADS-B pushback stage of
 10 October ([section below](#ads-b-pushback-stage-v64-on-docsadsb_stagemd), `LEDGER.md`). The campaign plan is
 [PLAN.md](PLAN.md) and [docs/CONTENDER-PLAN.md](docs/CONTENDER-PLAN.md).
 The October 2 review identified validation isolation and final-NN-fit issues; prospective work
@@ -78,18 +78,19 @@ off-block times when declared. No OpenSky state vectors are used. Each departure
 which gives candidate pushback clocks; a LightGBM stage fitted on the 2025 residual of the base model moves each
 matched prediction, with LIRF lane B left uncorrected (its labels often copy the schedule, which no pushback clock
 sees). The stage trains on every 2025 month (363 days; 2025-12-31 was never published, 2025-10-15's download was
-corrupt). It also sees each stand's and operator's rate of labels that copy a plan stamp (`cr`, leave-one-month-out on
-training rows). Holdout Jan+Jul 2025, each month corrected by a stage trained on the other 2025 months: 304.99 to
-290.13 all rows, +14.86 s [+11.90, +18.85]. Board: v71 241.0532 against v53 270.43. The final file is the same stage
-on the final population. Rebuild:
+corrupt). It also sees each stand's and operator's rate of labels that copy a plan stamp (`cr`) and each stand's
+mean gap from the first-seen and leave clocks to the label (`cb`), both leave-one-month-out on training rows. Holdout
+Jan+Jul 2025, each month corrected by a stage trained on the other 2025 months: 304.99 to 289.92 all rows, +15.07 s
+[+12.05, +19.09]. Board: v72 240.8664 against v53 270.43. The final file is the same stage on the final population.
+Rebuild:
 
 ```
 python adsb_fetch.py                 # download and cut the days, about 2 to 3.5 GB each, deleted after the cut
 python adsb_events.py train          # 2025 matches; then: adsb_events.py rank data/ranking.parquet
-python adsb_stage.py gate skipB=LIRF cr
-python adsb_stage.py apply rank data/merry-octopus_v53.parquet data/merry-octopus_v71.parquet skipB=LIRF cr
+python adsb_stage.py gate skipB=LIRF cr cb
+python adsb_stage.py apply rank data/merry-octopus_v53.parquet data/merry-octopus_v72.parquet skipB=LIRF cr cb
 python adsb_events.py final          # the 120 final days, then:
-python adsb_stage.py apply final data/merry-octopus_final_v53full.parquet data/merry-octopus_final_v71.parquet skipB=LIRF cr
+python adsb_stage.py apply final data/merry-octopus_final_v53full.parquet data/merry-octopus_final_v72.parquet skipB=LIRF cr cb
 ```
 
 Source access: [IEM ASOS/METAR downloads](https://mesonet.agron.iastate.edu/request/download.phtml).

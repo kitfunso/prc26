@@ -63,6 +63,14 @@ def test_copy_rates_leave_the_rows_own_month_out():
         S.set_opts(())
 
 
+def test_clock_bias_skips_stamp_copies_and_missing_clocks():
+    src = pd.DataFrame({"adep": "EDDF", "stand": "A1", "month": [1, 2, 3], "y": [1000.0, 900.0, 800.0],
+                        "z_eobt": [1000.0, 5000.0, 5000.0], "z_sched": 5000.0, "z_lobt": np.nan,
+                        "lv10": [500.0, 600.0, np.nan], "first": [400.0, 500.0, 300.0]})
+    cb = S.clock_bias(src, src.iloc[:1], False)  # row 0 copies its EOBT, so only rows 1 and 2 count
+    assert np.allclose(cb["cb_lv10"], [300.0]) and np.allclose(cb["cb_first"], [450.0])
+
+
 def test_rec_adds_the_other_stamps_and_the_recording_columns():
     cols = S.CLOCKS + S.RAW + S.PLAN + S.STAMPS + S.REC + ["adep", "stand", "x0", "y0"]
     ev = pd.DataFrame({c: [1.0, 2.0] for c in cols}).assign(adep="EDDF", stand="A1", z_lobt=[500.0, 600.0])
