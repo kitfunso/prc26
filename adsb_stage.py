@@ -17,14 +17,78 @@ RAW = ["dwell0", "lastfar_len", "nstop", "stop_tot", "path_m", "gap_max", "npts"
        "seg_start_is_land", "dt_to", "cs_ok", "t_ok", "n_cand", "gs_roll", "big_len", "big_end", "big_droll",
        "mpass", "tail_gap", "prev_gap", "prev_d"]
 PLAN = ["z_sched", "z_aobt", "z_eobt"]
+STAMPS = ["z_lobt", "z_iobt"]  # rec: the other stamps a label can copy, and how each airport records them that day
+REC = ["aobt_sec", "aobt_m5", "eobt_m5", "lobt_sec", "n_day", "nB_day", "b_share", "day_dae_med", "day_zs_med",
+       "day_za_med", "h_nB", "ad_arr_a1", "ad_arr_sc", "ad_arr_tail", "ad_n_arr", "w_arr_a1", "w_arr_sc", "w_arr_tail",
+       "w_n_arr", "pa_a1", "pa_sc", "pa_taxi_in", "pa_gap", "pa_missing", "al_arr_a1", "al_arr_sc", "al_n_arr"]
 APTS = ["EDDF", "EDDM", "EGLL", "EHAM", "LEBL", "LEMD", "LFPG", "LIRF", "LSZH", "LTFM"]
 PARAMS = dict(objective="regression", learning_rate=0.03, num_leaves=31, min_data_in_leaf=200, feature_fraction=0.8,
               bagging_fraction=0.8, bagging_freq=1, lambda_l2=10.0, verbose=-1, seed=0, num_threads=8)
 ROUNDS = 600
 
 
-OPT = {"apt": True, "clip": 0.0}
+OPT = {"apt": True, "clip": 0.0, "rec": False, "cr": False, "cr3": False}
 STANDS = None
+CR_PRIOR = 50  # rows of the airport-wide rate added to each stand's or operator's count, fixed before the gate ran
+
+
+def plan_cols():
+    cols = PLAN + (STAMPS + REC if OPT["rec"] else []) + (["z_lobt", "operator"] if OPT["cr"] else [])
+    return list(dict.fromkeys(cols))
+
+
+def set_opts(flags):
+    OPT["apt"] = "noapt" not in flags
+    OPT["clip"] = next((float(f[4:]) for f in flags if f.startswith("clip")), 0.0)
+    OPT["rec"] = "rec" in flags
+    OPT["cr3"] = "cr3" in flags
+    OPT["cr"] = "cr" in flags or OPT["cr3"]
+
+
+def copy_flags(m):
+    """The label sits within 60 s of a plan stamp while the pushback clock is more than 180 s away; cr3 also keeps
+    which stamp, so the stage knows which one to move toward."""
+    far = np.abs(m.y - m.lv10).values > 180
+    near = {s: np.abs(m.y - m[f"z_{s}"]).values <= 60 for s in ("eobt", "sched", "lobt")}
+    out = {"": (near["eobt"] | near["sched"] | near["lobt"]) & far}
+    if OPT["cr3"]:
+        out.update({f"_{s}": v & far for s, v in near.items()})
+    return out
+
+
+def copy_rates(src, dst, lomo):
+    """Smoothed copy share per (airport, stand) and (airport, operator) from labelled src rows, for dst rows. lomo
+    leaves each dst row's own month out, so training rows see their key the way an unseen 2026 month does."""
+    key = lambda d, k: d.adep.astype(str).str.cat(d[k].astype(str), sep="|").values
+    out = {}
+    for name, flag in copy_flags(src).items():
+        c = flag.astype(float)
+        prior = pd.Series(c).groupby(src.adep.astype(str).values).mean()
+        p = pd.Series(dst.adep.astype(str).values).map(prior).values
+        for k in ("stand", "operator"):
+            g = pd.DataFrame({"key": key(src, k), "month": src.month.values, "c": c})
+            tot = g.groupby("key").c.agg(["sum", "size"])
+            s = pd.Series(key(dst, k)).map(tot["sum"]).fillna(0).values
+            n = pd.Series(key(dst, k)).map(tot["size"]).fillna(0).values
+            if lomo:
+                mon = g.groupby(["key", "month"]).c.agg(["sum", "size"])
+                idx = pd.MultiIndex.from_arrays([key(dst, k), dst.month.values])
+                s = s - mon["sum"].reindex(idx).fillna(0).values
+                n = n - mon["size"].reindex(idx).fillna(0).values
+            out[f"cr_{k}{name}"] = (s + CR_PRIOR * p) / (n + CR_PRIOR)
+    return out
+
+
+def with_rates(x, m, tr, te):
+    """x with the copy-rate columns: training rows leave-one-month-out within tr, te rows from every tr row."""
+    if not OPT["cr"]:
+        return x
+    x = x.copy()
+    for col, v in copy_rates(m[tr], m[tr], True).items():
+        x.loc[tr, col] = v
+    for col, v in copy_rates(m[tr], m[te], False).items():
+        x.loc[te, col] = v
+    return x
 
 
 def stand_map():
@@ -49,10 +113,12 @@ def frame(ev, p, apt, has_plan):
     sm = ev[["adep", "stand"]].merge(STANDS, on=["adep", "stand"], how="left")
     x["d_stand0"] = np.hypot(ev.x0.values - sm.sx.values, ev.y0.values - sm.sy.values)
     x["stand_n"] = sm.sn.values
-    for c in PLAN:  # the label is a schedule copy on some rows, which no pushback clock can see
+    for c in PLAN + (STAMPS if OPT["rec"] else []):  # the label copies a stamp on some rows, which no clock can see
         x[c] = ev[c].values
         for k in ("lv10", "first"):
             x[f"{c}_{k}"] = ev[c].values - ev[k].values
+    for c in REC if OPT["rec"] else []:
+        x[c] = ev[c].values
     return x
 
 
@@ -68,18 +134,18 @@ def train_rows():
     STANDS = stand_map()
     ev = pd.read_parquet(os.path.join(ADSB, "ev_train.parquet"))
     b = pd.read_parquet(os.path.join(ADSB, "base_2025.parquet"))
-    f = pd.read_parquet(os.path.join(ROOT, "data", "cache", "feat.parquet"), columns=["id"] + PLAN)
+    f = pd.read_parquet(os.path.join(ROOT, "data", "cache", "feat.parquet"), columns=["id"] + plan_cols())
     m = ev.merge(b, left_on="MVT_ID_mvt", right_on="id").merge(f, on="id")
     return m, frame(m, m.p.values, m.apt.values, m.has_plan.values)
 
 
 def gate(*flags):
     """Flags: noapt (no airport column), clipN (train on the residual clipped at +-N s), loao (each airport corrected by a
-    stage that never saw it, the test for airports 2025 does not cover)."""
+    stage that never saw it, the test for airports 2025 does not cover), rec (the LOBT and IOBT stamps and the base's
+    stamp-recording columns), cr (each stand's and operator's rate of labels that copy a plan stamp)."""
     sys.path.insert(0, ROOT)
     from train import boot_delta
-    OPT["apt"] = "noapt" not in flags
-    OPT["clip"] = next((float(f[4:]) for f in flags if f.startswith("clip")), 0.0)
+    set_opts(flags)
     m, x = train_rows()
     b = pd.read_parquet(os.path.join(ADSB, "base_2025.parquet"))
     h = b[b.month.isin([1, 7])].reset_index(drop=True)
@@ -91,12 +157,13 @@ def gate(*flags):
             tr, te = tr & (m.apt != a).values, te & (m.apt == a).values
         if not te.any():
             continue
-        bst = fit(x[tr], (m.y - m.p).values[tr])
-        corr.loc[m.id.values[te]] = bst.predict(x[te])
+        X = with_rates(x, m, tr, te)
+        bst = fit(X[tr], (m.y - m.p).values[tr])
+        corr.loc[m.id.values[te]] = bst.predict(X[te])
         for s in separate(flags):
             ts, tt = tr & (m.apt == s).values, te & (m.apt == s).values
             if tt.any():
-                corr.loc[m.id.values[tt]] = fit(x[ts], (m.y - m.p).values[ts]).predict(x[tt]) if ts.any() else 0.0
+                corr.loc[m.id.values[tt]] = fit(X[ts], (m.y - m.p).values[ts]).predict(X[tt]) if ts.any() else 0.0
         print(f"month {mo} {a or ''}: trained on {tr.sum()} rows, corrected {te.sum()}")
     c = h.id.map(corr).fillna(0.0).values
     c = np.where(keep(h.apt.values, h.has_plan.values, flags), c, 0.0)
@@ -141,15 +208,19 @@ def finish(p, z):
 
 
 def apply(src, base, out, *flags):
-    OPT["apt"] = "noapt" not in flags
-    OPT["clip"] = next((float(f[4:]) for f in flags if f.startswith("clip")), 0.0)
+    set_opts(flags)
     m, x = train_rows()
+    if OPT["cr"]:
+        x = x.assign(**copy_rates(m, m, True))
     bst = fit(x, (m.y - m.p).values)
     ev = pd.read_parquet(os.path.join(ADSB, f"ev_{src}.parquet"))
     s = pd.read_parquet(base)
-    feat = pd.read_parquet(os.path.join(ROOT, "data", "cache", "feat.parquet"), columns=["id", "apt", "has_plan", "z_lobt"] + PLAN)
+    cols = ["id", "apt", "has_plan"] + list(dict.fromkeys(["z_lobt"] + plan_cols()))
+    feat = pd.read_parquet(os.path.join(ROOT, "data", "cache", "feat.parquet"), columns=cols)
     e = ev.merge(s, on="MVT_ID_mvt").merge(feat, left_on="MVT_ID_mvt", right_on="id")
     xe = frame(e, e.TAXITIME_SEC_mvt.values, e.apt.values, e.has_plan.values)
+    if OPT["cr"]:
+        xe = xe.assign(**copy_rates(m, e, False))
     c = bst.predict(xe)
     for s in separate(flags):
         k = e.apt.values == s

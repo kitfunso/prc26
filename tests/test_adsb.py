@@ -46,6 +46,37 @@ def test_flags_parse():
     assert k.tolist() == [True, False, True]
 
 
+def test_copy_rates_leave_the_rows_own_month_out():
+    src = pd.DataFrame({"adep": "EDDF", "stand": "A1", "operator": "op", "month": [1, 2], "y": [1000.0, 1000.0],
+                        "z_eobt": [1000.0, 2000.0], "z_sched": [5000.0, 3000.0], "z_lobt": [np.nan, np.nan],
+                        "lv10": [500.0, 1000.0]})
+    assert S.copy_flags(src)[""].tolist() == [True, False]
+    lomo = S.copy_rates(src, src, True)["cr_stand"]
+    assert np.allclose(lomo, [(0 + 25) / 51, (1 + 25) / 51])  # prior 0.5 x 50 rows; each row sees only the other month
+    full = S.copy_rates(src, src.iloc[:1], False)["cr_operator"]
+    assert np.allclose(full, [(1 + 25) / 52])
+    try:
+        S.set_opts(("cr3",))
+        r = S.copy_rates(src, src.iloc[:1], False)
+        assert S.OPT["cr"] and np.allclose(r["cr_stand_eobt"], [(1 + 25) / 52]) and np.allclose(r["cr_stand_sched"], [0.0])
+    finally:
+        S.set_opts(())
+
+
+def test_rec_adds_the_other_stamps_and_the_recording_columns():
+    cols = S.CLOCKS + S.RAW + S.PLAN + S.STAMPS + S.REC + ["adep", "stand", "x0", "y0"]
+    ev = pd.DataFrame({c: [1.0, 2.0] for c in cols}).assign(adep="EDDF", stand="A1", z_lobt=[500.0, 600.0])
+    S.STANDS = pd.DataFrame({"adep": ["EDDF"], "stand": ["A1"], "sx": [0.0], "sy": [0.0], "sn": [9]})
+    try:
+        S.set_opts(("rec",))
+        x = S.frame(ev, np.zeros(2), np.array(["EDDF", "EDDF"]), np.ones(2))
+        assert x["z_lobt_lv10"].tolist() == [499.0, 598.0] and set(S.REC) <= set(x.columns)
+        S.set_opts(())
+        assert not {"z_lobt", "z_iobt_first", "b_share"} & set(S.frame(ev, np.zeros(2), np.array(["EDDF"] * 2), np.ones(2)))
+    finally:
+        S.set_opts(())
+
+
 def test_clocks_read_the_stand_dwell_and_the_leave_time():
     ts = np.arange(0.0, 1200.0, 10.0)  # 10 min parked, then 1 m/s along x
     x = np.where(ts < 600, 0.0, ts - 600)

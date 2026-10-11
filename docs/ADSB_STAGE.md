@@ -115,3 +115,22 @@ adopted unless the paired holdout says they are clearly worse, and `skipB=LIRF` 
   the base +14.33 s [+11.44, +18.18]; holdout 290.65 all, lane A 195.87, lane B 1730.42. This is v70.
 - v70 on the board: 241.4228 against v68's 243.0747. It corrects 8,415 LIRF lane A rows, which v68 left alone, and
   no LIRF lane B row.
+- `rec` (the LOBT and IOBT stamps and their distance to the clocks, the stamp seconds flags, and the base's day and
+  arrival recording-mode columns, 0 to 2.3 % missing on both 2025 and 2026 rows): +0.01 s [-0.12, +0.13] against
+  v70's stage. Null; the base already carries what those columns know.
+- Correcting LIRF lane B as well (no skip flag): -1.07 s [-2.14, -0.07] against v70 (LIRF lane B 3572.8 to 3708.5),
+  so LIRF lane B stays uncorrected.
+- Error left after v70 on the holdout: lane B rows hold 55 % of the squared error (5,373 rows, top 50 rows of all
+  holdout rows 47 %), unmatched lane A 27 % (LTFM 8.1 %, LFPG 7.1 %), matched lane A 18 % (LIRF 8.2 %, LEBL 3.0 %).
+  adsb.lol has 9 points near LTFM on 2026-01-15 against 344,918 near EHAM and 44,880 near LFPG, so LTFM and most of
+  LFPG are out of reach of this source.
+- `cr`, copy rates: a label "copies" when it sits within 60 s of the EOBT, schedule or LOBT gap while the pushback
+  clock is more than 180 s away (4.4 % of matched lane A rows at EDDM to 27.3 % at LIRF). The rate per stand is
+  stable across months (train-month rate against holdout-month rate, correlation 0.64 to 0.90 at 8 of 9 airports,
+  0.46 at EGLL; EHAM stands run 0.3 % to 11 %), and so is the rate per operator (0.93 at LIRF). Two columns, the
+  smoothed rate per (airport, stand) and per (airport, operator) with 50 rows of the airport rate as the prior
+  (fixed before the run); each training row's rate leaves its own month out, so it sees its key the way an unseen
+  2026 month does. Against v70's stage: +0.53 s [+0.40, +0.70], January +0.37, July +0.69, gains at 8 airports.
+  Gate against the base +14.86 s [+11.90, +18.85]; holdout 290.13, lane A 195.12. Keys with 50 or more training rows
+  cover 97.0 % (stand) and 97.8 % (operator) of matched 2026 rows, against 99.1 % and 98.6 % in the holdout. This is
+  v71.
